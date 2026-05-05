@@ -1203,6 +1203,45 @@
     box-shadow: inset 0 0 12px rgba(0, 212, 255, 0.18), 0 0 16px rgba(0, 212, 255, 0.25);
     border-color: var(--accent);
   }
+  /* Robot cards with a custom illustration — bigger paper-bg "polaroid" framing */
+  .robot-card.has-art {
+    grid-template-columns: 110px 1fr;
+  }
+  .robot-card.has-art .icon-wrap {
+    width: 110px;
+    height: 110px;
+    background: #fdf6e8;        /* warm cream so the white-bg PNGs blend invisibly */
+    border-radius: 14px;
+    border: 2px solid var(--border);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.5),
+      0 0 0 1px rgba(0, 212, 255, 0.15),
+      0 4px 12px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+  }
+  .robot-card.has-art:hover .icon-wrap {
+    border-color: var(--accent);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,0.6),
+      0 0 0 2px var(--accent),
+      0 0 24px rgba(0, 212, 255, 0.4),
+      0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+  .robot-card.has-art .icon-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Slightly larger so the robot fills the frame */
+    transform: scale(1.05);
+    transition: transform 0.2s;
+  }
+  .robot-card.has-art:hover .icon-wrap img {
+    transform: scale(1.1);
+  }
+  @media (max-width: 480px) {
+    .robot-card.has-art { grid-template-columns: 88px 1fr; }
+    .robot-card.has-art .icon-wrap { width: 88px; height: 88px; }
+  }
   .robot-card .icon-wrap img {
     width: 72%;
     height: 72%;
@@ -2106,6 +2145,7 @@
     {
       id: "night-counter",
       icon: "owl",
+      image: "robots/night-counter.png",
       name: "The Night Counter",
       what: "Every night, looks at every loan and works out the new amount left to pay, plus when the next payment is due.",
       when: "Once a night, after midnight",
@@ -2114,6 +2154,7 @@
     {
       id: "quick-counter",
       icon: "person-running",
+      image: "robots/quick-counter.png",
       name: "The Quick Counter",
       what: "Every time money goes in or out of a loan, quickly updates the totals so they're always right.",
       when: "Every time money moves",
@@ -2146,6 +2187,7 @@
     {
       id: "payment-collector",
       icon: "money-with-wings",
+      image: "robots/payment-collector.png",
       name: "The Payment Collector",
       what: "Takes lots of payments from cards and bank accounts at the same time, when payments are due.",
       when: "Always running",
@@ -2154,6 +2196,7 @@
     {
       id: "reply-robots",
       icon: "parrot",
+      image: "robots/reply-robots.png",
       name: "The Reply Robots",
       what: "When a customer texts back, these robots read what they said and figure out what to say in reply.",
       when: "Whenever a customer message arrives",
@@ -2162,6 +2205,7 @@
     {
       id: "lookout",
       icon: "rotating-light",
+      image: "robots/lookout.png",
       name: "The Lookout",
       what: "Checks on every other robot, every helper, and every job line. If anything's broken or stopped, it rings the alarm bell.",
       when: "Every 5 minutes",
@@ -2205,21 +2249,29 @@
     const grid = document.getElementById(gridId);
     const nav = document.getElementById(navId);
     items.forEach(it => {
+      // For sidebar/nav, always use the small Fluent Emoji icon — works at tiny size
+      const navIconSrc = `https://api.iconify.design/fluent-emoji/${it.icon}.svg`;
+      // For the card, prefer a custom illustration if present
+      const cardIconSrc = it.image
+        ? it.image
+        : `https://api.iconify.design/fluent-emoji/${it.icon}.svg`;
+      const hasCustomArt = !!it.image;
+
       // Sidebar entry
       if (nav) {
         const navLi = document.createElement('li');
-        navLi.innerHTML = `<a href="#${it.id}" onclick="document.body.classList.remove('menu-open')"><img class="emoji" src="https://api.iconify.design/fluent-emoji/${it.icon}.svg" /> ${it.name.replace(/^The /, '')}</a>`;
+        navLi.innerHTML = `<a href="#${it.id}" onclick="document.body.classList.remove('menu-open')"><img class="emoji" src="${navIconSrc}" /> ${it.name.replace(/^The /, '')}</a>`;
         nav.appendChild(navLi);
       }
       // Card
       const div = document.createElement('div');
-      div.className = 'robot-card';
+      div.className = 'robot-card' + (hasCustomArt ? ' has-art' : '');
       div.id = it.id;
       const whenPill = it.when ? `<span class="robot-meta-pill"><span class="label">When</span> ${it.when}</span>` : '';
       const asksValue = it.asks || it.calls || '';
       const asksPill = asksValue ? `<span class="robot-meta-pill"><span class="label">Asks</span> ${asksValue}</span>` : '';
       div.innerHTML = `
-        <div class="icon-wrap"><img src="https://api.iconify.design/fluent-emoji/${it.icon}.svg" alt="" /></div>
+        <div class="icon-wrap"><img src="${cardIconSrc}" alt="" /></div>
         <div>
           <h3>${it.name}</h3>
           <p class="what">${it.what}</p>
