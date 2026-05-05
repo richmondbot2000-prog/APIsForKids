@@ -1025,8 +1025,9 @@
 <body>
 
 <div class="topbar">
-  <button class="menu-toggle" aria-label="Open navigation menu" id="menuToggle">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+  <button class="menu-toggle" aria-label="Open navigation menu" id="menuToggle"
+          onclick="event.stopPropagation();document.body.classList.toggle('menu-open');">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" style="pointer-events:none">
       <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
     </svg>
   </button>
@@ -1042,7 +1043,8 @@
     <a href="database.html">Schema</a>
   </nav>
 </div>
-<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<div class="sidebar-backdrop" id="sidebarBackdrop"
+     onclick="document.body.classList.remove('menu-open');"></div>
 
 <div class="layout">
 
