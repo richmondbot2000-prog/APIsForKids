@@ -4,6 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>How big our world is — Central Services</title>
+<link rel="icon" type="image/png" href="site-icon.png">
+<link rel="apple-touch-icon" href="site-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&family=Orbitron:wght@500;600;700;800&family=Roboto+Mono:wght@700;800&display=swap" rel="stylesheet">
@@ -74,14 +76,17 @@
     height: 64px; display: flex; align-items: center; padding: 0 24px;
   }
   .topbar .brand { font-family: var(--font-display); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em;
-    text-transform: uppercase; display: flex; align-items: center; gap: 12px; color: var(--ink); }
-  .topbar .brand .dot { display: inline-block; width: 22px; height: 22px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    border-radius: 6px; box-shadow: var(--shadow-glow-cyan);
+    text-transform: uppercase; display: flex; align-items: center; gap: 12px; color: var(--ink);
+    text-decoration: none; transition: color 0.15s ease; }
+  .topbar .brand:hover { color: var(--accent); text-decoration: none; }
+  .topbar .brand .brand-icon { display: block; width: 36px; height: 36px;
+    border-radius: 50%; object-fit: cover; background: #fff;
+    border: 1.5px solid rgba(0, 212, 255, 0.55);
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.55), inset 0 0 6px rgba(255,255,255,0.25);
     animation: pulse-dot 3s ease-in-out infinite; }
   @keyframes pulse-dot {
-    0%, 100% { box-shadow: 0 0 12px rgba(0,212,255,0.5); }
-    50% { box-shadow: 0 0 22px rgba(0,212,255,0.95), 0 0 32px rgba(255,57,168,0.4); }
+    0%, 100% { box-shadow: 0 0 12px rgba(0, 212, 255, 0.55), inset 0 0 6px rgba(255,255,255,0.25); }
+    50%      { box-shadow: 0 0 22px rgba(0, 212, 255, 0.95), inset 0 0 8px rgba(255,255,255,0.4); }
   }
   .topbar nav { margin-left: auto; display: flex; gap: 22px; }
   .topbar nav a { color: var(--ink-soft); font-family: var(--font-display); font-weight: 500; font-size: 0.78rem;
@@ -178,7 +183,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     body::before { animation: none; }
-    .topbar .brand .dot { animation: none; }
+    .topbar .brand .brand-icon { animation: none; }
     .flip-strip { transition: none !important; }
   }
 
@@ -202,7 +207,7 @@
 <body>
 
 <div class="topbar">
-  <div class="brand"><span class="dot"></span> The Helpers</div>
+  <a class="brand" href="index.html" aria-label="Home"><img class="brand-icon" src="site-icon.png" alt=""> The Helpers</a>
   <nav>
     <a href="index.html">← The Helpers</a>
     <a href="database.html">Schema</a>

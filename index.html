@@ -4,6 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Meet the Helpers — How Our APIs Work</title>
+<link rel="icon" type="image/png" href="site-icon.png">
+<link rel="apple-touch-icon" href="site-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800;900&family=Audiowide&display=swap" rel="stylesheet">
@@ -88,6 +90,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     body::before { animation: none; }
+    .topbar .brand .brand-icon { animation: none; }
   }
 
   a { color: var(--accent); text-decoration: none; transition: color 0.15s; }
@@ -144,19 +147,24 @@
     align-items: center;
     gap: 12px;
     color: var(--ink);
+    text-decoration: none;
+    transition: color 0.15s ease;
   }
-  .topbar .brand .dot {
-    display: inline-block;
-    width: 24px;
-    height: 24px;
-    background: radial-gradient(circle at 30% 30%, #67e8ff, #00d4ff 60%, #0066aa);
+  .topbar .brand:hover { color: var(--accent); text-decoration: none; }
+  .topbar .brand .brand-icon {
+    display: block;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    box-shadow: 0 0 12px rgba(0, 212, 255, 0.7), inset 0 0 6px rgba(255,255,255,0.3);
+    object-fit: cover;
+    background: #fff;
+    border: 1.5px solid rgba(0, 212, 255, 0.55);
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.55), inset 0 0 6px rgba(255,255,255,0.25);
     animation: pulse-dot 3s ease-in-out infinite;
   }
   @keyframes pulse-dot {
-    0%, 100% { box-shadow: 0 0 12px rgba(0, 212, 255, 0.7), inset 0 0 6px rgba(255,255,255,0.3); }
-    50%      { box-shadow: 0 0 20px rgba(0, 212, 255, 1), inset 0 0 8px rgba(255,255,255,0.5); }
+    0%, 100% { box-shadow: 0 0 12px rgba(0, 212, 255, 0.55), inset 0 0 6px rgba(255,255,255,0.25); }
+    50%      { box-shadow: 0 0 22px rgba(0, 212, 255, 0.95), inset 0 0 8px rgba(255,255,255,0.4); }
   }
   .topbar nav {
     margin-left: auto;
@@ -1464,7 +1472,7 @@
       <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
     </svg>
   </button>
-  <div class="brand"><span class="dot"></span> The Helpers</div>
+  <a class="brand" href="index.html" aria-label="Home"><img class="brand-icon" src="site-icon.png" alt=""> The Helpers</a>
   <nav>
     <a href="#apis">APIs</a>
     <a href="#robots">Robots</a>
