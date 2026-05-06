@@ -32,7 +32,8 @@ import pyodbc
 # Default DB allowlist — the warehouses the kids site cares about.
 # Update if more get added to the Fabric workspace.
 DEFAULT_DATABASES = [
-    "BackingTables",
+    # BackingTables is curated reports + Fabric mirror control tables, not raw
+    # production data — explicitly excluded from the kids-site stats.
     "ReportingApplications",
     "ReportingBrokers",
     "ReportingCentralCrm",
