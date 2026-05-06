@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-06T19:56:43.250903Z",
+  "updated_at": "2026-05-06T20:04:53.087503Z",
   "target_date": "2026-05-05",
   "totals": {
     "borrowers": 211
@@ -10,1267 +10,1689 @@
       "first_name": "Andrew",
       "state": "AZ",
       "zip": "85120",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 33.402386,
+      "lng": -111.567878
     },
     {
       "first_name": "Billie",
       "state": "AZ",
       "zip": "85716",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 32.24154,
+      "lng": -110.923201
     },
     {
       "first_name": "Gracely",
       "state": "AZ",
       "zip": "85210",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 33.389733,
+      "lng": -111.843505
     },
     {
       "first_name": "Jacob",
       "state": "AZ",
       "zip": "85338",
-      "amount": 6000.0
+      "amount": 6000.0,
+      "lat": 33.372975,
+      "lng": -112.410829
     },
     {
       "first_name": "Joshua",
       "state": "AZ",
       "zip": "85283",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 33.364638,
+      "lng": -111.931604
     },
     {
       "first_name": "Kaylee",
       "state": "AZ",
       "zip": "85281",
-      "amount": 5500.0
+      "amount": 5500.0,
+      "lat": 33.42744,
+      "lng": -111.934004
     },
     {
       "first_name": "Luchie",
       "state": "AZ",
       "zip": "85027",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 33.679761,
+      "lng": -112.092529
     },
     {
       "first_name": "Maria",
       "state": "AZ",
       "zip": "85620",
-      "amount": 6000.0
+      "amount": 6000.0,
+      "lat": 31.337282,
+      "lng": -109.941325
     },
     {
       "first_name": "Melissa",
       "state": "AZ",
       "zip": "85257",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 33.46196,
+      "lng": -111.916392
     },
     {
       "first_name": "Valeria",
       "state": "AZ",
       "zip": "85029",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 33.594738,
+      "lng": -112.109861
     },
     {
       "first_name": "William",
       "state": "AZ",
       "zip": "86442",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 35.089613,
+      "lng": -114.560868
     },
     {
       "first_name": "Amber",
       "state": "CA",
       "zip": "90706",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 33.887821,
+      "lng": -118.12725
     },
     {
       "first_name": "Blake",
       "state": "CA",
       "zip": "92010",
-      "amount": 3750.0
+      "amount": 3750.0,
+      "lat": 33.1585,
+      "lng": -117.277163
     },
     {
       "first_name": "Christine",
       "state": "CA",
       "zip": "94501",
-      "amount": 8500.0
+      "amount": 8500.0,
+      "lat": 37.773793,
+      "lng": -122.278115
     },
     {
       "first_name": "Danae",
       "state": "CA",
       "zip": "94601",
-      "amount": 5500.0
+      "amount": 5500.0,
+      "lat": 37.775545,
+      "lng": -122.218705
     },
     {
       "first_name": "Daniel",
       "state": "CA",
       "zip": "92325",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 34.243482,
+      "lng": -117.281304
     },
     {
       "first_name": "Darele",
       "state": "CA",
       "zip": "95648",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 38.922812,
+      "lng": -121.312005
     },
     {
       "first_name": "Edwin",
       "state": "CA",
       "zip": "90038",
-      "amount": 7000.0
+      "amount": 7000.0,
+      "lat": 34.088475,
+      "lng": -118.325527
     },
     {
       "first_name": "Jacob",
       "state": "CA",
       "zip": "90808",
-      "amount": 8500.0
+      "amount": 8500.0,
+      "lat": 33.823943,
+      "lng": -118.111335
     },
     {
       "first_name": "James",
       "state": "CA",
       "zip": "92821",
-      "amount": 7750.0
+      "amount": 7750.0,
+      "lat": 33.927561,
+      "lng": -117.887086
     },
     {
       "first_name": "Jamie",
       "state": "CA",
       "zip": "95361",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 37.787236,
+      "lng": -120.759202
     },
     {
       "first_name": "Jesus",
       "state": "CA",
       "zip": "95111",
-      "amount": 6000.0
+      "amount": 6000.0,
+      "lat": 37.283111,
+      "lng": -121.826245
     },
     {
       "first_name": "Jorge",
       "state": "CA",
       "zip": "93454",
-      "amount": 7250.0
+      "amount": 7250.0,
+      "lat": 34.923013,
+      "lng": -120.259463
     },
     {
       "first_name": "Joseph",
       "state": "CA",
       "zip": "94403",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 37.538449,
+      "lng": -122.305447
     },
     {
       "first_name": "Jumar",
       "state": "CA",
       "zip": "94134",
-      "amount": 6250.0
+      "amount": 6250.0,
+      "lat": 37.721052,
+      "lng": -122.413573
     },
     {
       "first_name": "Karla",
       "state": "CA",
       "zip": "92805",
-      "amount": 6750.0
+      "amount": 6750.0,
+      "lat": 33.830457,
+      "lng": -117.905941
     },
     {
       "first_name": "Kimberly",
       "state": "CA",
       "zip": "93728",
-      "amount": 6250.0
+      "amount": 6250.0,
+      "lat": 36.757294,
+      "lng": -119.818488
     },
     {
       "first_name": "Kimmy",
       "state": "CA",
       "zip": "96035",
-      "amount": 3500.0
+      "amount": 3500.0,
+      "lat": 40.045637,
+      "lng": -122.184859
     },
     {
       "first_name": "Linda",
       "state": "CA",
       "zip": "96078",
-      "amount": 4500.0
+      "amount": 4500.0,
+      "lat": null,
+      "lng": null
     },
     {
       "first_name": "MarcAnthony",
       "state": "CA",
       "zip": "91722",
-      "amount": 8000.0
+      "amount": 8000.0,
+      "lat": 34.097345,
+      "lng": -117.906736
     },
     {
       "first_name": "Martin",
       "state": "CA",
       "zip": "92551",
-      "amount": 4750.0
+      "amount": 4750.0,
+      "lat": 33.88274,
+      "lng": -117.224878
     },
     {
       "first_name": "Maxwell",
       "state": "CA",
       "zip": "96003",
-      "amount": 10000.0
+      "amount": 10000.0,
+      "lat": 40.751937,
+      "lng": -122.230678
     },
     {
       "first_name": "Meylin",
       "state": "CA",
       "zip": "94607",
-      "amount": 7000.0
+      "amount": 7000.0,
+      "lat": 37.807215,
+      "lng": -122.301497
     },
     {
       "first_name": "Noah",
       "state": "CA",
       "zip": "90015",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 34.039378,
+      "lng": -118.2663
     },
     {
       "first_name": "Quincy",
       "state": "CA",
       "zip": "91602",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 34.150818,
+      "lng": -118.368159
     },
     {
       "first_name": "Scott",
       "state": "CA",
       "zip": "95123",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 37.244238,
+      "lng": -121.831604
     },
     {
       "first_name": "somantha",
       "state": "CA",
       "zip": "91708",
-      "amount": 5750.0
+      "amount": 5750.0,
+      "lat": 33.952902,
+      "lng": -117.639325
     },
     {
       "first_name": "Amanda",
       "state": "FL",
       "zip": "32404",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 30.189031,
+      "lng": -85.506785
     },
     {
       "first_name": "Antione",
       "state": "FL",
       "zip": "32817",
-      "amount": 7000.0
+      "amount": 7000.0,
+      "lat": 28.591012,
+      "lng": -81.243652
     },
     {
       "first_name": "Austin",
       "state": "FL",
       "zip": "32219",
-      "amount": 8500.0
+      "amount": 8500.0,
+      "lat": 30.427093,
+      "lng": -81.818966
     },
     {
       "first_name": "Brandie",
       "state": "FL",
       "zip": "33304",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 26.140411,
+      "lng": -80.121184
     },
     {
       "first_name": "Carlhenry",
       "state": "FL",
       "zip": "33167",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 25.884867,
+      "lng": -80.239362
     },
     {
       "first_name": "Chad",
       "state": "FL",
       "zip": "33435",
-      "amount": 10000.0
+      "amount": 10000.0,
+      "lat": 26.525785,
+      "lng": -80.061367
     },
     {
       "first_name": "Christine",
       "state": "FL",
       "zip": "33308",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 26.188511,
+      "lng": -80.104988
     },
     {
       "first_name": "DANIELLE",
       "state": "FL",
       "zip": "33325",
-      "amount": 7000.0
+      "amount": 7000.0,
+      "lat": 26.112043,
+      "lng": -80.318317
     },
     {
       "first_name": "Edwina",
       "state": "FL",
       "zip": "34482",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 29.244387,
+      "lng": -82.275029
     },
     {
       "first_name": "Eula",
       "state": "FL",
       "zip": "32209",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 30.361015,
+      "lng": -81.696254
     },
     {
       "first_name": "Jacinto",
       "state": "FL",
       "zip": "33584",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 28.005479,
+      "lng": -82.2943
     },
     {
       "first_name": "Jaime",
       "state": "FL",
       "zip": "34772",
-      "amount": 7500.0
+      "amount": 7500.0,
+      "lat": 28.163035,
+      "lng": -81.264079
     },
     {
       "first_name": "Jennifer",
       "state": "FL",
       "zip": "32548",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 30.403001,
+      "lng": -86.650482
     },
     {
       "first_name": "Jesse",
       "state": "FL",
       "zip": "34104",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 26.149955,
+      "lng": -81.741562
     },
     {
       "first_name": "Jessica",
       "state": "FL",
       "zip": "33712",
-      "amount": 10000.0
+      "amount": 10000.0,
+      "lat": 27.734375,
+      "lng": -82.667894
     },
     {
       "first_name": "Jonathan",
       "state": "FL",
       "zip": "32824",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 28.384164,
+      "lng": -81.33304
     },
     {
       "first_name": "Joseph",
       "state": "FL",
       "zip": "32703",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 28.671439,
+      "lng": -81.553055
     },
     {
       "first_name": "Katherine",
       "state": "FL",
       "zip": "32162",
-      "amount": 6250.0
+      "amount": 6250.0,
+      "lat": 28.914383,
+      "lng": -81.98956
     },
     {
       "first_name": "Kristal",
       "state": "FL",
       "zip": "34741",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 28.30637,
+      "lng": -81.42706
     },
     {
       "first_name": "Linette",
       "state": "FL",
       "zip": "32148",
-      "amount": 6750.0
+      "amount": 6750.0,
+      "lat": 29.617032,
+      "lng": -81.883646
     },
     {
       "first_name": "Marline",
       "state": "FL",
       "zip": "33401",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 26.715844,
+      "lng": -80.070249
     },
     {
       "first_name": "Melanie",
       "state": "FL",
       "zip": "34743",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 28.329308,
+      "lng": -81.355152
     },
     {
       "first_name": "Shayla",
       "state": "FL",
       "zip": "33026",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 26.026198,
+      "lng": -80.295994
     },
     {
       "first_name": "Almeda",
       "state": "GA",
       "zip": "30741",
-      "amount": 7000.0
+      "amount": 7000.0,
+      "lat": 34.952685,
+      "lng": -85.281297
     },
     {
       "first_name": "Brandy",
       "state": "GA",
       "zip": "30734",
-      "amount": 3250.0
+      "amount": 3250.0,
+      "lat": 34.532804,
+      "lng": -84.714916
     },
     {
       "first_name": "Crasetta",
       "state": "GA",
       "zip": "30337",
-      "amount": 3250.0
+      "amount": 3250.0,
+      "lat": 33.640147,
+      "lng": -84.450081
     },
     {
       "first_name": "Damy",
       "state": "GA",
       "zip": "31781",
-      "amount": 5500.0
+      "amount": 5500.0,
+      "lat": 31.560577,
+      "lng": -83.796293
     },
     {
       "first_name": "Darryl",
       "state": "GA",
       "zip": "30046",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 33.948632,
+      "lng": -83.995766
     },
     {
       "first_name": "Destiny",
       "state": "GA",
       "zip": "39845",
-      "amount": 3500.0
+      "amount": 3500.0,
+      "lat": 30.951468,
+      "lng": -84.892838
     },
     {
       "first_name": "Justin",
       "state": "GA",
       "zip": "31069",
-      "amount": 7000.0
+      "amount": 7000.0,
+      "lat": 32.440068,
+      "lng": -83.748603
     },
     {
       "first_name": "Justin",
       "state": "GA",
       "zip": "30116",
-      "amount": 8500.0
+      "amount": 8500.0,
+      "lat": 33.54059,
+      "lng": -85.003082
     },
     {
       "first_name": "Kayla",
       "state": "GA",
       "zip": "30161",
-      "amount": 4500.0
+      "amount": 4500.0,
+      "lat": 34.242301,
+      "lng": -85.171371
     },
     {
       "first_name": "Leandra",
       "state": "GA",
       "zip": "30134",
-      "amount": 7000.0
+      "amount": 7000.0,
+      "lat": 33.777518,
+      "lng": -84.781392
     },
     {
       "first_name": "Lonnie",
       "state": "GA",
       "zip": "30126",
-      "amount": 3250.0
+      "amount": 3250.0,
+      "lat": 33.815025,
+      "lng": -84.553831
     },
     {
       "first_name": "Marsha",
       "state": "GA",
       "zip": "30453",
-      "amount": 3250.0
+      "amount": 3250.0,
+      "lat": 32.011133,
+      "lng": -82.121758
     },
     {
       "first_name": "Miles",
       "state": "GA",
       "zip": "30096",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 33.974292,
+      "lng": -84.145426
     },
     {
       "first_name": "Roy",
       "state": "GA",
       "zip": "30033",
-      "amount": 6000.0
+      "amount": 6000.0,
+      "lat": 33.811659,
+      "lng": -84.28323
     },
     {
       "first_name": "Tosheika",
       "state": "GA",
       "zip": "31548",
-      "amount": 4250.0
+      "amount": 4250.0,
+      "lat": 30.796163,
+      "lng": -81.698233
     },
     {
       "first_name": "Brenda",
       "state": "IA",
       "zip": "50662",
-      "amount": 5750.0
+      "amount": 5750.0,
+      "lat": 42.688662,
+      "lng": -91.937486
     },
     {
       "first_name": "RAFAEL",
       "state": "IA",
       "zip": "50263",
-      "amount": 4500.0
+      "amount": 4500.0,
+      "lat": 41.593171,
+      "lng": -93.874712
     },
     {
       "first_name": "Tyrell",
       "state": "IA",
       "zip": "52803",
-      "amount": 6000.0
+      "amount": 6000.0,
+      "lat": 41.538947,
+      "lng": -90.555977
     },
     {
       "first_name": "Breshey",
       "state": "IL",
       "zip": "60443",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 41.502184,
+      "lng": -87.748201
     },
     {
       "first_name": "Christwean",
       "state": "IL",
       "zip": "60076",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 42.03526,
+      "lng": -87.729928
     },
     {
       "first_name": "Dylan",
       "state": "IL",
       "zip": "61761",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 40.529016,
+      "lng": -88.958935
     },
     {
       "first_name": "Elliot",
       "state": "IL",
       "zip": "60155",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 41.857694,
+      "lng": -87.856223
     },
     {
       "first_name": "Jordan",
       "state": "IL",
       "zip": "60124",
-      "amount": 3250.0
+      "amount": 3250.0,
+      "lat": 42.020169,
+      "lng": -88.400686
     },
     {
       "first_name": "manda",
       "state": "IL",
       "zip": "62442",
-      "amount": 10000.0
+      "amount": 10000.0,
+      "lat": 39.303946,
+      "lng": -87.853807
     },
     {
       "first_name": "Osvaldo",
       "state": "IL",
       "zip": "60459",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 41.744431,
+      "lng": -87.768576
     },
     {
       "first_name": "Phillip",
       "state": "IL",
       "zip": "61350",
-      "amount": 7000.0
+      "amount": 7000.0,
+      "lat": 41.372095,
+      "lng": -88.865127
     },
     {
       "first_name": "Sean",
       "state": "IL",
       "zip": "60517",
-      "amount": 10000.0
+      "amount": 10000.0,
+      "lat": 41.740329,
+      "lng": -88.042149
     },
     {
       "first_name": "todd",
       "state": "IL",
       "zip": "60517",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 41.740329,
+      "lng": -88.042149
     },
     {
       "first_name": "Christian",
       "state": "IN",
       "zip": "47720",
-      "amount": 4250.0
+      "amount": 4250.0,
+      "lat": 38.062897,
+      "lng": -87.641573
     },
     {
       "first_name": "Holly",
       "state": "IN",
       "zip": "46143",
-      "amount": 4250.0
+      "amount": 4250.0,
+      "lat": 39.59586,
+      "lng": -86.116319
     },
     {
       "first_name": "Johnni",
       "state": "IN",
       "zip": "46923",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 40.610524,
+      "lng": -86.637989
     },
     {
       "first_name": "Kristopher",
       "state": "IN",
       "zip": "46219",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 39.782412,
+      "lng": -86.042939
     },
     {
       "first_name": "Kimberly",
       "state": "KS",
       "zip": "66801",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 38.414215,
+      "lng": -96.218301
     },
     {
       "first_name": "Ronald",
       "state": "KS",
       "zip": "66067",
-      "amount": 8500.0
+      "amount": 8500.0,
+      "lat": 38.623617,
+      "lng": -95.276284
     },
     {
       "first_name": "Timothy",
       "state": "KS",
       "zip": "66523",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 38.61079,
+      "lng": -95.840023
     },
     {
       "first_name": "Tracy",
       "state": "KS",
       "zip": "66502",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 39.156299,
+      "lng": -96.521265
     },
     {
       "first_name": "Brian",
       "state": "KY",
       "zip": "40360",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 38.155201,
+      "lng": -83.789536
     },
     {
       "first_name": "Ernest",
       "state": "KY",
       "zip": "41045",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 38.717979,
+      "lng": -85.035298
     },
     {
       "first_name": "Gage",
       "state": "KY",
       "zip": "42408",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 37.179537,
+      "lng": -87.692699
     },
     {
       "first_name": "Joshua",
       "state": "KY",
       "zip": "42101",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 37.058097,
+      "lng": -86.463061
     },
     {
       "first_name": "Keiona",
       "state": "KY",
       "zip": "40219",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 38.137909,
+      "lng": -85.692693
     },
     {
       "first_name": "Leighanne",
       "state": "KY",
       "zip": "40031",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 38.429416,
+      "lng": -85.400814
     },
     {
       "first_name": "Nathan",
       "state": "KY",
       "zip": "40204",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 38.239913,
+      "lng": -85.721591
     },
     {
       "first_name": "Randall",
       "state": "KY",
       "zip": "42501",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 37.056193,
+      "lng": -84.450902
     },
     {
       "first_name": "Sharrell",
       "state": "KY",
       "zip": "40215",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 38.190476,
+      "lng": -85.785734
     },
     {
       "first_name": "Tanya",
       "state": "KY",
       "zip": "40324",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 38.24538,
+      "lng": -84.550241
     },
     {
       "first_name": "April",
       "state": "MO",
       "zip": "64119",
-      "amount": 3500.0
+      "amount": 3500.0,
+      "lat": 39.209967,
+      "lng": -94.514665
     },
     {
       "first_name": "Audra",
       "state": "MO",
       "zip": "63146",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 38.697686,
+      "lng": -90.474667
     },
     {
       "first_name": "Cody",
       "state": "MO",
       "zip": "64759",
-      "amount": 7000.0
+      "amount": 7000.0,
+      "lat": 37.52122,
+      "lng": -94.25704
     },
     {
       "first_name": "Dylan",
       "state": "MO",
       "zip": "63901",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 36.759059,
+      "lng": -90.460058
     },
     {
       "first_name": "Erick",
       "state": "MO",
       "zip": "64112",
-      "amount": 4000.0
+      "amount": 4000.0,
+      "lat": 39.035975,
+      "lng": -94.59519
     },
     {
       "first_name": "Gina",
       "state": "MO",
       "zip": "65656",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 36.793766,
+      "lng": -93.46783
     },
     {
       "first_name": "Alex",
       "state": "NC",
       "zip": "28081",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 35.502816,
+      "lng": -80.670173
     },
     {
       "first_name": "Brandon",
       "state": "NC",
       "zip": "27310",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 36.174072,
+      "lng": -79.992233
     },
     {
       "first_name": "chassidy",
       "state": "NC",
       "zip": "27360",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 35.86058,
+      "lng": -80.099288
     },
     {
       "first_name": "DeMontre",
       "state": "NC",
       "zip": "28277",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 35.052875,
+      "lng": -80.817552
     },
     {
       "first_name": "Elijah",
       "state": "NC",
       "zip": "28312",
-      "amount": 4000.0
+      "amount": 4000.0,
+      "lat": 34.947752,
+      "lng": -78.738133
     },
     {
       "first_name": "Hannah",
       "state": "NC",
       "zip": "27455",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 36.187509,
+      "lng": -79.817677
     },
     {
       "first_name": "Ina",
       "state": "NC",
       "zip": "28090",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 35.454659,
+      "lng": -81.559555
     },
     {
       "first_name": "Jessicka",
       "state": "NC",
       "zip": "28303",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 35.085644,
+      "lng": -78.959363
     },
     {
       "first_name": "Kimberli",
       "state": "NC",
       "zip": "28124",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 35.399738,
+      "lng": -80.408631
     },
     {
       "first_name": "Magnolia",
       "state": "NC",
       "zip": "28205",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 35.218791,
+      "lng": -80.789601
     },
     {
       "first_name": "MICHAEL",
       "state": "NC",
       "zip": "28677",
-      "amount": 6000.0
+      "amount": 6000.0,
+      "lat": 35.738099,
+      "lng": -80.926089
     },
     {
       "first_name": "Nottanya fletcher",
       "state": "NC",
       "zip": "27597",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 35.841015,
+      "lng": -78.30268
     },
     {
       "first_name": "Rebecca",
       "state": "NC",
       "zip": "27302",
-      "amount": 6000.0
+      "amount": 6000.0,
+      "lat": 36.14203,
+      "lng": -79.266181
     },
     {
       "first_name": "Rockey",
       "state": "NC",
       "zip": "28262",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 35.322061,
+      "lng": -80.739981
     },
     {
       "first_name": "Taviean",
       "state": "NC",
       "zip": "28174",
-      "amount": 3500.0
+      "amount": 3500.0,
+      "lat": 34.969035,
+      "lng": -80.43958
     },
     {
       "first_name": "Taylor",
       "state": "NC",
       "zip": "27357",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 36.2666,
+      "lng": -79.970625
     },
     {
       "first_name": "Tonijah",
       "state": "NC",
       "zip": "27707",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 35.954525,
+      "lng": -78.953317
     },
     {
       "first_name": "Linda",
       "state": "ND",
       "zip": "58078",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 46.8625,
+      "lng": -96.924088
     },
     {
       "first_name": "Tayari",
       "state": "ND",
       "zip": "58103",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 46.85614,
+      "lng": -96.822073
     },
     {
       "first_name": "Aaron",
       "state": "NM",
       "zip": "87109",
-      "amount": 7000.0
+      "amount": 7000.0,
+      "lat": 35.152882,
+      "lng": -106.575536
     },
     {
       "first_name": "Jesus",
       "state": "NM",
       "zip": "88012",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 32.583386,
+      "lng": -106.771377
     },
     {
       "first_name": "NIKKI",
       "state": "NM",
       "zip": "87020",
-      "amount": 7000.0
+      "amount": 7000.0,
+      "lat": 34.86525,
+      "lng": -107.947956
     },
     {
       "first_name": "Abigail",
       "state": "OH",
       "zip": "45420",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 39.718818,
+      "lng": -84.129169
     },
     {
       "first_name": "Amara",
       "state": "OH",
       "zip": "43224",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 40.043925,
+      "lng": -82.966265
     },
     {
       "first_name": "Bianca",
       "state": "OH",
       "zip": "44903",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 40.776344,
+      "lng": -82.527634
     },
     {
       "first_name": "Brittany",
       "state": "OH",
       "zip": "44125",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 41.405687,
+      "lng": -81.609466
     },
     {
       "first_name": "Carmela",
       "state": "OH",
       "zip": "44512",
-      "amount": 4000.0
+      "amount": 4000.0,
+      "lat": 41.025661,
+      "lng": -80.668279
     },
     {
       "first_name": "Christine",
       "state": "OH",
       "zip": "44815",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 41.246607,
+      "lng": -83.239471
     },
     {
       "first_name": "DARREN",
       "state": "OH",
       "zip": "45801",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 40.772863,
+      "lng": -84.034098
     },
     {
       "first_name": "Heather",
       "state": "OH",
       "zip": "44287",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 40.938453,
+      "lng": -82.102332
     },
     {
       "first_name": "Jacquelyn",
       "state": "OH",
       "zip": "43449",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 41.534376,
+      "lng": -83.13557
     },
     {
       "first_name": "Jennifer",
       "state": "OH",
       "zip": "45459",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 39.647433,
+      "lng": -84.170598
     },
     {
       "first_name": "Johnny",
       "state": "OH",
       "zip": "44136",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 41.311507,
+      "lng": -81.811326
     },
     {
       "first_name": "KC",
       "state": "OH",
       "zip": "43160",
-      "amount": 3500.0
+      "amount": 3500.0,
+      "lat": 39.526516,
+      "lng": -83.441323
     },
     {
       "first_name": "kim",
       "state": "OH",
       "zip": "43228",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 39.966129,
+      "lng": -83.125346
     },
     {
       "first_name": "KIMBERLY",
       "state": "OH",
       "zip": "43410",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 41.311868,
+      "lng": -82.957583
     },
     {
       "first_name": "Lanise",
       "state": "OH",
       "zip": "43968",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 40.632407,
+      "lng": -80.683847
     },
     {
       "first_name": "Matthew",
       "state": "OH",
       "zip": "44140",
-      "amount": 7000.0
+      "amount": 7000.0,
+      "lat": 41.487794,
+      "lng": -81.931435
     },
     {
       "first_name": "Michael",
       "state": "OH",
       "zip": "44720",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 40.903454,
+      "lng": -81.433282
     },
     {
       "first_name": "Nicole",
       "state": "OH",
       "zip": "44830",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 41.167936,
+      "lng": -83.398998
     },
     {
       "first_name": "Richard",
       "state": "OH",
       "zip": "44203",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 41.020888,
+      "lng": -81.628652
     },
     {
       "first_name": "Tabatha",
       "state": "OH",
       "zip": "44125",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 41.405687,
+      "lng": -81.609466
     },
     {
       "first_name": "Tracy",
       "state": "OH",
       "zip": "45223",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 39.17081,
+      "lng": -84.549528
     },
     {
       "first_name": "Brittany",
       "state": "OK",
       "zip": "73130",
-      "amount": 6250.0
+      "amount": 6250.0,
+      "lat": 35.458633,
+      "lng": -97.345632
     },
     {
       "first_name": "Erin",
       "state": "OK",
       "zip": "73117",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 35.474862,
+      "lng": -97.462502
     },
     {
       "first_name": "Joshua",
       "state": "OK",
       "zip": "73012",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 35.667234,
+      "lng": -97.593657
     },
     {
       "first_name": "Rita",
       "state": "OK",
       "zip": "74107",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 36.114847,
+      "lng": -96.03232
     },
     {
       "first_name": "Shonda",
       "state": "OK",
       "zip": "74730",
-      "amount": 7000.0
+      "amount": 7000.0,
+      "lat": 33.912019,
+      "lng": -96.430988
     },
     {
       "first_name": "Amber",
       "state": "SC",
       "zip": "29605",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 34.774425,
+      "lng": -82.37661
     },
     {
       "first_name": "Asia",
       "state": "SC",
       "zip": "29718",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 34.624163,
+      "lng": -80.331295
     },
     {
       "first_name": "Dennis",
       "state": "SC",
       "zip": "29706",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 34.715558,
+      "lng": -81.23453
     },
     {
       "first_name": "Keith",
       "state": "SC",
       "zip": "29532",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 34.280331,
+      "lng": -79.869336
     },
     {
       "first_name": "keya",
       "state": "SC",
       "zip": "29487",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 32.657682,
+      "lng": -80.183948
     },
     {
       "first_name": "Alexandro",
       "state": "TX",
       "zip": "79549",
-      "amount": 4000.0
+      "amount": 4000.0,
+      "lat": 32.887589,
+      "lng": -100.841389
     },
     {
       "first_name": "ANTHONY",
       "state": "TX",
       "zip": "78653",
-      "amount": 4000.0
+      "amount": 4000.0,
+      "lat": 30.339696,
+      "lng": -97.523512
     },
     {
       "first_name": "Ashley",
       "state": "TX",
       "zip": "78213",
-      "amount": 4500.0
+      "amount": 4500.0,
+      "lat": 29.516395,
+      "lng": -98.523017
     },
     {
       "first_name": "Braeden",
       "state": "TX",
       "zip": "76522",
-      "amount": 4250.0
+      "amount": 4250.0,
+      "lat": 31.219045,
+      "lng": -97.968224
     },
     {
       "first_name": "Brandy",
       "state": "TX",
       "zip": "76271",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 33.464637,
+      "lng": -96.892763
     },
     {
       "first_name": "Bryam",
       "state": "TX",
       "zip": "78253",
-      "amount": 4500.0
+      "amount": 4500.0,
+      "lat": 29.469011,
+      "lng": -98.797801
     },
     {
       "first_name": "Caleb",
       "state": "TX",
       "zip": "77856",
-      "amount": 4500.0
+      "amount": 4500.0,
+      "lat": 31.075823,
+      "lng": -96.425784
     },
     {
       "first_name": "Candice",
       "state": "TX",
       "zip": "76013",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 32.719328,
+      "lng": -97.155028
     },
     {
       "first_name": "Chilena",
       "state": "TX",
       "zip": "76067",
-      "amount": 3000.0
-    },
-    {
-      "first_name": "Crystal",
-      "state": "TX",
-      "zip": "77095",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 32.799602,
+      "lng": -98.126806
     },
     {
       "first_name": "Crystal",
       "state": "TX",
       "zip": "79423",
-      "amount": 4000.0
+      "amount": 4000.0,
+      "lat": 33.439976,
+      "lng": -101.855463
+    },
+    {
+      "first_name": "Crystal",
+      "state": "TX",
+      "zip": "77095",
+      "amount": 3000.0,
+      "lat": 29.909513,
+      "lng": -95.651476
     },
     {
       "first_name": "David",
       "state": "TX",
       "zip": "78207",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 29.422124,
+      "lng": -98.525978
     },
     {
       "first_name": "Debra",
       "state": "TX",
       "zip": "75602",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 32.449598,
+      "lng": -94.666048
     },
     {
       "first_name": "Gavin",
       "state": "TX",
       "zip": "76180",
-      "amount": 4500.0
+      "amount": 4500.0,
+      "lat": 32.840011,
+      "lng": -97.225295
     },
     {
       "first_name": "Heather",
       "state": "TX",
       "zip": "75092",
-      "amount": 4500.0
+      "amount": 4500.0,
+      "lat": 33.652101,
+      "lng": -96.700254
     },
     {
       "first_name": "Joseph",
       "state": "TX",
       "zip": "77062",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 29.573552,
+      "lng": -95.130613
     },
     {
       "first_name": "Lance",
       "state": "TX",
       "zip": "78664",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 30.501927,
+      "lng": -97.647251
     },
     {
       "first_name": "LaQuanna",
       "state": "TX",
       "zip": "77477",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 29.624261,
+      "lng": -95.568033
     },
     {
       "first_name": "Laurie",
       "state": "TX",
       "zip": "78539",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 26.280689,
+      "lng": -98.183295
     },
     {
       "first_name": "Martin",
       "state": "TX",
       "zip": "77429",
-      "amount": 4500.0
+      "amount": 4500.0,
+      "lat": 29.998421,
+      "lng": -95.66736
     },
     {
       "first_name": "Michael",
       "state": "TX",
       "zip": "77356",
-      "amount": 4500.0
+      "amount": 4500.0,
+      "lat": 30.465662,
+      "lng": -95.729888
     },
     {
       "first_name": "Morgan",
       "state": "TX",
       "zip": "76502",
-      "amount": 4500.0
+      "amount": 4500.0,
+      "lat": 31.103931,
+      "lng": -97.41202
     },
     {
       "first_name": "Nicole",
       "state": "TX",
       "zip": "75474",
-      "amount": 4500.0
+      "amount": 4500.0,
+      "lat": 32.9242,
+      "lng": -96.109811
     },
     {
       "first_name": "Paul",
       "state": "TX",
       "zip": "78504",
-      "amount": 4500.0
+      "amount": 4500.0,
+      "lat": 26.271965,
+      "lng": -98.23657
     },
     {
       "first_name": "Robel",
       "state": "TX",
       "zip": "75224",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 32.711405,
+      "lng": -96.838591
     },
     {
       "first_name": "Seanna",
       "state": "TX",
       "zip": "77346",
-      "amount": 4000.0
+      "amount": 4000.0,
+      "lat": 29.994499,
+      "lng": -95.177499
     },
     {
       "first_name": "Sonia",
       "state": "TX",
       "zip": "75019",
-      "amount": 4500.0
+      "amount": 4500.0,
+      "lat": 32.963417,
+      "lng": -96.984664
     },
     {
       "first_name": "Stephen",
       "state": "TX",
       "zip": "78216",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 29.537264,
+      "lng": -98.487882
     },
     {
       "first_name": "Treasure",
       "state": "TX",
       "zip": "78744",
-      "amount": 4500.0
+      "amount": 4500.0,
+      "lat": 30.176044,
+      "lng": -97.727787
     },
     {
       "first_name": "Mindy",
       "state": "UT",
       "zip": "84606",
-      "amount": 8500.0
+      "amount": 8500.0,
+      "lat": 40.21444,
+      "lng": -111.625543
     },
     {
       "first_name": "Steven",
       "state": "UT",
       "zip": "84128",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 40.70045,
+      "lng": -112.046772
     },
     {
       "first_name": "Brandon",
       "state": "VA",
       "zip": "22835",
-      "amount": 7000.0
+      "amount": 7000.0,
+      "lat": 38.669963,
+      "lng": -78.453689
     },
     {
       "first_name": "Eugene",
       "state": "VA",
       "zip": "22407",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 38.283474,
+      "lng": -77.575684
     },
     {
       "first_name": "Jason",
       "state": "VA",
       "zip": "23112",
-      "amount": 6500.0
+      "amount": 6500.0,
+      "lat": 37.433405,
+      "lng": -77.662862
     },
     {
       "first_name": "Jennifer",
       "state": "VA",
       "zip": "24137",
-      "amount": 8500.0
+      "amount": 8500.0,
+      "lat": 36.927552,
+      "lng": -79.657504
     },
     {
       "first_name": "John",
       "state": "VA",
       "zip": "23513",
-      "amount": 8500.0
+      "amount": 8500.0,
+      "lat": 36.889916,
+      "lng": -76.238602
     },
     {
       "first_name": "Kyvon",
       "state": "VA",
       "zip": "22578",
-      "amount": 8500.0
+      "amount": 8500.0,
+      "lat": 37.636571,
+      "lng": -76.356134
     },
     {
       "first_name": "Cody",
       "state": "WI",
       "zip": "53214",
-      "amount": 4250.0
+      "amount": 4250.0,
+      "lat": 43.020327,
+      "lng": -88.012871
     },
     {
       "first_name": "Jaclyn",
       "state": "WI",
       "zip": "53005",
-      "amount": 5000.0
+      "amount": 5000.0,
+      "lat": 43.062401,
+      "lng": -88.098804
     },
     {
       "first_name": "Jeffrey",
       "state": "WI",
       "zip": "53704",
-      "amount": 8500.0
+      "amount": 8500.0,
+      "lat": 43.136269,
+      "lng": -89.347319
     },
     {
       "first_name": "Jorge",
       "state": "WI",
       "zip": "53222",
-      "amount": 3250.0
+      "amount": 3250.0,
+      "lat": 43.083208,
+      "lng": -88.036041
     },
     {
       "first_name": "Julianne",
       "state": "WI",
       "zip": "53204",
-      "amount": 7000.0
+      "amount": 7000.0,
+      "lat": 43.018587,
+      "lng": -87.926053
     },
     {
       "first_name": "Kaleb",
       "state": "WI",
       "zip": "53561",
-      "amount": 3250.0
+      "amount": 3250.0,
+      "lat": 43.39494,
+      "lng": -89.638619
     },
     {
       "first_name": "KRESENT",
       "state": "WI",
       "zip": "54843",
-      "amount": 3500.0
+      "amount": 3500.0,
+      "lat": 46.023604,
+      "lng": -91.293027
     },
     {
       "first_name": "Brittney",
       "state": "WY",
       "zip": "82839",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 44.925813,
+      "lng": -107.161076
     },
     {
       "first_name": "KIERSTEN",
       "state": "WY",
       "zip": "82604",
-      "amount": 3000.0
+      "amount": 3000.0,
+      "lat": 42.857603,
+      "lng": -106.770764
     }
   ]
 }

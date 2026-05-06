@@ -10,6 +10,7 @@ Required env vars: same set the row-counts scan uses
 """
 from __future__ import annotations
 
+import csv
 import datetime
 import json
 import os
@@ -17,6 +18,27 @@ import sys
 from pathlib import Path
 
 import pyodbc
+
+ZIP_COORDS_CSV = Path(__file__).resolve().parent.parent / "data" / "us-zip-coords.csv"
+
+
+def load_zip_coords():
+    """Return {zip5: (lat, lng)} from the bundled CSV (US Census 2013 dataset)."""
+    out = {}
+    if not ZIP_COORDS_CSV.exists():
+        print(f"# WARNING: {ZIP_COORDS_CSV} missing — no coords will be attached", flush=True)
+        return out
+    with open(ZIP_COORDS_CSV) as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            z = (row.get("ZIP") or "").strip().zfill(5)
+            try:
+                lat = float((row.get("LAT") or "").strip())
+                lng = float((row.get("LNG") or "").strip())
+            except ValueError:
+                continue
+            out[z] = (lat, lng)
+    return out
 
 
 def env(name: str) -> str:
@@ -71,17 +93,27 @@ def main() -> None:
     cur.execute(QUERY)
     rows = cur.fetchall()
 
+    zip_coords = load_zip_coords()
+
     items = []
     target = None
+    coord_misses = 0
     for first_name, state, zipcode, amount, payout_date in rows:
         target = payout_date  # all rows share the same date by construction
+        z5 = (zipcode or "").strip()[:5].zfill(5) if (zipcode or "").strip() else ""
+        coords = zip_coords.get(z5)
+        if not coords:
+            coord_misses += 1
         items.append({
             "first_name": (first_name or "").strip(),
             "state":      (state or "").strip(),
             "zip":        (zipcode or "").strip(),
             "amount":     float(amount) if amount is not None else 0.0,
+            "lat":        coords[0] if coords else None,
+            "lng":        coords[1] if coords else None,
         })
     conn.close()
+    print(f"# zip coord misses: {coord_misses}/{len(items)}", flush=True)
 
     payload = {
         "schema_version": 1,

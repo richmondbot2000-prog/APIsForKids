@@ -10,6 +10,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin="">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
 <style>
   .yp-section { max-width: 1080px; margin: 0 auto; padding: 56px 32px 120px; }
   .yp-section h1 {
@@ -28,6 +33,30 @@
     font-size: 0.78rem;
     margin: 0 0 24px;
   }
+  .yp-map {
+    height: 480px;
+    margin: 0 0 28px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg-soft);
+  }
+  /* Make Leaflet's tiles slightly muted so they blend with the dark theme. */
+  .yp-map .leaflet-tile { filter: brightness(0.85) saturate(0.85); }
+  .yp-map .leaflet-container {
+    background: var(--bg-soft);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+  }
+  .yp-map .leaflet-popup-content-wrapper {
+    background: var(--bg-soft-2);
+    color: var(--ink);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+  }
+  .yp-map .leaflet-popup-tip { background: var(--bg-soft-2); }
+  .yp-map .leaflet-popup-content { margin: 8px 12px; line-height: 1.4; }
+  .yp-map .leaflet-popup-content strong { color: var(--accent-ink); }
   .yp-states {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
@@ -194,6 +223,8 @@
       <p class="lead">US borrowers whose loans paid out on <strong id="ypDate">…</strong>.</p>
       <p class="yp-meta" id="ypMeta">Loading…</p>
 
+      <div class="yp-map" id="ypMap"></div>
+
       <div class="yp-states" id="ypStates"></div>
     </section>
   </main>
@@ -203,9 +234,63 @@
   const fmtUSD0 = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
   const fmtUSD2 = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
-  fetch('yesterday-payouts.json', { cache: 'no-cache' })
-    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-    .then(data => {
+  function renderMap(items) {
+    const mapEl = document.getElementById('ypMap');
+    if (!mapEl || typeof L === 'undefined') return;
+    const map = L.map(mapEl, { worldCopyJump: false, scrollWheelZoom: false })
+                 .setView([39.0, -96.5], 4);  // center on the contiguous US
+    map.on('click', () => map.scrollWheelZoom.enable());
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    const cluster = (typeof L.markerClusterGroup === 'function')
+      ? L.markerClusterGroup({ chunkedLoading: true, showCoverageOnHover: false, spiderfyOnMaxZoom: true })
+      : L.layerGroup();
+    let plotted = 0;
+    for (const it of items) {
+      if (it.lat == null || it.lng == null) continue;
+      const popup =
+        `<strong>${it.first_name || ''}</strong><br>` +
+        `${it.state || ''} · ${it.zip || ''}<br>` +
+        `${fmtUSD2.format(it.amount || 0)}`;
+      const m = L.circleMarker([it.lat, it.lng], {
+        radius: 6,
+        color: '#00d4ff',
+        weight: 1.5,
+        fillColor: '#00d4ff',
+        fillOpacity: 0.55,
+      }).bindPopup(popup);
+      cluster.addLayer(m);
+      plotted++;
+    }
+    map.addLayer(cluster);
+    return plotted;
+  }
+
+  function loadScript(src, integrity) {
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = src;
+      if (integrity) { s.integrity = integrity; s.crossOrigin = 'anonymous'; }
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('failed to load ' + src));
+      document.head.appendChild(s);
+    });
+  }
+
+  // Load Leaflet + markercluster, then fetch the data and render.
+  Promise.all([
+    loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
+               'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo='),
+    loadScript('https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js'),
+  ])
+  .catch(() => { /* still render the data; map will degrade */ })
+  .finally(() => {
+    fetch('yesterday-payouts.json', { cache: 'no-cache' })
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(data => {
       const dateLabel = data.target_date
         ? new Date(data.target_date).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })
         : 'unknown date';
@@ -252,11 +337,14 @@
         frag.appendChild(card);
       }
       root.appendChild(frag);
+
+      try { renderMap(items); } catch (e) { console.error('map render failed', e); }
     })
     .catch(err => {
       const meta = document.getElementById('ypMeta');
       if (meta) meta.textContent = 'Could not load yesterday\'s payouts: ' + err.message;
     });
+  });
 </script>
 
 </body>
