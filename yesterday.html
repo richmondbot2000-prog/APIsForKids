@@ -33,7 +33,7 @@
     font-size: 0.78rem;
     margin: 0 0 24px;
   }
-  .yp-map {
+  .yp-map, .yp-map-states {
     height: 480px;
     margin: 0 0 28px;
     border: 1px solid var(--border);
@@ -41,8 +41,36 @@
     overflow: hidden;
     background: var(--bg-soft);
   }
+  .yp-map-caption {
+    margin: 0 0 8px;
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+  }
   /* Make Leaflet's tiles slightly muted so they blend with the dark theme. */
-  .yp-map .leaflet-tile { filter: brightness(0.85) saturate(0.85); }
+  .yp-map .leaflet-tile, .yp-map-states .leaflet-tile { filter: brightness(0.85) saturate(0.85); }
+  .yp-map-states .leaflet-container { background: var(--bg-soft); }
+
+  /* State-total pill markers (second map) */
+  .state-amount-icon { background: transparent !important; border: none !important; }
+  .state-amount-icon .amount-pill {
+    background: rgba(6, 10, 31, 0.92);
+    color: var(--accent-ink);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 3px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-align: center;
+    white-space: nowrap;
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.45);
+    transform: translate(-50%, -50%);
+    display: inline-block;
+  }
   .yp-map .leaflet-container {
     background: var(--bg-soft);
     font-family: 'JetBrains Mono', monospace;
@@ -223,7 +251,11 @@
       <p class="lead">US borrowers whose loans paid out on <strong id="ypDate">…</strong>.</p>
       <p class="yp-meta" id="ypMeta">Loading…</p>
 
+      <p class="yp-map-caption">Where the borrowers are</p>
       <div class="yp-map" id="ypMap"></div>
+
+      <p class="yp-map-caption">Total paid out by state</p>
+      <div class="yp-map-states" id="ypStateMap"></div>
 
       <div class="yp-states" id="ypStates"></div>
     </section>
@@ -233,6 +265,61 @@
 <script>
   const fmtUSD0 = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
   const fmtUSD2 = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+
+  // Geographic centre of each US state (lat, lng) — used to anchor the
+  // total-paid-out label on the second map.
+  const STATE_CENTROIDS = {
+    AL: [32.74, -86.84], AK: [64.07, -152.28], AZ: [34.27, -111.66],
+    AR: [34.89, -92.44], CA: [37.18, -119.47], CO: [38.99, -105.55],
+    CT: [41.62, -72.73], DE: [38.99, -75.51], DC: [38.91, -77.04],
+    FL: [28.63, -82.45], GA: [32.64, -83.44], HI: [20.29, -156.37],
+    ID: [44.35, -114.61], IL: [40.04, -89.20], IN: [39.89, -86.28],
+    IA: [42.08, -93.50], KS: [38.49, -98.38], KY: [37.53, -85.30],
+    LA: [31.07, -91.99], ME: [45.37, -69.24], MD: [39.05, -76.79],
+    MA: [42.26, -71.81], MI: [44.35, -85.41], MN: [46.28, -94.31],
+    MS: [32.74, -89.67], MO: [38.36, -92.46], MT: [47.05, -109.63],
+    NE: [41.54, -99.80], NV: [39.33, -116.63], NH: [43.68, -71.58],
+    NJ: [40.19, -74.67], NM: [34.41, -106.11], NY: [42.95, -75.53],
+    NC: [35.56, -79.39], ND: [47.45, -100.47], OH: [40.29, -82.79],
+    OK: [35.59, -97.49], OR: [43.93, -120.56], PA: [40.88, -77.80],
+    RI: [41.68, -71.56], SC: [33.92, -80.90], SD: [44.44, -100.23],
+    TN: [35.86, -86.35], TX: [31.48, -99.33], UT: [39.32, -111.69],
+    VT: [44.07, -72.67], VA: [37.52, -78.85], WA: [47.38, -120.45],
+    WV: [38.64, -80.62], WI: [44.62, -89.99], WY: [43.00, -107.55],
+  };
+
+  function renderStateMap(items) {
+    const mapEl = document.getElementById('ypStateMap');
+    if (!mapEl || typeof L === 'undefined') return;
+    const map = L.map(mapEl, { worldCopyJump: false, scrollWheelZoom: false })
+                 .setView([39.0, -96.5], 4);
+    map.on('click', () => map.scrollWheelZoom.enable());
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 10,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Aggregate amount per state (using the 2-letter postal code from the data)
+    const totals = new Map();
+    for (const it of items) {
+      const s = (it.state || '').toUpperCase();
+      if (!s) continue;
+      totals.set(s, (totals.get(s) || 0) + (it.amount || 0));
+    }
+    for (const [state, total] of totals.entries()) {
+      const c = STATE_CENTROIDS[state];
+      if (!c) continue;
+      const icon = L.divIcon({
+        className: 'state-amount-icon',
+        html: `<span class="amount-pill" title="${state}: ${fmtUSD2.format(total)}">${fmtUSD0.format(total)}</span>`,
+        iconSize: null,    // sized by content
+        iconAnchor: [0, 0],
+      });
+      L.marker(c, { icon, interactive: true })
+        .addTo(map)
+        .bindPopup(`<strong>${state}</strong><br>${fmtUSD2.format(total)}`);
+    }
+  }
 
   function renderMap(items) {
     const mapEl = document.getElementById('ypMap');
@@ -348,7 +435,8 @@
       }
       root.appendChild(frag);
 
-      try { renderMap(items); } catch (e) { console.error('map render failed', e); }
+      try { renderMap(items); }      catch (e) { console.error('pin map failed', e); }
+      try { renderStateMap(items); } catch (e) { console.error('state map failed', e); }
     })
     .catch(err => {
       const meta = document.getElementById('ypMeta');
