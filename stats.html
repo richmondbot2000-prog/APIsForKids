@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>How big our world is — Central Services</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060a1f;
+    --bg-soft: #0e1438;
+    --bg-soft-2: #161e4d;
+    --ink: #e6f1ff;
+    --ink-soft: #b8c4e8;
+    --muted: #7686b8;
+    --border: #28315c;
+    --border-soft: #1a2148;
+    --accent: #00d4ff;
+    --accent-2: #ff39a8;
+    --accent-3: #ffe066;
+    --accent-soft: #0c2a3e;
+    --accent-ink: #67e8ff;
+    --shadow-glow-cyan: 0 0 22px rgba(0, 212, 255, 0.32);
+    --shadow-glow-pink: 0 0 22px rgba(255, 57, 168, 0.30);
+    --font-display: 'Orbitron', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 15.5px; line-height: 1.65; -webkit-font-smoothing: antialiased;
+    position: relative; overflow-x: hidden;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, #fff, transparent),
+      radial-gradient(1px 1px at 80% 10%, #67e8ff, transparent),
+      radial-gradient(1px 1px at 50% 70%, #fff, transparent),
+      radial-gradient(2px 2px at 90% 50%, #fff, transparent),
+      radial-gradient(1px 1px at 10% 80%, #ff39a8, transparent),
+      radial-gradient(1px 1px at 70% 90%, #fff, transparent),
+      radial-gradient(1px 1px at 35% 50%, #67e8ff, transparent),
+      radial-gradient(1px 1px at 60% 25%, #fff, transparent);
+    background-size: 800px 800px;
+    opacity: 0.55;
+    animation: drift-stars 200s linear infinite;
+  }
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background: radial-gradient(ellipse at 25% 15%, rgba(103,232,255,0.07), transparent 50%),
+                radial-gradient(ellipse at 75% 85%, rgba(255,57,168,0.06), transparent 50%);
+  }
+  @keyframes drift-stars {
+    from { background-position: 0 0; } to { background-position: 800px 400px; }
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 0.86em;
+    background: var(--bg-soft); padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border);
+    color: var(--accent-ink); }
+
+  /* TOP BAR */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(6, 10, 31, 0.85);
+    backdrop-filter: saturate(180%) blur(14px);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    border-bottom: 1px solid var(--border);
+    height: 64px; display: flex; align-items: center; padding: 0 24px;
+  }
+  .topbar .brand { font-family: var(--font-display); font-weight: 700; font-size: 1rem; letter-spacing: 0.05em;
+    text-transform: uppercase; display: flex; align-items: center; gap: 12px; color: var(--ink); }
+  .topbar .brand .dot { display: inline-block; width: 22px; height: 22px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    border-radius: 6px; box-shadow: var(--shadow-glow-cyan);
+    animation: pulse-dot 3s ease-in-out infinite; }
+  @keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 12px rgba(0,212,255,0.5); }
+    50% { box-shadow: 0 0 22px rgba(0,212,255,0.95), 0 0 32px rgba(255,57,168,0.4); }
+  }
+  .topbar nav { margin-left: auto; display: flex; gap: 22px; }
+  .topbar nav a { color: var(--ink-soft); font-family: var(--font-display); font-weight: 500; font-size: 0.78rem;
+    text-transform: uppercase; letter-spacing: 0.08em; }
+  .topbar nav a:hover { color: var(--accent); text-shadow: 0 0 8px rgba(0,212,255,0.6); text-decoration: none; }
+  .topbar nav a.active { color: var(--accent-ink); }
+
+  /* CONTENT */
+  main { max-width: 1080px; margin: 0 auto; padding: 56px 32px 120px; position: relative; z-index: 1; }
+  h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 800;
+    letter-spacing: 0.02em; margin: 0 0 14px; line-height: 1.05; text-transform: uppercase;
+    background: linear-gradient(135deg, #67e8ff, #00d4ff 50%, #ff39a8);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 0 40px rgba(0,212,255,0.18); }
+  .subtitle { color: var(--ink-soft); font-size: 1.1rem; margin: 0 0 8px; max-width: 780px; }
+  .stamp { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+    letter-spacing: 0.05em; text-transform: uppercase; margin: 0 0 40px; }
+
+  h2 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; letter-spacing: 0.04em;
+    text-transform: uppercase; margin: 64px 0 16px; padding-top: 28px;
+    border-top: 1px solid var(--border-soft); line-height: 1.25; color: var(--accent); }
+
+  /* HERO STAT TILES */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin: 32px 0 8px; }
+  .stat-tile {
+    background: linear-gradient(180deg, var(--bg-soft), var(--bg-soft-2));
+    border: 1px solid var(--border); border-radius: 14px; padding: 24px 22px;
+    position: relative; overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+  .stat-tile:hover { border-color: var(--accent); box-shadow: var(--shadow-glow-cyan); transform: translateY(-2px); }
+  .stat-tile.pink:hover { border-color: var(--accent-2); box-shadow: var(--shadow-glow-pink); }
+  .stat-tile .label { font-family: var(--font-display); font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--muted); margin: 0 0 10px; }
+  .stat-tile .value { font-family: var(--font-display); font-size: 2.4rem; font-weight: 800;
+    line-height: 1; letter-spacing: 0.01em; color: var(--ink);
+    background: linear-gradient(135deg, var(--accent-ink), var(--accent));
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .stat-tile.pink .value { background: linear-gradient(135deg, var(--accent-2), #ff8fc7);
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .stat-tile.gold .value { background: linear-gradient(135deg, var(--accent-3), #ffb84d);
+    -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .stat-tile .sub { color: var(--ink-soft); font-size: 0.85rem; margin: 8px 0 0; }
+
+  /* TABLES */
+  .table-wrap { background: var(--bg-soft); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 16px 0 8px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+  th, td { padding: 10px 14px; border-bottom: 1px solid var(--border-soft); text-align: left; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  th { background: var(--bg-soft-2); font-family: var(--font-display); font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 0.08em; font-weight: 600; color: var(--muted); white-space: nowrap; }
+  td.num { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; text-align: right; color: var(--ink); }
+  tbody tr:hover { background: rgba(0, 212, 255, 0.04); }
+
+  /* BARS */
+  .bar-cell { width: 28%; min-width: 120px; }
+  .bar { height: 8px; background: var(--bg-soft-2); border-radius: 4px; overflow: hidden; border: 1px solid var(--border-soft); }
+  .bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-ink)); border-radius: 3px;
+    box-shadow: 0 0 8px rgba(0,212,255,0.5); }
+  .bar-fill-pink { background: linear-gradient(90deg, var(--accent-2), #ff8fc7); box-shadow: 0 0 8px rgba(255,57,168,0.5); }
+
+  /* PILLS */
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 0.74rem;
+    background: var(--accent-soft); color: var(--accent-ink); border: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace; }
+
+  .note { color: var(--muted); font-size: 0.85rem; margin: 12px 0 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    body::before { animation: none; }
+    .topbar .brand .dot { animation: none; }
+  }
+
+  @media (max-width: 720px) {
+    main { padding: 32px 18px 80px; }
+    h1 { font-size: 1.8rem; }
+    h2 { font-size: 1.15rem; }
+    .stat-tile .value { font-size: 1.9rem; }
+    table { font-size: 0.8rem; }
+    th, td { padding: 8px 10px; }
+    .bar-cell { display: none; }
+    .topbar { padding: 0 14px; }
+    .topbar nav { gap: 14px; }
+    .topbar nav a { font-size: 0.7rem; }
+    .topbar .brand { font-size: 0.85rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span> The Helpers</div>
+  <nav>
+    <a href="index.html">← The Helpers</a>
+    <a href="database.html">Schema</a>
+    <a href="stats.html" class="active">Stats</a>
+  </nav>
+</div>
+
+<main>
+  <h1>How big our world is</h1>
+  <p class="subtitle">Every helper, screen, robot and outside-asker on this site is built from real code. Here's how much there is.</p>
+  <p class="stamp">Snapshot taken 6 May 2026 · counting 45 active code projects</p>
+
+  <div class="stats-grid">
+    <div class="stat-tile">
+      <p class="label">Lines of code</p>
+      <div class="value">1,652,130</div>
+      <p class="sub">Real instructions humans typed</p>
+    </div>
+    <div class="stat-tile pink">
+      <p class="label">Files</p>
+      <div class="value">12,301</div>
+      <p class="sub">Spread across every project</p>
+    </div>
+    <div class="stat-tile gold">
+      <p class="label">Code projects</p>
+      <div class="value">45</div>
+      <p class="sub">Active repositories</p>
+    </div>
+    <div class="stat-tile">
+      <p class="label">Comments &amp; blank lines</p>
+      <div class="value">390,632</div>
+      <p class="sub">Notes from devs + breathing room</p>
+    </div>
+  </div>
+
+  <h2>By language</h2>
+  <p>Most of Central Services is written in C# (the .NET world), with the front-end split between TypeScript / JavaScript and Razor templates. SQL holds the database logic.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Language</th>
+          <th style="text-align:right">Files</th>
+          <th style="text-align:right">Lines</th>
+          <th style="text-align:right">Share</th>
+          <th>Bar</th>
+        </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td><strong>C#</strong></td>
+        <td class="num">7,935</td>
+        <td class="num">913,913</td>
+        <td class="num">55.3%</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill bar-fill-pink" style="width:100.0%"></div></div></td>
+      </tr>
+      <tr>
+        <td><strong>JSON</strong></td>
+        <td class="num">370</td>
+        <td class="num">176,636</td>
+        <td class="num">10.7%</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill bar-fill-pink" style="width:19.3%"></div></div></td>
+      </tr>
+      <tr>
+        <td><strong>JavaScript</strong></td>
+        <td class="num">401</td>
+        <td class="num">145,288</td>
+        <td class="num">8.8%</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill bar-fill-pink" style="width:15.9%"></div></div></td>
+      </tr>
+      <tr>
+        <td><strong>TypeScript</strong></td>
+        <td class="num">771</td>
+        <td class="num">78,035</td>
+        <td class="num">4.7%</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill bar-fill-pink" style="width:8.5%"></div></div></td>
+      </tr>
+      <tr>
+        <td><strong>Razor</strong></td>
+        <td class="num">572</td>
+        <td class="num">72,803</td>
+        <td class="num">4.4%</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill bar-fill-pink" style="width:8.0%"></div></div></td>
+      </tr>
+      <tr>
+        <td><strong>SQL</strong></td>
+        <td class="num">537</td>
+        <td class="num">65,972</td>
+        <td class="num">4.0%</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill bar-fill-pink" style="width:7.2%"></div></div></td>
+      </tr>
+      <tr>
+        <td><strong>CSS</strong></td>
+        <td class="num">211</td>
+        <td class="num">43,105</td>
+        <td class="num">2.6%</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill bar-fill-pink" style="width:4.7%"></div></div></td>
+      </tr>
+      <tr>
+        <td><strong>SVG</strong></td>
+        <td class="num">157</td>
+        <td class="num">34,638</td>
+        <td class="num">2.1%</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill bar-fill-pink" style="width:3.8%"></div></div></td>
+      </tr>
+      <tr>
+        <td><strong>Markdown</strong></td>
+        <td class="num">123</td>
+        <td class="num">21,138</td>
+        <td class="num">1.3%</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill bar-fill-pink" style="width:2.3%"></div></div></td>
+      </tr>
+      <tr>
+        <td><strong>HTML</strong></td>
+        <td class="num">209</td>
+        <td class="num">20,242</td>
+        <td class="num">1.2%</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill bar-fill-pink" style="width:2.2%"></div></div></td>
+      </tr>
+      <tr>
+        <td><strong>SCSS</strong></td>
+        <td class="num">164</td>
+        <td class="num">18,394</td>
+        <td class="num">1.1%</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill bar-fill-pink" style="width:2.0%"></div></div></td>
+      </tr>
+      <tr>
+        <td><strong>Bicep</strong></td>
+        <td class="num">111</td>
+        <td class="num">15,705</td>
+        <td class="num">1.0%</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill bar-fill-pink" style="width:1.7%"></div></div></td>
+      </tr>
+      <tr>
+        <td><strong>Other</strong></td>
+        <td class="num">740</td>
+        <td class="num">46,261</td>
+        <td class="num">2.8%</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill bar-fill-pink" style="width:5.1%"></div></div></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>By code project</h2>
+  <p>Every repository the team can read in <code>rgcore</code>, sorted from biggest to smallest. Disabled / archived repos are excluded.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Project</th>
+          <th>Org area</th>
+          <th style="text-align:right">Files</th>
+          <th style="text-align:right">Lines</th>
+          <th>Bar</th>
+          <th>Top language</th>
+        </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td><code>rgcore-admin</code></td>
+        <td>Central Services</td>
+        <td class="num">1,454</td>
+        <td class="num">244,880</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:100.0%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-applications</code></td>
+        <td>Central Services</td>
+        <td class="num">647</td>
+        <td class="num">202,127</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:82.5%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-crm-ng</code></td>
+        <td>Central Services</td>
+        <td class="num">1,766</td>
+        <td class="num">142,918</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:58.4%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-loanbook</code></td>
+        <td>Central Services</td>
+        <td class="num">660</td>
+        <td class="num">128,788</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:52.6%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>TransformCredit-website-apply</code></td>
+        <td>Transform Credit</td>
+        <td class="num">1,013</td>
+        <td class="num">118,371</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:48.3%"></div></div></td>
+        <td class="lang-pill"><span class="pill">Razor</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-brokers</code></td>
+        <td>Central Services</td>
+        <td class="num">724</td>
+        <td class="num">113,490</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:46.3%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>TogetherLoans-Reporting</code></td>
+        <td>Transform Credit</td>
+        <td class="num">527</td>
+        <td class="num">106,248</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:43.4%"></div></div></td>
+        <td class="lang-pill"><span class="pill">SQL</span></td>
+      </tr>
+      <tr>
+        <td><code>TransformCredit-Whitebox</code></td>
+        <td>Transform Credit</td>
+        <td class="num">855</td>
+        <td class="num">103,374</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:42.2%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-centralwebsite</code></td>
+        <td>Central Services</td>
+        <td class="num">588</td>
+        <td class="num">85,779</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:35.0%"></div></div></td>
+        <td class="lang-pill"><span class="pill">Razor</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-communications</code></td>
+        <td>Central Services</td>
+        <td class="num">634</td>
+        <td class="num">81,919</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:33.5%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>TransformCredit-App</code></td>
+        <td>Transform Credit</td>
+        <td class="num">382</td>
+        <td class="num">68,855</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:28.1%"></div></div></td>
+        <td class="lang-pill"><span class="pill">TypeScript</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-payments</code></td>
+        <td>Central Services</td>
+        <td class="num">685</td>
+        <td class="num">61,957</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:25.3%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-videochat</code></td>
+        <td>Central Services</td>
+        <td class="num">237</td>
+        <td class="num">58,150</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:23.7%"></div></div></td>
+        <td class="lang-pill"><span class="pill">JavaScript</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-wallboard</code></td>
+        <td>Central Services</td>
+        <td class="num">140</td>
+        <td class="num">24,494</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:10.0%"></div></div></td>
+        <td class="lang-pill"><span class="pill">JavaScript</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-functions</code></td>
+        <td>Central Services</td>
+        <td class="num">381</td>
+        <td class="num">19,521</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:8.0%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-reporting</code></td>
+        <td>Central Services</td>
+        <td class="num">133</td>
+        <td class="num">18,566</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:7.6%"></div></div></td>
+        <td class="lang-pill"><span class="pill">JSON</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-CreditBuilder</code></td>
+        <td>Central Services</td>
+        <td class="num">238</td>
+        <td class="num">17,924</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:7.3%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-ai</code></td>
+        <td>Central Services</td>
+        <td class="num">176</td>
+        <td class="num">12,086</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:4.9%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-webjobs</code></td>
+        <td>Central Services</td>
+        <td class="num">258</td>
+        <td class="num">11,230</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:4.6%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-loanbook-dailyupdate</code></td>
+        <td>Central Services</td>
+        <td class="num">128</td>
+        <td class="num">7,853</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:3.2%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-dashboard</code></td>
+        <td>Central Services</td>
+        <td class="num">15</td>
+        <td class="num">7,169</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:2.9%"></div></div></td>
+        <td class="lang-pill"><span class="pill">JSON</span></td>
+      </tr>
+      <tr>
+        <td><code>Scripts</code></td>
+        <td>Central Services</td>
+        <td class="num">45</td>
+        <td class="num">6,724</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:2.7%"></div></div></td>
+        <td class="lang-pill"><span class="pill">PowerShell</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-apigateway</code></td>
+        <td>Central Services</td>
+        <td class="num">96</td>
+        <td class="num">5,939</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:2.4%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-lookup</code></td>
+        <td>Central Services</td>
+        <td class="num">83</td>
+        <td class="num">4,910</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:2.0%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-metro2</code></td>
+        <td>Central Services</td>
+        <td class="num">97</td>
+        <td class="num">4,508</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:1.8%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-security</code></td>
+        <td>Central Services</td>
+        <td class="num">84</td>
+        <td class="num">3,856</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:1.6%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-packages</code></td>
+        <td>Central Services</td>
+        <td class="num">119</td>
+        <td class="num">3,778</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:1.5%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-socials-search</code></td>
+        <td>Central Services</td>
+        <td class="num">58</td>
+        <td class="num">3,591</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:1.5%"></div></div></td>
+        <td class="lang-pill"><span class="pill">Bicep</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-transcription</code></td>
+        <td>Central Services</td>
+        <td class="num">30</td>
+        <td class="num">3,534</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:1.4%"></div></div></td>
+        <td class="lang-pill"><span class="pill">Text</span></td>
+      </tr>
+      <tr>
+        <td><code>transformcredit-comms-migrator</code></td>
+        <td>Transform Credit</td>
+        <td class="num">66</td>
+        <td class="num">3,078</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:1.3%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-infrastructure</code></td>
+        <td>Central Services</td>
+        <td class="num">29</td>
+        <td class="num">2,937</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:1.2%"></div></div></td>
+        <td class="lang-pill"><span class="pill">Bicep</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-brokerfunctions</code></td>
+        <td>Transform Credit</td>
+        <td class="num">77</td>
+        <td class="num">2,671</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:1.1%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-monitoring</code></td>
+        <td>Central Services</td>
+        <td class="num">74</td>
+        <td class="num">2,485</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:1.0%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>TransformCredit-Monitoring</code></td>
+        <td>Transform Credit</td>
+        <td class="num">59</td>
+        <td class="num">1,839</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:0.8%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>financial-reports</code></td>
+        <td>Central Services</td>
+        <td class="num">7</td>
+        <td class="num">1,578</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:0.6%"></div></div></td>
+        <td class="lang-pill"><span class="pill">SQL</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-vvcsnapshot</code></td>
+        <td>Central Services</td>
+        <td class="num">23</td>
+        <td class="num">740</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:0.3%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-deletedata-functions</code></td>
+        <td>Central Services</td>
+        <td class="num">24</td>
+        <td class="num">653</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:0.3%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-templates</code></td>
+        <td>Central Services</td>
+        <td class="num">6</td>
+        <td class="num">570</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:0.2%"></div></div></td>
+        <td class="lang-pill"><span class="pill">PowerShell</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-tracking</code></td>
+        <td>Central Services</td>
+        <td class="num">12</td>
+        <td class="num">421</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:0.2%"></div></div></td>
+        <td class="lang-pill"><span class="pill">JavaScript</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-apisecurity</code></td>
+        <td>Central Services</td>
+        <td class="num">15</td>
+        <td class="num">357</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:0.1%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>TwilioComposition</code></td>
+        <td>Central Services</td>
+        <td class="num">3</td>
+        <td class="num">71</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:0.0%"></div></div></td>
+        <td class="lang-pill"><span class="pill">C#</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-datafactory</code></td>
+        <td>Central Services</td>
+        <td class="num">1</td>
+        <td class="num">16</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:0.0%"></div></div></td>
+        <td class="lang-pill"><span class="pill">Markdown</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-statements</code></td>
+        <td>Central Services</td>
+        <td class="num">1</td>
+        <td class="num">11</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:0.0%"></div></div></td>
+        <td class="lang-pill"><span class="pill">Visual Studio Solution</span></td>
+      </tr>
+      <tr>
+        <td><code>TransformCredit-IL-CILA</code></td>
+        <td>Transform Credit</td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:0.0%"></div></div></td>
+        <td class="lang-pill"><span class="pill">-</span></td>
+      </tr>
+      <tr>
+        <td><code>rgcore-scripts</code></td>
+        <td>Central Services</td>
+        <td class="num">0</td>
+        <td class="num">0</td>
+        <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:0.0%"></div></div></td>
+        <td class="lang-pill"><span class="pill">-</span></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="note">Counted with <code>cloc</code> 2.09. Bars are scaled to the largest item in each table. <code>node_modules</code>, <code>bin</code>, <code>obj</code>, <code>packages</code>, <code>dist</code> and <code>build</code> directories are excluded — these are auto-generated, not code humans write.</p>
+</main>
+
+</body>
+</html>
