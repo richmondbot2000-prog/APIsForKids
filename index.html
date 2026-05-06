@@ -2368,6 +2368,18 @@
       title: "An API never calls another API",
       kid: "Helpers don't talk to each other. They wait. Front-ends and robots are the ones who knock on doors.",
       why: "Orchestration belongs to a caller — a front-end (CRM, websites, app) or a robot. APIs stay pure responders. This keeps every API independently testable and stops a chain of failures from cascading across services."
+    },
+    {
+      icon: "link",
+      title: "One call must not force a chain of others",
+      kid: "When a helper gets asked to do something, that one ask should be enough. It mustn't force ten more asks behind the scenes — and definitely not a hundred.",
+      why: "Without this rule, a single button click can fan out into 50+ API calls that all have to succeed. Endpoints are designed so one call carries everything it needs to do its job. If a feature would require many chained calls, that's a sign an endpoint is missing — design it as one call, not a daisy-chain."
+    },
+    {
+      icon: "stopwatch",
+      title: "APIs are one and done",
+      kid: "When you ask a helper something, you get the answer right then. They don't say 'come back later'. They might leave a note for someone else to follow up — but their own bit is finished the moment they reply.",
+      why: "An API call is synchronous: it triggers a process and returns a result in the same round trip. It must never queue itself, post to a message bus, or hand back a job ID for the caller to poll. Side effects are fine — the API can write a row, and a separate robot or watcher can later pick that row up and do follow-up work. But the API call itself completes start-to-finish in one exchange."
     }
   ];
 
