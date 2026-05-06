@@ -1,0 +1,65 @@
+name: Refresh yesterday payouts
+
+# Daily — pulls yesterday's US payouts from the Fabric warehouse and commits
+# yesterday-payouts.json back to main so the kids site stays current.
+
+on:
+  schedule:
+    - cron: '0 6 * * *'   # 06:00 UTC every day (after the warehouse refresh has settled)
+  workflow_dispatch:        # manual trigger from the Actions tab
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-yesterday-payouts
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Microsoft ODBC Driver 18
+        run: |
+          set -euo pipefail
+          source /etc/os-release
+          curl -fsSL "https://packages.microsoft.com/config/ubuntu/${VERSION_ID}/packages-microsoft-prod.deb" -o /tmp/packages-microsoft-prod.deb
+          sudo dpkg -i /tmp/packages-microsoft-prod.deb
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python deps
+        run: pip install --quiet pyodbc==5.*
+
+      - name: Scan
+        env:
+          FABRIC_SQL_ENDPOINT: d76gbn5gtayeppltcrsxsvkluq-ruqkpz7fkwpelmnjh4kbg2lqpi.datawarehouse.fabric.microsoft.com
+          FABRIC_TENANT_ID:    b760fc1f-98a6-4730-bd73-146579554ba4
+          FABRIC_CLIENT_ID:    b8fb2709-6e42-4a1e-91e6-8a3807a9884d
+          FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
+        run: python scripts/scan_yesterday_payouts.py
+
+      - name: Commit if yesterday-payouts.json changed
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- yesterday-payouts.json; then
+            echo "no changes — nothing to commit"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add yesterday-payouts.json
+          N=$(python -c "import json; d=json.load(open('yesterday-payouts.json')); print(d['totals']['borrowers'])")
+          DATE=$(python -c "import json; d=json.load(open('yesterday-payouts.json')); print(d.get('target_date',''))")
+          git commit -m "Refresh yesterday payouts: ${N} borrowers on ${DATE}"
+          git push

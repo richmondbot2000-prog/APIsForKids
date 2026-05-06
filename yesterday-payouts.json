@@ -1,0 +1,1065 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-05-06T19:46:13.066743Z",
+  "target_date": "2026-05-05",
+  "totals": {
+    "borrowers": 211
+  },
+  "items": [
+    {
+      "borrower": "Gracely Abadilla",
+      "state": "AZ",
+      "zip": "85210"
+    },
+    {
+      "borrower": "Tracy Addis",
+      "state": "OH",
+      "zip": "45223"
+    },
+    {
+      "borrower": "Linette Adkins",
+      "state": "FL",
+      "zip": "32148"
+    },
+    {
+      "borrower": "Alexandro Alvarez",
+      "state": "TX",
+      "zip": "79549"
+    },
+    {
+      "borrower": "Chilena Alvarez",
+      "state": "TX",
+      "zip": "76067"
+    },
+    {
+      "borrower": "Kristal Alvarez",
+      "state": "FL",
+      "zip": "34741"
+    },
+    {
+      "borrower": "Destiny Anderson",
+      "state": "GA",
+      "zip": "39845"
+    },
+    {
+      "borrower": "Amber Atkinson",
+      "state": "SC",
+      "zip": "29605"
+    },
+    {
+      "borrower": "Candice Autmon",
+      "state": "TX",
+      "zip": "76013"
+    },
+    {
+      "borrower": "Timothy Balmer",
+      "state": "KS",
+      "zip": "66523"
+    },
+    {
+      "borrower": "Martin Barriga",
+      "state": "CA",
+      "zip": "92551"
+    },
+    {
+      "borrower": "Almeda Barron",
+      "state": "GA",
+      "zip": "30741"
+    },
+    {
+      "borrower": "Jeffrey Bates",
+      "state": "WI",
+      "zip": "53704"
+    },
+    {
+      "borrower": "Linda Beauchamp",
+      "state": "CA",
+      "zip": "96078"
+    },
+    {
+      "borrower": "Taviean Beauford",
+      "state": "NC",
+      "zip": "28174"
+    },
+    {
+      "borrower": "Roy Benitez",
+      "state": "GA",
+      "zip": "30033"
+    },
+    {
+      "borrower": "Nottanya fletcher Berry",
+      "state": "NC",
+      "zip": "27597"
+    },
+    {
+      "borrower": "Katherine Bird",
+      "state": "FL",
+      "zip": "32162"
+    },
+    {
+      "borrower": "Miles Bishop",
+      "state": "GA",
+      "zip": "30096"
+    },
+    {
+      "borrower": "Joseph Blacklock",
+      "state": "FL",
+      "zip": "32703"
+    },
+    {
+      "borrower": "ANTHONY BLAKE",
+      "state": "TX",
+      "zip": "78653"
+    },
+    {
+      "borrower": "Justin Bonner",
+      "state": "GA",
+      "zip": "31069"
+    },
+    {
+      "borrower": "manda boyer",
+      "state": "IL",
+      "zip": "62442"
+    },
+    {
+      "borrower": "Gavin Brasko",
+      "state": "TX",
+      "zip": "76180"
+    },
+    {
+      "borrower": "Gage Brewer",
+      "state": "KY",
+      "zip": "42408"
+    },
+    {
+      "borrower": "Joshua Brock",
+      "state": "OK",
+      "zip": "73012"
+    },
+    {
+      "borrower": "Marsha Brooks",
+      "state": "GA",
+      "zip": "30453"
+    },
+    {
+      "borrower": "Brittany Brown",
+      "state": "OK",
+      "zip": "73130"
+    },
+    {
+      "borrower": "Damy Brown",
+      "state": "GA",
+      "zip": "31781"
+    },
+    {
+      "borrower": "Jennifer Brown",
+      "state": "VA",
+      "zip": "24137"
+    },
+    {
+      "borrower": "Shayla Brown",
+      "state": "FL",
+      "zip": "33026"
+    },
+    {
+      "borrower": "Tonijah Bunch",
+      "state": "NC",
+      "zip": "27707"
+    },
+    {
+      "borrower": "Michael Buonaspina",
+      "state": "OH",
+      "zip": "44720"
+    },
+    {
+      "borrower": "Andrew Butera",
+      "state": "AZ",
+      "zip": "85120"
+    },
+    {
+      "borrower": "Justin Cable",
+      "state": "GA",
+      "zip": "30116"
+    },
+    {
+      "borrower": "Jessicka Cabrera",
+      "state": "NC",
+      "zip": "28303"
+    },
+    {
+      "borrower": "Leandra Caceres",
+      "state": "GA",
+      "zip": "30134"
+    },
+    {
+      "borrower": "Jonathan Camacho",
+      "state": "FL",
+      "zip": "32824"
+    },
+    {
+      "borrower": "Taylor Carlyle",
+      "state": "NC",
+      "zip": "27357"
+    },
+    {
+      "borrower": "Amber Carranza",
+      "state": "CA",
+      "zip": "90706"
+    },
+    {
+      "borrower": "Jesus Carrasco",
+      "state": "NM",
+      "zip": "88012"
+    },
+    {
+      "borrower": "KC Carson",
+      "state": "OH",
+      "zip": "43160"
+    },
+    {
+      "borrower": "John Cary Jr",
+      "state": "VA",
+      "zip": "23513"
+    },
+    {
+      "borrower": "Holly Cassaday",
+      "state": "IN",
+      "zip": "46143"
+    },
+    {
+      "borrower": "Laurie Castillo",
+      "state": "TX",
+      "zip": "78539"
+    },
+    {
+      "borrower": "Carlhenry Choute",
+      "state": "FL",
+      "zip": "33167"
+    },
+    {
+      "borrower": "Christine Christian",
+      "state": "OH",
+      "zip": "44815"
+    },
+    {
+      "borrower": "Kyvon Clayton",
+      "state": "VA",
+      "zip": "22578"
+    },
+    {
+      "borrower": "RAFAEL COFFMAN",
+      "state": "IA",
+      "zip": "50263"
+    },
+    {
+      "borrower": "Brittney Cooper",
+      "state": "WY",
+      "zip": "82839"
+    },
+    {
+      "borrower": "Christine Corpus",
+      "state": "CA",
+      "zip": "94501"
+    },
+    {
+      "borrower": "Chad Courshon",
+      "state": "FL",
+      "zip": "33435"
+    },
+    {
+      "borrower": "Asia Coward",
+      "state": "SC",
+      "zip": "29718"
+    },
+    {
+      "borrower": "Jennifer Cowic",
+      "state": "OH",
+      "zip": "45459"
+    },
+    {
+      "borrower": "Christian Culbertson",
+      "state": "IN",
+      "zip": "47720"
+    },
+    {
+      "borrower": "Jaime Dattile",
+      "state": "FL",
+      "zip": "34772"
+    },
+    {
+      "borrower": "Jorge Davila",
+      "state": "WI",
+      "zip": "53222"
+    },
+    {
+      "borrower": "Jamie Davis",
+      "state": "CA",
+      "zip": "95361"
+    },
+    {
+      "borrower": "Ronald Davis",
+      "state": "KS",
+      "zip": "66067"
+    },
+    {
+      "borrower": "Jesus Delgado",
+      "state": "CA",
+      "zip": "95111"
+    },
+    {
+      "borrower": "Steven Despain",
+      "state": "UT",
+      "zip": "84128"
+    },
+    {
+      "borrower": "Scott Dias",
+      "state": "CA",
+      "zip": "95123"
+    },
+    {
+      "borrower": "Melanie Diddle Priest",
+      "state": "FL",
+      "zip": "34743"
+    },
+    {
+      "borrower": "Sonia Dimas",
+      "state": "TX",
+      "zip": "75019"
+    },
+    {
+      "borrower": "Brenda Doty",
+      "state": "IA",
+      "zip": "50662"
+    },
+    {
+      "borrower": "Bryam Duran resendiz",
+      "state": "TX",
+      "zip": "78253"
+    },
+    {
+      "borrower": "Sean Enright",
+      "state": "IL",
+      "zip": "60517"
+    },
+    {
+      "borrower": "Austin Everhart",
+      "state": "FL",
+      "zip": "32219"
+    },
+    {
+      "borrower": "Quincy Everidge",
+      "state": "CA",
+      "zip": "91602"
+    },
+    {
+      "borrower": "Brittany Fink",
+      "state": "OH",
+      "zip": "44125"
+    },
+    {
+      "borrower": "MICHAEL FOGLE",
+      "state": "NC",
+      "zip": "28677"
+    },
+    {
+      "borrower": "James Fox",
+      "state": "CA",
+      "zip": "92821"
+    },
+    {
+      "borrower": "Edwin Garcia",
+      "state": "CA",
+      "zip": "90038"
+    },
+    {
+      "borrower": "Meylin Garcia",
+      "state": "CA",
+      "zip": "94607"
+    },
+    {
+      "borrower": "Lonnie Garner",
+      "state": "GA",
+      "zip": "30126"
+    },
+    {
+      "borrower": "Ernest Garrett",
+      "state": "KY",
+      "zip": "41045"
+    },
+    {
+      "borrower": "Joshua Garrison",
+      "state": "KY",
+      "zip": "42101"
+    },
+    {
+      "borrower": "Kimberly Glenn",
+      "state": "CA",
+      "zip": "93728"
+    },
+    {
+      "borrower": "Jaclyn Gonzalez",
+      "state": "WI",
+      "zip": "53005"
+    },
+    {
+      "borrower": "Nicole Grambo",
+      "state": "OH",
+      "zip": "44830"
+    },
+    {
+      "borrower": "DARREN GRIFFITHZEIGLER",
+      "state": "OH",
+      "zip": "45801"
+    },
+    {
+      "borrower": "Phillip Guerrero",
+      "state": "IL",
+      "zip": "61350"
+    },
+    {
+      "borrower": "Kimberli Gulley",
+      "state": "NC",
+      "zip": "28124"
+    },
+    {
+      "borrower": "Erin Hamilton",
+      "state": "OK",
+      "zip": "73117"
+    },
+    {
+      "borrower": "Jacob Haney",
+      "state": "CA",
+      "zip": "90808"
+    },
+    {
+      "borrower": "Tracy Hansen",
+      "state": "KS",
+      "zip": "66502"
+    },
+    {
+      "borrower": "Billie Hayes",
+      "state": "AZ",
+      "zip": "85716"
+    },
+    {
+      "borrower": "chassidy Hepler",
+      "state": "NC",
+      "zip": "27360"
+    },
+    {
+      "borrower": "Karla Hernandez",
+      "state": "CA",
+      "zip": "92805"
+    },
+    {
+      "borrower": "Martin Hernandez",
+      "state": "TX",
+      "zip": "77429"
+    },
+    {
+      "borrower": "Amara Hicks",
+      "state": "OH",
+      "zip": "43224"
+    },
+    {
+      "borrower": "Mindy Higley",
+      "state": "UT",
+      "zip": "84606"
+    },
+    {
+      "borrower": "Christine Hill",
+      "state": "FL",
+      "zip": "33308"
+    },
+    {
+      "borrower": "Erick Hill",
+      "state": "MO",
+      "zip": "64112"
+    },
+    {
+      "borrower": "Elijah Hines",
+      "state": "NC",
+      "zip": "28312"
+    },
+    {
+      "borrower": "Jordan Hochstatter",
+      "state": "IL",
+      "zip": "60124"
+    },
+    {
+      "borrower": "Brandon Hollis",
+      "state": "NC",
+      "zip": "27310"
+    },
+    {
+      "borrower": "Tosheika Hubbard",
+      "state": "GA",
+      "zip": "31548"
+    },
+    {
+      "borrower": "Kaylee Hundelt",
+      "state": "AZ",
+      "zip": "85281"
+    },
+    {
+      "borrower": "Christwean Hunt",
+      "state": "IL",
+      "zip": "60076"
+    },
+    {
+      "borrower": "Amanda Huston",
+      "state": "FL",
+      "zip": "32404"
+    },
+    {
+      "borrower": "Richard Isheim",
+      "state": "OH",
+      "zip": "44203"
+    },
+    {
+      "borrower": "Antione Jackson",
+      "state": "FL",
+      "zip": "32817"
+    },
+    {
+      "borrower": "Brandie Jackson",
+      "state": "FL",
+      "zip": "33304"
+    },
+    {
+      "borrower": "Dennis Jackson",
+      "state": "SC",
+      "zip": "29706"
+    },
+    {
+      "borrower": "Cody Janke",
+      "state": "WI",
+      "zip": "53214"
+    },
+    {
+      "borrower": "Heather Johnson",
+      "state": "OH",
+      "zip": "44287"
+    },
+    {
+      "borrower": "Kristopher Johnson",
+      "state": "IN",
+      "zip": "46219"
+    },
+    {
+      "borrower": "Jennifer Jones",
+      "state": "FL",
+      "zip": "32548"
+    },
+    {
+      "borrower": "Lanise Jones",
+      "state": "OH",
+      "zip": "43968"
+    },
+    {
+      "borrower": "Tyrell Juarez",
+      "state": "IA",
+      "zip": "52803"
+    },
+    {
+      "borrower": "Kimmy Kimblermartinez",
+      "state": "CA",
+      "zip": "96035"
+    },
+    {
+      "borrower": "Marline King",
+      "state": "FL",
+      "zip": "33401"
+    },
+    {
+      "borrower": "Abigail Kraft",
+      "state": "OH",
+      "zip": "45420"
+    },
+    {
+      "borrower": "Dylan Lack",
+      "state": "MO",
+      "zip": "63901"
+    },
+    {
+      "borrower": "Kaleb Lamberty",
+      "state": "WI",
+      "zip": "53561"
+    },
+    {
+      "borrower": "Debra Langford",
+      "state": "TX",
+      "zip": "75602"
+    },
+    {
+      "borrower": "Kimberly Lanzrath",
+      "state": "KS",
+      "zip": "66801"
+    },
+    {
+      "borrower": "Gina Lasala",
+      "state": "MO",
+      "zip": "65656"
+    },
+    {
+      "borrower": "Jason Lee",
+      "state": "VA",
+      "zip": "23112"
+    },
+    {
+      "borrower": "Magnolia Lewis",
+      "state": "NC",
+      "zip": "28205"
+    },
+    {
+      "borrower": "Tanya Linkous",
+      "state": "KY",
+      "zip": "40324"
+    },
+    {
+      "borrower": "Valeria Lizarraga",
+      "state": "AZ",
+      "zip": "85029"
+    },
+    {
+      "borrower": "Luchie LOPEZ",
+      "state": "AZ",
+      "zip": "85027"
+    },
+    {
+      "borrower": "Keiona Mack",
+      "state": "KY",
+      "zip": "40219"
+    },
+    {
+      "borrower": "Keith Madera",
+      "state": "SC",
+      "zip": "29532"
+    },
+    {
+      "borrower": "Nathan Mark",
+      "state": "KY",
+      "zip": "40204"
+    },
+    {
+      "borrower": "Brandon Marston Cubbage",
+      "state": "VA",
+      "zip": "22835"
+    },
+    {
+      "borrower": "Tabatha Martemus",
+      "state": "OH",
+      "zip": "44125"
+    },
+    {
+      "borrower": "Daniel Martinez",
+      "state": "CA",
+      "zip": "92325"
+    },
+    {
+      "borrower": "Johnni McCarty",
+      "state": "IN",
+      "zip": "46923"
+    },
+    {
+      "borrower": "Randall Mccollum",
+      "state": "KY",
+      "zip": "42501"
+    },
+    {
+      "borrower": "Darryl Mccoy",
+      "state": "GA",
+      "zip": "30046"
+    },
+    {
+      "borrower": "Leighanne Mckenzie",
+      "state": "KY",
+      "zip": "40031"
+    },
+    {
+      "borrower": "Tayari Meadows",
+      "state": "ND",
+      "zip": "58103"
+    },
+    {
+      "borrower": "Heather Medrano",
+      "state": "TX",
+      "zip": "75092"
+    },
+    {
+      "borrower": "MarcAnthony Mendez",
+      "state": "CA",
+      "zip": "91722"
+    },
+    {
+      "borrower": "Darele Miller",
+      "state": "CA",
+      "zip": "95648"
+    },
+    {
+      "borrower": "Kayla Montgomery",
+      "state": "GA",
+      "zip": "30161"
+    },
+    {
+      "borrower": "Stephen moreno",
+      "state": "TX",
+      "zip": "78216"
+    },
+    {
+      "borrower": "Crasetta Newby",
+      "state": "GA",
+      "zip": "30337"
+    },
+    {
+      "borrower": "Paul Nutall",
+      "state": "TX",
+      "zip": "78504"
+    },
+    {
+      "borrower": "keya Odom",
+      "state": "SC",
+      "zip": "29487"
+    },
+    {
+      "borrower": "somantha odom",
+      "state": "CA",
+      "zip": "91708"
+    },
+    {
+      "borrower": "Joshua Onabanjo",
+      "state": "AZ",
+      "zip": "85283"
+    },
+    {
+      "borrower": "Crystal Pacheco",
+      "state": "TX",
+      "zip": "79423"
+    },
+    {
+      "borrower": "Noah Park",
+      "state": "CA",
+      "zip": "90015"
+    },
+    {
+      "borrower": "Eugene Parker",
+      "state": "VA",
+      "zip": "22407"
+    },
+    {
+      "borrower": "Jesse Peterson",
+      "state": "FL",
+      "zip": "34104"
+    },
+    {
+      "borrower": "Breshey Phillips",
+      "state": "IL",
+      "zip": "60443"
+    },
+    {
+      "borrower": "KIERSTEN PHILLIPS",
+      "state": "WY",
+      "zip": "82604"
+    },
+    {
+      "borrower": "DANIELLE PICA",
+      "state": "FL",
+      "zip": "33325"
+    },
+    {
+      "borrower": "kim pich",
+      "state": "OH",
+      "zip": "43228"
+    },
+    {
+      "borrower": "Joseph Pitocchi",
+      "state": "CA",
+      "zip": "94403"
+    },
+    {
+      "borrower": "DeMontre Platt",
+      "state": "NC",
+      "zip": "28277"
+    },
+    {
+      "borrower": "todd pozniak",
+      "state": "IL",
+      "zip": "60517"
+    },
+    {
+      "borrower": "Jacob Radke",
+      "state": "AZ",
+      "zip": "85338"
+    },
+    {
+      "borrower": "Braeden Ramirez",
+      "state": "TX",
+      "zip": "76522"
+    },
+    {
+      "borrower": "Jorge ramirez",
+      "state": "CA",
+      "zip": "93454"
+    },
+    {
+      "borrower": "Rita Randey",
+      "state": "OK",
+      "zip": "74107"
+    },
+    {
+      "borrower": "LaQuanna Reese",
+      "state": "TX",
+      "zip": "77477"
+    },
+    {
+      "borrower": "Brandy Reyes",
+      "state": "GA",
+      "zip": "30734"
+    },
+    {
+      "borrower": "Crystal Richardson",
+      "state": "TX",
+      "zip": "77095"
+    },
+    {
+      "borrower": "Maxwell Richter",
+      "state": "CA",
+      "zip": "96003"
+    },
+    {
+      "borrower": "Melissa Ridder",
+      "state": "AZ",
+      "zip": "85257"
+    },
+    {
+      "borrower": "Osvaldo Ruiz",
+      "state": "IL",
+      "zip": "60459"
+    },
+    {
+      "borrower": "Cody Rutledge",
+      "state": "MO",
+      "zip": "64759"
+    },
+    {
+      "borrower": "Maria Saavedra",
+      "state": "AZ",
+      "zip": "85620"
+    },
+    {
+      "borrower": "Caleb Sanders",
+      "state": "TX",
+      "zip": "77856"
+    },
+    {
+      "borrower": "NIKKI SARRACINO",
+      "state": "NM",
+      "zip": "87020"
+    },
+    {
+      "borrower": "Jacinto Serrano",
+      "state": "FL",
+      "zip": "33584"
+    },
+    {
+      "borrower": "Johnny Sestan",
+      "state": "OH",
+      "zip": "44136"
+    },
+    {
+      "borrower": "Shonda Shires",
+      "state": "OK",
+      "zip": "74730"
+    },
+    {
+      "borrower": "Audra Smith",
+      "state": "MO",
+      "zip": "63146"
+    },
+    {
+      "borrower": "Sharrell Smith",
+      "state": "KY",
+      "zip": "40215"
+    },
+    {
+      "borrower": "Julianne Solis",
+      "state": "WI",
+      "zip": "53204"
+    },
+    {
+      "borrower": "William Sowers",
+      "state": "AZ",
+      "zip": "86442"
+    },
+    {
+      "borrower": "April Spillman",
+      "state": "MO",
+      "zip": "64119"
+    },
+    {
+      "borrower": "Michael Stewart",
+      "state": "TX",
+      "zip": "77356"
+    },
+    {
+      "borrower": "Rockey Stone",
+      "state": "NC",
+      "zip": "28262"
+    },
+    {
+      "borrower": "Ina Strickland",
+      "state": "NC",
+      "zip": "28090"
+    },
+    {
+      "borrower": "KIMBERLY STYER",
+      "state": "OH",
+      "zip": "43410"
+    },
+    {
+      "borrower": "Hannah Sullivan",
+      "state": "NC",
+      "zip": "27455"
+    },
+    {
+      "borrower": "Edwina TaylorGrayer",
+      "state": "FL",
+      "zip": "34482"
+    },
+    {
+      "borrower": "Carmela Theodore",
+      "state": "OH",
+      "zip": "44512"
+    },
+    {
+      "borrower": "Eula Thomas",
+      "state": "FL",
+      "zip": "32209"
+    },
+    {
+      "borrower": "Treasure Thomas",
+      "state": "TX",
+      "zip": "78744"
+    },
+    {
+      "borrower": "Rebecca Thompson",
+      "state": "NC",
+      "zip": "27302"
+    },
+    {
+      "borrower": "Matthew Tiefenbach",
+      "state": "OH",
+      "zip": "44140"
+    },
+    {
+      "borrower": "Ashley Torres",
+      "state": "TX",
+      "zip": "78213"
+    },
+    {
+      "borrower": "Brandy Tune",
+      "state": "TX",
+      "zip": "76271"
+    },
+    {
+      "borrower": "Blake Tyre",
+      "state": "CA",
+      "zip": "92010"
+    },
+    {
+      "borrower": "Seanna Unruh",
+      "state": "TX",
+      "zip": "77346"
+    },
+    {
+      "borrower": "Linda Vandyke",
+      "state": "ND",
+      "zip": "58078"
+    },
+    {
+      "borrower": "David Vasquez",
+      "state": "TX",
+      "zip": "78207"
+    },
+    {
+      "borrower": "Aaron Vigil",
+      "state": "NM",
+      "zip": "87109"
+    },
+    {
+      "borrower": "Jessica Vines",
+      "state": "FL",
+      "zip": "33712"
+    },
+    {
+      "borrower": "Morgan Vrana",
+      "state": "TX",
+      "zip": "76502"
+    },
+    {
+      "borrower": "Brian Walker",
+      "state": "KY",
+      "zip": "40360"
+    },
+    {
+      "borrower": "Alex Wallace",
+      "state": "NC",
+      "zip": "28081"
+    },
+    {
+      "borrower": "Dylan Walsh",
+      "state": "IL",
+      "zip": "61761"
+    },
+    {
+      "borrower": "Jacquelyn Washburn",
+      "state": "OH",
+      "zip": "43449"
+    },
+    {
+      "borrower": "Elliot Watson",
+      "state": "IL",
+      "zip": "60155"
+    },
+    {
+      "borrower": "Danae West",
+      "state": "CA",
+      "zip": "94601"
+    },
+    {
+      "borrower": "Joseph White",
+      "state": "TX",
+      "zip": "77062"
+    },
+    {
+      "borrower": "Lance Williams",
+      "state": "TX",
+      "zip": "78664"
+    },
+    {
+      "borrower": "Bianca Woods",
+      "state": "OH",
+      "zip": "44903"
+    },
+    {
+      "borrower": "KRESENT WORMAN",
+      "state": "WI",
+      "zip": "54843"
+    },
+    {
+      "borrower": "Robel Yemane",
+      "state": "TX",
+      "zip": "75224"
+    },
+    {
+      "borrower": "Jumar Zapanta",
+      "state": "CA",
+      "zip": "94134"
+    },
+    {
+      "borrower": "Nicole Zimmerman",
+      "state": "TX",
+      "zip": "75474"
+    }
+  ]
+}

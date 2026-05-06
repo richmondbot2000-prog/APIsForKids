@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BOOK — Yesterday's payouts</title>
+<link rel="icon" type="image/png" href="site-icon.png">
+<link rel="apple-touch-icon" href="site-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  .yp-section { max-width: 1080px; margin: 0 auto; padding: 56px 32px 120px; }
+  .yp-section h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    margin: 0 0 12px;
+    color: var(--ink);
+  }
+  .yp-section .lead { color: var(--ink-soft); font-size: 1.05rem; margin: 0 0 4px; }
+  .yp-meta {
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    margin: 0 0 24px;
+  }
+  .yp-table-wrap {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  table.yp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+  table.yp-table th, table.yp-table td {
+    text-align: left;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  table.yp-table th {
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    background: var(--bg-soft-2);
+    position: sticky; top: 64px;
+  }
+  table.yp-table tr:last-child td { border-bottom: none; }
+  table.yp-table tr:hover td { background: rgba(0, 212, 255, 0.05); }
+  table.yp-table td.borrower { color: var(--ink); }
+  table.yp-table td.state, table.yp-table td.zip {
+    font-family: 'JetBrains Mono', monospace; color: var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+
+<script>
+  // Document-level fallback: close drawer when any link inside the sidebar is tapped.
+  document.addEventListener('click', function (e) {
+    if (!document.body.classList.contains('menu-open')) return;
+    const link = e.target.closest('a');
+    if (link && e.target.closest('.sidebar')) {
+      document.body.classList.remove('menu-open');
+    }
+  }, true);
+</script>
+
+<div class="topbar">
+  <button class="menu-toggle" aria-label="Open navigation menu" id="menuToggle"
+          onclick="event.stopPropagation();document.body.classList.toggle('menu-open');">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" style="pointer-events:none">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+  <a class="brand" href="index.html" aria-label="BOOK — home"><img class="brand-icon" src="site-icon.png" alt=""><img class="brand-logo" src="book-logo.png" alt="BOOK"></a>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="apis.html">APIs</a>
+    <a href="robots.html">Robots</a>
+    <a href="yesterday.html" class="active">Yesterday</a>
+    <a href="database.html">Schema</a>
+    <a href="stats.html">Stats</a>
+  </nav>
+</div>
+<div class="sidebar-backdrop" onclick="document.body.classList.remove('menu-open')"></div>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <button class="drawer-close" aria-label="Close menu"
+            onclick="document.body.classList.remove('menu-open')">✕ Close menu</button>
+<h4><a href="index.html"    onclick="document.body.classList.remove('menu-open')">Home</a></h4>
+    <ul class="sidebar-nav">
+      <li><a href="index.html#meet"         onclick="document.body.classList.remove('menu-open')"><span class="em">🏠</span> Overview</a></li>
+      <li><a href="index.html#apis"         onclick="document.body.classList.remove('menu-open')"><span class="em">🛎️</span> APIs (intro)</a></li>
+      <li><a href="index.html#robots"       onclick="document.body.classList.remove('menu-open')"><span class="em">🤖</span> Robots (intro)</a></li>
+      <li><a href="index.html#screens"      onclick="document.body.classList.remove('menu-open')"><span class="em">🖥️</span> The Screens</a></li>
+      <li><a href="index.html#outside"      onclick="document.body.classList.remove('menu-open')"><span class="em">🏢</span> Outside Askers</a></li>
+      <li><a href="index.html#story"        onclick="document.body.classList.remove('menu-open')"><span class="em">📖</span> A loan story</a></li>
+      <li><a href="index.html#rules"        onclick="document.body.classList.remove('menu-open')"><span class="em">📚</span> How they talk</a></li>
+      <li><a href="index.html#commandments" onclick="document.body.classList.remove('menu-open')"><span class="em">📜</span> The Commandments</a></li>
+    </ul>
+
+    <h4><a href="apis.html"     onclick="document.body.classList.remove('menu-open')">The 8 APIs</a></h4>
+    <ul class="sidebar-nav" id="sideNavApis">
+      <li><a href="apis.html#gary"     onclick="document.body.classList.remove('menu-open')"><span class="em">🔒</span> Gary</a></li>
+      <li><a href="apis.html#anna"     onclick="document.body.classList.remove('menu-open')"><span class="em">📋</span> App Anna</a></li>
+      <li><a href="apis.html#bessie"   onclick="document.body.classList.remove('menu-open')"><span class="em">🦈</span> Bessie</a></li>
+      <li><a href="apis.html#whitney"  onclick="document.body.classList.remove('menu-open')"><span class="em">◻️</span> Whitney</a></li>
+      <li><a href="apis.html#larry"    onclick="document.body.classList.remove('menu-open')"><span class="em">📖</span> Larry</a></li>
+      <li><a href="apis.html#penny"    onclick="document.body.classList.remove('menu-open')"><span class="em">💳</span> Penny</a></li>
+      <li><a href="apis.html#connie"   onclick="document.body.classList.remove('menu-open')"><span class="em">💬</span> Connie</a></li>
+      <li><a href="apis.html#sherlock" onclick="document.body.classList.remove('menu-open')"><span class="em">🕵️</span> Sherlock</a></li>
+    </ul>
+
+    <h4><a href="robots.html"   onclick="document.body.classList.remove('menu-open')">The 12 Robots</a></h4>
+    <ul class="sidebar-nav" id="sideNavRobots">
+      <li><a href="robots.html#night-counter"     onclick="document.body.classList.remove('menu-open')"><img class="emoji" src="https://api.iconify.design/fluent-emoji/owl.svg" /> Night Counter</a></li>
+      <li><a href="robots.html#quick-counter"     onclick="document.body.classList.remove('menu-open')"><img class="emoji" src="https://api.iconify.design/fluent-emoji/person-running.svg" /> Quick Counter</a></li>
+      <li><a href="robots.html#payment-matcher"   onclick="document.body.classList.remove('menu-open')"><img class="emoji" src="https://api.iconify.design/fluent-emoji/puzzle-piece.svg" /> Payment Matcher</a></li>
+      <li><a href="robots.html#card-bank-tidier"  onclick="document.body.classList.remove('menu-open')"><img class="emoji" src="https://api.iconify.design/fluent-emoji/man-mechanic.svg" /> Card-and-Bank Tidier</a></li>
+      <li><a href="robots.html#big-mailout"       onclick="document.body.classList.remove('menu-open')"><img class="emoji" src="https://api.iconify.design/fluent-emoji/dove.svg" /> Big Mailout Team</a></li>
+      <li><a href="robots.html#payment-collector" onclick="document.body.classList.remove('menu-open')"><img class="emoji" src="https://api.iconify.design/fluent-emoji/money-with-wings.svg" /> Payment Collector</a></li>
+      <li><a href="robots.html#reply-robots"      onclick="document.body.classList.remove('menu-open')"><img class="emoji" src="https://api.iconify.design/fluent-emoji/parrot.svg" /> Reply Robots</a></li>
+      <li><a href="robots.html#lookout"           onclick="document.body.classList.remove('menu-open')"><img class="emoji" src="https://api.iconify.design/fluent-emoji/rotating-light.svg" /> Lookout</a></li>
+      <li><a href="robots.html#loan-inspector"    onclick="document.body.classList.remove('menu-open')"><img class="emoji" src="https://api.iconify.design/fluent-emoji/face-with-monocle.svg" /> Loan Inspector</a></li>
+      <li><a href="robots.html#tidy-up-crew"      onclick="document.body.classList.remove('menu-open')"><img class="emoji" src="https://api.iconify.design/fluent-emoji/broom.svg" /> Tidy-Up Crew</a></li>
+      <li><a href="robots.html#card-sorter"       onclick="document.body.classList.remove('menu-open')"><img class="emoji" src="https://api.iconify.design/fluent-emoji/card-index-dividers.svg" /> Card Sorter</a></li>
+      <li><a href="robots.html#finder"            onclick="document.body.classList.remove('menu-open')"><img class="emoji" src="https://api.iconify.design/fluent-emoji/dog-face.svg" /> Finder</a></li>
+    </ul>
+
+    <h4><a href="yesterday.html"  onclick="document.body.classList.remove('menu-open')">Yesterday</a></h4>
+    <ul class="sidebar-nav">
+      <li><a href="yesterday.html" onclick="document.body.classList.remove('menu-open')"><span class="em">📅</span> Yesterday's payouts</a></li>
+    </ul>
+
+    <h4><a href="database.html" onclick="document.body.classList.remove('menu-open')">Schema</a></h4>
+    <ul class="sidebar-nav">
+      <li><a href="database.html"            onclick="document.body.classList.remove('menu-open')"><span class="em">🗄️</span> Database schema</a></li>
+      <li><a href="database.html#row-counts" onclick="document.body.classList.remove('menu-open')"><span class="em">📈</span> Live row counts</a></li>
+    </ul>
+
+    <h4><a href="stats.html"    onclick="document.body.classList.remove('menu-open')">Stats</a></h4>
+    <ul class="sidebar-nav">
+      <li><a href="stats.html" onclick="document.body.classList.remove('menu-open')"><span class="em">📊</span> How big our world is</a></li>
+    </ul>
+  </aside>
+
+  <main>
+    <section class="yp-section">
+      <h1>Yesterday's payouts</h1>
+      <p class="lead">US borrowers whose loans paid out on <strong id="ypDate">…</strong>.</p>
+      <p class="yp-meta" id="ypMeta">Loading…</p>
+
+      <div class="yp-table-wrap">
+        <table class="yp-table" id="ypTable">
+          <thead>
+            <tr><th>Borrower</th><th>State</th><th>Zip</th></tr>
+          </thead>
+          <tbody id="ypBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  fetch('yesterday-payouts.json', { cache: 'no-cache' })
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(data => {
+      const dateLabel = data.target_date
+        ? new Date(data.target_date).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })
+        : 'unknown date';
+      document.getElementById('ypDate').textContent = dateLabel;
+      const updated = data.updated_at ? new Date(data.updated_at).toLocaleString('en-GB') : '';
+      const n = (data.totals && data.totals.borrowers) || (data.items || []).length;
+      document.getElementById('ypMeta').textContent =
+        `${n} borrowers · last refreshed ${updated}`;
+
+      const body = document.getElementById('ypBody');
+      const frag = document.createDocumentFragment();
+      for (const it of (data.items || [])) {
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+          `<td class="borrower">${it.borrower || ''}</td>` +
+          `<td class="state">${it.state || ''}</td>` +
+          `<td class="zip">${it.zip || ''}</td>`;
+        frag.appendChild(tr);
+      }
+      body.appendChild(frag);
+    })
+    .catch(err => {
+      const meta = document.getElementById('ypMeta');
+      if (meta) meta.textContent = 'Could not load yesterday\'s payouts: ' + err.message;
+    });
+</script>
+
+</body>
+</html>
