@@ -1049,6 +1049,67 @@
     color: var(--ink);
     font-size: 0.78rem;
   }
+  .commandment .breakages {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--border-soft);
+  }
+  .commandment .breakages summary {
+    list-style: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border: 1px solid rgba(255, 57, 168, 0.32);
+    border-radius: 999px;
+    background: rgba(255, 57, 168, 0.08);
+    color: var(--accent-2);
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    transition: background 0.15s ease;
+  }
+  .commandment .breakages summary::-webkit-details-marker { display: none; }
+  .commandment .breakages summary::before {
+    content: "▶";
+    font-size: 0.7em;
+    transition: transform 0.18s ease;
+    display: inline-block;
+  }
+  .commandment .breakages[open] summary::before { transform: rotate(90deg); }
+  .commandment .breakages summary:hover { background: rgba(255, 57, 168, 0.16); }
+  .commandment .breakages ul {
+    list-style: none;
+    margin: 14px 0 0;
+    padding: 0;
+  }
+  .commandment .breakages li {
+    margin: 0 0 10px;
+    padding: 12px 14px;
+    background: rgba(255, 57, 168, 0.05);
+    border-left: 2px solid var(--accent-2);
+    border-radius: 4px;
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+  .commandment .breakages li:last-child { margin-bottom: 0; }
+  .commandment .breakages li strong { color: var(--ink); font-weight: 600; }
+  .commandment .breakages li code {
+    background: rgba(0, 212, 255, 0.10);
+    border: 1px solid rgba(0, 212, 255, 0.22);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85em;
+    color: var(--accent);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .commandment .breakages summary::before { transition: none; }
+  }
   @media (max-width: 700px) {
     .commandment {
       grid-template-columns: 50px 60px 1fr;
@@ -2313,7 +2374,10 @@
       icon: "magnifying-glass-tilted-left",
       title: "Names match the wiki — exactly",
       kid: "If the wiki says ARef, you write ARef. Not 'ApplicationId,' not 'aref,' not 'Aref.'",
-      why: "Casing is part of the contract. Paraphrased field, endpoint, or table names silently break queries — and the documentation stops being a source of truth."
+      why: "Casing is part of the contract. Paraphrased field, endpoint, or table names silently break queries — and the documentation stops being a source of truth.",
+      breakages: [
+        { where: "<code>CustomerId</code> in Applications vs Loanbook", what: "Central Applications and Central Loanbook each have a column called <code>CustomerId</code>, but for the same person they are completely different numbers. Same field name, two different meanings. The Loanbook wiki even spells this out: \"This is not the same CustomerId as stored in Applications.\"" }
+      ]
     },
     {
       icon: "scroll",
@@ -2343,7 +2407,13 @@
       icon: "locked-with-key",
       title: "The database is private. The API is public.",
       kid: "If you want something from a helper, you ask them. You don't sneak into their drawer.",
-      why: "Direct DB writes fire Slack alerts on every service (<code>rgcore-payments</code>, <code>rg-core-loanbook</code>, …). The API enforces every other commandment on this list."
+      why: "Direct DB writes fire Slack alerts on every service (<code>rgcore-payments</code>, <code>rg-core-loanbook</code>, …). The API enforces every other commandment on this list.",
+      breakages: [
+        { where: "Central Admin Site → General Settings", what: "The Admin Site reads lender configuration straight from the CRM's <code>Lenders</code> table instead of asking the CRM API for it." },
+        { where: "Central CRM → outbound payout flow", what: "The CRM looks up bounced loans by reading the Loanbook database directly rather than calling the Loanbook API." },
+        { where: "Central Robots → <code>NewLoanFundedToday</code>", what: "This robot finds the day's funded loans by querying the Loanbook database directly, not via the API." },
+        { where: "Central Brokers → source-settings page", what: "The Brokers Portal loads its source data through a direct database connection instead of calling an API." }
+      ]
     },
     {
       icon: "bullseye",
@@ -2355,7 +2425,10 @@
       icon: "counterclockwise-arrows-button",
       title: "Versioning is additive, never destructive",
       kid: "When something changes, it gets a new door. The old door keeps working for old friends.",
-      why: "New behaviour lives on a new endpoint version (V1 → V2). The CRM <code>Endpoints</code> table lets us swap which version the CRM uses without a redeploy."
+      why: "New behaviour lives on a new endpoint version (V1 → V2). The CRM <code>Endpoints</code> table lets us swap which version the CRM uses without a redeploy.",
+      breakages: [
+        { where: "Loanbook → flag tables", what: "Three tables (<code>Flags</code>, <code>FlagTypes</code>, <code>LenderEnabledFlagTypes</code>) were deleted from the codebase even though the wiki still describes them. Their replacements (<code>CustomFlags</code>, <code>CustomFlagsType</code>) sit alongside, but the originals were taken out rather than left as a working old door." }
+      ]
     },
     {
       icon: "gear",
@@ -2367,7 +2440,10 @@
       icon: "speech-balloon",
       title: "An API never calls another API",
       kid: "Helpers don't talk to each other. They wait. Front-ends and robots are the ones who knock on doors.",
-      why: "Orchestration belongs to a caller — a front-end (CRM, websites, app) or a robot. APIs stay pure responders. This keeps every API independently testable and stops a chain of failures from cascading across services."
+      why: "Orchestration belongs to a caller — a front-end (CRM, websites, app) or a robot. APIs stay pure responders. This keeps every API independently testable and stops a chain of failures from cascading across services.",
+      breakages: [
+        { where: "Central Brokers → <code>CreateApplication</code>", what: "When a broker submits a lead, the Brokers API itself orchestrates the whole intake — it calls <code>Applications/DeDupe</code>, <code>Loanbook/DeDupe</code>, <code>CreditBuilder/Query</code>, then <code>Applications/BrokerAPILead</code>. That orchestration is supposed to live in a front-end or robot, not inside an API." }
+      ]
     },
     {
       icon: "link",
@@ -2388,6 +2464,14 @@
     const num = String(i + 1).padStart(2, '0');
     const article = document.createElement('article');
     article.className = 'commandment';
+    let breakagesHtml = '';
+    if (cm.breakages && cm.breakages.length) {
+      const items = cm.breakages.map(b => `<li><strong>${b.where}.</strong> ${b.what}</li>`).join('');
+      const label = cm.breakages.length === 1
+        ? "Where this rule is broken (1)"
+        : `Where this rule is broken (${cm.breakages.length})`;
+      breakagesHtml = `<details class="breakages"><summary>${label}</summary><ul>${items}</ul></details>`;
+    }
     article.innerHTML = `
       <div class="num">${num}</div>
       <div class="icon-wrap"><img src="https://api.iconify.design/fluent-emoji/${cm.icon}.svg" alt="" /></div>
@@ -2395,6 +2479,7 @@
         <h3>${cm.title}</h3>
         <p class="kid">${cm.kid}</p>
         <p class="why"><strong>Why</strong>${cm.why}</p>
+        ${breakagesHtml}
       </div>
     `;
     commList.appendChild(article);
