@@ -245,39 +245,25 @@
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    // 1) Heatmap layer: aggregate borrowers per zip-centroid → intensity = count.
-    //    Hot areas (Chicago, Dallas, etc.) glow yellow/red; sparse areas barely show.
-    const perPoint = new Map();
-    for (const it of items) {
-      if (it.lat == null || it.lng == null) continue;
-      const k = `${it.lat},${it.lng}`;
-      perPoint.set(k, (perPoint.get(k) || 0) + 1);
-    }
-    const heatData = [];
-    let maxCount = 1;
-    for (const [k, n] of perPoint.entries()) {
-      const [lat, lng] = k.split(',').map(Number);
-      heatData.push([lat, lng, n]);
-      if (n > maxCount) maxCount = n;
-    }
-    if (typeof L.heatLayer === 'function') {
-      L.heatLayer(heatData, {
-        radius: 28,
-        blur: 22,
-        maxZoom: 9,
-        max: maxCount,        // scale gradient against the busiest zip
-        minOpacity: 0.35,
-      }).addTo(map);
-    }
+    // Leaflet's default marker images live under /images/ inside the CDN. The
+    // bundler-style relative path doesn't work with a plain script-tag load,
+    // so point at the CDN explicitly. Without this, you see broken-image icons.
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+      iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+      shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    });
 
-    // 2) Cluster layer on top: bubbles show a count number you can click.
+    // Cluster layer with one classic Leaflet "stuck-in pin" per borrower.
+    // Dense areas show a numbered bubble at low zoom; zoom in and the
+    // bubble breaks into individual droplets, each clickable.
     const clusterAvail = (typeof L.markerClusterGroup === 'function');
     const cluster = clusterAvail
       ? L.markerClusterGroup({
           chunkedLoading: true,
           showCoverageOnHover: false,
           spiderfyOnMaxZoom: true,
-          maxClusterRadius: 50,
+          maxClusterRadius: 40,
         })
       : L.layerGroup();
     for (const it of items) {
@@ -286,15 +272,9 @@
         `<strong>${it.first_name || ''}</strong><br>` +
         `${it.state || ''} · ${it.zip || ''}<br>` +
         `${fmtUSD2.format(it.amount || 0)}`;
-      // Without clustering, draw each pin smaller & more transparent so dense
-      // areas at least visibly stack. With clustering, bubbles handle this.
-      const m = L.circleMarker([it.lat, it.lng], {
-        radius: clusterAvail ? 5 : 4,
-        color: '#00d4ff',
-        weight: 1,
-        fillColor: '#00d4ff',
-        fillOpacity: clusterAvail ? 0.7 : 0.35,
-      }).bindPopup(popup);
+      // Default Leaflet droplet marker — literally looks like a pin pushed
+      // into the map (with shadow), one per borrower.
+      const m = L.marker([it.lat, it.lng]).bindPopup(popup);
       cluster.addLayer(m);
     }
     map.addLayer(cluster);
@@ -315,10 +295,7 @@
   // both need `L` to be defined at parse time — running them in parallel
   // races the leaflet bundle and silently drops one of the layers.
   loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js')
-    .then(() => Promise.all([
-      loadScript('https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js'),
-      loadScript('https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js'),
-    ]))
+    .then(() => loadScript('https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js'))
     .catch(err => console.warn('leaflet plugin load failed', err))
     .finally(() => {
     fetch('yesterday-payouts.json', { cache: 'no-cache' })
