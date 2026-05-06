@@ -245,49 +245,82 @@
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    const cluster = (typeof L.markerClusterGroup === 'function')
-      ? L.markerClusterGroup({ chunkedLoading: true, showCoverageOnHover: false, spiderfyOnMaxZoom: true })
+    // 1) Heatmap layer: aggregate borrowers per zip-centroid → intensity = count.
+    //    Hot areas (Chicago, Dallas, etc.) glow yellow/red; sparse areas barely show.
+    const perPoint = new Map();
+    for (const it of items) {
+      if (it.lat == null || it.lng == null) continue;
+      const k = `${it.lat},${it.lng}`;
+      perPoint.set(k, (perPoint.get(k) || 0) + 1);
+    }
+    const heatData = [];
+    let maxCount = 1;
+    for (const [k, n] of perPoint.entries()) {
+      const [lat, lng] = k.split(',').map(Number);
+      heatData.push([lat, lng, n]);
+      if (n > maxCount) maxCount = n;
+    }
+    if (typeof L.heatLayer === 'function') {
+      L.heatLayer(heatData, {
+        radius: 28,
+        blur: 22,
+        maxZoom: 9,
+        max: maxCount,        // scale gradient against the busiest zip
+        minOpacity: 0.35,
+      }).addTo(map);
+    }
+
+    // 2) Cluster layer on top: bubbles show a count number you can click.
+    const clusterAvail = (typeof L.markerClusterGroup === 'function');
+    const cluster = clusterAvail
+      ? L.markerClusterGroup({
+          chunkedLoading: true,
+          showCoverageOnHover: false,
+          spiderfyOnMaxZoom: true,
+          maxClusterRadius: 50,
+        })
       : L.layerGroup();
-    let plotted = 0;
     for (const it of items) {
       if (it.lat == null || it.lng == null) continue;
       const popup =
         `<strong>${it.first_name || ''}</strong><br>` +
         `${it.state || ''} · ${it.zip || ''}<br>` +
         `${fmtUSD2.format(it.amount || 0)}`;
+      // Without clustering, draw each pin smaller & more transparent so dense
+      // areas at least visibly stack. With clustering, bubbles handle this.
       const m = L.circleMarker([it.lat, it.lng], {
-        radius: 6,
+        radius: clusterAvail ? 5 : 4,
         color: '#00d4ff',
-        weight: 1.5,
+        weight: 1,
         fillColor: '#00d4ff',
-        fillOpacity: 0.55,
+        fillOpacity: clusterAvail ? 0.7 : 0.35,
       }).bindPopup(popup);
       cluster.addLayer(m);
-      plotted++;
     }
     map.addLayer(cluster);
-    return plotted;
   }
 
-  function loadScript(src, integrity) {
+  function loadScript(src) {
     return new Promise((resolve, reject) => {
       const s = document.createElement('script');
       s.src = src;
-      if (integrity) { s.integrity = integrity; s.crossOrigin = 'anonymous'; }
+      s.crossOrigin = 'anonymous';
       s.onload = () => resolve();
       s.onerror = () => reject(new Error('failed to load ' + src));
       document.head.appendChild(s);
     });
   }
 
-  // Load Leaflet + markercluster, then fetch the data and render.
-  Promise.all([
-    loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-               'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo='),
-    loadScript('https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js'),
-  ])
-  .catch(() => { /* still render the data; map will degrade */ })
-  .finally(() => {
+  // Load Leaflet first, THEN the plugins (cluster + heat). The plugins
+  // both need `L` to be defined at parse time — running them in parallel
+  // races the leaflet bundle and silently drops one of the layers.
+  loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js')
+    .then(() => Promise.all([
+      loadScript('https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js'),
+      loadScript('https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js'),
+    ]))
+    .catch(err => console.warn('leaflet plugin load failed', err))
+    .finally(() => {
     fetch('yesterday-payouts.json', { cache: 'no-cache' })
       .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(data => {
