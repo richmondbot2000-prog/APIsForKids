@@ -40,6 +40,10 @@
     border-radius: 8px;
     overflow: hidden;
     background: var(--bg-soft);
+    /* Contain Leaflet's internal z-index (markers up to 600, popups 700, controls 800)
+       so it can't escape and float over the mobile sidebar drawer (z-index 60). */
+    position: relative;
+    z-index: 0;
   }
   .yp-map-caption {
     margin: 0 0 8px;
