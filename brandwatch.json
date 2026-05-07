@@ -1,24 +1,24 @@
 {
   "schema_version": 1,
-  "snapshot_date": "1970-01-01",
-  "updated_at": "2026-05-07T17:44:39Z",
+  "snapshot_date": "2026-05-07",
+  "updated_at": "2026-05-07T17:52:02Z",
   "brands": [
     "Together Loans",
     "TransformCredit"
   ],
   "totals": {
-    "all": 12,
+    "all": 5,
     "by_source": {
       "trustpilot": 0,
       "bbb": 0,
       "reddit": 0,
-      "bluesky": 7,
+      "bluesky": 4,
       "hackernews": 0,
-      "google_news": 5
+      "google_news": 1
     },
     "by_brand": {
       "together_loans": 4,
-      "transform_credit": 8
+      "transform_credit": 1
     }
   },
   "source_status": {
@@ -54,34 +54,6 @@
     }
   },
   "mentions": [
-    {
-      "source": "bluesky",
-      "brand": "transform_credit",
-      "id": "bs-m6wn2lr-app-bsky-feed-post-3mixuoeg7u7g2",
-      "title": "Finastra and Marketnode transform credit agreement onboarding through AI Integration of Marketnode’…",
-      "snippet": "Finastra and Marketnode transform credit agreement onboarding through AI Integration of Marketnode’s intelligent document automation with Finastra’s Loan IQ platform accelerates lo…",
-      "url": "https://bsky.app/profile/llms.activitypub.awakari.com.ap.brid.gy/post/3mixuoeg7u7g2",
-      "date": "2026-04-08",
-      "author": "@llms.activitypub.awakari.com.ap.brid.gy",
-      "score": null,
-      "score_max": null,
-      "site_name": "Bluesky",
-      "site_domain": "bsky.app"
-    },
-    {
-      "source": "google_news",
-      "brand": "transform_credit",
-      "id": "gn-4djZVNWdQREJXVVBOV0JYMUw5Y0JiWElfOFE0ekE",
-      "title": "Transform Credit: Reviews and Ratings - MSN",
-      "snippet": "Transform Credit: Reviews and Ratings MSN",
-      "url": "https://news.google.com/rss/articles/CBMipgJBVV95cUxNVFhJQXZlOUlqeHJnQm9QdmNqME11RjRJcDFCNmhNeTZCQWRXWEVkNy1KNDgxcDNxSllOZURRR2hhRWlmQTRWYXowUzhoeHJyM1VfVG1pUERWX09zQjRJUlpZSVhwTjllZjVFSm5jdXBQWkFNQ3Y1WXQ3V0Z2OVVLdC1wSEtKZHlNcDF2Y21VMC1pbmNKbnJvbXRvOXZZRVFaNnI1d2c1WF9FZUd0VGx4RXRBWkFSSVl2czBNZ2F3WTZ4V0pTenBoX0RBSlBxcU5Lck1Xd05QV29hV2tON3ZPeFlaME9OdnFiQXR6SjRrTUE2c3FQTEZudnM2THNzNEdVcUFPcDJMTXJ4djZVNWdQREJXVVBOV0JYMUw5Y0JiWElfOFE0ekE?oc=5",
-      "date": "2025-11-28",
-      "author": null,
-      "score": null,
-      "score_max": null,
-      "site_name": "MSN",
-      "site_domain": "msn.com"
-    },
     {
       "source": "bluesky",
       "brand": "together_loans",
@@ -141,34 +113,6 @@
     {
       "source": "google_news",
       "brand": "transform_credit",
-      "id": "gn-ZGRpbFVLNVNHam1KcDhCd3dTS2FOOVhPR3NManpO",
-      "title": "Poonawalla Fincorp launches AI-powered underwriting solution to transform credit decisions - ETLegalWorld.com",
-      "snippet": "Poonawalla Fincorp launches AI-powered underwriting solution to transform credit decisions ETLegalWorld.com",
-      "url": "https://news.google.com/rss/articles/CBMi-wFBVV95cUxNdlBtX0Jzckh1Y29yUGtJdWFRRjNPRWVoMkZXMms3QXpkV3FJSzNwVnV1TUhEWUNOSS1EaHJxXzJ1NzJlc3hZMzRCUGJMSHFTYnJpY2pVc3BYZjFpSlhhT0ROV2p4eXkxZlYxMTl1cHg2WFFvNEp0bWVqeW5EcGs1MXJrdWx0dkVIZUZmUzFPZHpQNDVNU3lnN3NQSEszajd6OF9ycXItOTZTcm15Qi1scFdOZGZQMDY1NFU0dkZhTXBoX3Z6Zi1NeDZ3TW5iTm11d2Q2QW5yQUk5ejFYNllPUVF2UjZXME9GV05ycmxNa1RFLVl5V3RKQ0NwNNIBgAJBVV95cUxOajBIbWl3UTYzU3hZcHRqZnlYX2w3QnBKRXpKcVFXZFFXTG8wVXhBd1hCZmNrZ0JnMEZBSDh0Q2NIOGg5ZFVRMXZmOGRnN3I2WnU2SlJTQ3M3ekNRR3M2blNWdXdZTkFrMHp1dWdSOGFGUFVGa1p0S3d5VUVBdnJOQ3RjRzA2T3ZEbFI5RUVaZFN5cTA2c3RNdE50YjFFelh2LVpkQ1E4U2tzSnRseDZhYUw2YW5UZTBJU3ZNX0xXLTlHR3FmWXdqcUhqWUE3SVA5MzJtdzA3WlZZc1ZYNWtjN1BkZGRpbFVLNVNHam1KcDhCd3dTS2FOOVhPR3NManpO?oc=5",
-      "date": "2025-03-25",
-      "author": null,
-      "score": null,
-      "score_max": null,
-      "site_name": "ETLegalWorld.com",
-      "site_domain": "legal.economictimes.indiatimes.com"
-    },
-    {
-      "source": "bluesky",
-      "brand": "transform_credit",
-      "id": "bs-jadx4jd-app-bsky-feed-post-3lk6v2iapws2p",
-      "title": "NestEgg’s new analytics tools will transform credit union lending! 🚀 Make smarter, data-driven deci…",
-      "snippet": "NestEgg’s new analytics tools will transform credit union lending! 🚀 Make smarter, data-driven decisions on: 📊 Growth 🎯 Marketing ⚖ Risk ⚡ Efficiency Read our latest blog post to learn more a…",
-      "url": "https://bsky.app/profile/nestegg.ai/post/3lk6v2iapws2p",
-      "date": "2025-03-12",
-      "author": "@nestegg.ai",
-      "score": 1,
-      "score_max": null,
-      "site_name": "Bluesky",
-      "site_domain": "bsky.app"
-    },
-    {
-      "source": "google_news",
-      "brand": "transform_credit",
       "id": "gn-VoWDlPdmJ4eW4xLXpucFY2QmZMMXlCaW53VWxqUQ",
       "title": "TransformCredit Review – Is it Safe and Legit? (April 2026) - Traders Union",
       "snippet": "TransformCredit Review – Is it Safe and Legit? (April 2026) Traders Union",
@@ -179,48 +123,6 @@
       "score_max": null,
       "site_name": "Traders Union",
       "site_domain": "tradersunion.com"
-    },
-    {
-      "source": "bluesky",
-      "brand": "transform_credit",
-      "id": "bs-tfg75nz-app-bsky-feed-post-3lgkpfh3w3k2d",
-      "title": "Innovations in Lending-Focused FinTech: Leveraging AI to Transform Credit Accessibility and Risk As…",
-      "snippet": "Innovations in Lending-Focused FinTech: Leveraging AI to Transform Credit Accessibility and Risk Assessement - goo.gl/scholar/tVJM3D",
-      "url": "https://bsky.app/profile/manuelvina.bsky.social/post/3lgkpfh3w3k2d",
-      "date": "2025-01-25",
-      "author": "@manuelvina.bsky.social",
-      "score": null,
-      "score_max": null,
-      "site_name": "Bluesky",
-      "site_domain": "bsky.app"
-    },
-    {
-      "source": "google_news",
-      "brand": "transform_credit",
-      "id": "gn-BmaVZPUUJXcFpWRU5fSkxXb2dTVkJmdXNOalg2UQ",
-      "title": "BankTech Ventures Invests in SOLO to Transform Credit Underwriting for Banks - Business Wire",
-      "snippet": "BankTech Ventures Invests in SOLO to Transform Credit Underwriting for Banks Business Wire",
-      "url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxOdEVVWTFTYlZYazBFVW5uRTdILWFwaVR1MjlIZ2dFdTZUY0pWME03allvc1hoTHpJM0ltZi1Ecno0NFFaY0xMcDVJT2g3LV9kekhySDNsellnUl9GZ0d1S2ItZEZrQlh1bkVsUGtvNk1qd2pVeWJRX1JIcVlhcDRxS0w1U2dpejZHc1hNU1RrS0NTZV9sR3VrWVpoTjVhZFlla3VKdGRJU2FwZjJlcDRyUDBmaVZPUUJXcFpWRU5fSkxXb2dTVkJmdXNOalg2UQ?oc=5",
-      "date": "2024-12-03",
-      "author": null,
-      "score": null,
-      "score_max": null,
-      "site_name": "Business Wire",
-      "site_domain": "businesswire.com"
-    },
-    {
-      "source": "google_news",
-      "brand": "transform_credit",
-      "id": "gn-elV6YVAxeDVrOVJKYzFReWh3MFRZaWRDSHBqMFpr",
-      "title": "Wiserfunding and Cardo AI Partner to Transform Credit Analytics in the Private Debt Market - GlobeNewswire",
-      "snippet": "Wiserfunding and Cardo AI Partner to Transform Credit Analytics in the Private Debt Market GlobeNewswire",
-      "url": "https://news.google.com/rss/articles/CBMi9AFBVV95cUxOMkM4UDBtMFUxUERBOEloSzJsLVZqX0FMTjVqR1hScjJVR2JBbkoyUUFhQklXal9xdFRmb0c1dmlUcEZiOGVqNG5yVktOazZzNU9vMXFsdHBWNnZveUYzcEdrMXRWQW1kbEJmTDA4MDVJdHJQajd2YUpheklYUGxzaWljM0hpMklCR2VueVFMbXRTYm1VVy1aY1A0bVdjNFg0aXBaS1lGMXY1dFVUUzFmdFVnLXpvZlBZMG9oU1V5QVVGRlMxY3RsVUpRU3NHTzd6dVRoUDRRelV6YVAxeDVrOVJKYzFReWh3MFRZaWRDSHBqMFpr?oc=5",
-      "date": "2022-12-13",
-      "author": null,
-      "score": null,
-      "score_max": null,
-      "site_name": "GlobeNewswire",
-      "site_domain": "globenewswire.com"
     }
   ]
 }
