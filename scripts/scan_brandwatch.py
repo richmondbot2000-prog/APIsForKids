@@ -172,7 +172,8 @@ def _http_get(url: str, **kwargs) -> requests.Response:
     headers = kwargs.pop("headers", {}) or {}
     headers.setdefault("User-Agent", USER_AGENT)
     headers.setdefault("Accept", "*/*")
-    return requests.get(url, headers=headers, timeout=HTTP_TIMEOUT, **kwargs)
+    kwargs.setdefault("timeout", HTTP_TIMEOUT)
+    return requests.get(url, headers=headers, **kwargs)
 
 
 def _http_get_proxied(url: str, **kwargs) -> requests.Response:
@@ -197,11 +198,11 @@ def _http_get_proxied(url: str, **kwargs) -> requests.Response:
         f"&premium=true"
         f"&country_code=us"
     )
-    # Use a longer timeout — ScraperAPI may take 20–40 s to fetch a Cloudflare-
-    # protected page through its rotation logic.
+    # ScraperAPI may take 20–40 s to fetch a Cloudflare-protected page through
+    # its IP rotation. Default timeout from _http_get (HTTP_TIMEOUT = 20s) is
+    # too short. Pass an explicit timeout that overrides the default.
     kwargs.setdefault("timeout", 70)
-    return _http_get(proxied, **{k: v for k, v in kwargs.items() if k != "timeout"},
-                     timeout=kwargs["timeout"])
+    return _http_get(proxied, **kwargs)
 
 
 # --------------------------------------------------------------------------
