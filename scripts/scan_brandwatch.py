@@ -278,7 +278,7 @@ def _http_get_proxied(url: str, *, tier: str = "premium", **kwargs) -> requests.
 TRUSTPILOT_MAX_PAGES = 5  # 5 × 20 = 100 most-recent reviews per brand per scan
 
 
-def fetch_trustpilot(brand: dict) -> list[dict]:
+def fetch_trustpilot(brand: dict, known_ids: set[str] | None = None) -> list[dict]:
     """
     Trustpilot embeds a JSON blob in a <script id="__NEXT_DATA__"> tag with
     every review on the page. Pull that blob, walk its 'reviews' list.
@@ -286,10 +286,25 @@ def fetch_trustpilot(brand: dict) -> list[dict]:
     Paginates through TRUSTPILOT_MAX_PAGES pages of reviews (default 5) for
     historical depth. Each page costs 10 ScraperAPI credits (render=true).
 
+    If `known_ids` is provided (the set of "tp-<id>" strings we've already
+    archived from prior scans), pagination short-circuits as soon as a page
+    contains a known review. Trustpilot is sorted desc by published date,
+    so a known ID means we've reached our archive boundary — there's
+    nothing new beyond it. Saves ScraperAPI credits dramatically once an
+    archive has been built up: typical incremental scan is page 1 only,
+    not 5 pages.
+
     If the brand has no Trustpilot profile (404 on page 1) we return [] and
     let the caller record source_status accordingly. If a later page 404s,
     we silently stop (probably ran past the end of available reviews).
+
+    Date returned is `experiencedDate` (date of the actual loan experience,
+    which is the date Trustpilot's own UI displays as 'Date of experience')
+    falling back to `publishedDate` only if experiencedDate is missing.
+    Earlier versions used publishedDate, which can be 1–3 days later than
+    the experience date.
     """
+    known_ids = known_ids or set()
     out: list[dict] = []
     seen_ids: set[str] = set()
     headers = {
@@ -337,6 +352,7 @@ def fetch_trustpilot(brand: dict) -> list[dict]:
         if not reviews:
             break  # past the end of available pages
 
+        hit_archive = False
         for rv in reviews:
             try:
                 review_id = rv.get("id") or ""
@@ -344,10 +360,26 @@ def fetch_trustpilot(brand: dict) -> list[dict]:
                     continue
                 seen_ids.add(review_id)
 
+                # Archive boundary check — flag and skip; we'll break out
+                # of pagination after the loop completes (still process the
+                # rest of this page in case there's a newer review out of
+                # order, which is rare but cheap to handle).
+                if f"tp-{review_id}" in known_ids:
+                    hit_archive = True
+                    continue
+
                 title = rv.get("title") or ""
                 body  = rv.get("text")  or ""
                 rating = int(rv.get("rating") or 0) or None
-                created = rv.get("dates", {}).get("publishedDate") or rv.get("createdAt")
+                dates_blob = rv.get("dates") or {}
+                # Date of experience (what Trustpilot's UI prominently shows)
+                # is preferred over publishedDate (when the review was posted)
+                # because users compare against the former when sanity-checking.
+                created = (
+                    dates_blob.get("experiencedDate")
+                    or dates_blob.get("publishedDate")
+                    or rv.get("createdAt")
+                )
                 consumer = rv.get("consumer", {}).get("displayName")
                 slug = rv.get("id", "")
                 link = f"{base_url}#{slug}" if slug else base_url
@@ -368,6 +400,14 @@ def fetch_trustpilot(brand: dict) -> list[dict]:
                 })
             except Exception as e:
                 print(f"  trustpilot: skipping review ({e})", flush=True)
+
+        if hit_archive:
+            print(
+                f"  trustpilot: hit archive boundary on page {page} — "
+                f"stopping (saves {TRUSTPILOT_MAX_PAGES - page} pages × 10 credits)",
+                flush=True,
+            )
+            break
     return out
 
 
@@ -510,14 +550,21 @@ def fetch_reddit(brand: dict) -> list[dict]:
     return out
 
 
-def fetch_bbb(brand: dict) -> list[dict]:
+def fetch_bbb(brand: dict, known_ids: set[str] | None = None) -> list[dict]:
     """
     BBB (Better Business Bureau) — search the public business-search page
     for the brand and return any business profiles + reviews found.
 
     BBB is Cloudflare-protected like Trustpilot, so this often 403s from
     cloud-IP runners. The page surfaces source-status warnings when it does.
+
+    `known_ids` (the set of "bbb-<id>" strings we've already archived) is
+    used to skip already-known reviews at the review level. Unlike
+    Trustpilot we can't short-circuit pagination here (BBB exposes only
+    the top 10 reviews per profile) so the saving is just dedup, not
+    skipped requests.
     """
+    known_ids = known_ids or set()
     out: list[dict] = []
     url = (
         "https://www.bbb.org/search?find_country=USA"
@@ -605,6 +652,9 @@ def fetch_bbb(brand: dict) -> list[dict]:
             for rv in review_items[:10]:
                 try:
                     review_id = rv.get("id") or rv.get("customerReviewGuid") or ""
+                    full_id = f"bbb-{review_id or re.sub(r'[^a-zA-Z0-9]+', '-', href)[-30:]}"
+                    if full_id in known_ids:
+                        continue  # already archived from a prior scan
                     rating = rv.get("reviewStarRating")
                     try:
                         rating = int(rating) if rating is not None else None
@@ -641,7 +691,7 @@ def fetch_bbb(brand: dict) -> list[dict]:
                     out.append({
                         "source":      "bbb",
                         "brand":       brand["key"],
-                        "id":          f"bbb-{review_id or re.sub(r'[^a-zA-Z0-9]+', '-', href)[-30:]}",
+                        "id":          full_id,
                         "title":       _short(title, 200),
                         "snippet":     _short(body, 280) or f"BBB review of {biz_name}.",
                         "url":         reviews_url,
@@ -975,6 +1025,31 @@ def run() -> dict:
     }
     all_mentions: list[dict] = []
 
+    # Cumulative archive: load existing trustpilot + bbb mentions from the
+    # last brandwatch.json. These are durable history (review pages are
+    # immutable — a 4-May review will still be there tomorrow), so there's
+    # no point re-scraping pages whose reviews we already have. We pass the
+    # known IDs into fetch_trustpilot / fetch_bbb so they can short-circuit
+    # pagination once they hit the archive boundary.
+    out_path = Path(__file__).resolve().parent.parent / "brandwatch.json"
+    archived_reviews: list[dict] = []
+    archive_ids: dict[str, set[str]] = {"trustpilot": set(), "bbb": set()}
+    if out_path.exists():
+        try:
+            existing = json.loads(out_path.read_text())
+            for m in existing.get("mentions", []):
+                src = m.get("source")
+                if src in archive_ids:
+                    archived_reviews.append(m)
+                    archive_ids[src].add(m.get("id", ""))
+            print(
+                f"loaded archive: trustpilot={len(archive_ids['trustpilot'])} "
+                f"bbb={len(archive_ids['bbb'])} reviews",
+                flush=True,
+            )
+        except Exception as e:
+            print(f"warning: couldn't load existing archive: {e}", flush=True)
+
     for brand in BRANDS:
         print(f"== {brand['label']} ==", flush=True)
         for source_key, fn in (
@@ -988,8 +1063,11 @@ def run() -> dict:
             ("google_news",    fetch_google_news),
         ):
             try:
-                rows = fn(brand)
-                print(f"  {source_key}: {len(rows)} mentions", flush=True)
+                if source_key in archive_ids:
+                    rows = fn(brand, known_ids=archive_ids[source_key])
+                else:
+                    rows = fn(brand)
+                print(f"  {source_key}: {len(rows)} new mentions", flush=True)
                 source_status[source_key]["fetched"] += len(rows)
                 all_mentions.extend(rows)
             except Exception as e:
@@ -997,6 +1075,15 @@ def run() -> dict:
                 print(f"  {source_key}: FAILED — {e}", flush=True)
                 source_status[source_key]["ok"] = False
                 source_status[source_key]["error"] = f"{type(e).__name__}: {e}"
+
+    # Merge in archived trustpilot + bbb reviews (already passed precision
+    # filter on the scan that originally fetched them — they're trusted).
+    # Any "fresh fetch" hit with the same ID wins (in case the live page
+    # has updated text/rating); else we fall back to the archived copy.
+    fresh_keys = {(m["source"], m["id"]) for m in all_mentions}
+    for m in archived_reviews:
+        if (m.get("source"), m.get("id")) not in fresh_keys:
+            all_mentions.append(m)
 
     # De-dupe by (source, id)
     seen = set()
