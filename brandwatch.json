@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "snapshot_date": "1970-01-01",
-  "updated_at": "2026-05-07T19:28:47Z",
+  "snapshot_date": "2026-05-07",
+  "updated_at": "2026-05-07T19:39:23Z",
   "brands": [
     "Together Loans",
     "TransformCredit"
   ],
   "totals": {
-    "all": 5,
+    "all": 6,
     "by_source": {
       "trustpilot": 0,
-      "bbb": 0,
+      "bbb": 1,
       "reddit": 0,
       "bluesky": 4,
       "lemmy": 0,
@@ -19,19 +19,19 @@
       "google_news": 1
     },
     "by_brand": {
-      "together_loans": 4,
+      "together_loans": 5,
       "transform_credit": 1
     }
   },
   "source_status": {
     "trustpilot": {
-      "ok": false,
-      "fetched": 0,
-      "error": "HTTPError: 403 Client Error: Forbidden for url: https://api.scraperapi.com/?api_key=d45dbd4045b58d674921125d0e585bca&url=https%3A%2F%2Fwww.trustpilot.com%2Freview%2Ftransformcredit.com&country_code=us&ultra_premium=true"
+      "ok": true,
+      "fetched": 20,
+      "error": null
     },
     "bbb": {
       "ok": true,
-      "fetched": 0,
+      "fetched": 1,
       "error": null
     },
     "reddit": {
@@ -61,11 +61,25 @@
     },
     "google_news": {
       "ok": true,
-      "fetched": 71,
+      "fetched": 72,
       "error": null
     }
   },
   "mentions": [
+    {
+      "source": "bbb",
+      "brand": "together_loans",
+      "id": "bbb-mer-finance-companies-together-loans-0654-90019971",
+      "title": "Together Loans",
+      "snippet": "Better Business Bureau profile in the Consumer Finance Companies category.",
+      "url": "https://www.bbb.org/us/il/chicago/profile/consumer-finance-companies/together-loans-0654-90019971",
+      "date": "2026-05-07",
+      "author": "Consumer Finance Companies",
+      "score": null,
+      "score_max": null,
+      "site_name": "BBB",
+      "site_domain": "bbb.org"
+    },
     {
       "source": "bluesky",
       "brand": "together_loans",
