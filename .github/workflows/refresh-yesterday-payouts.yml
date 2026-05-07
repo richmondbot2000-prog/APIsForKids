@@ -1,11 +1,17 @@
 name: Refresh yesterday payouts
 
-# Daily — pulls yesterday's US payouts from the Fabric warehouse and commits
+# Pulls yesterday's US payouts from the Fabric warehouse and commits
 # yesterday-payouts.json back to main so the kids site stays current.
+#
+# We try every hour from 06:00–23:00 UTC instead of a single 06:00 slot
+# because GitHub Actions cron is unreliable on free public repos
+# (slots can be silently skipped during high load). The first step in
+# the job is a guard that exits cleanly if today's run has already
+# committed — so 17 of the 18 daily firings do almost no work.
 
 on:
   schedule:
-    - cron: '0 6 * * *'   # 06:00 UTC every day (after the warehouse refresh has settled)
+    - cron: '0 6-23 * * *'
   workflow_dispatch:        # manual trigger from the Actions tab
 
 permissions:
@@ -24,7 +30,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Skip if already up to date
+        id: guard
+        run: |
+          set -euo pipefail
+          EXPECTED=$(date -u -d 'yesterday' +%Y-%m-%d)
+          if [ -f yesterday-payouts.json ]; then
+            CURRENT=$(python3 -c "import json; print(json.load(open('yesterday-payouts.json')).get('target_date',''))")
+          else
+            CURRENT=""
+          fi
+          echo "expected_target_date=$EXPECTED  current_target_date=$CURRENT"
+          if [ "$CURRENT" = "$EXPECTED" ]; then
+            echo "Already refreshed for $EXPECTED — skipping the rest of the job."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Need to refresh: have '$CURRENT', want '$EXPECTED'."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install Microsoft ODBC Driver 18
+        if: steps.guard.outputs.skip != 'true'
         run: |
           set -euo pipefail
           source /etc/os-release
@@ -34,14 +60,17 @@ jobs:
           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
 
       - name: Set up Python
+        if: steps.guard.outputs.skip != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install Python deps
+        if: steps.guard.outputs.skip != 'true'
         run: pip install --quiet pyodbc==5.*
 
       - name: Scan
+        if: steps.guard.outputs.skip != 'true'
         env:
           FABRIC_SQL_ENDPOINT: d76gbn5gtayeppltcrsxsvkluq-ruqkpz7fkwpelmnjh4kbg2lqpi.datawarehouse.fabric.microsoft.com
           FABRIC_TENANT_ID:    b760fc1f-98a6-4730-bd73-146579554ba4
@@ -50,6 +79,7 @@ jobs:
         run: python scripts/scan_yesterday_payouts.py
 
       - name: Commit if yesterday-payouts.json changed
+        if: steps.guard.outputs.skip != 'true'
         run: |
           set -euo pipefail
           if git diff --quiet -- yesterday-payouts.json; then

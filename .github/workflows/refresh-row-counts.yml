@@ -2,10 +2,19 @@ name: Refresh row counts
 
 # Re-runs the Fabric warehouse scan and commits an updated `row-counts.json`
 # back to main. The kids-site database page reads that JSON.
+#
+# We try every hour from 06:00–23:00 UTC instead of a single weekly slot
+# because GitHub Actions cron is unreliable on free public repos
+# (slots can be silently skipped during high load). The first step in
+# the job is a guard that exits cleanly if today's snapshot is already
+# in the file — so 17 of the 18 daily firings do almost no work.
+#
+# This is a behaviour change from the previous Sunday-only schedule:
+# row counts now refresh every day instead of every week.
 
 on:
   schedule:
-    - cron: '0 4 * * 0'   # 04:00 UTC every Sunday
+    - cron: '0 6-23 * * *'
   workflow_dispatch:        # allow manual trigger from the Actions tab
 
 permissions:
@@ -24,7 +33,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Skip if already up to date
+        id: guard
+        run: |
+          set -euo pipefail
+          EXPECTED=$(date -u +%Y-%m-%d)
+          if [ -f row-counts.json ]; then
+            CURRENT=$(python3 -c "import json; print(json.load(open('row-counts.json')).get('snapshot_date',''))")
+          else
+            CURRENT=""
+          fi
+          echo "expected_snapshot_date=$EXPECTED  current_snapshot_date=$CURRENT"
+          if [ "$CURRENT" = "$EXPECTED" ]; then
+            echo "Snapshot already taken for $EXPECTED — skipping the rest of the job."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Need to refresh: have '$CURRENT', want '$EXPECTED'."
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install Microsoft ODBC Driver 18
+        if: steps.guard.outputs.skip != 'true'
         run: |
           set -euo pipefail
           source /etc/os-release
@@ -34,14 +63,17 @@ jobs:
           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
 
       - name: Set up Python
+        if: steps.guard.outputs.skip != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Install Python deps
+        if: steps.guard.outputs.skip != 'true'
         run: pip install --quiet pyodbc==5.*
 
       - name: Scan warehouse
+        if: steps.guard.outputs.skip != 'true'
         env:
           FABRIC_SQL_ENDPOINT: d76gbn5gtayeppltcrsxsvkluq-ruqkpz7fkwpelmnjh4kbg2lqpi.datawarehouse.fabric.microsoft.com
           FABRIC_TENANT_ID:    b760fc1f-98a6-4730-bd73-146579554ba4
@@ -51,6 +83,7 @@ jobs:
         run: python scripts/scan_row_counts.py
 
       - name: Commit if row-counts.json changed
+        if: steps.guard.outputs.skip != 'true'
         run: |
           set -euo pipefail
           if git diff --quiet -- row-counts.json; then
