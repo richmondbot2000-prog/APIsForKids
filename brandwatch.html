@@ -472,9 +472,19 @@
           <div class="bw-stat-sub">recent posts</div>
         </div>
         <div class="bw-stat">
+          <div class="bw-stat-label">Lemmy</div>
+          <div class="bw-stat-value" id="statLm">0</div>
+          <div class="bw-stat-sub">forum posts</div>
+        </div>
+        <div class="bw-stat">
           <div class="bw-stat-label">Hacker News</div>
           <div class="bw-stat-value" id="statHn">0</div>
           <div class="bw-stat-sub">stories</div>
+        </div>
+        <div class="bw-stat">
+          <div class="bw-stat-label">Court records</div>
+          <div class="bw-stat-value" id="statCl">0</div>
+          <div class="bw-stat-sub">US legal filings</div>
         </div>
         <div class="bw-stat">
           <div class="bw-stat-label">News</div>
@@ -493,7 +503,9 @@
           <button class="bw-pill" data-filter="source" data-value="bbb">BBB <span class="bw-pill-count" id="filterCountBbb">0</span></button>
           <button class="bw-pill" data-filter="source" data-value="reddit">Reddit <span class="bw-pill-count" id="filterCountRd">0</span></button>
           <button class="bw-pill" data-filter="source" data-value="bluesky">Bluesky <span class="bw-pill-count" id="filterCountBs">0</span></button>
+          <button class="bw-pill" data-filter="source" data-value="lemmy">Lemmy <span class="bw-pill-count" id="filterCountLm">0</span></button>
           <button class="bw-pill" data-filter="source" data-value="hackernews">Hacker News <span class="bw-pill-count" id="filterCountHn">0</span></button>
+          <button class="bw-pill" data-filter="source" data-value="courtlistener">Court records <span class="bw-pill-count" id="filterCountCl">0</span></button>
           <button class="bw-pill" data-filter="source" data-value="google_news">News <span class="bw-pill-count" id="filterCountGn">0</span></button>
         </div>
         <div class="bw-filter-row">
@@ -523,12 +535,14 @@
   // ----------------------------------------------------------------
 
   const SOURCE_LABELS = {
-    trustpilot:  "Trustpilot",
-    bbb:         "BBB",
-    reddit:      "Reddit",
-    bluesky:     "Bluesky",
-    hackernews:  "Hacker News",
-    google_news: "News",
+    trustpilot:    "Trustpilot",
+    bbb:           "BBB",
+    reddit:        "Reddit",
+    bluesky:       "Bluesky",
+    lemmy:         "Lemmy",
+    hackernews:    "Hacker News",
+    courtlistener: "Court records",
+    google_news:   "News",
   };
 
   const BRAND_LABELS = {
@@ -652,21 +666,25 @@
     const bb = t.by_brand  || {};
 
     document.getElementById("statTotal").textContent = t.all || 0;
-    document.getElementById("statTp").textContent    = bs.trustpilot  || 0;
-    document.getElementById("statBbb").textContent   = bs.bbb         || 0;
-    document.getElementById("statRd").textContent    = bs.reddit      || 0;
-    document.getElementById("statBs").textContent    = bs.bluesky     || 0;
-    document.getElementById("statHn").textContent    = bs.hackernews  || 0;
-    document.getElementById("statGn").textContent    = bs.google_news || 0;
+    document.getElementById("statTp").textContent    = bs.trustpilot     || 0;
+    document.getElementById("statBbb").textContent   = bs.bbb            || 0;
+    document.getElementById("statRd").textContent    = bs.reddit         || 0;
+    document.getElementById("statBs").textContent    = bs.bluesky        || 0;
+    document.getElementById("statLm").textContent    = bs.lemmy          || 0;
+    document.getElementById("statHn").textContent    = bs.hackernews     || 0;
+    document.getElementById("statCl").textContent    = bs.courtlistener  || 0;
+    document.getElementById("statGn").textContent    = bs.google_news    || 0;
     document.getElementById("bwStats").hidden = false;
 
     document.getElementById("filterCountAllSrc").textContent = t.all || 0;
-    document.getElementById("filterCountTp").textContent     = bs.trustpilot  || 0;
-    document.getElementById("filterCountBbb").textContent    = bs.bbb         || 0;
-    document.getElementById("filterCountRd").textContent     = bs.reddit      || 0;
-    document.getElementById("filterCountBs").textContent     = bs.bluesky     || 0;
-    document.getElementById("filterCountHn").textContent     = bs.hackernews  || 0;
-    document.getElementById("filterCountGn").textContent     = bs.google_news || 0;
+    document.getElementById("filterCountTp").textContent     = bs.trustpilot     || 0;
+    document.getElementById("filterCountBbb").textContent    = bs.bbb            || 0;
+    document.getElementById("filterCountRd").textContent     = bs.reddit         || 0;
+    document.getElementById("filterCountBs").textContent     = bs.bluesky        || 0;
+    document.getElementById("filterCountLm").textContent     = bs.lemmy          || 0;
+    document.getElementById("filterCountHn").textContent     = bs.hackernews     || 0;
+    document.getElementById("filterCountCl").textContent     = bs.courtlistener  || 0;
+    document.getElementById("filterCountGn").textContent     = bs.google_news    || 0;
     document.getElementById("filterCountAllBr").textContent  = t.all || 0;
     document.getElementById("filterCountTl").textContent     = bb.together_loans   || 0;
     document.getElementById("filterCountTc").textContent     = bb.transform_credit || 0;

@@ -528,6 +528,117 @@ def fetch_hackernews(brand: dict) -> list[dict]:
     return out
 
 
+def fetch_courtlistener(brand: dict) -> list[dict]:
+    """
+    CourtListener (Free Law Project) — free public API for US court records.
+    Surfaces lawsuits, opinions, dockets that mention the brand. No auth.
+
+    For a consumer lender this is genuinely high-signal: regulatory actions,
+    class actions, and CFPB-style cases land here long before they show up
+    on the news side.
+    """
+    out: list[dict] = []
+    seen_ids: set[str] = set()
+
+    for query in brand["queries"]:
+        url = (
+            "https://www.courtlistener.com/api/rest/v4/search/"
+            f"?q={quote_plus(query)}&order_by=dateFiled+desc"
+        )
+        r = _http_get(url, headers={"Accept": "application/json"})
+        r.raise_for_status()
+        results = r.json().get("results") or []
+        for res in results[:PER_BRAND_LIMIT]:
+            cluster_id = res.get("cluster_id") or res.get("id")
+            if not cluster_id or cluster_id in seen_ids:
+                continue
+            seen_ids.add(cluster_id)
+
+            case_name = res.get("caseName") or res.get("caseNameFull") or "(unnamed case)"
+            court     = res.get("court") or ""
+            date_filed = (res.get("dateFiled") or "")[:10]
+            snippet_raw = res.get("snippet") or res.get("text") or ""
+            absolute_url = res.get("absolute_url") or ""
+            full_url = (
+                f"https://www.courtlistener.com{absolute_url}"
+                if absolute_url.startswith("/")
+                else absolute_url
+                or f"https://www.courtlistener.com/opinion/{cluster_id}/"
+            )
+
+            out.append({
+                "source":      "courtlistener",
+                "brand":       brand["key"],
+                "id":          f"cl-{cluster_id}",
+                "title":       _short(case_name, 200),
+                "snippet":     _snippet_around_brand(_strip_html(snippet_raw), brand, 280)
+                                  or f"Court case in {court}." if court else "Court case.",
+                "url":         full_url,
+                "date":        date_filed,
+                "author":      _short(court, 60) or None,
+                "score":       None,
+                "score_max":   None,
+                "site_name":   "CourtListener",
+                "site_domain": "courtlistener.com",
+            })
+    return out
+
+
+def fetch_lemmy(brand: dict) -> list[dict]:
+    """
+    Lemmy (federated Reddit-alternative) — search the lemmy.world instance
+    via its public v3 API. No auth, no rate limit issues at this volume.
+
+    Lemmy is small today; this often returns zero. Worth plumbing anyway:
+    it's where some of the privacy-conscious / anti-Reddit crowd has gone,
+    and the cost of an empty-list call is negligible.
+    """
+    out: list[dict] = []
+    seen_ids: set[str] = set()
+
+    for query in brand["queries"]:
+        url = (
+            "https://lemmy.world/api/v3/search"
+            f"?q={quote_plus(query)}&type_=Posts&sort=New&limit={PER_BRAND_LIMIT}"
+        )
+        r = _http_get(url, headers={"Accept": "application/json"})
+        r.raise_for_status()
+        posts = r.json().get("posts") or []
+        for entry in posts:
+            post = entry.get("post") or {}
+            pid = post.get("id")
+            if not pid or pid in seen_ids:
+                continue
+            seen_ids.add(pid)
+
+            title  = post.get("name") or ""
+            body   = post.get("body") or ""
+            published = (post.get("published") or "")[:10]
+            creator   = (entry.get("creator") or {}).get("name") or ""
+            community = (entry.get("community") or {}).get("name") or ""
+
+            post_url = f"https://lemmy.world/post/{pid}"
+            site_name = f"c/{community}" if community else "Lemmy"
+
+            snippet = _snippet_around_brand(body, brand, 280) if body.strip() else "(link post — no text body)"
+
+            out.append({
+                "source":      "lemmy",
+                "brand":       brand["key"],
+                "id":          f"lm-{pid}",
+                "title":       _short(title, 200) or "(no title)",
+                "snippet":     snippet,
+                "url":         post_url,
+                "date":        published,
+                "author":      f"@{creator}" if creator else None,
+                "score":       (entry.get("counts") or {}).get("score"),
+                "score_max":   None,
+                "site_name":   site_name,
+                "site_domain": "lemmy.world",
+            })
+    return out
+
+
 def fetch_google_news(brand: dict) -> list[dict]:
     """Google News RSS. Free, no auth, returns recent press / blog mentions."""
     out: list[dict] = []
@@ -596,24 +707,28 @@ def run() -> dict:
     now_utc   = dt.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
 
     source_status: dict[str, dict] = {
-        "trustpilot":   {"ok": True, "fetched": 0, "error": None},
-        "bbb":          {"ok": True, "fetched": 0, "error": None},
-        "reddit":       {"ok": True, "fetched": 0, "error": None},
-        "bluesky":      {"ok": True, "fetched": 0, "error": None},
-        "hackernews":   {"ok": True, "fetched": 0, "error": None},
-        "google_news":  {"ok": True, "fetched": 0, "error": None},
+        "trustpilot":     {"ok": True, "fetched": 0, "error": None},
+        "bbb":            {"ok": True, "fetched": 0, "error": None},
+        "reddit":         {"ok": True, "fetched": 0, "error": None},
+        "bluesky":        {"ok": True, "fetched": 0, "error": None},
+        "lemmy":          {"ok": True, "fetched": 0, "error": None},
+        "hackernews":     {"ok": True, "fetched": 0, "error": None},
+        "courtlistener":  {"ok": True, "fetched": 0, "error": None},
+        "google_news":    {"ok": True, "fetched": 0, "error": None},
     }
     all_mentions: list[dict] = []
 
     for brand in BRANDS:
         print(f"== {brand['label']} ==", flush=True)
         for source_key, fn in (
-            ("trustpilot",  fetch_trustpilot),
-            ("bbb",         fetch_bbb),
-            ("reddit",      fetch_reddit),
-            ("bluesky",     fetch_bluesky),
-            ("hackernews",  fetch_hackernews),
-            ("google_news", fetch_google_news),
+            ("trustpilot",     fetch_trustpilot),
+            ("bbb",            fetch_bbb),
+            ("reddit",         fetch_reddit),
+            ("bluesky",        fetch_bluesky),
+            ("lemmy",          fetch_lemmy),
+            ("hackernews",     fetch_hackernews),
+            ("courtlistener",  fetch_courtlistener),
+            ("google_news",    fetch_google_news),
         ):
             try:
                 rows = fn(brand)
