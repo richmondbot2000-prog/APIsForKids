@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "snapshot_date": "1970-01-01",
-  "updated_at": "2026-05-07T19:05:54Z",
+  "snapshot_date": "2026-05-07",
+  "updated_at": "2026-05-07T19:19:50Z",
   "brands": [
     "Together Loans",
     "TransformCredit"
@@ -27,12 +27,12 @@
     "trustpilot": {
       "ok": false,
       "fetched": 0,
-      "error": "HTTPError: 403 Client Error: Forbidden for url: https://www.trustpilot.com/review/transformcredit.com"
+      "error": "TypeError: requests.api.get() got multiple values for keyword argument 'timeout'"
     },
     "bbb": {
       "ok": false,
       "fetched": 0,
-      "error": "HTTPError: 403 Client Error: Forbidden for url: https://www.bbb.org/search?find_country=USA&find_text=transformcredit.com&page=1"
+      "error": "TypeError: requests.api.get() got multiple values for keyword argument 'timeout'"
     },
     "reddit": {
       "ok": false,
