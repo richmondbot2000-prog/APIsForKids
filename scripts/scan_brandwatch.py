@@ -176,33 +176,52 @@ def _http_get(url: str, **kwargs) -> requests.Response:
     return requests.get(url, headers=headers, **kwargs)
 
 
-def _http_get_proxied(url: str, **kwargs) -> requests.Response:
+def _http_get_proxied(url: str, *, tier: str = "premium", **kwargs) -> requests.Response:
     """
     Like _http_get, but routes through ScraperAPI when SCRAPERAPI_KEY is set.
 
     Used for sites like Trustpilot and BBB that 403 every cloud-IP runner via
     Cloudflare. ScraperAPI rotates residential IPs and handles JS challenges
-    behind the scenes. Costs 25 ScraperAPI credits per call (premium = anti-bot).
-    Free tier is 5,000 credits/month → 200 such calls/month — comfortably above
-    our daily-scan footprint of ~120/month.
+    behind the scenes.
 
-    If the key isn't set, falls back to a direct fetch (which will probably 403).
+    `tier` selects the ScraperAPI tier (and thus credit cost):
+      - "premium"       : 25 credits  — covers basic Cloudflare (BBB)
+      - "ultra_premium" : 75 credits  — covers high-defence sites (Trustpilot)
+
+    Includes one retry on 5xx (ScraperAPI 500s on premium tier are sometimes
+    transient — their backend has occasional momentary failures).
+
+    If SCRAPERAPI_KEY isn't set, falls back to a direct fetch.
     """
     key = os.environ.get("SCRAPERAPI_KEY")
     if not key:
         return _http_get(url, **kwargs)
-    proxied = (
+
+    base = (
         "https://api.scraperapi.com"
         f"?api_key={quote_plus(key)}"
         f"&url={quote_plus(url)}"
-        f"&premium=true"
         f"&country_code=us"
     )
-    # ScraperAPI may take 20–40 s to fetch a Cloudflare-protected page through
-    # its IP rotation. Default timeout from _http_get (HTTP_TIMEOUT = 20s) is
-    # too short. Pass an explicit timeout that overrides the default.
-    kwargs.setdefault("timeout", 70)
-    return _http_get(proxied, **kwargs)
+    if tier == "ultra_premium":
+        base += "&ultra_premium=true"
+    else:
+        base += "&premium=true"
+
+    # ScraperAPI takes 20–40 s for premium and up to 70 s for ultra_premium
+    # because of additional JS-rendering and IP-rotation steps.
+    kwargs.setdefault("timeout", 90 if tier == "ultra_premium" else 70)
+
+    last: requests.Response | None = None
+    for attempt in (1, 2):
+        last = _http_get(base, **kwargs)
+        if last.status_code < 500:
+            return last
+        # Transient 5xx — small back-off before retry.
+        if attempt == 1:
+            import time as _t
+            _t.sleep(2)
+    return last  # type: ignore[return-value]
 
 
 # --------------------------------------------------------------------------
@@ -228,7 +247,10 @@ def fetch_trustpilot(brand: dict) -> list[dict]:
         ),
         "Accept": "text/html,application/xhtml+xml",
     }
-    r = _http_get_proxied(url, headers=headers)
+    # Trustpilot is one of ScraperAPI's hardest targets — their `premium` tier
+    # (25 credits) consistently 500s here. Use `ultra_premium` (75 credits)
+    # which is the documented escalation path for high-defence sites.
+    r = _http_get_proxied(url, headers=headers, tier="ultra_premium")
     if r.status_code == 404:
         return []
     r.raise_for_status()
@@ -424,14 +446,29 @@ def fetch_bbb(brand: dict) -> list[dict]:
     r.raise_for_status()
 
     # Search results have stars + business name + URL. Pull those out of the
-    # HTML and surface as a single "BBB profile" mention per brand. Real
-    # per-review parsing would need to fetch each profile in turn — out of
-    # scope for v1 since the search itself often gets blocked.
-    profile_re = re.compile(
-        r'<a[^>]+href="(/us/[^"]+/profile/[^"]+)"[^>]*>([^<]+)</a>',
-        re.IGNORECASE,
-    )
-    matches = profile_re.findall(r.text)[:5]
+    # HTML and surface as a single "BBB profile" mention per brand.
+    # BBB has tweaked its DOM repeatedly over the years; try several link
+    # patterns in turn.
+    patterns = [
+        # Modern (2024+) profile link with optional category in path
+        r'<a[^>]+href="(/us/[a-z]{2}/[^/"]+/profile/[^"]+/[^"]+)"[^>]*>([^<]+)</a>',
+        # Older form with explicit "online-loans" / "loans" category
+        r'<a[^>]+href="(/us/[a-z]{2}/[^/"]+/profile/(?:online-loans|loans|consumer-finance-companies)/[^"]+)"[^>]*>([^<]+)</a>',
+        # Catch-all: any `/profile/` href that looks like a business
+        r'<a[^>]+href="(/us/[^"]*?/profile/[^"]+)"[^>]*>([^<]+)</a>',
+    ]
+    matches: list[tuple[str, str]] = []
+    for pat in patterns:
+        matches = re.findall(pat, r.text, re.IGNORECASE)
+        if matches:
+            break
+
+    # Diagnostic: if no profile cards were extracted, dump a peek at the HTML
+    # so the workflow log shows what BBB returned (helps when their DOM shifts).
+    if not matches:
+        snippet = re.sub(r"\s+", " ", r.text[:600])
+        print(f"  bbb: no profile links matched any pattern. response_size={len(r.text)} preview: {snippet}", flush=True)
+    matches = matches[:5]
 
     for href, name in matches:
         full_url = "https://www.bbb.org" + href
