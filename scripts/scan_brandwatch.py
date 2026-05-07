@@ -82,23 +82,16 @@ BRANDS = [
         "label":            "TransformCredit",
         "domain":           "transformcredit.com",
         "queries":          ['"TransformCredit"', '"Transform Credit"', "transformcredit.com"],
-        # Two-tier precision filter:
-        #   strong_terms: any single occurrence is enough to keep the mention.
-        #     "TransformCredit" (one word) and the URL are unambiguous brand.
-        #   contextual_terms: the spaced form "transform credit" is ambiguous
-        #     (matches generic phrases like "transform credit agreement
-        #     onboarding"). Only keep it if at least one disambiguating
-        #     lending-context word appears in the same title+snippet.
-        "precision_terms": ["transformcredit", "transformcredit.com"],
-        "contextual_pairs": [
-            ("transform credit", [
-                "loan", "lender", "lending", "borrower", "guarantor",
-                "review", "complaint", "debt", "personal finance",
-                "consumer finance", "financial services", "money",
-                "illinois", "cila", "fcra", "interest rate", "apr",
-                "subprime", "underwriting", "co-signer", "cosigner",
-            ]),
-        ],
+        # STRICT — only the unambiguous one-word form ("TransformCredit") or
+        # the URL counts. The spaced form "Transform Credit" was tested with
+        # a contextual gate (require a lending-context word nearby) but the
+        # generic verb-phrase usage in fintech overlaps too heavily with
+        # legitimate brand context. Cleaner to lose some legit press than to
+        # keep showing "transform credit agreement onboarding" articles.
+        # If/when the brand spelling fork stops being a problem, re-add the
+        # contextual_pairs entry that lived here in commit 6cae2a2.
+        "precision_terms":  ["transformcredit", "transformcredit.com"],
+        "contextual_pairs": [],
     },
 ]
 
