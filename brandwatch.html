@@ -137,17 +137,30 @@
     color: var(--accent-ink);
     text-decoration: none;
   }
+  /* Star rating — its own row above the headline, prominent. Shown on any
+     card whose mention has score + score_max (Trustpilot, BBB). */
   .bw-card-stars {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 2px;
-    font-size: 0.95rem;
-    margin-right: 10px;
-    letter-spacing: 1px;
-    vertical-align: 2px;
+    gap: 4px;
+    font-size: 1.6rem;
+    line-height: 1;
+    margin: 0 0 10px;
+    letter-spacing: 2px;
   }
-  .bw-card-stars .star-on  { color: #ffd66b; text-shadow: 0 0 6px rgba(255, 214, 107, 0.5); }
+  .bw-card-stars .star-on  {
+    color: #ffd66b;
+    text-shadow: 0 0 10px rgba(255, 214, 107, 0.55);
+  }
   .bw-card-stars .star-off { color: #2a2f55; }
+  .bw-card-stars .bw-card-stars-num {
+    margin-left: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0;
+    align-self: center;
+  }
   .bw-card-snippet {
     color: var(--ink-soft);
     font-size: 0.95rem;
@@ -480,11 +493,12 @@
 
   function stars(rating, max) {
     if (!rating || !max) return "";
-    let s = '<span class="bw-card-stars" aria-label="' + rating + " out of " + max + ' stars">';
+    let s = '<div class="bw-card-stars" aria-label="' + rating + " out of " + max + ' stars">';
     for (let i = 1; i <= max; i++) {
       s += '<span class="' + (i <= rating ? "star-on" : "star-off") + '">★</span>';
     }
-    s += "</span>";
+    s += '<span class="bw-card-stars-num">' + rating + " / " + max + "</span>";
+    s += "</div>";
     return s;
   }
 
@@ -506,14 +520,16 @@
       ? '<span class="bw-brand-tag tc">TransformCredit</span>'
       : '<span class="bw-brand-tag">Together Loans</span>';
 
-    const starHtml = (m.source === "trustpilot") ? stars(m.score, m.score_max) : "";
+    // Show stars on any rated mention (Trustpilot reviews + BBB reviews).
+    // Stars sit ABOVE the headline now, on their own row, large.
+    const starHtml = (m.score && m.score_max) ? stars(m.score, m.score_max) : "";
 
     const headlineLink =
       '<a href="' + escapeHtml(m.url) + '" target="_blank" rel="noopener noreferrer">'
       + escapeHtml(m.title) + "</a>";
 
     const headline =
-      '<div class="bw-card-headline">' + starHtml + headlineLink + "</div>";
+      starHtml + '<div class="bw-card-headline">' + headlineLink + "</div>";
 
     const snippet = m.snippet
       ? '<blockquote class="bw-card-snippet">' + highlight(m.snippet) + "</blockquote>"
