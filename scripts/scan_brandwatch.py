@@ -57,18 +57,28 @@ import requests
 # --------------------------------------------------------------------------
 # Brand definitions
 
+# Each brand has:
+#   - queries: passed to each external source. Tight, exact-phrase forms only,
+#              to keep recall reasonable while avoiding the noise we get from
+#              generic phrasings like "transform credit agreement onboarding".
+#   - precision_terms: the post-fetch filter. A mention from any source is
+#              kept ONLY if its title or snippet contains at least one of
+#              these strings (case-insensitive). Strict so we drop the
+#              "transform" + "credit" coincidences.
 BRANDS = [
     {
-        "key":      "together_loans",
-        "label":    "Together Loans",
-        "domain":   "togetherloans.com",
-        "queries":  ['"Together Loans"', "togetherloans"],
+        "key":             "together_loans",
+        "label":           "Together Loans",
+        "domain":          "togetherloans.com",
+        "queries":         ['"Together Loans"', "togetherloans.com"],
+        "precision_terms": ["together loans", "togetherloans"],
     },
     {
-        "key":      "transform_credit",
-        "label":    "TransformCredit",
-        "domain":   "transformcredit.com",
-        "queries":  ['"Transform Credit"', '"TransformCredit"'],
+        "key":             "transform_credit",
+        "label":           "TransformCredit",
+        "domain":          "transformcredit.com",
+        "queries":         ['"TransformCredit"', "transformcredit.com"],
+        "precision_terms": ["transformcredit"],   # the brand spells itself one word; "transform credit" is the false positive
     },
 ]
 
@@ -227,23 +237,38 @@ def fetch_reddit(brand: dict) -> list[dict]:
     """
     Reddit's public search.json endpoint. Returns recent posts that match
     any of the brand's quoted queries.
+
+    Reddit aggressively blocks cloud-IP unauth calls; we fall back across
+    a few hosts before giving up.
     """
     out: list[dict] = []
     seen_ids: set[str] = set()
 
+    hosts = ["www.reddit.com", "old.reddit.com", "api.reddit.com"]
+
     for query in brand["queries"]:
-        url = (
-            "https://www.reddit.com/search.json"
-            f"?q={quote_plus(query)}&sort=new&limit={PER_BRAND_LIMIT}&t=year"
-        )
-        r = _http_get(url)
-        if r.status_code in (403, 429):
-            # rate-limited or blocked — surface to caller via raise
-            raise RuntimeError(
-                f"reddit returned {r.status_code} for query {query!r}"
+        last_err: Exception | None = None
+        data = None
+        for host in hosts:
+            url = (
+                f"https://{host}/search.json"
+                f"?q={quote_plus(query)}&sort=new&limit={PER_BRAND_LIMIT}&t=year"
             )
-        r.raise_for_status()
-        data = r.json().get("data", {}).get("children", [])
+            try:
+                r = _http_get(url)
+                if r.status_code in (403, 429):
+                    last_err = RuntimeError(
+                        f"reddit {host} returned {r.status_code} for {query!r}"
+                    )
+                    continue
+                r.raise_for_status()
+                data = r.json().get("data", {}).get("children", [])
+                break  # this host worked
+            except Exception as e:
+                last_err = e
+                continue
+        if data is None:
+            raise last_err or RuntimeError(f"reddit: every host failed for {query!r}")
         for child in data:
             d = child.get("data", {})
             rid = d.get("id")
@@ -253,7 +278,6 @@ def fetch_reddit(brand: dict) -> list[dict]:
 
             title = d.get("title") or ""
             body  = d.get("selftext") or ""
-            snippet = _short(body, 280) if body.strip() else "(link post)"
             permalink = d.get("permalink") or ""
             created = d.get("created_utc")
             iso_date = (
@@ -384,6 +408,25 @@ def run() -> dict:
             continue
         seen.add(k)
         deduped.append(m)
+
+    # Precision filter: drop mentions whose title + snippet don't actually
+    # contain the brand. Catches Google News false positives like
+    # "Finastra transform credit agreement onboarding" when searching for
+    # the TransformCredit lender. Case-insensitive substring match against
+    # each brand's `precision_terms`.
+    precision_by_brand = {b["key"]: [t.lower() for t in b["precision_terms"]] for b in BRANDS}
+    filtered = []
+    dropped = 0
+    for m in deduped:
+        terms = precision_by_brand.get(m["brand"], [])
+        haystack = ((m.get("title") or "") + " " + (m.get("snippet") or "")).lower()
+        if any(t in haystack for t in terms):
+            filtered.append(m)
+        else:
+            dropped += 1
+    if dropped:
+        print(f"\nprecision filter: dropped {dropped} mentions with no brand term in title/snippet", flush=True)
+    deduped = filtered
 
     # Sort by date desc; missing dates sink to the bottom.
     deduped.sort(key=lambda m: (m.get("date") or ""), reverse=True)
