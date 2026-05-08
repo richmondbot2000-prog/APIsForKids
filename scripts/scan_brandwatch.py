@@ -1044,6 +1044,61 @@ def fetch_cfpb(brand: dict) -> list[dict]:
     return out
 
 
+def fetch_youtube(brand: dict) -> list[dict]:
+    """
+    YouTube Data API v3 — keyword search across all of YouTube. Each search
+    call costs 100 quota units; the free daily quota is 10,000 units, so 4
+    queries per scan × 1 daily scan = 400 units, ~4% of the free budget.
+
+    Requires YOUTUBE_API_KEY (created in Google Cloud Console with the
+    YouTube Data API v3 enabled). Returns [] if the env var is missing so
+    the workflow doesn't break before the key is wired up.
+    """
+    api_key = os.environ.get("YOUTUBE_API_KEY")
+    if not api_key:
+        return []
+
+    out: list[dict] = []
+    seen: set[str] = set()
+    for query in brand["queries"]:
+        bare = query.strip('"')
+        url = (
+            "https://www.googleapis.com/youtube/v3/search"
+            "?part=snippet&type=video&maxResults=25&order=date"
+            f"&q={quote_plus(bare)}&key={quote_plus(api_key)}"
+        )
+        r = _http_get(url)
+        r.raise_for_status()
+        items = (r.json().get("items") or [])
+
+        for item in items:
+            vid = (item.get("id") or {}).get("videoId")
+            if not vid or vid in seen:
+                continue
+            seen.add(vid)
+            sn = item.get("snippet") or {}
+            title       = html.unescape(sn.get("title") or "")
+            description = html.unescape(sn.get("description") or "")
+            channel     = sn.get("channelTitle") or ""
+            published   = (sn.get("publishedAt") or "")[:10]
+
+            out.append({
+                "source":      "youtube",
+                "brand":       brand["key"],
+                "id":          f"yt-{vid}",
+                "title":       _short(title, 200) or "(no title)",
+                "snippet":     _snippet_around_brand(description, brand, 280),
+                "url":         f"https://www.youtube.com/watch?v={vid}",
+                "date":        published,
+                "author":      channel,
+                "score":       None,
+                "score_max":   None,
+                "site_name":   channel or "YouTube",
+                "site_domain": "youtube.com",
+            })
+    return out
+
+
 def fetch_lemmy(brand: dict) -> list[dict]:
     """
     Lemmy (federated Reddit-alternative) — search the lemmy.world instance
@@ -1176,6 +1231,7 @@ def run() -> dict:
         "courtlistener":  {"ok": True, "fetched": 0, "error": None},
         "google_news":    {"ok": True, "fetched": 0, "error": None},
         "cfpb":           {"ok": True, "fetched": 0, "error": None},
+        "youtube":        {"ok": True, "fetched": 0, "error": None},
     }
     all_mentions: list[dict] = []
 
@@ -1216,6 +1272,7 @@ def run() -> dict:
             ("courtlistener",  fetch_courtlistener),
             ("google_news",    fetch_google_news),
             ("cfpb",           fetch_cfpb),
+            ("youtube",        fetch_youtube),
         ):
             try:
                 if source_key in archive_ids:
@@ -1272,7 +1329,7 @@ def run() -> dict:
     #     consistently when naming a brand; lowercase usually means the verb
     #     phrase. Strict capitalization "Transform Credit" is a real signal.
     UNFILTERED_SOURCES = {"trustpilot", "bbb", "cfpb"}
-    NEWS_LIKE_SOURCES  = {"google_news", "courtlistener"}
+    NEWS_LIKE_SOURCES  = {"google_news", "courtlistener", "youtube"}
 
     by_brand_cfg = {b["key"]: b for b in BRANDS}
     filtered = []

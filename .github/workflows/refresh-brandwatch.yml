@@ -73,6 +73,10 @@ jobs:
           # per request; 5,000-credit free tier is plenty for this site's
           # daily-scan footprint. When absent, those two sources will 403.
           SCRAPERAPI_KEY:       ${{ secrets.SCRAPERAPI_KEY }}
+          # Optional — YouTube Data API v3 key. Free quota of 10,000 units/day;
+          # one search costs 100 units. When absent, fetch_youtube returns []
+          # gracefully so the rest of the scan still runs.
+          YOUTUBE_API_KEY:      ${{ secrets.YOUTUBE_API_KEY }}
         run: python scripts/scan_brandwatch.py
 
       - name: Commit if brandwatch.json changed
