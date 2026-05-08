@@ -83,6 +83,9 @@ WHERE le.Country = 'USA'
 
 
 # ---- Step 2: inbound emails in the same window with a LoanbookId attached ----
+# Description is an enum stored as INT in the warehouse:
+#   0 = InboundSms, 1 = InboundEmail, 2 = InboundCall
+# (per the Central Communications wiki). We want type 1.
 EMAILS_QUERY = f"""
 DECLARE @cutoff datetime = DATEADD(month, -{MONTHS_BACK}, GETDATE());
 
@@ -96,7 +99,7 @@ SELECT
   m.ExternalAddress,
   m.ExternalName
 FROM dbo.Messages m
-WHERE m.Description = 'InboundEmail'
+WHERE m.Description = 1
   AND m.UTCTime >= @cutoff
   AND m.LoanbookId IS NOT NULL
 ORDER BY m.LoanbookId, ISNULL(m.GtRef, 0), m.UTCTime ASC
