@@ -58,7 +58,11 @@ def conn_str(database: str) -> str:
     )
 
 
-# ---- Step 1: paid-out loans + their customers (one row per BRW + per GT) ----
+# ---- Step 1: paid-out loans + every customer's name parts (BRW + GTs) ----
+# Customer table doesn't carry a GtRef column — it's on Messages only — so
+# we collect every name part on the loan and redact aggressively. That's
+# safer anyway (if a BRW's email mentions their guarantor, we strip both
+# names regardless of who actually sent it).
 LOANS_QUERY = f"""
 DECLARE @cutoff date = DATEADD(month, -{MONTHS_BACK}, CAST(GETDATE() AS date));
 
@@ -66,8 +70,6 @@ SELECT
   li.LoanBookID,
   CAST(li.LoanAgreementDateLocal AS date) AS PayoutDate,
   l.LenderID,
-  c.GtRef,
-  c.RelationToBrw,
   c.FirstName,
   c.MiddleName,
   c.LastName
@@ -189,27 +191,26 @@ def main() -> None:
     cur = conn.cursor()
     cur.execute(LOANS_QUERY)
 
-    # Key: (LoanBookID, gtref_or_0). Value: dict with payout_date, lender,
-    # role (BRW/GT), and the name parts to redact.
-    loans: dict[tuple[int, int], dict] = {}
+    # Key: LoanBookID. Value: dict with payout_date, lender, and the union
+    # of name parts across BRW + every GT row for that loan.
+    loans: dict[int, dict] = {}
     for (loanbook_id, payout_date, lender_id,
-         gtref, relation_to_brw, first_name, middle_name, last_name) in cur.fetchall():
-        gtkey = int(gtref) if gtref else 0
-        # GT rows have RelationToBrw set; BRW rows have it NULL (per the
-        # yesterday-payouts script's convention).
-        role = "BRW" if relation_to_brw is None else "GT"
-        lid = int(lender_id) if lender_id else None
-        loans[(int(loanbook_id), gtkey)] = {
-            "payout_date":  payout_date,
-            "lender_id":    lid,
-            "lender_name":  LENDER_LABELS.get(lid, f"Lender {lid}" if lid else "Unknown lender"),
-            "role":         role,
-            "name_parts":   [
-                (first_name  or "").strip(),
-                (middle_name or "").strip(),
-                (last_name   or "").strip(),
-            ],
-        }
+         first_name, middle_name, last_name) in cur.fetchall():
+        lid  = int(lender_id) if lender_id else None
+        lbid = int(loanbook_id)
+        rec = loans.get(lbid)
+        if rec is None:
+            rec = {
+                "payout_date":  payout_date,
+                "lender_id":    lid,
+                "lender_name":  LENDER_LABELS.get(lid, f"Lender {lid}" if lid else "Unknown lender"),
+                "name_parts":   [],
+            }
+            loans[lbid] = rec
+        for n in (first_name, middle_name, last_name):
+            n = (n or "").strip()
+            if n:
+                rec["name_parts"].append(n)
     conn.close()
     print(f"# loans paid out in last {MONTHS_BACK} months: {len(loans)}", flush=True)
 
@@ -225,9 +226,12 @@ def main() -> None:
     cur = conn.cursor()
     cur.execute(EMAILS_QUERY)
 
+    # Dedup key: (LoanBookID, gtref_or_0). BRW emails have gtref=NULL, each
+    # GT has its own gtref >= 1. (gtref=99 is a sentinel meaning "we know
+    # it's the active GT but don't know which one" — treat as one bucket.)
     seen_keys: set[tuple[int, int]] = set()
     first_contacts: list[dict] = []
-    skipped_no_loan      = 0
+    skipped_no_loan       = 0
     skipped_before_payout = 0
 
     for (loanbook_id, aref, gtref, utc_time, subject, body,
@@ -238,27 +242,27 @@ def main() -> None:
         key   = (int(loanbook_id), gtkey)
         if key in seen_keys:
             continue
-        loan = loans.get(key)
+        loan = loans.get(int(loanbook_id))
         if loan is None:
             skipped_no_loan += 1
             continue
-        # Compare on date level — emails carry datetime; payout is a date.
         email_date = utc_time.date() if hasattr(utc_time, "date") else utc_time
         if email_date < loan["payout_date"]:
-            # This email pre-dates the payout — keep scanning for the next
-            # one for this customer (don't add to seen_keys yet).
+            # Email pre-dates the payout — don't claim this customer's
+            # first-contact slot yet; keep scanning for a later one.
             skipped_before_payout += 1
             continue
         seen_keys.add(key)
 
         days_after = (email_date - loan["payout_date"]).days
+        role       = "BRW" if gtkey == 0 else "GT"
         name_parts = list(loan["name_parts"]) + _split_external_name(ext_name or "")
 
         first_contacts.append({
             "received_utc":      utc_time.isoformat() if utc_time else None,
             "received_date":     email_date.isoformat(),
             "days_after_payout": days_after,
-            "role":              loan["role"],            # "BRW" | "GT"
+            "role":              role,
             "lender_name":       loan["lender_name"],
             "subject":           _redact_text(subject or "", name_parts)[:200],
             "body":              _redact_text(body    or "", name_parts)[:MAX_BODY_CHARS],
