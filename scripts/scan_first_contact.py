@@ -23,6 +23,7 @@ import json
 import os
 import re
 import sys
+from collections import Counter
 from pathlib import Path
 
 import pyodbc
@@ -37,6 +38,32 @@ MONTHS_BACK     = 3
 LENDER_LABELS = {
     6: "Together Loans / TransformCredit",
 }
+
+# Words to ignore when building the word cloud — standard English stopwords
+# plus contractions. Words are matched lowercase, post-tokenisation. We do
+# NOT strip "thank", "please", "loan", "payment" etc — those are exactly the
+# borrower-language signals we want surfaced. The redaction sentinel "****"
+# can't appear here because the tokenizer is letters-only.
+STOPWORDS = frozenset("""
+i me my myself we our ours ourselves you your yours yourself yourselves
+he him his himself she her hers herself it its itself they them their theirs themselves
+what which who whom whose this that these those
+am is are was were be been being have has had having do does did doing
+a an the and but if or because as until while of at by for with about against
+between into through during before after above below to from up down in out on off
+over under again further then once here there when where why how
+all any both each few more most other some such no nor not only own same so than too very
+can will just should now don dont didnt doesnt isnt arent wasnt werent havent hadnt
+won wouldnt couldnt shouldnt im ive id ill youre youve theyre weve well thats whats
+ll re ve d s t m
+hi hello hey ok okay yeah yes please thanks thank
+also let know would could need
+""".split())
+
+WORDCLOUD_TOP_N = 150
+WORD_MIN_LEN    = 3
+
+RX_WORD = re.compile(r"[A-Za-z][A-Za-z']{2,}")
 
 
 def env(name: str) -> str:
@@ -176,6 +203,23 @@ def _redact_text(text: str, name_parts: list[str]) -> str:
     return text.strip()
 
 
+def _build_word_cloud(items: list[dict]) -> list[list]:
+    """Tokenise every item's redacted subject + body and return the top
+    WORDCLOUD_TOP_N words as [[word, count], …] for wordcloud2.js."""
+    counter: Counter[str] = Counter()
+    for it in items:
+        for field in ("subject", "body"):
+            text = (it.get(field) or "").lower()
+            for tok in RX_WORD.findall(text):
+                w = tok.strip("'")
+                if len(w) < WORD_MIN_LEN:
+                    continue
+                if w in STOPWORDS:
+                    continue
+                counter[w] += 1
+    return [[w, n] for w, n in counter.most_common(WORDCLOUD_TOP_N)]
+
+
 def _split_external_name(ext_name: str) -> list[str]:
     """ExternalName is the parsed sender-name from the email's From: header.
     Often the customer's own name. Split into pieces so each part is redacted
@@ -299,6 +343,8 @@ def main() -> None:
         by_lender[fc["lender_name"]] = by_lender.get(fc["lender_name"], 0) + 1
         by_role[fc["role"]] = by_role.get(fc["role"], 0) + 1
 
+    word_cloud = _build_word_cloud(first_contacts)
+
     payload = {
         "schema_version":   1,
         "updated_at":       started.isoformat() + "Z",
@@ -309,6 +355,7 @@ def main() -> None:
             "by_lender": by_lender,
             "by_role":   by_role,
         },
+        "word_cloud": word_cloud,
         "items": first_contacts,
     }
 
