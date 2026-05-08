@@ -115,6 +115,10 @@ REDACTED = "****"
 RX_CARD     = re.compile(r"\b(?:\d[ -]?){13,19}\b")
 RX_SSN      = re.compile(r"\b\d{3}[\s-]?\d{2}[\s-]?\d{4}\b")
 RX_LONG_ID  = re.compile(r"\b\d{13,}\b")           # ARef (22 digits) + similar long account refs
+# LoanbookId — internal Loanbook reference, format is digits + uppercase
+# letters, e.g. "010100AQUA" or "033190COOL". Distinctive enough to safely
+# redact without matching anything else in customer prose.
+RX_LOANBOOK_ID = re.compile(r"\b\d{4,8}[A-Z]{3,6}\b")
 RX_PHONE    = re.compile(
     r"(?:(?:\+?1[\s.-]?)?)?\(?\b\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b"
 )
@@ -150,6 +154,7 @@ def _redact_text(text: str, name_parts: list[str]) -> str:
     text = RX_CARD.sub(REDACTED, text)
     text = RX_SSN.sub(REDACTED, text)
     text = RX_LONG_ID.sub(REDACTED, text)
+    text = RX_LOANBOOK_ID.sub(REDACTED, text)
     text = RX_PHONE.sub(REDACTED, text)
     text = RX_EMAIL.sub(REDACTED, text)
     text = RX_URL.sub(REDACTED, text)
