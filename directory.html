@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778363873">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778363873">
-<link rel="stylesheet" href="quiet.css?v=1778363873">
-<link rel="stylesheet" href="quiet-extras.css?v=1778363873">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778363873">
+<link rel="stylesheet" href="style.css?v=1778365150">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778365150">
+<link rel="stylesheet" href="quiet.css?v=1778365150">
+<link rel="stylesheet" href="quiet-extras.css?v=1778365150">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778365150">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -217,6 +217,20 @@
     font-weight: 500;
   }
 
+  .dir-card--external {
+    opacity: 0.92;
+  }
+  .dir-card--external .dir-photo-placeholder {
+    background: var(--paper-200, #F5ECD4);
+    color: var(--brass-600, #A47829);
+    border: 1.5px dashed var(--brass-300, #E2BF74);
+  }
+  .dir-card--external .dir-title {
+    font-style: italic;
+    color: var(--ink-500, #6B7794);
+    font-size: 0.78rem;
+  }
+
   .dir-empty {
     background: var(--bg-soft);
     border: 1px dashed var(--border);
@@ -243,7 +257,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778363873" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778365150" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -286,10 +300,14 @@
   </main>
 
 <script>
-  let allUsers = [];
+  // Each entry is { type: 'staff'|'external', user: {…} | null, activity: {…} | null }.
+  // Staff entries always have user; external entries always have activity.
+  let allEntries = [];
   let activeDept = "all";
   let searchTerm = "";
-  let activityByEmail = {};   // email (lowercase) → { writes_60d, last_active_utc, tenants, top_warehouse }
+
+  // Tenant priority: transform/together → rgroup → other.
+  const tenantRank = t => (t === "transform" || t === "together") ? 0 : t === "rgroup" ? 1 : 2;
 
   Promise.all([
     fetch("staff.json", { cache: "no-store" }).then(r => r.ok ? r.json() : Promise.reject("staff.json HTTP " + r.status)),
@@ -297,30 +315,60 @@
   ])
     .then(([staff, activity]) => {
       const allWorkspaceUsers = staff.users || [];
-      // Build email-keyed lookup of activity
-      activityByEmail = {};
-      if (activity && activity.active_users) {
-        for (const a of activity.active_users) {
-          activityByEmail[(a.email || "").toLowerCase()] = a;
-        }
+      const activityByEmail = {};
+      const externalUsers = [];
+      if (activity) {
+        for (const a of activity.active_users || []) activityByEmail[(a.email || "").toLowerCase()] = a;
+        for (const e of activity.external_users || []) externalUsers.push(e);
       }
-      // Filter the directory to people with activity in the last 60 days
-      allUsers = allWorkspaceUsers.filter(u => activityByEmail[(u.email || "").toLowerCase()]);
+
+      // Build the merged entry list.
+      allEntries = [];
+      for (const u of allWorkspaceUsers) {
+        allEntries.push({
+          type: "staff",
+          user: u,
+          activity: activityByEmail[(u.email || "").toLowerCase()] || null,
+        });
+      }
+      for (const e of externalUsers) {
+        allEntries.push({ type: "external", user: null, activity: e });
+      }
+
+      // Sort: active first; within active, tenant priority; within tenant,
+      // writes desc; finally alphabetical. Inactive staff sit at the end.
+      allEntries.sort((a, b) => {
+        const aActive = a.activity ? 0 : 1;
+        const bActive = b.activity ? 0 : 1;
+        if (aActive !== bActive) return aActive - bActive;
+        const aTenant = a.activity?.primary_tenant || "";
+        const bTenant = b.activity?.primary_tenant || "";
+        const tr = tenantRank(aTenant) - tenantRank(bTenant);
+        if (tr !== 0) return tr;
+        const aWrites = a.activity?.writes_60d || 0;
+        const bWrites = b.activity?.writes_60d || 0;
+        if (aWrites !== bWrites) return bWrites - aWrites;
+        const aName = (a.user?.name || a.activity?.username || "").toLowerCase();
+        const bName = (b.user?.name || b.activity?.username || "").toLowerCase();
+        return aName.localeCompare(bName);
+      });
 
       const updated = staff.updated_at ? staff.updated_at.replace("T", " ").replace("Z", " UTC") : "—";
+      const activeStaffCount = allEntries.filter(e => e.type === "staff" && e.activity).length;
       const meta = activity
-        ? `Updated ${updated} · ${allUsers.length} active in last ${activity.window_days} days · ${allWorkspaceUsers.length} total Workspace accounts`
-        : `Updated ${updated} · ${allWorkspaceUsers.length} ${staff.domain || "letme.co.uk"} accounts (activity data not yet available)`;
+        ? `Updated ${updated} · ${allWorkspaceUsers.length} Workspace accounts · ${activeStaffCount} active in DB · ${externalUsers.length} extra people active in DB only`
+        : `Updated ${updated} · ${allWorkspaceUsers.length} accounts (activity data not yet available)`;
       document.getElementById("dirMeta").textContent = meta;
 
-      // Recount departments to reflect the active subset
+      // Department pills count Workspace staff only.
       const byDept = {};
-      for (const u of allUsers) {
-        const d = u.department || "(unspecified)";
+      for (const e of allEntries) {
+        if (e.type !== "staff") continue;
+        const d = e.user.department || "(unspecified)";
         byDept[d] = (byDept[d] || 0) + 1;
       }
       buildDeptPills(byDept);
-      document.getElementById("dirControls").hidden = allUsers.length === 0;
+      document.getElementById("dirControls").hidden = allEntries.length === 0;
       renderGrid();
     })
     .catch(err => {
@@ -330,7 +378,7 @@
 
   function buildDeptPills(byDept) {
     const row = document.getElementById("dirDeptRow");
-    document.getElementById("dirCountAll").textContent = allUsers.length;
+    document.getElementById("dirCountAll").textContent = allEntries.length;
     Object.entries(byDept)
       .sort((a, b) => b[1] - a[1])
       .forEach(([name, n]) => {
@@ -357,11 +405,11 @@
   function renderGrid() {
     const grid = document.getElementById("dirGrid");
     const empty = document.getElementById("dirEmpty");
-    const items = allUsers.filter(visible);
+    const items = allEntries.filter(visible);
     if (items.length === 0) {
       grid.innerHTML = "";
       empty.hidden = false;
-      empty.textContent = allUsers.length === 0
+      empty.textContent = allEntries.length === 0
         ? "Directory hasn't been populated yet — see hint above."
         : "No people match the current search/filter.";
       return;
@@ -370,22 +418,52 @@
     grid.innerHTML = items.map(renderCard).join("");
   }
 
-  function visible(u) {
+  function visible(entry) {
     if (activeDept !== "all") {
-      const dept = u.department || "(unspecified)";
+      // The dept filter is for Workspace staff; external entries are excluded
+      // from the filter view entirely (they don't have a department).
+      if (entry.type !== "staff") return false;
+      const dept = entry.user.department || "(unspecified)";
       if (dept !== activeDept) return false;
     }
     if (searchTerm) {
-      const haystack = (
-        (u.name || "") + " " + (u.email || "") + " " +
-        (u.title || "") + " " + (u.department || "")
-      ).toLowerCase();
+      const u = entry.user;
+      const a = entry.activity;
+      const haystack = entry.type === "staff"
+        ? ((u.name || "") + " " + (u.email || "") + " " + (u.title || "") + " " + (u.department || "")).toLowerCase()
+        : (a?.username || "").toLowerCase();
       if (!haystack.includes(searchTerm)) return false;
     }
     return true;
   }
 
-  function renderCard(u) {
+  function activityHtml(a) {
+    if (!a) return "";
+    const lastDate = a.last_active_utc
+      ? new Date(a.last_active_utc).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
+      : null;
+    const tenants = (a.tenants || []).map(t => `<span class="dir-tenant">${escapeHtml(t)}</span>`).join("");
+    return `
+      <div class="dir-activity">
+        ${lastDate ? `<div class="dir-last">last seen <b>${escapeHtml(lastDate)}</b></div>` : ""}
+        ${tenants ? `<div class="dir-tenants">${tenants}</div>` : ""}
+        ${a.top_warehouse ? `<div class="dir-warehouse">mostly <em>${escapeHtml(a.top_warehouse)}</em></div>` : ""}
+      </div>`;
+  }
+
+  function prettyName(localPart) {
+    return localPart
+      .replace(/[._-]+/g, " ")
+      .replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  function renderCard(entry) {
+    return entry.type === "staff" ? renderStaffCard(entry) : renderExternalCard(entry);
+  }
+
+  function renderStaffCard(entry) {
+    const u = entry.user;
+    const a = entry.activity;
     const initials = (
       (u.given || u.name || "?").charAt(0) +
       (u.family || "").charAt(0)
@@ -395,21 +473,6 @@
       ? `<img class="dir-photo" src="${escapeHtml(u.photo_url)}" alt="${escapeHtml(u.name)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=&quot;dir-photo-placeholder&quot;>${escapeHtml(initials)}</div>'">`
       : `<div class="dir-photo-placeholder">${escapeHtml(initials)}</div>`;
 
-    const a = activityByEmail[(u.email || "").toLowerCase()];
-    let activityHtml = "";
-    if (a) {
-      const lastDate = a.last_active_utc
-        ? new Date(a.last_active_utc).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
-        : null;
-      const tenants = (a.tenants || []).map(t => `<span class="dir-tenant">${escapeHtml(t)}</span>`).join("");
-      activityHtml = `
-        <div class="dir-activity">
-          ${lastDate ? `<div class="dir-last">last seen <b>${escapeHtml(lastDate)}</b></div>` : ""}
-          ${tenants ? `<div class="dir-tenants">${tenants}</div>` : ""}
-          ${a.top_warehouse ? `<div class="dir-warehouse">mostly <em>${escapeHtml(a.top_warehouse)}</em></div>` : ""}
-        </div>`;
-    }
-
     return `
       <a class="dir-card" href="mailto:${escapeHtml(u.email)}" title="Email ${escapeHtml(u.name || u.email)}">
         ${photo}
@@ -417,7 +480,25 @@
         ${u.title ? `<div class="dir-title">${escapeHtml(u.title)}</div>` : ""}
         ${u.department ? `<div class="dir-department">${escapeHtml(u.department)}</div>` : ""}
         <div class="dir-email">${escapeHtml(u.email)}</div>
-        ${activityHtml}
+        ${activityHtml(a)}
+      </a>
+    `;
+  }
+
+  function renderExternalCard(entry) {
+    const a = entry.activity;
+    const username = a.username || "";
+    const local = username.split("@")[0] || username;
+    const display = prettyName(local);
+    const initials = ((local.charAt(0) || "?") + (local.split(/[._-]/)[1]?.charAt(0) || "")).toUpperCase();
+
+    return `
+      <a class="dir-card dir-card--external" href="mailto:${escapeHtml(username)}" title="Active in DB only — ${escapeHtml(username)}">
+        <div class="dir-photo-placeholder">${escapeHtml(initials)}</div>
+        <div class="dir-name">${escapeHtml(display)}</div>
+        <div class="dir-title">no Workspace account</div>
+        <div class="dir-email">${escapeHtml(username)}</div>
+        ${activityHtml(a)}
       </a>
     `;
   }

@@ -183,10 +183,13 @@ def find_tables_and_timestamp(cur, database: str) -> list[tuple[str, str, str]]:
     return out
 
 
-def scan_database(database: str, all_candidates: set[str], cutoff: datetime.datetime) -> dict[str, dict]:
-    """Return { username_lower -> { writes, last_at, tables_seen[] } }."""
+def scan_database(database: str, cutoff: datetime.datetime) -> dict[str, dict]:
+    """Return { username_lower -> { writes, last_at, by_db[db] } } for every
+    email-shaped ClientUsername that wrote in the 60-day window. Robot /
+    system usernames (no '@') are excluded — they aren't people.
+    """
     print(f"# {database}", flush=True)
-    aggregated: dict[str, dict] = defaultdict(lambda: {"writes": 0, "last_at": None, "tables": set()})
+    aggregated: dict[str, dict] = defaultdict(lambda: {"writes": 0, "last_at": None, "by_db": defaultdict(int)})
     try:
         c = pyodbc.connect(conn_str(database), timeout=20)
         c.timeout = QUERY_TIMEOUT
@@ -206,12 +209,6 @@ def scan_database(database: str, all_candidates: set[str], cutoff: datetime.date
 
     cutoff_str = cutoff.strftime("%Y-%m-%d %H:%M:%S")
 
-    # SQL IN-list of candidate usernames. Fabric SQL Server has a limit
-    # around 2,100 parameters per query; we have <100 staff × 12 domains < 1500
-    # so a single IN list is fine. Lowercase comparison via LOWER().
-    cands_csv = ", ".join(["?"] * len(all_candidates))
-    cands_lower = [c.lower() for c in all_candidates]
-
     for schema, table, ts in targets:
         try:
             q = (
@@ -219,24 +216,32 @@ def scan_database(database: str, all_candidates: set[str], cutoff: datetime.date
                 f"       COUNT_BIG(*) AS writes, "
                 f"       MAX([{ts}]) AS last_at "
                 f"FROM [{schema}].[{table}] "
-                f"WHERE [{ts}] >= ? AND LOWER(ClientUsername) IN ({cands_csv}) "
+                f"WHERE [{ts}] >= ? AND ClientUsername LIKE '%@%' "
                 f"GROUP BY LOWER(ClientUsername)"
             )
-            cur.execute(q, [cutoff_str, *cands_lower])
-            rows = cur.fetchall()
-            for un, writes, last_at in rows:
+            cur.execute(q, [cutoff_str])
+            for un, writes, last_at in cur.fetchall():
                 bucket = aggregated[un]
                 bucket["writes"] += int(writes or 0)
-                if last_at is not None:
-                    if bucket["last_at"] is None or last_at > bucket["last_at"]:
-                        bucket["last_at"] = last_at
-                bucket["tables"].add(f"{schema}.{table}")
+                bucket["by_db"][database] += int(writes or 0)
+                if last_at is not None and (bucket["last_at"] is None or last_at > bucket["last_at"]):
+                    bucket["last_at"] = last_at
         except Exception as e:
             print(f"  ! {schema}.{table}: {e}", flush=True)
             continue
     try: c.close()
     except: pass
     return aggregated
+
+
+def primary_tenant_priority(tenant: str) -> int:
+    """Sort key for the directory ordering. Transform/Together first, rgroup
+    second, everything else last (alphabetical within)."""
+    if tenant in ("transform", "together"):
+        return 0
+    if tenant == "rgroup":
+        return 1
+    return 2
 
 
 def main() -> None:
@@ -249,66 +254,99 @@ def main() -> None:
 
     # username (lowercase) -> staff record
     username_to_staff: dict[str, dict] = {}
-    all_candidates: set[str] = set()
     for u in staff:
         for cand in candidate_usernames(u["email"]):
-            cand = cand.lower()
-            # If two staff have identical candidates (shouldn't, since local-parts
-            # are unique within Workspace), keep the first.
-            username_to_staff.setdefault(cand, u)
-            all_candidates.add(cand)
+            username_to_staff.setdefault(cand.lower(), u)
 
-    print(f"# candidates per staff: ~{len(all_candidates) // max(len(staff), 1)} | total: {len(all_candidates)}", flush=True)
+    # Aggregate per username across all DBs.
+    per_username: dict[str, dict] = defaultdict(lambda: {
+        "writes": 0,
+        "last_at": None,
+        "by_db": defaultdict(int),
+    })
+    for db in DATABASES:
+        for un, agg in scan_database(db, cutoff).items():
+            entry = per_username[un]
+            entry["writes"] += agg["writes"]
+            for k, v in agg["by_db"].items():
+                entry["by_db"][k] += v
+            if agg["last_at"] is not None:
+                if entry["last_at"] is None or agg["last_at"] > entry["last_at"]:
+                    entry["last_at"] = agg["last_at"]
 
-    # email (lowercase) -> activity record
-    activity: dict[str, dict] = defaultdict(lambda: {
+    print(f"# distinct email-shaped usernames active in window: {len(per_username)}", flush=True)
+
+    # Group by staff (matched) and external (unmatched).
+    # staff key: staff email; external key: the username itself.
+    staff_active: dict[str, dict] = defaultdict(lambda: {
         "writes_60d": 0,
         "last_active_utc": None,
         "by_db": defaultdict(int),
-        "tenants_set": set(),
+        "by_tenant": defaultdict(int),  # writes per tenant — used to pick primary
     })
+    external_active: dict[str, dict] = {}
 
-    for db in DATABASES:
-        per_user = scan_database(db, all_candidates, cutoff)
-        for un, agg in per_user.items():
-            staff_record = username_to_staff.get(un)
-            if not staff_record:
-                continue
+    for un, agg in per_username.items():
+        staff_record = username_to_staff.get(un)
+        tenant = short_tenant(domain_from_username(un))
+        if staff_record:
             email = staff_record["email"].lower()
-            entry = activity[email]
+            entry = staff_active[email]
             entry["writes_60d"] += agg["writes"]
-            if agg["last_at"] is not None:
-                if entry["last_active_utc"] is None or agg["last_at"] > entry["last_active_utc"]:
-                    entry["last_active_utc"] = agg["last_at"]
-            entry["by_db"][db] += agg["writes"]
-            entry["tenants_set"].add(short_tenant(domain_from_username(un)))
+            for k, v in agg["by_db"].items():
+                entry["by_db"][k] += v
+            if agg["last_at"] is not None and (
+                entry["last_active_utc"] is None or agg["last_at"] > entry["last_active_utc"]
+            ):
+                entry["last_active_utc"] = agg["last_at"]
+            entry["by_tenant"][tenant] += agg["writes"]
+        else:
+            top_db = max(agg["by_db"].items(), key=lambda kv: kv[1])[0]
+            external_active[un] = {
+                "username": un,
+                "writes_60d": agg["writes"],
+                "last_active_utc": agg["last_at"].isoformat() if agg["last_at"] else None,
+                "tenants": [tenant] if tenant else [],
+                "primary_tenant": tenant,
+                "top_warehouse": short_warehouse(top_db),
+            }
 
-    # Materialize for JSON
-    out_users = []
-    for email, entry in activity.items():
+    # Materialize the staff list with primary_tenant.
+    staff_users = []
+    for email, entry in staff_active.items():
         if entry["writes_60d"] == 0:
             continue
         top_db = max(entry["by_db"].items(), key=lambda kv: kv[1])[0]
-        out_users.append({
+        primary = max(entry["by_tenant"].items(), key=lambda kv: kv[1])[0] if entry["by_tenant"] else ""
+        staff_users.append({
             "email": email,
             "writes_60d": entry["writes_60d"],
             "last_active_utc": entry["last_active_utc"].isoformat() if entry["last_active_utc"] else None,
-            "tenants": sorted(t for t in entry["tenants_set"] if t),
+            "tenants": sorted(t for t in entry["by_tenant"].keys() if t),
+            "primary_tenant": primary,
             "top_warehouse": short_warehouse(top_db),
         })
-    out_users.sort(key=lambda u: u["writes_60d"], reverse=True)
+
+    # Sort: primary_tenant priority (transform → rgroup → other), then writes desc.
+    sort_key = lambda u: (primary_tenant_priority(u["primary_tenant"]), -u["writes_60d"], u["primary_tenant"])
+    staff_users.sort(key=sort_key)
+    external_users = list(external_active.values())
+    external_users.sort(key=sort_key)
 
     output = {
         "snapshot_at": started.isoformat(),
         "snapshot_date": started.date().isoformat(),
         "window_days": WINDOW_DAYS,
         "cutoff_utc": cutoff.isoformat(),
-        "active_count": len(out_users),
-        "active_users": out_users,
+        "active_count": len(staff_users),
+        "external_count": len(external_users),
+        "active_users": staff_users,
+        "external_users": external_users,
     }
     out_path = Path("staff-activity.json")
     out_path.write_text(json.dumps(output, indent=2, default=str))
-    print(f"# wrote {out_path} ({out_path.stat().st_size} bytes); {len(out_users)} active staff", flush=True)
+    print(f"# wrote {out_path} ({out_path.stat().st_size} bytes); "
+          f"staff={len(staff_users)} external={len(external_users)}", flush=True)
 
 
 if __name__ == "__main__":
