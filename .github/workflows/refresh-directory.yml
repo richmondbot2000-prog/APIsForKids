@@ -1,6 +1,6 @@
 name: Refresh Directory
 
-# Pulls the live Google Workspace user list for letme.com and commits
+# Pulls the live Google Workspace user list for letme.co.uk and commits
 # staff.json back to main so directory.html stays current.
 #
 # Same hourly + guard + retry-on-rebase pattern as the other refresh-*
@@ -66,7 +66,7 @@ jobs:
           # is a no-op until the secret arrives.
           WORKSPACE_SERVICE_ACCOUNT_JSON: ${{ secrets.WORKSPACE_SERVICE_ACCOUNT_JSON }}
           WORKSPACE_DELEGATE_USER:        ${{ secrets.WORKSPACE_DELEGATE_USER }}
-          WORKSPACE_DOMAIN:               letme.com
+          WORKSPACE_DOMAIN:               letme.co.uk
         run: python scripts/scan_directory.py
 
       - name: Commit if staff.json changed

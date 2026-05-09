@@ -1,8 +1,8 @@
 """
-Generate staff.json — the Google Workspace user directory for letme.com.
+Generate staff.json — the Google Workspace user directory for letme.co.uk.
 
 Used by directory.html on the BOOK site (gated behind Cloudflare Access
-+ @letme.com login, so we can show internal-staff data here).
++ @letme.co.uk login, so we can show internal-staff data here).
 
 Authentication: a Google Cloud service account with domain-wide delegation
 authorised in Workspace admin. The service account impersonates a super
@@ -11,7 +11,7 @@ admin to call the Admin SDK Directory API users.list endpoint.
 Required env vars:
   WORKSPACE_SERVICE_ACCOUNT_JSON  — full service-account key JSON (string)
   WORKSPACE_DELEGATE_USER         — super-admin email to impersonate
-  WORKSPACE_DOMAIN                — letme.com (default if unset)
+  WORKSPACE_DOMAIN                — letme.co.uk (default if unset)
   OUT                             — output path (default: staff.json)
 """
 from __future__ import annotations
@@ -29,7 +29,7 @@ from googleapiclient.discovery import build
 
 SCOPES = ['https://www.googleapis.com/auth/admin.directory.user.readonly']
 PAGE_SIZE = 500   # API max
-DOMAIN_DEFAULT = 'letme.com'
+DOMAIN_DEFAULT = 'letme.co.uk'
 
 
 def env(name: str, default: str | None = None) -> str:
