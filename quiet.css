@@ -1,0 +1,416 @@
+@import url("./quiet-tokens.css");
+
+/* ─────────────────────────────────────────────────────────────────────────
+   TogetherBOOK — Quiet Edition
+   Editorial / antique-book treatment. No emoji. No card shadows.
+   Brass leads; manuscript red is reserved for italic marginalia and rubrication.
+   ───────────────────────────────────────────────────────────────────────── */
+
+html, body { margin: 0; background: var(--bg); color: var(--fg); }
+body { font-family: var(--font-display); font-feature-settings: "kern", "liga", "onum"; }
+
+/* paper grain — quieter than before */
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='2' seed='5'/><feColorMatrix values='0 0 0 0 0.1  0 0 0 0 0.1  0 0 0 0 0.18  0 0 0 0.04 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity: 0.55; mix-blend-mode: multiply;
+}
+
+/* ───── Topbar ───── */
+.qb-topbar {
+  position: sticky; top: 0; z-index: 30;
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 28px;
+  height: 76px; padding: 0 56px;
+  background: rgba(251, 246, 233, 0.86);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--divider);
+}
+.qb-brand { display: flex; align-items: baseline; gap: 14px; cursor: pointer; user-select: none; }
+.qb-brand-mark {
+  font: italic 600 22px/1 var(--font-display); color: var(--fg-strong);
+  letter-spacing: 0.01em;
+}
+.qb-brand-mark::after {
+  content: "·"; margin: 0 10px; color: var(--brass-500); font-style: normal;
+}
+.qb-brand-sub {
+  font: italic 400 13px/1 var(--font-display); color: var(--fg-muted);
+  letter-spacing: 0.02em;
+}
+.qb-nav { display: flex; gap: 28px; justify-self: end; }
+.qb-nav-link {
+  font: 400 15px/1 var(--font-display); color: var(--fg-muted);
+  text-decoration: none; cursor: pointer; padding: 6px 0;
+  border-bottom: 1px solid transparent;
+  transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+  letter-spacing: 0.005em;
+}
+.qb-nav-link:hover { color: var(--fg-strong); border-bottom-color: var(--brass-300); }
+.qb-nav-link.is-active {
+  color: var(--fg-strong); font-style: italic;
+  border-bottom-color: var(--brass-500);
+}
+.qb-folio {
+  font: 400 11px/1 var(--font-body); letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--fg-subtle);
+}
+
+/* ───── Page shell ───── */
+.qb-page {
+  position: relative; z-index: 1;
+  max-width: 920px; margin: 0 auto; padding: 0 56px 120px;
+}
+
+/* ───── Hero ───── */
+.qb-hero { padding: 88px 0 72px; }
+.qb-marker {
+  font: italic 400 15px/1 var(--font-display); color: var(--accent);
+  letter-spacing: 0.02em; margin-bottom: 20px;
+  display: flex; align-items: center; gap: 14px;
+}
+.qb-marker::before, .qb-marker::after {
+  content: ""; flex: 0 0 36px; height: 1px; background: var(--brass-300);
+}
+.qb-marker::after { flex: 1 1 auto; }
+.qb-hero-title {
+  font: 400 88px/1.02 var(--font-display);
+  color: var(--fg-strong); margin: 0 0 28px;
+  letter-spacing: -0.02em; text-wrap: balance;
+  font-variation-settings: "opsz" 72;
+}
+.qb-hero-title em {
+  font-style: italic; font-weight: 400;
+  color: var(--accent);
+}
+.qb-hero-lead {
+  font: 400 19px/1.6 var(--font-display); color: var(--fg-muted);
+  max-width: 620px; text-wrap: pretty; margin: 0 0 36px;
+  font-feature-settings: "kern", "liga", "onum";
+}
+.qb-hero-lead em { color: var(--fg); font-style: italic; }
+.qb-hero-actions { display: flex; gap: 36px; align-items: baseline; }
+.qb-link-action {
+  font: italic 400 17px/1 var(--font-display); color: var(--fg-strong);
+  background: none; border: none; padding: 0; cursor: pointer;
+  border-bottom: 1px solid var(--brass-500);
+  padding-bottom: 4px;
+  transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+.qb-link-action:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.qb-link-action.is-quiet { color: var(--fg-muted); border-bottom-color: var(--ink-300); }
+.qb-link-action.is-quiet:hover { color: var(--fg-strong); border-bottom-color: var(--brass-500); }
+
+/* ornamental fleuron between sections */
+.qb-fleuron {
+  display: flex; align-items: center; justify-content: center;
+  margin: 64px auto; gap: 22px; max-width: 320px;
+}
+.qb-fleuron::before, .qb-fleuron::after {
+  content: ""; flex: 1; height: 1px; background: var(--ink-300); opacity: 0.5;
+}
+.qb-fleuron-glyph {
+  width: 12px; height: 12px; border: 1px solid var(--brass-500);
+  transform: rotate(45deg); position: relative;
+}
+.qb-fleuron-glyph::after {
+  content: ""; position: absolute; inset: 3px; background: var(--brass-500);
+}
+
+/* ───── Section heading ───── */
+.qb-section { padding: 24px 0; }
+.qb-section-head { margin-bottom: 48px; max-width: 620px; }
+.qb-section-eyebrow {
+  font: italic 400 15px/1 var(--font-display); color: var(--accent);
+  letter-spacing: 0.02em; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 14px;
+}
+.qb-section-eyebrow::before {
+  content: ""; flex: 0 0 36px; height: 1px; background: var(--brass-300);
+}
+.qb-roman {
+  font: 400 13px/1 var(--font-display); color: var(--fg-subtle);
+  letter-spacing: 0.18em; text-transform: uppercase; margin-right: 6px;
+}
+.qb-section-title {
+  font: 400 44px/1.05 var(--font-display);
+  color: var(--fg-strong); margin: 0 0 12px;
+  letter-spacing: -0.012em; text-wrap: balance;
+}
+.qb-section-sub {
+  font: 400 17px/1.6 var(--font-display); color: var(--fg-muted);
+  margin: 0; max-width: 580px; text-wrap: pretty;
+}
+.qb-section-sub em { font-style: italic; color: var(--fg); }
+
+/* ───── Helpers — monogram cards ───── */
+.qb-helpers {
+  display: grid; grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--ink-300);
+  border-left: 1px solid var(--ink-300);
+}
+.qb-helper {
+  display: grid; grid-template-columns: 96px 1fr; gap: 24px; align-items: start;
+  padding: 32px 28px;
+  border-right: 1px solid var(--ink-300); border-bottom: 1px solid var(--ink-300);
+  cursor: pointer; background: transparent;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.qb-helper:hover { background: var(--paper-50); }
+.qb-helper:hover .qb-monogram { border-color: var(--brass-500); }
+.qb-helper:hover .qb-helper-name { color: var(--accent); }
+
+.qb-monogram {
+  width: 88px; height: 88px; border-radius: 50%;
+  border: 1px solid var(--ink-300);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  transition: border-color var(--dur-base) var(--ease-out);
+  background: transparent;
+}
+.qb-monogram::before {
+  content: ""; position: absolute; inset: 6px; border-radius: 50%;
+  border: 1px solid var(--brass-300); opacity: 0.55;
+}
+.qb-monogram-letter {
+  font: italic 400 52px/1 var(--font-display);
+  color: var(--brass-600); letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 48;
+  position: relative; z-index: 1;
+  transform: translate(0, 1px);
+}
+.qb-helper-body { padding-top: 4px; min-width: 0; }
+.qb-helper-name {
+  font: 400 22px/1.2 var(--font-display);
+  color: var(--fg-strong); margin: 0 0 8px; letter-spacing: -0.005em;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.qb-helper-blurb {
+  font: 400 15px/1.55 var(--font-display); color: var(--fg-muted);
+  margin: 0 0 12px; text-wrap: pretty;
+}
+.qb-helper-endpoint {
+  font: 400 12px/1 var(--font-mono);
+  color: var(--ink-600); letter-spacing: -0.005em;
+  background: transparent; border: none; padding: 0;
+  border-bottom: 1px dotted var(--ink-300); padding-bottom: 2px;
+}
+
+/* ───── Robots — editorial list with painted plates ───── */
+.qb-robots {
+  display: flex; flex-direction: column;
+}
+.qb-robot {
+  display: grid; grid-template-columns: 140px 1fr auto; gap: 36px; align-items: center;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--divider);
+}
+.qb-robot:first-child { border-top: 1px solid var(--ink-300); }
+.qb-robot-plate {
+  width: 124px; height: 124px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--paper-50);
+  border: 1px solid var(--paper-300);
+  position: relative;
+}
+.qb-robot-plate::before {
+  content: ""; position: absolute; inset: 4px; border: 1px solid var(--brass-300); opacity: 0.4;
+  pointer-events: none;
+}
+.qb-robot-plate img { width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; }
+.qb-robot-body { min-width: 0; }
+.qb-robot-name {
+  font: 400 24px/1.15 var(--font-display); color: var(--fg-strong);
+  margin: 0 0 6px; letter-spacing: -0.005em;
+}
+.qb-robot-blurb {
+  font: 400 15px/1.55 var(--font-display); color: var(--fg-muted);
+  margin: 0; text-wrap: pretty; max-width: 520px;
+}
+.qb-robot-meta {
+  display: flex; flex-direction: column; gap: 8px; align-items: flex-end;
+  text-align: right;
+}
+.qb-robot-when {
+  font: italic 400 14px/1.2 var(--font-display); color: var(--accent);
+  letter-spacing: 0.01em;
+}
+.qb-robot-asks {
+  font: 400 12px/1 var(--font-body); color: var(--fg-subtle);
+  letter-spacing: 0.16em; text-transform: uppercase;
+}
+.qb-robot-asks b { color: var(--fg); font-weight: 500; letter-spacing: 0.01em; text-transform: none;
+  font-family: var(--font-display); font-style: italic; font-size: 14px;
+}
+
+/* ───── Commandments — numbered editorial list ───── */
+.qb-cmds { display: flex; flex-direction: column; }
+.qb-cmd {
+  display: grid; grid-template-columns: 96px 1fr; gap: 36px; align-items: baseline;
+  padding: 36px 0;
+  border-bottom: 1px solid var(--divider);
+}
+.qb-cmd:first-child { border-top: 1px solid var(--ink-300); }
+.qb-cmd-numeral {
+  font: italic 400 64px/0.9 var(--font-display);
+  color: var(--brass-500); letter-spacing: -0.02em;
+  text-align: right; font-variation-settings: "opsz" 60;
+}
+.qb-cmd-body { padding-top: 6px; }
+.qb-cmd-title {
+  font: 400 26px/1.2 var(--font-display); color: var(--fg-strong);
+  margin: 0 0 10px; letter-spacing: -0.005em; text-wrap: balance;
+}
+.qb-cmd-kid {
+  font: 400 16px/1.6 var(--font-display); color: var(--fg);
+  margin: 0 0 14px; max-width: 580px;
+}
+.qb-cmd-why {
+  display: grid; grid-template-columns: 80px 1fr; gap: 16px; align-items: baseline;
+  padding-top: 12px; border-top: 1px dashed var(--divider);
+  max-width: 620px;
+}
+.qb-cmd-why-label {
+  font: italic 400 13px/1.4 var(--font-display); color: var(--accent);
+  letter-spacing: 0.02em;
+}
+.qb-cmd-why-text {
+  font: 400 14px/1.6 var(--font-display); color: var(--fg-muted);
+  margin: 0;
+}
+.qb-cmd-why-text code {
+  font: 500 12.5px/1 var(--font-mono); color: var(--ink-900);
+  background: var(--paper-200); border: 1px solid var(--paper-300);
+  padding: 1px 6px; border-radius: var(--radius-xs);
+}
+
+/* ───── Helper detail page ───── */
+.qb-back {
+  font: italic 400 15px/1 var(--font-display); color: var(--fg-muted);
+  background: none; border: none; padding: 0; cursor: pointer;
+  margin: 32px 0 28px;
+  border-bottom: 1px solid var(--ink-300); padding-bottom: 4px;
+  transition: color var(--dur-fast), border-color var(--dur-fast);
+}
+.qb-back:hover { color: var(--fg-strong); border-bottom-color: var(--brass-500); }
+
+.qb-detail {
+  display: grid; grid-template-columns: 1fr 320px; gap: 64px; align-items: start;
+  padding-top: 12px;
+}
+.qb-detail-main { min-width: 0; }
+.qb-detail-monogram {
+  width: 120px; height: 120px; border-radius: 50%;
+  border: 1px solid var(--ink-300);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; margin-bottom: 32px;
+}
+.qb-detail-monogram::before {
+  content: ""; position: absolute; inset: 8px; border-radius: 50%;
+  border: 1px solid var(--brass-300); opacity: 0.6;
+}
+.qb-detail-monogram .qb-monogram-letter { font-size: 76px; }
+.qb-detail-title {
+  font: 400 56px/1.05 var(--font-display); color: var(--fg-strong);
+  margin: 0 0 16px; letter-spacing: -0.018em;
+}
+.qb-detail-lead {
+  font: 400 19px/1.6 var(--font-display); color: var(--fg-muted);
+  margin: 0 0 18px; max-width: 560px; text-wrap: pretty;
+}
+.qb-detail-endpoint {
+  display: inline-block; font: 500 13px/1 var(--font-mono);
+  color: var(--ink-700); border-bottom: 1px dotted var(--ink-300); padding-bottom: 3px;
+  margin-bottom: 40px;
+}
+
+/* ───── Chat example — quiet correspondence card ───── */
+.qb-chat {
+  border-top: 1px solid var(--ink-300); border-bottom: 1px solid var(--ink-300);
+  padding: 24px 0;
+}
+.qb-chat-label {
+  font: italic 400 13px/1 var(--font-display); color: var(--accent);
+  letter-spacing: 0.02em; margin-bottom: 18px;
+}
+.qb-chat-body { display: flex; flex-direction: column; gap: 18px; }
+.qb-bubble-row { max-width: 86%; }
+.qb-bubble-row.is-them { align-self: flex-end; text-align: right; }
+.qb-bubble-name {
+  font: italic 400 13px/1 var(--font-display); color: var(--fg-subtle);
+  margin-bottom: 6px;
+}
+.qb-bubble {
+  font: 400 16px/1.55 var(--font-display); color: var(--fg);
+  padding-left: 14px; border-left: 1px solid var(--brass-300);
+}
+.qb-bubble-row.is-them .qb-bubble {
+  padding-left: 0; padding-right: 14px;
+  border-left: none; border-right: 1px solid var(--accent);
+  color: var(--ink-900);
+}
+
+/* ───── Detail meta panel — antique register ───── */
+.qb-meta {
+  border-top: 1px solid var(--ink-300);
+  padding-top: 20px;
+}
+.qb-meta-section { margin-bottom: 28px; }
+.qb-meta-label {
+  font: 400 11px/1 var(--font-body); letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--fg-subtle); margin-bottom: 14px;
+}
+.qb-register-row {
+  display: grid; grid-template-columns: 96px 1fr; gap: 14px;
+  padding: 10px 0; border-bottom: 1px dashed var(--divider);
+  align-items: baseline;
+}
+.qb-register-row:last-child { border-bottom: none; }
+.qb-register-tag {
+  font: italic 400 13px/1 var(--font-display);
+  letter-spacing: 0.01em;
+}
+.qb-register-tag.is-external { color: var(--ink-600); }
+.qb-register-tag.is-frontend { color: var(--teal-500); }
+.qb-register-tag.is-robot    { color: var(--sage-500); }
+.qb-register-row span:last-child {
+  font: 400 14px/1.5 var(--font-display); color: var(--fg);
+}
+.qb-meta-prose {
+  font: 400 14px/1.6 var(--font-display); color: var(--fg-muted);
+  margin: 0; text-wrap: pretty;
+}
+
+/* ───── Footer ───── */
+.qb-footer {
+  margin-top: 80px; padding-top: 36px; border-top: 1px solid var(--divider);
+  text-align: center;
+}
+.qb-footer p {
+  font: italic 400 14px/1.6 var(--font-display); color: var(--fg-muted);
+  margin: 0; letter-spacing: 0.01em;
+}
+.qb-footer-mark {
+  display: inline-block; width: 8px; height: 8px;
+  background: var(--brass-500); transform: rotate(45deg);
+  margin: 0 14px; vertical-align: middle;
+}
+
+/* ───── Responsive ───── */
+@media (max-width: 760px) {
+  .qb-page { padding: 0 24px 80px; }
+  .qb-topbar { padding: 0 24px; height: 64px; gap: 16px; }
+  .qb-folio { display: none; }
+  .qb-hero { padding: 56px 0 48px; }
+  .qb-hero-title { font-size: 56px; }
+  .qb-helpers { grid-template-columns: 1fr; }
+  .qb-helper { padding: 24px 16px; grid-template-columns: 72px 1fr; gap: 18px; }
+  .qb-monogram { width: 64px; height: 64px; }
+  .qb-monogram-letter { font-size: 38px; }
+  .qb-robot { grid-template-columns: 100px 1fr; gap: 20px; padding: 20px 0; }
+  .qb-robot-plate { width: 92px; height: 92px; }
+  .qb-robot-meta { grid-column: 1 / -1; align-items: flex-start; text-align: left; }
+  .qb-cmd { grid-template-columns: 64px 1fr; gap: 20px; padding: 24px 0; }
+  .qb-cmd-numeral { font-size: 44px; }
+  .qb-detail { grid-template-columns: 1fr; gap: 32px; }
+  .qb-detail-title { font-size: 38px; }
+}

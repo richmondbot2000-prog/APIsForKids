@@ -10,6 +10,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="quiet-tokens.css">
+<link rel="stylesheet" href="quiet.css">
+<link rel="stylesheet" href="quiet-extras.css">
+<link rel="stylesheet" href="quiet-legacy.css">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 56px 32px 120px; }
   @media (max-width: 800px) { .dir-section { padding: 4px 3px 80px; } }
@@ -203,46 +207,25 @@
   }, true);
 </script>
 
-<div class="topbar">
-  <button class="menu-toggle" aria-label="Open navigation menu" id="menuToggle"
-          onclick="event.stopPropagation();document.body.classList.toggle('menu-open');">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" style="pointer-events:none">
-      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-    </svg>
-  </button>
-  <a class="brand" href="index.html" aria-label="BOOK — home"><img class="brand-icon" src="site-icon.png" alt=""><img class="brand-logo" src="book-logo.png" alt="BOOK"></a>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="apis.html">APIs</a>
-    <a href="robots.html">Robots</a>
-    <a href="yesterday.html">Yesterday</a>
-    <a href="brandwatch.html">Brandwatch</a>
-    <a href="1stcontact.html">1stContact</a>
-    <a href="directory.html" class="active">Directory</a>
-    <a href="database.html">Schema</a>
-    <a href="stats.html">Stats</a>
+<header class="qb-topbar">
+  <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
+    <img class="qb-brand-logo" src="togetherbook-logo.png" alt="TogetherBOOK">
+    <span class="qb-brand-sub">a storybook of Central Services</span>
+  </a>
+  <nav class="qb-nav">
+    <a class="qb-nav-link" href="index.html">Helpers</a>
+    <a class="qb-nav-link" href="robots.html">Robots</a>
+    <a class="qb-nav-link" href="index.html#commandments">Commandments</a>
+    <a class="qb-nav-link" href="yesterday.html">Yesterday</a>
+    <a class="qb-nav-link" href="brandwatch.html">Brandwatch</a>
+    <a class="qb-nav-link" href="1stcontact.html">1stContact</a>
+    <a class="qb-nav-link is-active" href="directory.html">Directory</a>
+    <a class="qb-nav-link" href="database.html">Schema</a>
+    <a class="qb-nav-link" href="stats.html">Stats</a>
   </nav>
-</div>
-<div class="sidebar-backdrop" onclick="document.body.classList.remove('menu-open')"></div>
-
-<div class="layout">
-
-  <aside class="sidebar">
-    <button class="drawer-close" aria-label="Close menu"
-            onclick="document.body.classList.remove('menu-open')">✕ Close menu</button>
-
-    <h4><a href="index.html"      onclick="document.body.classList.remove('menu-open')">Home</a></h4>
-    <h4><a href="apis.html"       onclick="document.body.classList.remove('menu-open')">The 8 APIs</a></h4>
-    <h4><a href="robots.html"     onclick="document.body.classList.remove('menu-open')">The 12 Robots</a></h4>
-    <h4><a href="yesterday.html"  onclick="document.body.classList.remove('menu-open')">Yesterday's payouts</a></h4>
-    <h4><a href="brandwatch.html" onclick="document.body.classList.remove('menu-open')">Brandwatch</a></h4>
-    <h4><a href="1stcontact.html" onclick="document.body.classList.remove('menu-open')">1stContact</a></h4>
-    <h4><a href="directory.html"  onclick="document.body.classList.remove('menu-open')">Directory</a></h4>
-    <h4><a href="database.html"   onclick="document.body.classList.remove('menu-open')">Schema</a></h4>
-    <h4><a href="stats.html"      onclick="document.body.classList.remove('menu-open')">Stats</a></h4>
-  </aside>
-
-  <main>
+  <div class="qb-folio">Vol. I &nbsp;·&nbsp; mmxxvi</div>
+</header>
+<main class="qb-page">
     <section class="dir-section">
       <h1>Directory</h1>
       <p class="lead">Everyone with an active <strong>@letme.com</strong> Google Workspace account.</p>
@@ -266,7 +249,6 @@
       </div>
     </section>
   </main>
-</div>
 
 <script>
   let allUsers = [];

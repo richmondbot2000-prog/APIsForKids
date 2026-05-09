@@ -3,270 +3,128 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>BOOK — The Robots</title>
+<title>TogetherBOOK — The Robots</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800;900&family=Audiowide&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="quiet-tokens.css">
+<link rel="stylesheet" href="quiet.css">
+<link rel="stylesheet" href="quiet-extras.css">
 </head>
 <body>
 
-<script>
-  // Document-level fallback: close drawer when any link inside the sidebar is tapped.
-  // Runs before any other JS to guarantee the close behavior even if later scripts error out.
-  document.addEventListener('click', function (e) {
-    if (!document.body.classList.contains('menu-open')) return;
-    const link = e.target.closest('a');
-    if (link && e.target.closest('.sidebar')) {
-      document.body.classList.remove('menu-open');
-    }
-  }, true);
-</script>
-
-<div class="topbar">
-  <button class="menu-toggle" aria-label="Open navigation menu" id="menuToggle"
-          onclick="event.stopPropagation();document.body.classList.toggle('menu-open');">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" style="pointer-events:none">
-      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-    </svg>
-  </button>
-  <a class="brand" href="index.html" aria-label="BOOK — home"><img class="brand-icon" src="site-icon.png" alt=""><img class="brand-logo" src="book-logo.png" alt="BOOK"></a>
-  <nav>
-    <a href="index.html">Home</a>
-    <a href="apis.html">APIs</a>
-    <a href="robots.html" class="active">Robots</a>
-    <a href="yesterday.html">Yesterday</a>
-    <a href="brandwatch.html">Brandwatch</a>
-    <a href="1stcontact.html">1stContact</a>
-    <a href="directory.html">Directory</a>
-    <a href="database.html">Schema</a>
-    <a href="stats.html">Stats</a>
+<header class="qb-topbar">
+  <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
+    <img class="qb-brand-logo" src="togetherbook-logo.png" alt="TogetherBOOK">
+    <span class="qb-brand-sub">a storybook of Central Services</span>
+  </a>
+  <nav class="qb-nav">
+    <a class="qb-nav-link" href="index.html">Helpers</a>
+    <a class="qb-nav-link is-active" href="robots.html">Robots</a>
+    <a class="qb-nav-link" href="index.html#commandments">Commandments</a>
+    <a class="qb-nav-link" href="yesterday.html">Yesterday</a>
+    <a class="qb-nav-link" href="brandwatch.html">Brandwatch</a>
+    <a class="qb-nav-link" href="1stcontact.html">1stContact</a>
+    <a class="qb-nav-link" href="directory.html">Directory</a>
+    <a class="qb-nav-link" href="database.html">Schema</a>
+    <a class="qb-nav-link" href="stats.html">Stats</a>
   </nav>
-</div>
-<div class="sidebar-backdrop" onclick="document.body.classList.remove('menu-open')"></div>
+  <div class="qb-folio">Vol. I &nbsp;·&nbsp; mmxxvi</div>
+</header>
 
-<div class="layout">
+<main class="qb-page">
 
-    <aside class="sidebar">
-    <button class="drawer-close" aria-label="Close menu"
-            onclick="document.body.classList.remove('menu-open')">✕ Close menu</button>
+  <a class="qb-back" href="index.html">← Back to all helpers</a>
 
-    <h4><a href="index.html"      onclick="document.body.classList.remove('menu-open')">Home</a></h4>
-    <h4><a href="apis.html"       onclick="document.body.classList.remove('menu-open')">The 8 APIs</a></h4>
-    <h4><a href="robots.html"     onclick="document.body.classList.remove('menu-open')">The 12 Robots</a></h4>
-    <h4><a href="yesterday.html"  onclick="document.body.classList.remove('menu-open')">Yesterday's payouts</a></h4>
-    <h4><a href="brandwatch.html" onclick="document.body.classList.remove('menu-open')">Brandwatch</a></h4>
-    <h4><a href="1stcontact.html" onclick="document.body.classList.remove('menu-open')">1stContact</a></h4>
-    <h4><a href="directory.html"  onclick="document.body.classList.remove(\'menu-open\')">Directory</a></h4>
-    <h4><a href="database.html"   onclick="document.body.classList.remove('menu-open')">Schema</a></h4>
-    <h4><a href="stats.html"      onclick="document.body.classList.remove('menu-open')">Stats</a></h4>
-  </aside>
+  <section class="qb-section">
+    <div class="qb-section-head">
+      <div class="qb-section-eyebrow"><span class="qb-roman">Chapter II</span> the twelve</div>
+      <h2 class="qb-section-title">The robots.</h2>
+      <p class="qb-section-sub">
+        Twelve invisible workers. Some wake up at set times of day, some wake up the moment
+        there's a job to do. They never sleep, never get bored, and they're
+        <em>the ones doing most of the asking.</em>
+      </p>
+    </div>
+    <div class="qb-robots" id="robotsList"></div>
+  </section>
 
-  <main>
-
-    <section class="hero" id="meet">
-      <div class="crumb">Deep dive</div>
-      <h1>The Robots</h1>
-      <p class="lead">12 invisible workers. Some wake up at set times of day, some wake up the moment there's a job for them to do. They never sleep, they never get bored, and they're the ones doing most of the asking.</p>
-    </section>
-
-    <div class="robot-grid" id="robotGrid"></div>
-
-  </main>
-</div>
-
-<footer>
-  Made with care for curious minds. Each helper here is one of our real services — same job, friendlier face. ·
-  <a href="#meet">Back to top</a>
-</footer>
+  <footer class="qb-footer">
+    <p>
+      TogetherBOOK
+      <span class="qb-footer-mark"></span>
+      <em>an internal storybook of the Central Services platform</em>
+      <span class="qb-footer-mark"></span>
+      Richmond Group
+    </p>
+  </footer>
+</main>
 
 <script>
-  const robots = [
-    {
-      id: "night-counter",
-      icon: "owl",
-      image: "robots/night-counter.png",
-      name: "The Night Counter",
-      what: "Every night, looks at every loan and works out the new amount left to pay, plus when the next payment is due.",
-      when: "Once a night, after midnight",
-      calls: "Larry"
-    },
-    {
-      id: "quick-counter",
-      icon: "person-running",
-      image: "robots/quick-counter.png",
-      name: "The Quick Counter",
-      what: "Every time money goes in or out of a loan, quickly updates the totals so they're always right.",
-      when: "Every time money moves",
-      calls: "Larry"
-    },
-    {
-      id: "payment-matcher",
-      icon: "puzzle-piece",
-      name: "The Payment Matcher",
-      what: "When Penny takes a payment from a customer, this robot tells Larry to write it down in his book.",
-      when: "Every 4 minutes",
-      calls: "Penny, then Larry"
-    },
-    {
-      id: "card-bank-tidier",
-      icon: "man-mechanic",
-      name: "The Card-and-Bank Tidier",
-      what: "Whenever someone adds a new card or bank account, this robot makes sure Larry's notes match Penny's records.",
-      when: "Whenever a card or bank changes",
-      calls: "Penny, then Larry"
-    },
-    {
-      id: "big-mailout",
-      icon: "dove",
-      name: "The Big Mailout Team",
-      what: "Sends out big batches of friendly messages to lots of customers at once — like 'your payment is due tomorrow' to everyone who needs it.",
-      when: "Some run every minute or two; others wake up when there's a job to do",
-      calls: "Anna and Larry (to find out who to write to), then Connie"
-    },
-    {
-      id: "payment-collector",
-      icon: "money-with-wings",
-      image: "robots/payment-collector.png",
-      name: "The Payment Collector",
-      what: "Takes lots of payments from cards and bank accounts at the same time, when payments are due.",
-      when: "Always running",
-      calls: "Penny"
-    },
-    {
-      id: "reply-robots",
-      icon: "parrot",
-      image: "robots/reply-robots.png",
-      name: "The Reply Robots",
-      what: "When a customer texts back, these robots read what they said and figure out what to say in reply.",
-      when: "Whenever a customer message arrives",
-      calls: "Connie, Anna, Larry"
-    },
-    {
-      id: "lookout",
-      icon: "rotating-light",
-      image: "robots/lookout.png",
-      name: "The Lookout",
-      what: "Checks on every other robot, every helper, and every job line. If anything's broken or stopped, it rings the alarm bell.",
-      when: "Every 5 minutes",
-      calls: "Everyone"
-    },
-    {
-      id: "loan-inspector",
-      icon: "face-with-monocle",
-      image: "robots/loan-inspector.png",
-      name: "The Loan Inspector",
-      what: "Looks for loans where something's gone wrong — wrong totals, missing payment dates, the same payment counted twice.",
-      when: "Every 15 minutes",
-      calls: "Larry"
-    },
-    {
-      id: "tidy-up-crew",
-      icon: "broom",
-      name: "The Tidy-Up Crew",
-      what: "When a customer hasn't been around for two months, wipes their card numbers, ID, and credit report so we don't keep things we don't need.",
-      when: "Once a day",
-      calls: "Anna, Larry, Penny"
-    },
-    {
-      id: "card-sorter",
-      icon: "card-index-dividers",
-      name: "The Card Sorter",
-      what: "Turns off cards that have expired, are stored twice by mistake, or that the bank has said are no good.",
-      when: "Once a day at 6 in the morning",
-      calls: "Penny"
-    },
-    {
-      id: "finder",
-      icon: "dog-face",
-      name: "The Finder",
-      what: "When somebody asks 'where is this customer?', this robot looks across all the helpers and finds them.",
-      when: "Whenever it's asked",
-      calls: "Anna, Larry, Connie"
-    }
+  const ROBOTS = [
+    { id:'night-counter',  plate:'assets/robots/night-counter.png',  name:'The Night Counter',
+      blurb:'Every night, looks at every loan and works out the new amount left to pay, plus when the next payment is due.',
+      when:'Once a night, after midnight', asks:'Larry' },
+    { id:'quick-counter',  plate:'assets/robots/quick-counter.png',  name:'The Quick Counter',
+      blurb:'Every time money goes in or out of a loan, quickly updates the totals so they\'re always right.',
+      when:'Every time money moves', asks:'Larry' },
+    { id:'matcher',        plate:null,                                name:'The Payment Matcher',
+      blurb:'When Penny takes a payment from a customer, this robot tells Larry to write it down in his book.',
+      when:'Every 4 minutes', asks:'Penny + Larry' },
+    { id:'tidier',         plate:null,                                name:'The Card-and-Bank Tidier',
+      blurb:'Whenever someone adds a new card or bank account, this robot makes sure Larry\'s notes match Penny\'s records.',
+      when:'Whenever a card or bank changes', asks:'Penny + Larry' },
+    { id:'mailout',        plate:null,                                name:'The Big Mailout Team',
+      blurb:'Sends out big batches of friendly messages to lots of customers at once — payment-due reminders, welcome notes, statements.',
+      when:'Some run every minute or two; others wake when there\'s a job', asks:'Anna + Larry + Connie' },
+    { id:'collect',        plate:'assets/robots/payment-collector.png', name:'The Payment Collector',
+      blurb:'Knocks on the bank to collect payments that are due today. If the bank says no, leaves a note for Penny.',
+      when:'Always running', asks:'Penny' },
+    { id:'reply',          plate:'assets/robots/reply-robots.png',   name:'The Reply Robots',
+      blurb:'A little squad that listens for replies on every email, text and letter Connie sent — and files them.',
+      when:'Whenever a customer message arrives', asks:'Connie + Anna + Larry' },
+    { id:'lookout',        plate:'assets/robots/lookout.png',        name:'The Lookout',
+      blurb:'Watches every other helper. If somebody is slow, broken, or saying something weird, rings the alarm bell.',
+      when:'Every 5 minutes', asks:'Everyone' },
+    { id:'inspect',        plate:'assets/robots/loan-inspector.png', name:'The Loan Inspector',
+      blurb:'Looks for loans where something\'s gone wrong — wrong totals, missing payment dates, the same payment counted twice.',
+      when:'Every 15 minutes', asks:'Larry' },
+    { id:'tidy',           plate:null,                                name:'The Tidy-Up Crew',
+      blurb:'When a customer hasn\'t been around for two months, wipes their card numbers, ID, and credit report so we don\'t keep things we don\'t need.',
+      when:'Once a day', asks:'Anna + Larry + Penny' },
+    { id:'sorter',         plate:null,                                name:'The Card Sorter',
+      blurb:'Turns off cards that have expired, are stored twice by mistake, or that the bank has said are no good.',
+      when:'Once a day at 6 in the morning', asks:'Penny' },
+    { id:'finder',         plate:null,                                name:'The Finder',
+      blurb:'When somebody asks "where is this customer?", looks across all the helpers and finds them.',
+      when:'Whenever it\'s asked', asks:'Anna + Larry + Connie' },
   ];
 
-  function renderAskerGroup(items, gridId, navId) {
-    const grid = document.getElementById(gridId);
-    const nav = document.getElementById(navId);
-    // Clear static fallback before re-rendering from data, so name changes
-    // in the data array flow through and we don't end up with duplicates.
-    if (nav) nav.innerHTML = '';
-    if (grid) grid.innerHTML = '';
-    items.forEach(it => {
-      // For sidebar/nav, always use the small Fluent Emoji icon — works at tiny size
-      const navIconSrc = `https://api.iconify.design/fluent-emoji/${it.icon}.svg`;
-      // For the card, prefer a custom illustration if present
-      const cardIconSrc = it.image
-        ? it.image
-        : `https://api.iconify.design/fluent-emoji/${it.icon}.svg`;
-      const hasCustomArt = !!it.image;
-
-      // Sidebar entry
-      if (nav) {
-        const navLi = document.createElement('li');
-        navLi.innerHTML = `<a href="#${it.id}" onclick="document.body.classList.remove('menu-open')"><img class="emoji" src="${navIconSrc}" /> ${it.name.replace(/^The /, '')}</a>`;
-        nav.appendChild(navLi);
-      }
-      // Card
-      const div = document.createElement('div');
-      div.className = 'robot-card' + (hasCustomArt ? ' has-art' : '');
-      div.id = it.id;
-      const whenPill = it.when ? `<span class="robot-meta-pill"><span class="label">When</span> ${it.when}</span>` : '';
-      const asksValue = it.asks || it.calls || '';
-      const asksPill = asksValue ? `<span class="robot-meta-pill"><span class="label">Asks</span> ${asksValue}</span>` : '';
-      div.innerHTML = `
-        <div class="icon-wrap"><img src="${cardIconSrc}" alt="" /></div>
-        <div>
-          <h3>${it.name}</h3>
-          <p class="what">${it.what}</p>
-          <div class="robot-meta">${whenPill}${asksPill}</div>
-        </div>
-      `;
-      grid.appendChild(div);
-    });
+  function initial(name){
+    const parts = name.split(' ');
+    const first = parts[0].toLowerCase() === 'the' ? parts[1] : parts[0];
+    return first.charAt(0);
   }
 
-  renderAskerGroup(robots, 'robotGrid', 'sideNavRobots');
-
-
-  // Active section highlighting in sidebar
-  const navLinks = document.querySelectorAll('.sidebar-nav a');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = entry.target.id;
-        navLinks.forEach(link => {
-          link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
-        });
-      }
-    });
-  }, { rootMargin: '-30% 0px -65% 0px' });
-  document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
-
-  // Mobile drawer: the toggle/close behavior is handled by inline onclick attributes
-  // on the hamburger button, the close button, the backdrop, and every sidebar link.
-  // We add only one extra niceness here: Escape key closes the drawer.
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') document.body.classList.remove('menu-open');
+  const robotsList = document.getElementById('robotsList');
+  ROBOTS.forEach(r => {
+    const article = document.createElement('article');
+    article.id = r.id;
+    article.className = 'qb-robot' + (r.plate ? '' : ' is-typographic');
+    const plate = r.plate
+      ? `<div class="qb-robot-plate"><img src="${r.plate}" alt=""></div>`
+      : `<div class="qb-robot-plate qb-robot-plate-typographic"><span class="qb-plate-letter">${initial(r.name)}</span></div>`;
+    article.innerHTML = `
+      ${plate}
+      <div class="qb-robot-body">
+        <h3 class="qb-robot-name">${r.name}</h3>
+        <p class="qb-robot-blurb">${r.blurb}</p>
+      </div>
+      <div class="qb-robot-meta">
+        <div class="qb-robot-when">${r.when}</div>
+        <div class="qb-robot-asks">asks <b>${r.asks}</b></div>
+      </div>`;
+    robotsList.appendChild(article);
   });
-
-  // Twemoji parsing — replace native emoji with Twitter SVGs for consistency
-  const twemojiScript = document.createElement('script');
-  twemojiScript.src = 'https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/dist/twemoji.min.js';
-  twemojiScript.crossOrigin = 'anonymous';
-  twemojiScript.onload = () => {
-    if (window.twemoji) {
-      window.twemoji.parse(document.body, {
-        folder: 'svg',
-        ext: '.svg',
-        base: 'https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/'
-      });
-    }
-  };
-  document.head.appendChild(twemojiScript);
 </script>
 
 </body>

@@ -1,0 +1,84 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   Quiet legacy aliases.
+
+   Tool pages (yesterday, brandwatch, 1stcontact, directory, database, stats)
+   carry inline styles that reference the previous theme's token names
+   (--bg, --ink, --accent, --muted, etc.). This file remaps those names to
+   the Quiet palette so existing inline rules pick up cream/ink/brass
+   automatically — without rewriting every page-specific stylesheet.
+
+   Load this AFTER style.css and the quiet-* stack on tool pages.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Old neutrals → Quiet paper / ink */
+  --bg:           var(--paper-100);
+  --bg-soft:      var(--paper-50);
+  --bg-soft-2:    var(--paper-200);
+  --ink:          var(--ink-800);
+  --ink-soft:     var(--ink-700);
+  --muted:        var(--ink-500);
+  --border:       var(--paper-300);
+  --border-soft:  var(--divider);
+
+  /* Old neon accents → Quiet brass / red / teal / sage */
+  --accent:        var(--brass-500);
+  --accent-soft:   var(--brass-50);
+  --accent-ink:    var(--brass-600);
+  --accent-2:      var(--red-500);
+  --accent-3:      var(--brass-300);
+  --accent-4:      var(--teal-500);
+  --good:          var(--sage-500);
+
+  /* Glows out — Quiet has no shadows by design. Make these no-ops. */
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-glow-cyan: none;
+  --shadow-glow-pink: none;
+
+  /* Radius — Quiet uses near-zero for chrome, but page-level cards can keep
+     gentle radii so they don't look broken. */
+  --radius: 6px;
+  --radius-lg: 10px;
+
+  /* Display font swap: Orbitron → Newsreader. Page hero headers will lose
+     their uppercase/spaced sci-fi treatment, which is the intended outcome. */
+  --font-display: "Newsreader", "Iowan Old Style", "Palatino", Georgia, serif;
+}
+
+/* Override the Futurama background pattern (starfield + city scroll) — quiet
+   pages inherit body{ background: var(--paper-100) } from quiet.css. */
+body::before, body::after { display: none !important; content: none !important; }
+
+/* Old topbar/sidebar/drawer/footer chrome was rebuilt as qb-* on every page;
+   hide any leftovers. */
+.topbar, .sidebar, .sidebar-backdrop, .menu-toggle, .drawer-close,
+body > footer:not(.qb-footer) {
+  display: none !important;
+}
+
+/* Old `main` lived inside .layout grid; tool pages now sit directly under
+   <main class="qb-page">. Keep the old `main` selectors functional. */
+.layout { display: block; }
+.layout > main { padding: 0; }
+
+/* Tool-page section headings used Orbitron uppercase with neon underlines.
+   Without restyling each page, just rein in the size + colour. */
+.yp-section h1, .bw-section h1, .fc-section h1,
+.dir-section h1, .schema-section h1, .stats-section h1 {
+  font-family: var(--font-display);
+  font-weight: 400 !important;
+  text-transform: none !important;
+  letter-spacing: -0.012em !important;
+  color: var(--fg-strong) !important;
+}
+
+/* Drop neon shadows on cards. */
+.yp-state, .bw-card, .fc-card, .dir-card, .schema-card, .stats-card {
+  box-shadow: none !important;
+}
+
+/* Reduce tile filter on Leaflet maps so they don't darken on cream paper. */
+.yp-map .leaflet-tile, .yp-map-states .leaflet-tile {
+  filter: none !important;
+}

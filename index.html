@@ -3,486 +3,451 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>BOOK — How Our APIs Work</title>
+<title>TogetherBOOK — a storybook of Central Services</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800;900&family=Audiowide&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="quiet-tokens.css">
+<link rel="stylesheet" href="quiet.css">
+<link rel="stylesheet" href="quiet-extras.css">
 </head>
 <body>
 
-<script>
-  // Document-level fallback: close drawer when any link inside the sidebar is tapped.
-  // Runs before any other JS to guarantee the close behavior even if later scripts error out.
-  document.addEventListener('click', function (e) {
-    if (!document.body.classList.contains('menu-open')) return;
-    const link = e.target.closest('a');
-    if (link && e.target.closest('.sidebar')) {
-      document.body.classList.remove('menu-open');
-    }
-  }, true);
-</script>
-
-<div class="topbar">
-  <button class="menu-toggle" aria-label="Open navigation menu" id="menuToggle"
-          onclick="event.stopPropagation();document.body.classList.toggle('menu-open');">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" style="pointer-events:none">
-      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-    </svg>
-  </button>
-  <a class="brand" href="index.html" aria-label="BOOK — home"><img class="brand-icon" src="site-icon.png" alt=""><img class="brand-logo" src="book-logo.png" alt="BOOK"></a>
-  <nav>
-    <a href="index.html" class="active">Home</a>
-    <a href="apis.html">APIs</a>
-    <a href="robots.html">Robots</a>
-    <a href="yesterday.html">Yesterday</a>
-    <a href="brandwatch.html">Brandwatch</a>
-    <a href="1stcontact.html">1stContact</a>
-    <a href="directory.html">Directory</a>
-    <a href="database.html">Schema</a>
-    <a href="stats.html">Stats</a>
+<header class="qb-topbar">
+  <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
+    <img class="qb-brand-logo" src="togetherbook-logo.png" alt="TogetherBOOK">
+    <span class="qb-brand-sub">a storybook of Central Services</span>
+  </a>
+  <nav class="qb-nav">
+    <a class="qb-nav-link is-active" href="index.html">Helpers</a>
+    <a class="qb-nav-link" href="robots.html">Robots</a>
+    <a class="qb-nav-link" href="index.html#commandments">Commandments</a>
+    <a class="qb-nav-link" href="yesterday.html">Yesterday</a>
+    <a class="qb-nav-link" href="brandwatch.html">Brandwatch</a>
+    <a class="qb-nav-link" href="1stcontact.html">1stContact</a>
+    <a class="qb-nav-link" href="directory.html">Directory</a>
+    <a class="qb-nav-link" href="database.html">Schema</a>
+    <a class="qb-nav-link" href="stats.html">Stats</a>
   </nav>
-</div>
-<div class="sidebar-backdrop" onclick="document.body.classList.remove('menu-open')"></div>
+  <div class="qb-folio">Vol. I &nbsp;·&nbsp; mmxxvi</div>
+</header>
 
-<div class="layout">
+<main class="qb-page">
 
-    <aside class="sidebar">
-    <button class="drawer-close" aria-label="Close menu"
-            onclick="document.body.classList.remove('menu-open')">✕ Close menu</button>
+  <section class="qb-hero">
+    <div class="qb-marker">A storybook of the Central Services platform</div>
+    <h1 class="qb-hero-title">
+      Eight helpers, twelve robots,<br>
+      <em>and one very tidy ledger.</em>
+    </h1>
+    <p class="qb-hero-lead">
+      TogetherBOOK explains how Richmond Group's lending platform actually works —
+      in plain English, with characters you can remember by name. Onboarding,
+      pairing on a bug, or simply curious: every page tells you <em>what each piece does</em>,
+      who calls it, and what to ask if you need something from it.
+    </p>
+    <div class="qb-hero-actions">
+      <a class="qb-link-action" href="#helpers">Begin reading →</a>
+      <a class="qb-link-action is-quiet" href="#commandments">Skip ahead to the commandments</a>
+    </div>
+  </section>
 
-    <h4><a href="index.html"      onclick="document.body.classList.remove('menu-open')">Home</a></h4>
-    <h4><a href="apis.html"       onclick="document.body.classList.remove('menu-open')">The 8 APIs</a></h4>
-    <h4><a href="robots.html"     onclick="document.body.classList.remove('menu-open')">The 12 Robots</a></h4>
-    <h4><a href="yesterday.html"  onclick="document.body.classList.remove('menu-open')">Yesterday's payouts</a></h4>
-    <h4><a href="brandwatch.html" onclick="document.body.classList.remove('menu-open')">Brandwatch</a></h4>
-    <h4><a href="1stcontact.html" onclick="document.body.classList.remove('menu-open')">1stContact</a></h4>
-    <h4><a href="directory.html"  onclick="document.body.classList.remove(\'menu-open\')">Directory</a></h4>
-    <h4><a href="database.html"   onclick="document.body.classList.remove('menu-open')">Schema</a></h4>
-    <h4><a href="stats.html"      onclick="document.body.classList.remove('menu-open')">Stats</a></h4>
-  </aside>
+  <div class="qb-fleuron" aria-hidden="true"><span class="qb-fleuron-glyph"></span></div>
 
-  <main>
+  <section class="qb-section" id="helpers">
+    <div class="qb-section-head">
+      <div class="qb-section-eyebrow"><span class="qb-roman">Chapter I</span> the eight</div>
+      <h2 class="qb-section-title">Meet the helpers.</h2>
+      <p class="qb-section-sub">
+        Each helper looks after one corner of the platform. Click any of them to see
+        <em>what they do</em>, who calls them, and an example exchange.
+      </p>
+    </div>
+    <div class="qb-helpers" id="helpersGrid"></div>
+  </section>
 
-    <section class="hero" id="meet">
-      <div class="crumb">A guide</div>
-      <h1>How our world fits together</h1>
-      <p class="lead">Our platform is made of two kinds of thing: <strong>APIs</strong> — eight quiet helpers who sit and wait — and <strong>Askers</strong>, the things that wake them up by asking for something. Together, they look after every loan.</p>
-      <p class="lead">This site is in two parts. Start with the askers, then meet the APIs.</p>
+  <div class="qb-fleuron" aria-hidden="true"><span class="qb-fleuron-glyph"></span></div>
 
-      <div class="hero-overview">
-        <div class="hero-card">
-          <span class="hero-badge">The helpers</span>
-          <h3><a href="apis.html">The APIs →</a></h3>
-          <p>Eight quiet helpers — Gary, Anna, Bessie, Whitney, Larry, Penny, Connie, Sherlock. Each has a special job. They sit and wait, and only answer when an asker comes.</p>
-        </div>
-        <div class="hero-card">
-          <span class="hero-badge">The askers</span>
-          <h3>What wakes them up</h3>
-          <p><strong>24 askers</strong>, split across three groups:</p>
-          <ul>
-            <li><a href="robots.html">Robots →</a> — 12 background workers, on a separate page</li>
-            <li><a href="#screens">Screens</a> — 6 apps &amp; websites humans use</li>
-            <li><a href="#outside">Outside Askers</a> — 6 outside companies &amp; services</li>
-          </ul>
-        </div>
-      </div>
+  <section class="qb-section" id="robots">
+    <div class="qb-section-head">
+      <div class="qb-section-eyebrow"><span class="qb-roman">Chapter II</span> the twelve</div>
+      <h2 class="qb-section-title">The robots.</h2>
+      <p class="qb-section-sub">
+        Robots aren't people who answer questions — they're scripts that
+        <em>wake up at scheduled times</em> and ask the helpers questions on your behalf.
+      </p>
+    </div>
+    <div class="qb-robots" id="robotsList"></div>
+  </section>
 
-      <p class="hero-links">Once you've met everyone, see how it all flows:
-        <a href="#story">walk through a loan</a> ·
-        <a href="#rules">how they talk</a> ·
-        <a href="#commandments">the 12 commandments</a></p>
-    </section>
+  <div class="qb-fleuron" aria-hidden="true"><span class="qb-fleuron-glyph"></span></div>
 
-    <section class="section-intro" id="screens">
-      <div class="section-marker">Section 3 — what humans see</div>
-      <h2>The Screens</h2>
-      <p class="lead">The 6 pages and apps humans look at. Every button a human presses turns into a question for a helper.</p>
-      <div class="robot-grid" id="screensGrid"></div>
-    </section>
+  <section class="qb-section" id="screens">
+    <div class="qb-section-head">
+      <div class="qb-section-eyebrow"><span class="qb-roman">Chapter III</span> the six screens</div>
+      <h2 class="qb-section-title">What humans see.</h2>
+      <p class="qb-section-sub">
+        Six pages and apps humans look at. Every button a human presses
+        <em>turns into a question for a helper.</em>
+      </p>
+    </div>
+    <div class="qb-helpers" id="screensGrid"></div>
+  </section>
 
-    <section class="section-intro" id="outside">
-      <div class="section-marker">Section 4 — from outside our world</div>
-      <h2>Outside Askers</h2>
-      <p class="lead">The 6 services and companies from outside our platform that hook into ours and ask the helpers for things.</p>
-      <div class="robot-grid" id="outsideGrid"></div>
-    </section>
+  <div class="qb-fleuron" aria-hidden="true"><span class="qb-fleuron-glyph"></span></div>
 
-    <section class="helper" id="story">
-      <h2>A loan story</h2>
-      <p class="lead">Here's how the helpers work together when somebody asks to borrow money.</p>
-      <div class="story-box">
-        <p style="margin: 0 0 14px; font-size: 0.92rem; color: var(--muted);">Notice the bold names — every step is started by a <em>caller</em> (a front-end, a robot, or an external system), never by one helper calling another.</p>
-        <ol>
-          <li><span class="who">🦈</span> A grown-up wants to borrow money. <strong>The broker's own system</strong> calls <strong>Bessie</strong> with the details.</li>
-          <li><span class="who">🦈➡️📋</span> Bessie's response tells the broker's system what to do next — so it then calls <strong>Anna</strong>, who tucks the new application into a folder.</li>
-          <li><span class="who">◻️</span> Behind the scenes, the <strong>Whitebox Run robot</strong> calls <strong>Whitney the Wise</strong> to do all the magic checks — credit, bank, ID, the lot.</li>
-          <li><span class="who">🕵️</span> An <strong>underwriting robot</strong> also calls <strong>Sherlock</strong> for a peek on Facebook and LinkedIn.</li>
-          <li><span class="who">💬</span> When everything passes, the <strong>Message Factory robot</strong> calls <strong>Connie</strong> to send the customer a friendly "you're approved!" message.</li>
-          <li><span class="who">📋➡️📖</span> When agents are ready, the <strong>Central CRM</strong> calls <strong>Larry</strong> to make a brand-new loan, then calls <strong>Anna</strong> to mark the application paid out.</li>
-          <li><span class="who">📖➡️💳</span> Every month, the <strong>Payments Factory robot</strong> calls <strong>Penny</strong> to take the payment. The <strong>Card Reconcile robot</strong> then calls <strong>Larry</strong> with the result.</li>
-          <li><span class="who">💬</span> Along the way, <strong>Message Factory</strong> keeps calling <strong>Connie</strong> with reminders and statements; <strong>Robot Responders</strong> reads every reply.</li>
-          <li><span class="who">🔒</span> When the customer opens the <strong>TL App</strong>, the app calls <strong>Gary</strong> first, every time, to check the wristband before anything else.</li>
-          <li><span class="who">🎉</span> When the loan is paid off — every helper has done its job perfectly, and never once spoken to another helper directly!</li>
-        </ol>
-      </div>
-    </section>
+  <section class="qb-section" id="outside">
+    <div class="qb-section-head">
+      <div class="qb-section-eyebrow"><span class="qb-roman">Chapter IV</span> from outside</div>
+      <h2 class="qb-section-title">Outside askers.</h2>
+      <p class="qb-section-sub">
+        Six services and companies from <em>outside our platform</em>
+        that hook into ours and ask the helpers for things.
+      </p>
+    </div>
+    <div class="qb-helpers" id="outsideGrid"></div>
+  </section>
 
-    <section class="helper" id="rules">
-      <h2>How they talk to each other</h2>
-      <p class="lead">A few simple ground rules every helper follows.</p>
-      <div class="rule-grid">
-        <div class="rule-card">
-          <span class="em">🎫</span>
-          <h4>Special badges</h4>
-          <p>Helpers only talk to each other if they show a real, valid badge — no sneaking allowed!</p>
-        </div>
-        <div class="rule-card">
-          <span class="em">🕒</span>
-          <h4>Two clocks</h4>
-          <p>Every helper writes things down twice — once in their own time zone, once in "world time" (UTC).</p>
-        </div>
-        <div class="rule-card">
-          <span class="em">📒</span>
-          <h4>Nothing thrown away</h4>
-          <p>Every important thing that happens gets a forever-note. You can't change old notes — you just add new ones.</p>
-        </div>
-        <div class="rule-card">
-          <span class="em">🔔</span>
-          <h4>Alarm bells</h4>
-          <p>If something goes wrong, every helper has their own alarm bell so the team knows to come help.</p>
-        </div>
-        <div class="rule-card">
-          <span class="em">📥</span>
-          <h4>Big jobs in queues</h4>
-          <p>When there's lots to do, helpers line work up like a queue at the ice cream shop and tackle it one at a time.</p>
-        </div>
-        <div class="rule-card">
-          <span class="em">🔁</span>
-          <h4>Try, try again</h4>
-          <p>If a job fails, helpers try again — and again — until it works. They never give up.</p>
-        </div>
-      </div>
-    </section>
+  <div class="qb-fleuron" aria-hidden="true"><span class="qb-fleuron-glyph"></span></div>
 
-    <section class="helper" id="commandments">
-      <h2>The Commandments</h2>
-      <p class="lead">Every helper had to promise these twelve things before they were allowed to join the team. They're the rules that keep our world tidy — easy to add to, hard to break. Disobeying them is how technical debt is born.</p>
-      <div class="commandments-list" id="commandmentsList"></div>
-    </section>
+  <section class="qb-section" id="story">
+    <div class="qb-section-head">
+      <div class="qb-section-eyebrow"><span class="qb-roman">Chapter V</span> a worked example</div>
+      <h2 class="qb-section-title">A loan, end to end.</h2>
+      <p class="qb-section-sub">
+        How the helpers work together when somebody asks to borrow money.
+        Notice that every step is started by <em>a caller</em> — a front-end, a robot,
+        or an external system — never by one helper calling another.
+      </p>
+    </div>
+    <ol class="qb-story" id="storyList"></ol>
+  </section>
 
-  </main>
-</div>
+  <div class="qb-fleuron" aria-hidden="true"><span class="qb-fleuron-glyph"></span></div>
 
-<footer>
-  Made with care for curious minds. Each helper here is one of our real services — same job, friendlier face. ·
-  <a href="#meet">Back to top</a>
-</footer>
+  <section class="qb-section" id="rules">
+    <div class="qb-section-head">
+      <div class="qb-section-eyebrow"><span class="qb-roman">Chapter VI</span> the small print</div>
+      <h2 class="qb-section-title">How they talk to each other.</h2>
+      <p class="qb-section-sub">
+        Six ground rules every helper follows. They're not negotiable —
+        they're <em>how the system stays trustworthy.</em>
+      </p>
+    </div>
+    <div class="qb-rules" id="rulesList"></div>
+  </section>
+
+  <div class="qb-fleuron" aria-hidden="true"><span class="qb-fleuron-glyph"></span></div>
+
+  <section class="qb-section" id="commandments">
+    <div class="qb-section-head">
+      <div class="qb-section-eyebrow"><span class="qb-roman">Chapter VII</span> the why</div>
+      <h2 class="qb-section-title">Fifteen commandments.</h2>
+      <p class="qb-section-sub">
+        Rules every helper had to promise before joining the team.
+        Disobeying them is <em>how technical debt is born.</em>
+      </p>
+    </div>
+    <div class="qb-cmds" id="commandmentsList"></div>
+  </section>
+
+  <footer class="qb-footer">
+    <p>
+      TogetherBOOK
+      <span class="qb-footer-mark"></span>
+      <em>an internal storybook of the Central Services platform</em>
+      <span class="qb-footer-mark"></span>
+      Richmond Group
+    </p>
+  </footer>
+</main>
 
 <script>
-  // Outside askers (from outside our world)
-  const outsideAskers = [
-    {
-      id: "asker-brokers",
-      icon: "office-building",
-      name: "Brokers",
-      what: "Other companies whose websites send us new customers who'd like a loan.",
-      asks: "Bessie"
-    },
-    {
-      id: "asker-veriff",
-      icon: "identification-card",
-      name: "Veriff",
-      what: "An outside service that checks people's IDs. Sends a message when each check is finished.",
-      asks: "Whitney"
-    },
-    {
-      id: "asker-twilio",
-      icon: "telephone-receiver",
-      name: "Twilio",
-      what: "The company that delivers our texts and phone calls. Tells Connie when each message arrives.",
-      asks: "Connie"
-    },
-    {
-      id: "asker-sendgrid",
-      icon: "incoming-envelope",
-      name: "Sendgrid",
-      what: "The company that delivers our emails. Tells Connie when each email is delivered or has bounced back.",
-      asks: "Connie"
-    },
-    {
-      id: "asker-card-processors",
-      icon: "credit-card",
-      name: "Card processors",
-      what: "Companies like BridgePay and Checkout that actually move the money. They tell Penny when payments succeed or fail.",
-      asks: "Penny"
-    },
-    {
-      id: "asker-bank-returns",
-      icon: "bank",
-      name: "Bank returns",
-      what: "Banks like HSBC tell us when a bank payment has gone through, or has been returned because something went wrong.",
-      asks: "Penny, Larry"
-    }
+  /* ── Helpers data — design's renamed set + simplified endpoints ── */
+  const HELPERS = [
+    { id:'gary',    name:'Gary the Gatekeeper', endpoint:'auth.api.rgcore.com',
+      blurb:'Stands at the front door of every app and checks that whoever\'s knocking is allowed in.' },
+    { id:'anna',    name:'App Anna',            endpoint:'applications.api.rgcore.com',
+      blurb:'Keeps every loan application in tidy folders, and spots when the same person applies twice.' },
+    { id:'bessie',  name:'Booking Bessie',      endpoint:'bookings.api.rgcore.com',
+      blurb:'Once a loan is agreed, Bessie does the paperwork that turns an application into a real booked loan.' },
+    { id:'whitney', name:'Whitney the Wallet',  endpoint:'wallet.api.rgcore.com',
+      blurb:'Looks after every customer\'s card and bank-account details, and keeps the secret bits secret.' },
+    { id:'larry',   name:'Loan Larry',          endpoint:'loans.api.rgcore.com',
+      blurb:'Knows every live loan inside-out: how much is left, when the next payment is, what\'s overdue.' },
+    { id:'penny',   name:'Penny Payments',      endpoint:'payments.api.rgcore.com',
+      blurb:'Actually moves money. Takes payments in, sends payouts out, and tells you when the bank says no.' },
+    { id:'connie',  name:'Connie Comms',        endpoint:'comms.api.rgcore.com',
+      blurb:'Sends emails, texts and letters. If a customer needs telling something, Connie tells them.' },
+    { id:'sherlock',name:'Sherlock Searches',   endpoint:'search.api.rgcore.com',
+      blurb:'When a colleague needs to find a person or a loan, Sherlock pulls the right folder out of the cabinet.' },
   ];
 
-  // Screens (front-ends humans use)
-  const screenAskers = [
-    {
-      id: "asker-crm",
-      icon: "desktop-computer",
-      name: "The Agent CRM",
-      what: "The big screen agents look at all day. Every customer's whole story is on it.",
-      asks: "Anna, Larry, Penny, Connie"
-    },
-    {
-      id: "asker-admin",
-      icon: "control-knobs",
-      name: "The Admin Site",
-      what: "Where lenders set their settings, agents, and the campaigns the robots send out.",
-      asks: "Anna, Larry, Bessie, Connie"
-    },
-    {
-      id: "asker-apply",
-      icon: "memo",
-      name: "The Apply Websites",
-      what: "Where new customers fill in the form to apply for a loan.",
-      asks: "Anna, Connie (for the 2FA code)"
-    },
-    {
-      id: "asker-app",
-      icon: "mobile-phone",
-      name: "The TL App",
-      what: "The Together Loans phone app. Customers use it to look at their loans on the go.",
-      asks: "Gary (who passes them on to the other helpers)"
-    },
-    {
-      id: "asker-self-service",
-      icon: "globe-with-meridians",
-      name: "The Self-Service Site",
-      what: "Customer pages where people can pay, get a statement, or change a payment date — without logging in.",
-      asks: "Larry, Penny, Connie"
-    },
-    {
-      id: "asker-sources-portal",
-      icon: "bar-chart",
-      name: "The Sources Portal",
-      what: "A page where brokers can sign in and see how the customers they sent us are doing.",
-      asks: "Bessie"
-    }
+  /* ── Robots — all 12. Six have painted plates; six are typographic-only. ── */
+  const ROBOTS = [
+    { id:'night',     plate:'assets/robots/night-counter.png',     name:'The Night Counter',
+      blurb:'Every night, looks at every loan and works out the new amount left to pay, plus when the next payment is due.',
+      when:'Once a night, after midnight', asks:'Larry' },
+    { id:'quick',     plate:'assets/robots/quick-counter.png',     name:'The Quick Counter',
+      blurb:'Every time money goes in or out of a loan, quickly updates the totals so they\'re always right.',
+      when:'Every time money moves', asks:'Larry' },
+    { id:'matcher',   plate:null,                                   name:'The Payment Matcher',
+      blurb:'When Penny takes a payment from a customer, this robot tells Larry to write it down in his book.',
+      when:'Every 4 minutes', asks:'Penny + Larry' },
+    { id:'tidier',    plate:null,                                   name:'The Card-and-Bank Tidier',
+      blurb:'Whenever someone adds a new card or bank account, this robot makes sure Larry\'s notes match Penny\'s records.',
+      when:'Whenever a card or bank changes', asks:'Penny + Larry' },
+    { id:'mailout',   plate:null,                                   name:'The Big Mailout Team',
+      blurb:'Sends out big batches of friendly messages to lots of customers at once — payment-due reminders, welcome notes, statements.',
+      when:'Some run every minute or two; others wake when there\'s a job', asks:'Anna + Larry + Connie' },
+    { id:'collect',   plate:'assets/robots/payment-collector.png', name:'The Payment Collector',
+      blurb:'Knocks on the bank to collect payments that are due today. If the bank says no, leaves a note for Penny.',
+      when:'Always running', asks:'Penny' },
+    { id:'reply',     plate:'assets/robots/reply-robots.png',      name:'The Reply Robots',
+      blurb:'A little squad that listens for replies on every email, text and letter Connie sent — and files them.',
+      when:'Whenever a customer message arrives', asks:'Connie + Anna + Larry' },
+    { id:'lookout',   plate:'assets/robots/lookout.png',           name:'The Lookout',
+      blurb:'Watches every other helper. If somebody is slow, broken, or saying something weird, rings the alarm bell.',
+      when:'Every 5 minutes', asks:'Everyone' },
+    { id:'inspect',   plate:'assets/robots/loan-inspector.png',    name:'The Loan Inspector',
+      blurb:'Looks for loans where something\'s gone wrong — wrong totals, missing payment dates, the same payment counted twice.',
+      when:'Every 15 minutes', asks:'Larry' },
+    { id:'tidy',      plate:null,                                   name:'The Tidy-Up Crew',
+      blurb:'When a customer hasn\'t been around for two months, wipes their card numbers, ID, and credit report so we don\'t keep things we don\'t need.',
+      when:'Once a day', asks:'Anna + Larry + Penny' },
+    { id:'sorter',    plate:null,                                   name:'The Card Sorter',
+      blurb:'Turns off cards that have expired, are stored twice by mistake, or that the bank has said are no good.',
+      when:'Once a day at 6 in the morning', asks:'Penny' },
+    { id:'finder',    plate:null,                                   name:'The Finder',
+      blurb:'When somebody asks "where is this customer?", looks across all the helpers and finds them.',
+      when:'Whenever it\'s asked', asks:'Anna + Larry + Connie' },
   ];
-  function renderAskerGroup(items, gridId, navId) {
-    const grid = document.getElementById(gridId);
-    const nav = document.getElementById(navId);
-    items.forEach(it => {
-      // For sidebar/nav, always use the small Fluent Emoji icon — works at tiny size
-      const navIconSrc = `https://api.iconify.design/fluent-emoji/${it.icon}.svg`;
-      // For the card, prefer a custom illustration if present
-      const cardIconSrc = it.image
-        ? it.image
-        : `https://api.iconify.design/fluent-emoji/${it.icon}.svg`;
-      const hasCustomArt = !!it.image;
 
-      // Sidebar entry
-      if (nav) {
-        const navLi = document.createElement('li');
-        navLi.innerHTML = `<a href="#${it.id}" onclick="document.body.classList.remove('menu-open')"><img class="emoji" src="${navIconSrc}" /> ${it.name.replace(/^The /, '')}</a>`;
-        nav.appendChild(navLi);
-      }
-      // Card
-      const div = document.createElement('div');
-      div.className = 'robot-card' + (hasCustomArt ? ' has-art' : '');
-      div.id = it.id;
-      const whenPill = it.when ? `<span class="robot-meta-pill"><span class="label">When</span> ${it.when}</span>` : '';
-      const asksValue = it.asks || it.calls || '';
-      const asksPill = asksValue ? `<span class="robot-meta-pill"><span class="label">Asks</span> ${asksValue}</span>` : '';
-      div.innerHTML = `
-        <div class="icon-wrap"><img src="${cardIconSrc}" alt="" /></div>
-        <div>
-          <h3>${it.name}</h3>
-          <p class="what">${it.what}</p>
-          <div class="robot-meta">${whenPill}${asksPill}</div>
-        </div>
-      `;
-      grid.appendChild(div);
-    });
+  /* ── Screens — six front-ends humans use ── */
+  const SCREENS = [
+    { id:'crm',      name:'The Agent CRM',          asks:'Anna + Larry + Penny + Connie',
+      blurb:'The big screen agents look at all day. Every customer\'s whole story is on it.' },
+    { id:'admin',    name:'The Admin Site',         asks:'Anna + Larry + Bessie + Connie',
+      blurb:'Where lenders set their settings, agents, and the campaigns the robots send out.' },
+    { id:'apply',    name:'The Apply Websites',     asks:'Anna + Connie',
+      blurb:'Where new customers fill in the form to apply for a loan.' },
+    { id:'app',      name:'The TL App',             asks:'Gary (who passes them on)',
+      blurb:'The Together Loans phone app. Customers use it to look at their loans on the go.' },
+    { id:'selfserv', name:'The Self-Service Site',  asks:'Larry + Penny + Connie',
+      blurb:'Customer pages where people can pay, get a statement, or change a payment date — without logging in.' },
+    { id:'portal',   name:'The Sources Portal',     asks:'Bessie',
+      blurb:'A page where brokers can sign in and see how the customers they sent us are doing.' },
+  ];
+
+  /* ── Outside askers ── */
+  const OUTSIDE = [
+    { id:'brokers',   name:'Brokers',          asks:'Bessie',
+      blurb:'Other companies whose websites send us new customers who\'d like a loan.' },
+    { id:'veriff',    name:'Veriff',           asks:'Whitney',
+      blurb:'An outside service that checks people\'s IDs. Sends a message when each check is finished.' },
+    { id:'twilio',    name:'Twilio',           asks:'Connie',
+      blurb:'The company that delivers our texts and phone calls. Tells Connie when each message arrives.' },
+    { id:'sendgrid',  name:'Sendgrid',         asks:'Connie',
+      blurb:'The company that delivers our emails. Tells Connie when each email is delivered or has bounced back.' },
+    { id:'cards',     name:'Card Processors',  asks:'Penny',
+      blurb:'BridgePay, Checkout and the like. They actually move the money and tell Penny when payments succeed or fail.' },
+    { id:'banks',     name:'Bank Returns',     asks:'Penny + Larry',
+      blurb:'Banks like HSBC tell us when a bank payment has gone through, or has been returned because something went wrong.' },
+  ];
+
+  /* ── Loan story (10 steps) ── */
+  const STORY = [
+    'A grown-up wants to borrow money. <b>The broker\'s own system</b> calls <b>Bessie</b> with the details.',
+    'Bessie\'s response tells the broker\'s system what to do next — so it then calls <b>Anna</b>, who tucks the new application into a folder.',
+    'Behind the scenes, the <b>Whitebox Run robot</b> calls <b>Whitney</b> to do all the magic checks — credit, bank, ID, the lot.',
+    'An <b>underwriting robot</b> also calls <b>Sherlock</b> for a peek on Facebook and LinkedIn.',
+    'When everything passes, the <b>Message Factory robot</b> calls <b>Connie</b> to send the customer a friendly "you\'re approved!" message.',
+    'When agents are ready, the <b>Central CRM</b> calls <b>Larry</b> to make a brand-new loan, then calls <b>Anna</b> to mark the application paid out.',
+    'Every month, the <b>Payments Factory robot</b> calls <b>Penny</b> to take the payment. The <b>Card Reconcile robot</b> then calls <b>Larry</b> with the result.',
+    'Along the way, <b>Message Factory</b> keeps calling <b>Connie</b> with reminders and statements; <b>Robot Responders</b> reads every reply.',
+    'When the customer opens the <b>TL App</b>, the app calls <b>Gary</b> first, every time, to check the wristband before anything else.',
+    'When the loan is paid off — every helper has done its job perfectly, and <em>never once spoken to another helper directly.</em>',
+  ];
+
+  /* ── Six rules ── */
+  const RULES = [
+    { title:'Special badges',     blurb:'Helpers only talk to each other if they show a real, valid badge — no sneaking allowed.' },
+    { title:'Two clocks',         blurb:'Every helper writes things down twice — once in their own time zone, once in <code>UTC</code>.' },
+    { title:'Nothing thrown away',blurb:'Every important thing that happens gets a forever-note. You don\'t change old notes — you add new ones next to them.' },
+    { title:'Alarm bells',        blurb:'If something goes wrong, every helper has their own alarm bell so the team knows to come help.' },
+    { title:'Big jobs in queues', blurb:'When there\'s lots to do, helpers line work up like a queue at the ice cream shop and tackle it one at a time.' },
+    { title:'Try, try again',     blurb:'If a job fails, helpers try again — and again — until it works. They never give up.' },
+  ];
+
+  /* ── 15 commandments ── */
+  const COMMANDMENTS = [
+    { n:1,  title:'Every record carries a LenderId.',
+      kid:'Every piece of paper has the lender\'s name on it. Two lenders never share folders, ever.',
+      why:'Multi-tenancy without surprises. Onboarding a new lender doesn\'t need code changes — just a new <code>LenderId</code>.' },
+    { n:2,  title:'Every write is signed.',
+      kid:'Whenever a helper changes something, they leave their initials. We always know who did what.',
+      why:'<code>ClientType</code> and <code>ClientUsername</code> on every write. The audit trail starts here — and direct DB writes that skip this fire Slack alerts.' },
+    { n:3,  title:'Every time is recorded twice.',
+      kid:'Once in "world time," once in the lender\'s local time. Both, always.',
+      why:'<code>DateTimeUTC</code> + <code>DateTimeLocal</code>. Local = UTC + lender <code>TimeOffset</code>. A payment at 11:59 PM local time charges that day\'s interest — UTC alone breaks across timezones.' },
+    { n:4,  title:'Names match the wiki — exactly.',
+      kid:'If the wiki says ARef, you write ARef. Not "ApplicationId," not "aref," not "Aref."',
+      why:'Casing is part of the contract. Paraphrased field, endpoint, or table names silently break queries — and the documentation stops being a source of truth.' },
+    { n:5,  title:'Events are append-only.',
+      kid:'Old notes never get rewritten. To fix a mistake, you write a new note next to the old one.',
+      why:'<code>Applications.Events</code>, <code>Loanbook.Events</code>, <code>Payments.Events</code> — all immutable. History stays trustworthy and any case can be replayed end-to-end.' },
+    { n:6,  title:'Each piece of data has exactly one owner.',
+      kid:'One helper writes the answer; everyone else asks them. Nobody scribbles in someone else\'s diary.',
+      why:'One source of truth per table. Datasyncs (<code>Lenders</code>, <code>EncryptedServiceKeys</code>) are read-only mirrors of the upstream owner.' },
+    { n:7,  title:'Async work goes through a queue.',
+      kid:'Big jobs line up like an ice-cream queue. The helper takes them one at a time and never drops one.',
+      why:'Bulk SMS, payments, reconciliation, robot replies — all queue-driven. Retries are safe. Outages don\'t lose work. Poison messages get isolated, not silently dropped.' },
+    { n:8,  title:'Every automation declares itself.',
+      kid:'Every new robot has to wear a name tag and a working alarm bell.',
+      why:'Add to <code>MonitorRobot</code>, name a Slack channel, declare queue names, say if it\'s singleton or parallel. We notice within five minutes when something stops.' },
+    { n:9,  title:'The database is private. The API is public.',
+      kid:'If you want something from a helper, you ask them. You don\'t sneak into their drawer.',
+      why:'Direct DB writes fire Slack alerts on every service. The API enforces every other commandment on this list.' },
+    { n:10, title:'Calculated truths have one calculator.',
+      kid:'Only Whitney decides if an application is approved. Only Larry knows the loan balance. Only Penny holds the real card numbers.',
+      why:'<code>ApplicationStatus</code> only changes via White Box. <code>Loan.CurrentBalance</code> only via Loanbook. Permanent payment tokens only inside Payments. No drift, no double-counting.' },
+    { n:11, title:'Versioning is additive, never destructive.',
+      kid:'When something changes, it gets a new door. The old door keeps working for old friends.',
+      why:'New behaviour lives on a new endpoint version (V1 → V2). The CRM <code>Endpoints</code> table lets us swap which version the CRM uses without a redeploy.' },
+    { n:12, title:'Side effects flow through the actions queue.',
+      kid:'When something needs to happen, everyone uses the same agreed list of jobs.',
+      why:'The universal <code>actions</code> queue (<code>Unsubscribe</code>, <code>Deactivate</code>, <code>AddFlag</code>, <code>CompleteTasks</code>). New verbs extend the payload — they don\'t invent a new dispatch path.' },
+    { n:13, title:'An API never calls another API.',
+      kid:'Helpers don\'t talk to each other. They wait. Front-ends and robots are the ones who knock on doors.',
+      why:'Orchestration belongs to a caller — a front-end (CRM, websites, app) or a robot. APIs stay pure responders. This keeps every API independently testable and stops a chain of failures from cascading across services.' },
+    { n:14, title:'One call must not force a chain of others.',
+      kid:'When a helper gets asked to do something, that one ask should be enough. It mustn\'t force ten more asks behind the scenes — and definitely not a hundred.',
+      why:'Without this rule, a single button click can fan out into 50+ API calls that all have to succeed. Endpoints are designed so one call carries everything it needs to do its job. If a feature would require many chained calls, that\'s a sign an endpoint is missing.' },
+    { n:15, title:'APIs are one and done.',
+      kid:'When you ask a helper something, you get the answer right then. They don\'t say "come back later."',
+      why:'An API call is synchronous: it triggers a process and returns a result in the same round trip. It must never queue itself, post to a message bus, or hand back a job ID for the caller to poll. Side effects are fine — the API can write a row, and a separate robot can later pick it up. But the API call itself completes start-to-finish in one exchange.' },
+  ];
+
+  /* ── helpers ── */
+  const ROMAN = [[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];
+  function toRoman(n){ let out='',x=n; for (const [v,s] of ROMAN){ while (x>=v){ out+=s; x-=v; } } return out; }
+  function initial(name){
+    const parts = name.split(' ');
+    const first = parts[0].toLowerCase() === 'the' ? parts[1] : parts[0];
+    return first.charAt(0);
+  }
+  function monogram(name){
+    return `<span class="qb-monogram"><span class="qb-monogram-letter">${initial(name)}</span></span>`;
   }
 
-  renderAskerGroup(outsideAskers, 'outsideGrid', 'sideNavOutside');
-  renderAskerGroup(screenAskers, 'screensGrid', 'sideNavScreens');
+  /* ── Render: helpers ── */
+  const helpersGrid = document.getElementById('helpersGrid');
+  HELPERS.forEach(h => {
+    const a = document.createElement('a');
+    a.className = 'qb-helper';
+    a.href = `apis.html#${h.id}`;
+    a.innerHTML = `
+      ${monogram(h.name)}
+      <div class="qb-helper-body">
+        <h3 class="qb-helper-name">${h.name}</h3>
+        <p class="qb-helper-blurb">${h.blurb}</p>
+        ${h.endpoint ? `<span class="qb-helper-endpoint">${h.endpoint}</span>` : ''}
+      </div>`;
+    helpersGrid.appendChild(a);
+  });
 
-  // The commandments
-  const commandments = [
-    {
-      icon: "id-button",
-      title: "Every record carries a LenderId",
-      kid: "Every piece of paper has the lender's name on it. Two lenders never share folders, ever.",
-      why: "Multi-tenancy without surprises. Onboarding a new lender doesn't need code changes — just a new <code>LenderId</code>."
-    },
-    {
-      icon: "writing-hand",
-      title: "Every write is signed",
-      kid: "Whenever a helper changes something, they leave their initials. We always know who did what.",
-      why: "<code>ClientType</code> and <code>ClientUsername</code> on every write. The audit trail starts here — and direct DB writes that skip this fire Slack alerts."
-    },
-    {
-      icon: "alarm-clock",
-      title: "Every time is recorded twice",
-      kid: "Once in 'world time,' once in the lender's local time. Both, always.",
-      why: "<code>DateTimeUTC</code> + <code>DateTimeLocal</code>. Local = UTC + lender <code>TimeOffset</code>. A payment at 11:59 PM local time charges that day's interest — UTC alone breaks across timezones."
-    },
-    {
-      icon: "magnifying-glass-tilted-left",
-      title: "Names match the wiki — exactly",
-      kid: "If the wiki says ARef, you write ARef. Not 'ApplicationId,' not 'aref,' not 'Aref.'",
-      why: "Casing is part of the contract. Paraphrased field, endpoint, or table names silently break queries — and the documentation stops being a source of truth.",
-      breakages: [
-        { where: "<code>CustomerId</code> in Applications vs Loanbook", what: "Central Applications and Central Loanbook each have a column called <code>CustomerId</code>, but for the same person they are completely different numbers. Same field name, two different meanings. The Loanbook wiki even spells this out: \"This is not the same CustomerId as stored in Applications.\"" }
-      ]
-    },
-    {
-      icon: "scroll",
-      title: "Events are append-only",
-      kid: "Old notes never get rewritten. To fix a mistake, you write a new note next to the old one.",
-      why: "<code>Applications.Events</code>, <code>Loanbook.Events</code>, <code>Payments.Events</code> — all immutable. History stays trustworthy and any case can be replayed end-to-end."
-    },
-    {
-      icon: "old-key",
-      title: "Each piece of data has exactly one owner",
-      kid: "One helper writes the answer; everyone else asks them. Nobody scribbles in someone else's diary.",
-      why: "One source of truth per table. Datasyncs (Lenders, EncryptedServiceKeys) are read-only mirrors of the upstream owner."
-    },
-    {
-      icon: "package",
-      title: "Async work goes through a queue",
-      kid: "Big jobs line up like an ice-cream queue. The helper takes them one at a time and never drops one.",
-      why: "Bulk SMS, payments, reconciliation, robot replies — all queue-driven. Retries are safe. Outages don't lose work. Poison messages get isolated, not silently dropped."
-    },
-    {
-      icon: "bell",
-      title: "Every automation declares itself",
-      kid: "Every new robot has to wear a name tag and a working alarm bell.",
-      why: "Add to MonitorRobot, name a Slack channel, declare queue names, say if it's singleton or parallel. We notice within 5 minutes when something stops."
-    },
-    {
-      icon: "locked-with-key",
-      title: "The database is private. The API is public.",
-      kid: "If you want something from a helper, you ask them. You don't sneak into their drawer.",
-      why: "Direct DB writes fire Slack alerts on every service (<code>rgcore-payments</code>, <code>rg-core-loanbook</code>, …). The API enforces every other commandment on this list.",
-      breakages: [
-        { where: "Central Admin Site → General Settings", what: "The Admin Site reads lender configuration straight from the CRM's <code>Lenders</code> table instead of asking the CRM API for it." },
-        { where: "Central CRM → outbound payout flow", what: "The CRM looks up bounced loans by reading the Loanbook database directly rather than calling the Loanbook API." },
-        { where: "Central Robots → <code>NewLoanFundedToday</code>", what: "This robot finds the day's funded loans by querying the Loanbook database directly, not via the API." },
-        { where: "Central Brokers → source-settings page", what: "The Brokers Portal loads its source data through a direct database connection instead of calling an API." }
-      ]
-    },
-    {
-      icon: "bullseye",
-      title: "Calculated truths have one calculator",
-      kid: "Only Whitney decides if an application is approved. Only Larry knows the loan balance. Only Penny holds the real card numbers.",
-      why: "<code>ApplicationStatus</code> only changes via White Box. <code>Loan.CurrentBalance</code> only via Loanbook (Mini + Daily Update). Permanent payment tokens only inside Payments. No drift, no double-counting."
-    },
-    {
-      icon: "counterclockwise-arrows-button",
-      title: "Versioning is additive, never destructive",
-      kid: "When something changes, it gets a new door. The old door keeps working for old friends.",
-      why: "New behaviour lives on a new endpoint version (V1 → V2). The CRM <code>Endpoints</code> table lets us swap which version the CRM uses without a redeploy.",
-      breakages: [
-        { where: "Loanbook → flag tables", what: "Three tables (<code>Flags</code>, <code>FlagTypes</code>, <code>LenderEnabledFlagTypes</code>) were deleted from the codebase even though the wiki still describes them. Their replacements (<code>CustomFlags</code>, <code>CustomFlagsType</code>) sit alongside, but the originals were taken out rather than left as a working old door." }
-      ]
-    },
-    {
-      icon: "gear",
-      title: "Side effects flow through the actions queue",
-      kid: "When something needs to happen, everyone uses the same agreed list of jobs.",
-      why: "The universal <code>actions</code> queue (<code>Unsubscribe</code>, <code>Deactivate</code>, <code>AddFlag</code>, <code>CompleteTasks</code>, …). New verbs extend the payload — they don't invent a new dispatch path."
-    },
-    {
-      icon: "speech-balloon",
-      title: "An API never calls another API",
-      kid: "Helpers don't talk to each other. They wait. Front-ends and robots are the ones who knock on doors.",
-      why: "Orchestration belongs to a caller — a front-end (CRM, websites, app) or a robot. APIs stay pure responders. This keeps every API independently testable and stops a chain of failures from cascading across services.",
-      breakages: [
-        { where: "Central Brokers → <code>CreateApplication</code>", what: "When a broker submits a lead, the Brokers API itself orchestrates the whole intake — it calls <code>Applications/DeDupe</code>, <code>Loanbook/DeDupe</code>, <code>CreditBuilder/Query</code>, then <code>Applications/BrokerAPILead</code>. That orchestration is supposed to live in a front-end or robot, not inside an API." }
-      ]
-    },
-    {
-      icon: "link",
-      title: "One call must not force a chain of others",
-      kid: "When a helper gets asked to do something, that one ask should be enough. It mustn't force ten more asks behind the scenes — and definitely not a hundred.",
-      why: "Without this rule, a single button click can fan out into 50+ API calls that all have to succeed. Endpoints are designed so one call carries everything it needs to do its job. If a feature would require many chained calls, that's a sign an endpoint is missing — design it as one call, not a daisy-chain."
-    },
-    {
-      icon: "stopwatch",
-      title: "APIs are one and done",
-      kid: "When you ask a helper something, you get the answer right then. They don't say 'come back later'. They might leave a note for someone else to follow up — but their own bit is finished the moment they reply.",
-      why: "An API call is synchronous: it triggers a process and returns a result in the same round trip. It must never queue itself, post to a message bus, or hand back a job ID for the caller to poll. Side effects are fine — the API can write a row, and a separate robot or watcher can later pick that row up and do follow-up work. But the API call itself completes start-to-finish in one exchange."
-    }
-  ];
-
-  const commList = document.getElementById('commandmentsList');
-  commandments.forEach((cm, i) => {
-    const num = String(i + 1).padStart(2, '0');
+  /* ── Render: robots ── */
+  const robotsList = document.getElementById('robotsList');
+  ROBOTS.forEach(r => {
     const article = document.createElement('article');
-    article.className = 'commandment';
-    let breakagesHtml = '';
-    if (cm.breakages && cm.breakages.length) {
-      const items = cm.breakages.map(b => `<li><strong>${b.where}.</strong> ${b.what}</li>`).join('');
-      const label = cm.breakages.length === 1
-        ? "Where this rule is broken (1)"
-        : `Where this rule is broken (${cm.breakages.length})`;
-      breakagesHtml = `<details class="breakages"><summary>${label}</summary><ul>${items}</ul></details>`;
-    }
+    article.className = 'qb-robot' + (r.plate ? '' : ' is-typographic');
+    const plate = r.plate
+      ? `<div class="qb-robot-plate"><img src="${r.plate}" alt=""></div>`
+      : `<div class="qb-robot-plate qb-robot-plate-typographic"><span class="qb-plate-letter">${initial(r.name)}</span></div>`;
     article.innerHTML = `
-      <div class="num">${num}</div>
-      <div class="icon-wrap"><img src="https://api.iconify.design/fluent-emoji/${cm.icon}.svg" alt="" /></div>
-      <div class="body">
-        <h3>${cm.title}</h3>
-        <p class="kid">${cm.kid}</p>
-        <p class="why"><strong>Why</strong>${cm.why}</p>
-        ${breakagesHtml}
+      ${plate}
+      <div class="qb-robot-body">
+        <h3 class="qb-robot-name">${r.name}</h3>
+        <p class="qb-robot-blurb">${r.blurb}</p>
       </div>
-    `;
-    commList.appendChild(article);
+      <div class="qb-robot-meta">
+        <div class="qb-robot-when">${r.when}</div>
+        <div class="qb-robot-asks">asks <b>${r.asks}</b></div>
+      </div>`;
+    robotsList.appendChild(article);
   });
 
-  // Active section highlighting in sidebar
-  const navLinks = document.querySelectorAll('.sidebar-nav a');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = entry.target.id;
-        navLinks.forEach(link => {
-          link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
-        });
-      }
-    });
-  }, { rootMargin: '-30% 0px -65% 0px' });
-  document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
-
-  // Mobile drawer: the toggle/close behavior is handled by inline onclick attributes
-  // on the hamburger button, the close button, the backdrop, and every sidebar link.
-  // We add only one extra niceness here: Escape key closes the drawer.
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') document.body.classList.remove('menu-open');
+  /* ── Render: screens (helpers grid layout) ── */
+  const screensGrid = document.getElementById('screensGrid');
+  SCREENS.forEach(s => {
+    const article = document.createElement('article');
+    article.className = 'qb-helper';
+    article.innerHTML = `
+      ${monogram(s.name)}
+      <div class="qb-helper-body">
+        <h3 class="qb-helper-name">${s.name}</h3>
+        <p class="qb-helper-blurb">${s.blurb}</p>
+        <div class="qb-asker-asks">asks <b>${s.asks}</b></div>
+      </div>`;
+    screensGrid.appendChild(article);
   });
 
-  // Twemoji parsing — replace native emoji with Twitter SVGs for consistency
-  const twemojiScript = document.createElement('script');
-  twemojiScript.src = 'https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/dist/twemoji.min.js';
-  twemojiScript.crossOrigin = 'anonymous';
-  twemojiScript.onload = () => {
-    if (window.twemoji) {
-      window.twemoji.parse(document.body, {
-        folder: 'svg',
-        ext: '.svg',
-        base: 'https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/'
-      });
-    }
-  };
-  document.head.appendChild(twemojiScript);
+  /* ── Render: outside (helpers grid layout) ── */
+  const outsideGrid = document.getElementById('outsideGrid');
+  OUTSIDE.forEach(o => {
+    const article = document.createElement('article');
+    article.className = 'qb-helper';
+    article.innerHTML = `
+      ${monogram(o.name)}
+      <div class="qb-helper-body">
+        <h3 class="qb-helper-name">${o.name}</h3>
+        <p class="qb-helper-blurb">${o.blurb}</p>
+        <div class="qb-asker-asks">asks <b>${o.asks}</b></div>
+      </div>`;
+    outsideGrid.appendChild(article);
+  });
+
+  /* ── Render: loan story ── */
+  const storyList = document.getElementById('storyList');
+  STORY.forEach((step, i) => {
+    const li = document.createElement('li');
+    li.className = 'qb-story-step';
+    li.innerHTML = `
+      <span class="qb-story-num">${String(i + 1).padStart(2, '0')}</span>
+      <p class="qb-story-text">${step}</p>`;
+    storyList.appendChild(li);
+  });
+
+  /* ── Render: rules ── */
+  const rulesList = document.getElementById('rulesList');
+  RULES.forEach((r, i) => {
+    const article = document.createElement('article');
+    article.className = 'qb-rule';
+    article.innerHTML = `
+      <span class="qb-rule-num">${toRoman(i + 1)}</span>
+      <div class="qb-rule-body">
+        <h3 class="qb-rule-title">${r.title}</h3>
+        <p class="qb-rule-text">${r.blurb}</p>
+      </div>`;
+    rulesList.appendChild(article);
+  });
+
+  /* ── Render: commandments ── */
+  const cmdsList = document.getElementById('commandmentsList');
+  COMMANDMENTS.forEach(c => {
+    const article = document.createElement('article');
+    article.className = 'qb-cmd';
+    article.innerHTML = `
+      <div class="qb-cmd-numeral">${toRoman(c.n)}</div>
+      <div class="qb-cmd-body">
+        <h3 class="qb-cmd-title">${c.title}</h3>
+        <p class="qb-cmd-kid">${c.kid}</p>
+        <div class="qb-cmd-why">
+          <div class="qb-cmd-why-label">the <em>why</em></div>
+          <p class="qb-cmd-why-text">${c.why}</p>
+        </div>
+      </div>`;
+    cmdsList.appendChild(article);
+  });
 </script>
 
 </body>

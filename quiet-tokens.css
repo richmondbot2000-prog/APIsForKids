@@ -1,0 +1,356 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   TogetherBOOK — Storybook Ledger
+   New visual direction (replaces "Futurama New New York" navy/cyan/magenta)
+
+   The product is a friendly, plain-English explainer of an internal lending
+   platform. The previous site dressed that up as deep-space sci-fi; this
+   system dresses the same content as a warm, well-loved storybook ledger:
+   cream paper, ink-blue text, a touch of brass and manuscript red.
+
+   Use the SEMANTIC tokens (--bg, --fg, --accent, --hN-*) in components.
+   The SCALE tokens are exposed for one-off design needs.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* ───────── Webfonts (Google Fonts CDN) ─────────
+   Newsreader  — display serif, warm, slightly literary, friendly italic
+   Inter       — body sans (kept from the previous system for continuity)
+   JetBrains Mono — code
+
+   ⚠ Substitution flag: the project did not ship .ttf files. We're loading
+   from Google Fonts. If the team wants self-hosted fonts, drop them into
+   /fonts/ and replace this @import block.
+*/
+@import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400;1,6..72,500;1,6..72,600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+:root {
+  /* ──────── Color scale ────────
+     Warm "paper" neutrals on one side, deep "ink" neutrals on the other.
+     The rest of the palette is two accents (manuscript red, brass gold)
+     plus a sage and a muted teal so we still have semantic colour without
+     the old neon bite.                                                  */
+
+  /* Paper (warm cream) — backgrounds, cards, surfaces */
+  --paper-50:  #FDFBF4;   /* page tint, near-white */
+  --paper-100: #FBF6E9;   /* primary background */
+  --paper-200: #F5ECD4;   /* hover surfaces, raised cards */
+  --paper-300: #ECDFB6;   /* muted edges, dividers on paper */
+  --paper-400: #DCC990;   /* deeper paper for emphasis blocks */
+
+  /* Ink (deep blue-black) — text, strong borders, dark mode surfaces */
+  --ink-900: #11192E;     /* deepest, body emphasis */
+  --ink-800: #1B2A4E;     /* primary text — fountain-pen blue */
+  --ink-700: #2C3E66;     /* secondary text */
+  --ink-600: #4A5878;     /* tertiary, captions */
+  --ink-500: #6B7794;     /* muted text */
+  --ink-400: #8F9AB2;     /* placeholder text */
+  --ink-300: #B6BECF;     /* disabled, soft borders */
+
+  /* Accent — Manuscript Red (the "rubrication" accent in old books) */
+  --red-50:  #FBEDEA;
+  --red-100: #F5D6D0;
+  --red-300: #E08F82;
+  --red-500: #C0392B;     /* primary red */
+  --red-600: #A02C20;     /* pressed */
+  --red-700: #7F2218;
+
+  /* Accent — Brass / Antique Gold */
+  --brass-50:  #FAF1DD;
+  --brass-100: #F2DFB1;
+  --brass-300: #E2BF74;
+  --brass-500: #C8973F;   /* primary brass */
+  --brass-600: #A47829;
+  --brass-700: #7A5916;
+
+  /* Sage — used for "good" / success / pass states (echoes the green
+     keystones of the BOOK logo) */
+  --sage-50:  #EDF1E7;
+  --sage-100: #D6DEC3;
+  --sage-500: #6B8A5E;
+  --sage-600: #4F6A45;
+  --sage-700: #38502F;
+
+  /* Teal — soft secondary, used sparingly for links / data labels */
+  --teal-500: #2C6E7E;
+  --teal-700: #1B4A56;
+
+  /* ──────── Semantic tokens ──────── */
+  --bg:           var(--paper-100);
+  --bg-raised:   var(--paper-50);
+  --bg-soft:     var(--paper-200);
+  --bg-emphasis: var(--paper-300);
+
+  --fg:          var(--ink-800);   /* primary text */
+  --fg-strong:   var(--ink-900);
+  --fg-muted:    var(--ink-600);
+  --fg-subtle:   var(--ink-500);
+  --fg-disabled: var(--ink-300);
+
+  --border:        var(--paper-300);
+  --border-strong: var(--ink-300);
+  --divider:       color-mix(in srgb, var(--ink-800) 12%, transparent);
+
+  --accent:        var(--red-500);
+  --accent-soft:   var(--red-50);
+  --accent-strong: var(--red-600);
+
+  --gold:        var(--brass-500);
+  --gold-soft:   var(--brass-50);
+
+  --good:        var(--sage-500);
+  --good-soft:   var(--sage-50);
+
+  --link:        var(--teal-500);
+  --link-hover:  var(--red-500);
+
+  --selection-bg: var(--brass-100);
+  --selection-fg: var(--ink-900);
+
+  /* Caller-pill semantic colours (preserved from product) */
+  --caller-external: #4A5878;   /* ink-600 */
+  --caller-frontend: #2C6E7E;   /* teal */
+  --caller-robot:    #6B8A5E;   /* sage */
+
+  /* ──────── Typography scale ──────── */
+  --font-display: "Newsreader", "Iowan Old Style", "Palatino", Georgia, serif;
+  --font-body:    "Inter", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Type scale — modular, slightly exaggerated for editorial feel */
+  --fs-3xs: 0.6875rem;    /* 11px — tag pills */
+  --fs-2xs: 0.75rem;      /* 12px — caption */
+  --fs-xs:  0.8125rem;    /* 13px — small UI */
+  --fs-sm:  0.9375rem;    /* 15px — body small */
+  --fs-md:  1rem;         /* 16px — body */
+  --fs-lg:  1.125rem;     /* 18px — lead */
+  --fs-xl:  1.375rem;     /* 22px — h4 */
+  --fs-2xl: 1.75rem;      /* 28px — h3 */
+  --fs-3xl: 2.25rem;      /* 36px — h2 */
+  --fs-4xl: 3rem;         /* 48px — h1 */
+  --fs-5xl: 4rem;         /* 64px — hero */
+
+  --lh-tight: 1.1;
+  --lh-snug:  1.25;
+  --lh-base:  1.55;
+  --lh-loose: 1.75;
+
+  --fw-regular:   400;
+  --fw-medium:    500;
+  --fw-semibold:  600;
+  --fw-bold:      700;
+  --fw-black:     800;
+
+  --tracking-tight:  -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide:    0.04em;
+  --tracking-wider:   0.10em;
+  --tracking-widest:  0.16em;
+
+  /* ──────── Spacing scale (4px base) ──────── */
+  --space-0:  0;
+  --space-1:  0.25rem;     /*  4px */
+  --space-2:  0.5rem;      /*  8px */
+  --space-3:  0.75rem;     /* 12px */
+  --space-4:  1rem;        /* 16px */
+  --space-5:  1.5rem;      /* 24px */
+  --space-6:  2rem;        /* 32px */
+  --space-7:  3rem;        /* 48px */
+  --space-8:  4rem;        /* 64px */
+  --space-9:  6rem;        /* 96px */
+
+  /* ──────── Radius ──────── */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-pill: 999px;
+
+  /* ──────── Shadows ──────── */
+  /* Shadows are warm-toned (ink-tinted, not pure black) so they sit on
+     paper without looking like a UI dropshadow. */
+  --shadow-xs: 0 1px 1px color-mix(in srgb, var(--ink-900) 6%, transparent);
+  --shadow-sm: 0 1px 2px color-mix(in srgb, var(--ink-900) 8%, transparent),
+               0 1px 3px color-mix(in srgb, var(--ink-900) 4%, transparent);
+  --shadow-md: 0 2px 4px color-mix(in srgb, var(--ink-900) 6%, transparent),
+               0 6px 14px color-mix(in srgb, var(--ink-900) 10%, transparent);
+  --shadow-lg: 0 4px 8px color-mix(in srgb, var(--ink-900) 8%, transparent),
+               0 16px 32px color-mix(in srgb, var(--ink-900) 12%, transparent);
+  --shadow-paper: 0 1px 0 color-mix(in srgb, #fff 60%, transparent) inset,
+                  0 2px 0 var(--paper-300),
+                  0 6px 18px color-mix(in srgb, var(--ink-900) 10%, transparent);
+  --shadow-stamp: 0 0 0 1px var(--accent),
+                  0 1px 0 var(--accent-strong);
+  --ring-focus:  0 0 0 3px color-mix(in srgb, var(--brass-500) 45%, transparent);
+
+  /* ──────── Motion ──────── */
+  --ease-out:    cubic-bezier(.2, .85, .35, 1);
+  --ease-spring: cubic-bezier(.2, .9, .3, 1.35);
+  --dur-fast:    140ms;
+  --dur-base:    220ms;
+  --dur-slow:    360ms;
+
+  /* ──────── Layout ──────── */
+  --content-max: 940px;
+  --sidebar-w:   260px;
+  --topbar-h:    64px;
+}
+
+/* ───────── Semantic typography rules ─────────
+   Use these by element OR by class (.h1, .lead, etc) so they apply
+   in plain HTML and inside JSX components.                          */
+
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+body, .body {
+  font-family: var(--font-body);
+  font-size: var(--fs-md);
+  line-height: var(--lh-base);
+  color: var(--fg);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.h1, h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, var(--fs-5xl));
+  font-weight: var(--fw-black);
+  font-style: normal;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-strong);
+  margin: 0 0 var(--space-4);
+}
+
+.h2, h2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-3xl);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-strong);
+  margin: 0 0 var(--space-3);
+}
+
+.h3, h3 {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-tight);
+  color: var(--fg-strong);
+  margin: var(--space-6) 0 var(--space-2);
+}
+
+.h4, h4 {
+  font-family: var(--font-body);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-snug);
+  letter-spacing: var(--tracking-normal);
+  color: var(--fg-strong);
+  margin: var(--space-5) 0 var(--space-2);
+}
+
+.lead {
+  font-family: var(--font-body);
+  font-size: var(--fs-lg);
+  line-height: var(--lh-loose);
+  color: var(--fg-muted);
+  margin: 0 0 var(--space-4);
+  text-wrap: pretty;
+}
+
+p { margin: 0 0 var(--space-3); color: var(--fg); text-wrap: pretty; }
+p strong, li strong { color: var(--fg-strong); font-weight: var(--fw-semibold); }
+
+small, .caption {
+  font-size: var(--fs-2xs);
+  color: var(--fg-muted);
+  letter-spacing: var(--tracking-wide);
+}
+
+/* Eyebrow / overline label */
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* Section marker — small italic, signals "chapter heading" feel */
+.section-marker {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--fs-sm);
+  color: var(--accent);
+  letter-spacing: var(--tracking-wide);
+  margin-bottom: var(--space-2);
+}
+
+/* Display "drop cap" — used at the start of a chapter intro */
+.dropcap::first-letter {
+  font-family: var(--font-display);
+  font-size: 4em;
+  font-weight: var(--fw-black);
+  float: left;
+  line-height: 0.9;
+  margin: 0.05em 0.08em 0 0;
+  color: var(--accent);
+}
+
+a, .link {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--link) 35%, transparent);
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+  transition: color var(--dur-fast) var(--ease-out),
+              text-decoration-color var(--dur-fast) var(--ease-out);
+}
+a:hover, .link:hover {
+  color: var(--link-hover);
+  text-decoration-color: currentColor;
+}
+
+code, .mono {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  font-weight: var(--fw-medium);
+}
+code {
+  background: var(--paper-200);
+  border: 1px solid var(--paper-300);
+  color: var(--ink-900);
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+}
+
+::selection { background: var(--selection-bg); color: var(--selection-fg); }
+
+/* ───────── Utility classes ───────── */
+.fg-strong { color: var(--fg-strong); }
+.fg-muted  { color: var(--fg-muted); }
+.fg-subtle { color: var(--fg-subtle); }
+.bg-paper  { background: var(--bg); }
+.bg-raised { background: var(--bg-raised); }
+.surface-paper {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Reduced motion — kill any transform-heavy hover rigs */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
