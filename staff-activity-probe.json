@@ -1,0 +1,1612 @@
+{
+  "snapshot_at": "2026-05-09T21:45:03.352297+00:00",
+  "databases": [
+    {
+      "database": "ReportingApplications",
+      "tables_with_clientusername": [
+        "dbo.Campaigns",
+        "dbo.Events",
+        "dbo.Flags",
+        "dbo.ProductHistories",
+        "dbo.Sources"
+      ],
+      "top_users": [
+        {
+          "username": "andrew.trevino@transformcredit.com",
+          "writes": 282,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "Elliott.Santana@lendingmate.ca",
+          "writes": 127,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "jason.mikula@transformcredit.com",
+          "writes": 112,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "kelly.black@transformcredit.com",
+          "writes": 72,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "mike.pursey@transformcredit.com",
+          "writes": 21,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "taylor.draper@transformcredit.com",
+          "writes": 19,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "kamen.totev",
+          "writes": 14,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "kamran.kamaei@rgroup.co.uk",
+          "writes": 12,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "jack.heaslip@transformcredit.com",
+          "writes": 12,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "jade.reynolds@transformcredit.com",
+          "writes": 11,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "golbarg.kirkland@transformcredit.com",
+          "writes": 10,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "violet.yebeyan@transformcredit.com",
+          "writes": 9,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "ben.nuttall@transformcredit.com",
+          "writes": 7,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "morgan.smith",
+          "writes": 6,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "ben.gardner@transformcredit.com",
+          "writes": 6,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "igor.kravcov@rgroup.co.uk",
+          "writes": 4,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "james.pothecary",
+          "writes": 4,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "andres.salcedo@fianceo.com",
+          "writes": 3,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "elliott.santana@transformcredit.com",
+          "writes": 3,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "test",
+          "writes": 3,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "izbirambg",
+          "writes": 2,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "MoitePari",
+          "writes": 2,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "dan.b@aviio.com",
+          "writes": 2,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "Creditdoc",
+          "writes": 2,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "loanscanada@lendingmate.ca",
+          "writes": 2,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "Pingyo",
+          "writes": 2,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "LendingArch",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "oscar.rodriguez@fianceo.com",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "nick.pellegrino",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "ed.heaney@transformcredit.com",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "Ed",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "benjamin.hartwell@transformcredit.com",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "lauren.rapley@transformcredit.com",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "Morgan",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "eric.salmon@rapida.bg",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "Mateusz.Grzyb@rapida.bg",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "benjamin.hartwell@lendingmate.ca",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "tctest",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "james.webster@transformcredit.com",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "mike.pursey@lendingmate.ca",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "igor.kravcov@lendingmate.ca",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "jenny.ck@icloud.com",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "benfacebook",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "Lendingtree",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "ITMedia",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "SuperMoney",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        }
+      ],
+      "error": null
+    },
+    {
+      "database": "ReportingBrokers",
+      "tables_with_clientusername": [
+        "dbo.Campaigns",
+        "dbo.ProductHistories",
+        "dbo.Sources"
+      ],
+      "top_users": [
+        {
+          "username": "andrew.trevino@transformcredit.com",
+          "writes": 282,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "Elliott.Santana@lendingmate.ca",
+          "writes": 127,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "jason.mikula@transformcredit.com",
+          "writes": 112,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "kelly.black@transformcredit.com",
+          "writes": 73,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "mike.pursey@transformcredit.com",
+          "writes": 21,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "taylor.draper@transformcredit.com",
+          "writes": 19,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "kamen.totev",
+          "writes": 14,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "kamran.kamaei@rgroup.co.uk",
+          "writes": 12,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "jack.heaslip@transformcredit.com",
+          "writes": 12,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "jade.reynolds@transformcredit.com",
+          "writes": 11,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "golbarg.kirkland@transformcredit.com",
+          "writes": 10,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "violet.yebeyan@transformcredit.com",
+          "writes": 9,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "ben.nuttall@transformcredit.com",
+          "writes": 7,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "ben.gardner@transformcredit.com",
+          "writes": 6,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "morgan.smith",
+          "writes": 6,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "igor.kravcov@rgroup.co.uk",
+          "writes": 5,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "james.pothecary",
+          "writes": 4,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "andres.salcedo@fianceo.com",
+          "writes": 3,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "test",
+          "writes": 3,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "elliott.santana@transformcredit.com",
+          "writes": 3,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "loanscanada@lendingmate.ca",
+          "writes": 2,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "Pingyo",
+          "writes": 2,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "sophie.polychronopulos@transformcredit.com",
+          "writes": 2,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "dan.b@aviio.com",
+          "writes": 2,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "MoitePari",
+          "writes": 2,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "izbirambg",
+          "writes": 2,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "Creditdoc",
+          "writes": 2,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "benjamin.hartwell@lendingmate.ca",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "Mateusz.Grzyb@rapida.bg",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "benjamin.hartwell@transformcredit.com",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "tctest",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "james.webster@transformcredit.com",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "Ed",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "eric.salmon@rapida.bg",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "igor.kravcov@lendingmate.ca",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "ed.heaney@transformcredit.com",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "oscar.rodriguez@fianceo.com",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "nick.pellegrino",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "Morgan",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "mike.pursey@lendingmate.ca",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "lauren.rapley@transformcredit.com",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "jenny.ck@icloud.com",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "benfacebook",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "SuperMoney",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "ITMedia",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "Lendingtree",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "LendingArch",
+          "writes": 1,
+          "from_table": "dbo.Campaigns"
+        }
+      ],
+      "error": null
+    },
+    {
+      "database": "ReportingCentralCrm",
+      "tables_with_clientusername": [
+        "dbo.Campaigns",
+        "dbo.MessagingSchedules",
+        "dbo.PaymentsFactories",
+        "dbo.PaymentsFactoryAudits",
+        "dbo.RobotResponderAudits",
+        "dbo.RobotResponders"
+      ],
+      "top_users": [
+        {
+          "username": "chris.malapris@lendingmate.ca",
+          "writes": 495,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "dorota.kazmierczyk@rapidamoney.pl",
+          "writes": 428,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "mateusz.grzyb@rapidamoney.pl",
+          "writes": 341,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "ben.gardner@transformcredit.com",
+          "writes": 319,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "cinthia.perez@fianceo.com",
+          "writes": 296,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "sammy.brichard@clearloans.co.au",
+          "writes": 218,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "martin.brenugat@lendingmate.ca",
+          "writes": 203,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "morgan.smith",
+          "writes": 188,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "berginie.botero@transformcredit.com",
+          "writes": 182,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "chelsea.mcfarlane@lendingmate.ca",
+          "writes": 178,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "mourad.malki@clearloans.com.au",
+          "writes": 162,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "jade.reynolds@transformcredit.com",
+          "writes": 162,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "alex.doychinova@rapida.bg",
+          "writes": 156,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "martin.brenugat@transformcredit.com",
+          "writes": 153,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "lauren.rapley@tandolaina.fi",
+          "writes": 149,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "lauren.rapley@tandolan.dk",
+          "writes": 149,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "lauren.rapley@tandolan.se",
+          "writes": 148,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "lauren.rapley@transformcredit.com",
+          "writes": 135,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "hayley.crisp@transformcredit.com",
+          "writes": 126,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "james.webster@transformcredit.com",
+          "writes": 123,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "patryk.mordarski@rapidamoney.pl",
+          "writes": 115,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "dorota.kazmierczyk@fianceo.com",
+          "writes": 106,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "morgan.smith@lendingmate.ca",
+          "writes": 103,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "rima.jalba",
+          "writes": 86,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "saskia.hedley@rgroup.co.uk",
+          "writes": 80,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "sammy@fianceo.com",
+          "writes": 64,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "alba.piraces@moneymas.me",
+          "writes": 55,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "morgan.smith@transformcredit.com",
+          "writes": 51,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "roksana.masella@letme.com",
+          "writes": 51,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "sammy@rapidamoney.pl",
+          "writes": 48,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "dorota.kazmierczyk@rapida.bg",
+          "writes": 43,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "jade.reynolds@rapidamoney.pl",
+          "writes": 42,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "chelsea.mcfarlane@transformcredit.com",
+          "writes": 39,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "Mateusz.Grzyb@rapida.bg",
+          "writes": 38,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "jack.bassilious@transformcredit.com",
+          "writes": 38,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "benjamin.hartwell@lendingmate.ca",
+          "writes": 37,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "internalbaddebtproject@rapidamoney.pl",
+          "writes": 36,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "stachia.walker@transformcredit.com",
+          "writes": 34,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "stachia.walker@lendingmate.ca",
+          "writes": 33,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "jordan.parker@transformcredit.com",
+          "writes": 30,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "boris.strumenliev@rapida.bg",
+          "writes": 29,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "karina@tandolan.dk",
+          "writes": 27,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "jade.reynolds",
+          "writes": 27,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "james.dewhurst@lendingmate.ca",
+          "writes": 26,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "kelly.black@transformcredit.com",
+          "writes": 25,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "sammy@tandolan.dk",
+          "writes": 24,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "roksana.masella@transformcredit.com",
+          "writes": 21,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "james.benamor@transformcredit.com",
+          "writes": 20,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "max.dynowski@lendingmate.ca",
+          "writes": 19,
+          "from_table": "dbo.Campaigns"
+        },
+        {
+          "username": "jacob.gardner@clearloans.com.au",
+          "writes": 18,
+          "from_table": "dbo.Campaigns"
+        }
+      ],
+      "error": null
+    },
+    {
+      "database": "ReportingCommunications",
+      "tables_with_clientusername": [
+        "dbo.BlockList",
+        "dbo.Messages"
+      ],
+      "top_users": [
+        {
+          "username": "karina@tandolan.dk",
+          "writes": 58,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "africa.cook@transformcredit.com",
+          "writes": 32,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "divya.abhijit@transformcredit.com",
+          "writes": 30,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "karina@tandolaina.fi",
+          "writes": 29,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "rory.armstrong@rgroup.co.uk",
+          "writes": 28,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "patryk.mordarski@rapidamoney.pl",
+          "writes": 23,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "stachia.walker@transformcredit.com",
+          "writes": 22,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "michelle.jacinto@transformcredit.com",
+          "writes": 19,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "Tom.Knight@transformcredit.com",
+          "writes": 19,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "elona.mema@lendingmate.ca",
+          "writes": 18,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "eden.oxley@transformcredit.com",
+          "writes": 13,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "karina@clearloans.com.au",
+          "writes": 13,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "david.jackson@transformcredit.com",
+          "writes": 12,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "sikurina.rodriguez@lendingmate.ca",
+          "writes": 12,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "rory.armstrong@transformcredit.com",
+          "writes": 10,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "Tom.Knight@lendingmate.ca",
+          "writes": 10,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "karina@tandolan.se",
+          "writes": 9,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "sophie.james@transformcredit.com",
+          "writes": 9,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "kelly.black@lendingmate.ca",
+          "writes": 8,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "james.pothecary@rgroup.co.uk",
+          "writes": 8,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "nicole.irving@clearloans.com.au",
+          "writes": 8,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "james.benamor@transformcredit.com",
+          "writes": 7,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "bushra.tabassum@transformcredit.com",
+          "writes": 7,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "daniel.jennings@lendingmate.ca",
+          "writes": 7,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "annette.rodriguez@togetherloans.com",
+          "writes": 6,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "mike.pursey@tandolaina.fi",
+          "writes": 6,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "benjamin.hartwell@transformcredit.com",
+          "writes": 4,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "james.pothecary",
+          "writes": 4,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "mourad.malki@clearloans.com.au",
+          "writes": 4,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "julien.hericotte@lendingmate.ca",
+          "writes": 4,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "kelly.black@transformcredit.com",
+          "writes": 4,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "mike.pursey@tandolan.dk",
+          "writes": 3,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "emma.dumaresq@clearloans.com.au",
+          "writes": 3,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "joshua.thomas@transformcredit.com",
+          "writes": 3,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "roksana.masella@lendingmate.ca",
+          "writes": 3,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "amber.cole@transformcredit.com",
+          "writes": 3,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "amber.cole@lendingmate.ca",
+          "writes": 3,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "julian.davis@transformcredit.com",
+          "writes": 2,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "benjamin.hartwell@lendingmate.ca",
+          "writes": 2,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "rebekah.dewaard@transformcredit.com",
+          "writes": 2,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "mike.pursey@tandolan.se",
+          "writes": 2,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "ceera.gillette@transformcredit.com",
+          "writes": 2,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "laura.allen@transformcredit.com",
+          "writes": 2,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "ruben.gonzales@fianceo.com",
+          "writes": 2,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "marnie.peraza@moneymas.me",
+          "writes": 2,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "internalbaddebtproject@rapidamoney.pl",
+          "writes": 2,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "lori.richardson@transformcredit.com",
+          "writes": 2,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "adnan.turken",
+          "writes": 2,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "jade.reynolds@transformcredit.com",
+          "writes": 1,
+          "from_table": "dbo.BlockList"
+        },
+        {
+          "username": "daniel.mapp@lendingmate.ca",
+          "writes": 1,
+          "from_table": "dbo.BlockList"
+        }
+      ],
+      "error": null
+    },
+    {
+      "database": "ReportingCreditbuilder",
+      "tables_with_clientusername": [],
+      "top_users": [],
+      "error": null
+    },
+    {
+      "database": "ReportingLoanbook",
+      "tables_with_clientusername": [
+        "dbo.CustomFlags",
+        "dbo.Events",
+        "dbo.Flags",
+        "dbo.Transactions"
+      ],
+      "top_users": [
+        {
+          "username": "Ed",
+          "writes": 185187,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "db-admin",
+          "writes": 107485,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "oxfordflags",
+          "writes": 78795,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "STPPPage",
+          "writes": 60650,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "CreateSTPPPage",
+          "writes": 48392,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "AutoSTPPDD",
+          "writes": 36094,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "Igor",
+          "writes": 24735,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "AutoCardSTPP",
+          "writes": 23316,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "AutoCardSTPP - 2nd Attempt",
+          "writes": 20799,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "CentralRobot",
+          "writes": 19775,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "nicole.irving@clearloans.com.au",
+          "writes": 15953,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "Ben",
+          "writes": 14462,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "dorota.kazmierczyk@rapidamoney.pl",
+          "writes": 14209,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "igor.kravcov@moneymas.es",
+          "writes": 12961,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "Luci",
+          "writes": 12158,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "prod_readexec_us",
+          "writes": 9744,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "mateusz.grzyb@rapidamoney.pl",
+          "writes": 9625,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "berginie.botero@transformcredit.com",
+          "writes": 8997,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "adnan.turken@rapidamoney.pl",
+          "writes": 8761,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "patryk.mordarski@rapidamoney.pl",
+          "writes": 6483,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "Overpayer Page",
+          "writes": 6251,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "PostTransferredFlag",
+          "writes": 5996,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "bryony.leach@transformcredit.com",
+          "writes": 5845,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "daniel.mapp@transformcredit.com",
+          "writes": 5703,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "MakePayment",
+          "writes": 5644,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "PaymentSummaryRobot",
+          "writes": 5411,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "saskia.hedley@rgroup.co.uk",
+          "writes": 4530,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "RapidaPolandWebsite",
+          "writes": 4375,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "Migrator",
+          "writes": 4132,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "daniel.mapp@lendingmate.ca",
+          "writes": 3826,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "gema.benjumea@fianceo.com",
+          "writes": 3794,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "karina@tandolan.dk",
+          "writes": 3686,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "edward.heaney@rgroup.co.uk",
+          "writes": 3670,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "james.webster@transformcredit.com",
+          "writes": 3516,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "kenishia.cotner@transformcredit.com",
+          "writes": 3428,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "sammy.brichard@clearloans.co.au",
+          "writes": 3314,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "OverpaymentPage",
+          "writes": 3256,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "internalbaddebtproject@rapidamoney.pl",
+          "writes": 2940,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "PSWReporting",
+          "writes": 2813,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "berginie.botero@lendingmate.ca",
+          "writes": 2535,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "sumeco.wynn@transformcredit.com",
+          "writes": 2299,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "benjamin.hartwell@lendingmate.ca",
+          "writes": 2091,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "marek.golab@letme.com",
+          "writes": 1969,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "noelle.blake1@transformcredit.com",
+          "writes": 1939,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "joe.cortez@transformcredit.com",
+          "writes": 1905,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "terri.adams@transformcredit.com",
+          "writes": 1359,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "Litigation",
+          "writes": 1285,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "elona.mema@lendingmate.ca",
+          "writes": 1267,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "cinthia.perez@fianceo.com",
+          "writes": 1262,
+          "from_table": "dbo.CustomFlags"
+        },
+        {
+          "username": "mourad.malki@clearloans.com.au",
+          "writes": 1114,
+          "from_table": "dbo.CustomFlags"
+        }
+      ],
+      "error": null
+    },
+    {
+      "database": "ReportingLookup",
+      "tables_with_clientusername": [],
+      "top_users": [],
+      "error": null
+    },
+    {
+      "database": "ReportingPayments",
+      "tables_with_clientusername": [
+        "dbo.Events"
+      ],
+      "top_users": [
+        {
+          "username": "TransformCreditWebsite1",
+          "writes": 10323551,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "CreditBuilder Live Due Today DD",
+          "writes": 8857392,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "TogetherLoansWebsite",
+          "writes": 3070979,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "TransformCreditWebsite",
+          "writes": 2103203,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "Migrator",
+          "writes": 2033159,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "AutoCard1-31",
+          "writes": 1098849,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "ProcessorNotification",
+          "writes": 977738,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "CardDeactivator",
+          "writes": 958206,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "ScheduledPayment",
+          "writes": 782184,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "MakePaymentPage",
+          "writes": 502965,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "AutoPayoutProcessor",
+          "writes": 394573,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "BankDeactivator",
+          "writes": 389192,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "AutoCard1-9 2nd Run",
+          "writes": 355918,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "AutoCard1-9",
+          "writes": 337688,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "CB Late setup DD",
+          "writes": 337540,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "MakePayment",
+          "writes": 314483,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "Card - In Arrears - Payment Passed Due",
+          "writes": 265930,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "CreditBuilder DIA 10 DD",
+          "writes": 251854,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "MakePaymentPage3DS",
+          "writes": 209028,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "AutoCard 1-31 2nd run",
+          "writes": 181395,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "Card - Payment Due",
+          "writes": 165570,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "ManagePaymentMethodsPage",
+          "writes": 156030,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "Card - Payment Due Today",
+          "writes": 145589,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "AutoCard31-60",
+          "writes": 141041,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "AutoScheduleDD",
+          "writes": 118332,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "MoneyMasWebsite",
+          "writes": 117122,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "JP",
+          "writes": 92180,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "AutoCardSTPP",
+          "writes": 82122,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "LendingMateWebsite",
+          "writes": 81898,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "AutoCard10-30",
+          "writes": 79809,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "MakePaymentPageV2",
+          "writes": 77859,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "AutoCard31-91",
+          "writes": 68648,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "AutoCard10-30 2nd Run",
+          "writes": 68279,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "Monday AutoCard 1-31",
+          "writes": 65587,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "AutoSTPPDD",
+          "writes": 56916,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "TransformCredit",
+          "writes": 54962,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "App",
+          "writes": 52012,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "AutoGTDD",
+          "writes": 47169,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "MandateUpdater",
+          "writes": 44563,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "AutoCard 1-31 17:00",
+          "writes": 43034,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "ScheduledPayment - Card",
+          "writes": 42501,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "CardPayer - Payment Due",
+          "writes": 36618,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "CreditBuilder Due yesterday late setup",
+          "writes": 35525,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "AutoCard 16-30 (25%)",
+          "writes": 33559,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "SettleLoan",
+          "writes": 26551,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "AutoCardSTPP - 2nd Attempt",
+          "writes": 23572,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "CBRefundGenerator",
+          "writes": 23552,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "noelle.blake1@transformcredit.com",
+          "writes": 22844,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "TandoWebsite",
+          "writes": 21721,
+          "from_table": "dbo.Events"
+        },
+        {
+          "username": "TandoWebsite, TandoWebsite",
+          "writes": 20020,
+          "from_table": "dbo.Events"
+        }
+      ],
+      "error": null
+    },
+    {
+      "database": "ReportingTracking",
+      "tables_with_clientusername": [],
+      "top_users": [],
+      "error": null
+    },
+    {
+      "database": "Whitebox",
+      "tables_with_clientusername": [
+        "dbo.DeclineOverrides",
+        "dbo.WhiteBoxStatuses"
+      ],
+      "top_users": [
+        {
+          "username": "Postman",
+          "writes": 3773,
+          "from_table": "dbo.DeclineOverrides"
+        },
+        {
+          "username": "Admin",
+          "writes": 1749,
+          "from_table": "dbo.DeclineOverrides"
+        },
+        {
+          "username": "swagger",
+          "writes": 198,
+          "from_table": "dbo.DeclineOverrides"
+        },
+        {
+          "username": "DatabaseQuery",
+          "writes": 164,
+          "from_table": "dbo.DeclineOverrides"
+        },
+        {
+          "username": "Sophie",
+          "writes": 18,
+          "from_table": "dbo.DeclineOverrides"
+        },
+        {
+          "username": "test",
+          "writes": 14,
+          "from_table": "dbo.DeclineOverrides"
+        },
+        {
+          "username": "Igor",
+          "writes": 1,
+          "from_table": "dbo.DeclineOverrides"
+        },
+        {
+          "username": "james.webster@rgroup.co.uk",
+          "writes": 1,
+          "from_table": "dbo.DeclineOverrides"
+        },
+        {
+          "username": "SophieTest",
+          "writes": 1,
+          "from_table": "dbo.DeclineOverrides"
+        }
+      ],
+      "error": null
+    }
+  ]
+}
