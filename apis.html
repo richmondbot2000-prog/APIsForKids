@@ -16,7 +16,11 @@
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
     <img class="qb-brand-logo" src="togetherbook-logo.png" alt="TogetherBOOK">
   </a>
-  <nav class="qb-nav">
+  <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
+          onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
+    <span></span><span></span><span></span>
+  </button>
+    <nav class="qb-nav">
     <a class="qb-nav-link is-active" href="index.html">Helpers</a>
     <a class="qb-nav-link" href="robots.html">Robots</a>
     <a class="qb-nav-link" href="index.html#commandments">Commandments</a>
@@ -28,6 +32,7 @@
     <a class="qb-nav-link" href="stats.html">Stats</a>
   </nav>
 </header>
+<div class="qb-nav-backdrop" onclick="document.body.classList.remove('nav-open')"></div>
 
 <main class="qb-page">
 
@@ -208,5 +213,13 @@
   });
 </script>
 
+<script>
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.body.classList.remove('nav-open');
+  });
+  document.querySelectorAll('.qb-nav-link').forEach(a =>
+    a.addEventListener('click', () => document.body.classList.remove('nav-open'))
+  );
+</script>
 </body>
 </html>

@@ -107,45 +107,151 @@
   outline: none; box-shadow: var(--ring-focus);
 }
 
-/* ── Brand logo (image replaces the typographic wordmark) ── */
-.qb-brand { gap: 12px; }
+/* ─────────────────────────────────────────────────────────────────────────
+   Topbar — standard responsive site nav.
+   Desktop (≥961px): brand left, horizontal nav right.
+   Narrow (≤960px): brand left, hamburger right; nav slides down full-width
+                     when body.nav-open is set.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Reset the original quiet.css grid topbar in favour of a flex bar */
+.qb-topbar {
+  display: flex !important;
+  grid-template-columns: none !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  height: 96px; padding: 0 40px;
+  position: sticky; top: 0; z-index: 1000;
+  background: rgba(251, 246, 233, 0.92);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--divider);
+}
+
+.qb-brand {
+  display: flex; align-items: center;
+  gap: 12px; flex: 0 0 auto;
+  cursor: pointer; user-select: none;
+  text-decoration: none;
+}
 .qb-brand-logo {
   display: block;
-  height: 36px; width: auto;
-}
-@media (max-width: 760px) {
-  .qb-brand-logo { height: 90px; }
-  .qb-brand-sub { display: none; }
+  height: 72px; width: auto;
+  max-height: none;
 }
 
-/* ── Topbar: 9 nav links won't fit on a narrow viewport.
-      Keep them on a single line desktop; collapse to wrap ≤980px;
-      hide secondary tools ≤760px (the three chapters stay). ── */
-.qb-topbar { gap: 18px; }
-.qb-nav { gap: 22px; flex-wrap: wrap; row-gap: 4px; }
-.qb-nav-link { white-space: nowrap; }
-
-@media (max-width: 980px) {
-  .qb-topbar {
-    grid-template-columns: auto 1fr;
-    height: auto; min-height: 64px; padding: 12px 24px;
-  }
-  .qb-folio { display: none; }
-  .qb-nav { justify-self: end; gap: 16px 18px; max-width: 64%; justify-content: flex-end; }
+/* Desktop nav — single horizontal row, never wraps */
+.qb-nav {
+  display: flex;
+  flex: 0 1 auto;
+  gap: 22px;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-self: end;
+}
+.qb-nav-link {
+  white-space: nowrap;
+  font: 400 15px/1 var(--font-display);
+  color: var(--fg-muted);
+  text-decoration: none; cursor: pointer;
+  padding: 6px 0;
+  border-bottom: 1px solid transparent;
+  transition: color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out);
+}
+.qb-nav-link:hover { color: var(--fg-strong); border-bottom-color: var(--brass-300); }
+.qb-nav-link.is-active {
+  color: var(--fg-strong); font-style: italic;
+  border-bottom-color: var(--brass-500);
 }
 
-@media (max-width: 760px) {
-  .qb-topbar {
-    grid-template-columns: 1fr; gap: 8px; padding: 14px 24px;
-  }
+/* Hamburger — only visible ≤960px */
+.qb-hamburger {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--ink-300);
+  width: 44px; height: 44px;
+  padding: 0; cursor: pointer;
+  position: relative;
+  border-radius: var(--radius-xs);
+  flex: 0 0 auto;
+}
+.qb-hamburger span {
+  display: block;
+  position: absolute; left: 50%; top: 50%;
+  width: 22px; height: 1.5px;
+  background: var(--ink-800);
+  transform: translate(-50%, -50%);
+  transition: transform var(--dur-fast) var(--ease-out),
+              opacity var(--dur-fast) var(--ease-out);
+}
+.qb-hamburger span:nth-child(1) { transform: translate(-50%, calc(-50% - 7px)); }
+.qb-hamburger span:nth-child(3) { transform: translate(-50%, calc(-50% + 7px)); }
+
+body.nav-open .qb-hamburger span:nth-child(1) {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+body.nav-open .qb-hamburger span:nth-child(2) { opacity: 0; }
+body.nav-open .qb-hamburger span:nth-child(3) {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* Backdrop behind the open mobile drawer */
+.qb-nav-backdrop {
+  display: none;
+  position: fixed; inset: 96px 0 0 0; z-index: 998;
+  background: rgba(17, 25, 46, 0.32);
+  opacity: 0; pointer-events: none;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+body.nav-open .qb-nav-backdrop {
+  display: block; opacity: 1; pointer-events: auto;
+}
+
+/* Narrow viewport — hide nav, show hamburger, drawer slides down */
+@media (max-width: 960px) {
+  .qb-topbar { height: 80px; padding: 0 24px; }
+  .qb-brand-logo { height: 56px; }
+  .qb-hamburger { display: block; }
+
+  .qb-nav-backdrop { inset: 80px 0 0 0; }
+
   .qb-nav {
-    justify-self: stretch; max-width: none;
-    gap: 4px 18px; justify-content: flex-start;
+    position: fixed;
+    top: 80px; left: 0; right: 0;
+    z-index: 999;
+    background: var(--paper-100);
+    border-bottom: 1px solid var(--ink-300);
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 8px 24px 20px;
+    transform: translateY(-12px);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform var(--dur-base) var(--ease-out),
+                opacity var(--dur-base) var(--ease-out);
   }
-  /* Demote tool pages (everything past Commandments) to a smaller secondary tier */
-  .qb-nav-link:nth-child(n+4) {
-    font-size: 13px; color: var(--fg-subtle);
+  .qb-nav-link {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--divider);
+    font-size: 17px;
   }
+  .qb-nav-link:last-child { border-bottom: none; }
+  .qb-nav-link.is-active { border-bottom-color: var(--brass-500); }
+
+  body.nav-open .qb-nav {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .qb-brand-logo { height: 44px; }
+  .qb-topbar { height: 72px; padding: 0 16px; }
+  .qb-nav { top: 72px; }
+  .qb-nav-backdrop { inset: 72px 0 0 0; }
 }
 
 /* ── Section dividers + structure ── */
@@ -331,10 +437,6 @@
 .qb-meta-label { font-size: 10px; margin-bottom: 8px; }
 .qb-register-row { padding: 6px 0; gap: 10px; grid-template-columns: 78px 1fr; }
 .qb-register-row span:last-child { font-size: 13px; line-height: 1.4; }
-
-/* Topbar — generous space for the dot-matrix wordmark */
-.qb-topbar { height: 180px; padding: 0 40px; }
-.qb-brand-logo { height: 150px; }
 
 /* Footer — closer to content */
 .qb-footer { margin-top: 48px; padding-top: 24px; }
