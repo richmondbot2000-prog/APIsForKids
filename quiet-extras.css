@@ -126,7 +126,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 32px;
-  height: 72px; padding: 0 40px;
+  height: 72px; padding: 0 16px;
   position: sticky; top: 0; z-index: 1000;
   background: rgba(251, 246, 233, 0.92);
   backdrop-filter: blur(14px);
@@ -215,7 +215,7 @@ body.nav-open .qb-nav-backdrop {
 
 /* Narrow viewport — hide nav, show hamburger, drawer slides down */
 @media (max-width: 960px) {
-  .qb-topbar { height: 64px; padding: 0 24px; }
+  .qb-topbar { height: 64px; padding: 0 12px; }
   .qb-brand-logo { height: 42px; }
   .qb-hamburger { display: block; }
 
@@ -254,7 +254,7 @@ body.nav-open .qb-nav-backdrop {
 
 @media (max-width: 480px) {
   .qb-brand-logo { height: 32px; }
-  .qb-topbar { height: 56px; padding: 0 16px; }
+  .qb-topbar { height: 56px; padding: 0 12px; }
   .qb-nav { top: 56px; }
   .qb-nav-backdrop { inset: 56px 0 0 0; }
 }
@@ -336,7 +336,7 @@ body.nav-open .qb-nav-backdrop {
    helpers grid, two-column rules, tighter commandment / robot rows.
    ───────────────────────────────────────────────────────────────────────── */
 
-.qb-page { max-width: 1200px; padding: 0 20px 36px; }
+.qb-page { max-width: 1200px; padding: 0 16px 36px; }
 
 /* Hero — half the vertical air, smaller display, narrower lead */
 .qb-hero { padding: 20px 0 16px; }
@@ -454,7 +454,7 @@ body.nav-open .qb-nav-backdrop {
   .qb-detail { grid-template-columns: 1fr; gap: 24px; }
 }
 @media (max-width: 760px) {
-  .qb-page { padding: 0 8px 32px; }
+  .qb-page { padding: 0 12px 32px; }
   .qb-helpers { grid-template-columns: 1fr; }
   .qb-hero { padding: 14px 0 12px; }
   .qb-hero-title { font-size: 38px; }
