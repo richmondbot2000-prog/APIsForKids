@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
-  "snapshot_date": "2026-05-08",
-  "updated_at": "2026-05-08T15:42:57Z",
+  "snapshot_date": "2026-05-09",
+  "updated_at": "2026-05-09T00:11:39Z",
   "brands": [
     "Together Loans",
     "TransformCredit"
   ],
   "totals": {
-    "all": 251,
+    "all": 254,
     "by_source": {
-      "trustpilot": 202,
+      "trustpilot": 205,
       "bbb": 10,
       "reddit": 25,
       "bluesky": 0,
@@ -21,14 +21,14 @@
       "youtube": 7
     },
     "by_brand": {
-      "together_loans": 233,
+      "together_loans": 236,
       "transform_credit": 18
     }
   },
   "source_status": {
     "trustpilot": {
       "ok": true,
-      "fetched": 0,
+      "fetched": 3,
       "error": null
     },
     "bbb": {
@@ -63,7 +63,7 @@
     },
     "google_news": {
       "ok": true,
-      "fetched": 72,
+      "fetched": 74,
       "error": null
     },
     "cfpb": {
@@ -73,11 +73,53 @@
     },
     "youtube": {
       "ok": true,
-      "fetched": 64,
+      "fetched": 63,
       "error": null
     }
   },
   "mentions": [
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-69fe44d0cfd5c55c4fac1f12",
+      "title": "Informative and efficient.",
+      "snippet": "Informative and efficient.",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#69fe44d0cfd5c55c4fac1f12",
+      "date": "2026-05-08",
+      "author": "customer",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-69fe38d5440a5aecd569047c",
+      "title": "Easy process but hard to actually get…",
+      "snippet": "Easy process but hard to actually get hold of PEOPLE. No chance in the auto bot",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#69fe38d5440a5aecd569047c",
+      "date": "2026-05-08",
+      "author": "LRC",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-69fe364bc3bc69815771c114",
+      "title": "My experience with Together Loans was…",
+      "snippet": "My experience with Together Loans was straightforward and stress-free. The application process was easy to complete, communication was clear, and I appreciated how quickly e…",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#69fe364bc3bc69815771c114",
+      "date": "2026-05-08",
+      "author": "customer",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
     {
       "source": "trustpilot",
       "brand": "together_loans",
@@ -2985,7 +3027,7 @@
       "url": "https://www.reddit.com/r/findacosigner/comments/1sa4v8k/scammer_alert/",
       "date": "2026-04-02",
       "author": "u/dlopez2018",
-      "score": 5,
+      "score": 7,
       "score_max": null,
       "site_name": "r/findacosigner",
       "site_domain": "reddit.com"
@@ -3083,7 +3125,7 @@
       "url": "https://www.reddit.com/r/debtfree/comments/1rjs7hz/anyone_have_experience_with_together_loans_seems/",
       "date": "2026-03-03",
       "author": "u/PM_Me_Money_Daddy",
-      "score": 4,
+      "score": 7,
       "score_max": null,
       "site_name": "r/debtfree",
       "site_domain": "reddit.com"
@@ -3125,7 +3167,7 @@
       "url": "https://www.reddit.com/r/Scams/comments/1r8j5km/us_tcrdt_com_stkgpbbbg_phishingsmishing_scam/",
       "date": "2026-02-18",
       "author": "u/ImplementLong5304",
-      "score": 4,
+      "score": 1,
       "score_max": null,
       "site_name": "r/Scams",
       "site_domain": "reddit.com"
@@ -3433,7 +3475,7 @@
       "url": "https://www.reddit.com/r/findacosigner/comments/1ocmme8/need_a_cosigner/",
       "date": "2025-10-21",
       "author": "u/CodyPalmer7",
-      "score": 3,
+      "score": 4,
       "score_max": null,
       "site_name": "r/findacosigner",
       "site_domain": "reddit.com"
