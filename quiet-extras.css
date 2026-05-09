@@ -114,7 +114,7 @@
   height: 36px; width: auto;
 }
 @media (max-width: 760px) {
-  .qb-brand-logo { height: 28px; }
+  .qb-brand-logo { height: 90px; }
   .qb-brand-sub { display: none; }
 }
 
@@ -332,9 +332,9 @@
 .qb-register-row { padding: 6px 0; gap: 10px; grid-template-columns: 78px 1fr; }
 .qb-register-row span:last-child { font-size: 13px; line-height: 1.4; }
 
-/* Topbar — slightly shorter, tighter folio */
-.qb-topbar { height: 60px; padding: 0 40px; }
-.qb-brand-logo { height: 30px; }
+/* Topbar — generous space for the dot-matrix wordmark */
+.qb-topbar { height: 180px; padding: 0 40px; }
+.qb-brand-logo { height: 150px; }
 
 /* Footer — closer to content */
 .qb-footer { margin-top: 48px; padding-top: 24px; }
