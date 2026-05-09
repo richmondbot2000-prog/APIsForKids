@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-05-09T21:34:01.962831Z",
+  "snapshot_date": "2026-05-09",
+  "domain": "letme.co.uk",
+  "totals": {
+    "users": 16,
+    "suspended_hidden": 3,
+    "by_department": {
+      "(unspecified)": 16
+    }
+  },
+  "users": [
+    {
+      "email": "lucas.benamor@letme.co.uk",
+      "name": "Lucas Benamor",
+      "given": "Lucas",
+      "family": "Benamor",
+      "title": "",
+      "department": "",
+      "photo_url": "",
+      "suspended": false,
+      "admin": false
+    },
+    {
+      "email": "joshua.carless@letme.co.uk",
+      "name": "Joshua Carless",
+      "given": "Joshua",
+      "family": "Carless",
+      "title": "",
+      "department": "",
+      "photo_url": "",
+      "suspended": false,
+      "admin": false
+    },
+    {
+      "email": "laura.chadbourne@letme.co.uk",
+      "name": "Laura Chadbourne",
+      "given": "Laura",
+      "family": "Chadbourne",
+      "title": "",
+      "department": "",
+      "photo_url": "",
+      "suspended": false,
+      "admin": false
+    },
+    {
+      "email": "max.dynowski@letme.co.uk",
+      "name": "Max Dynowski",
+      "given": "Max",
+      "family": "Dynowski",
+      "title": "",
+      "department": "",
+      "photo_url": "",
+      "suspended": false,
+      "admin": false
+    },
+    {
+      "email": "candidate.email@letme.co.uk",
+      "name": "Candidate Email",
+      "given": "Candidate",
+      "family": "Email",
+      "title": "",
+      "department": "",
+      "photo_url": "",
+      "suspended": false,
+      "admin": false
+    },
+    {
+      "email": "historic@letme.co.uk",
+      "name": "Historic Emails",
+      "given": "Historic",
+      "family": "Emails",
+      "title": "",
+      "department": "",
+      "photo_url": "",
+      "suspended": false,
+      "admin": false
+    },
+    {
+      "email": "julian.foster@letme.co.uk",
+      "name": "Julian Foster",
+      "given": "Julian",
+      "family": "Foster",
+      "title": "",
+      "department": "",
+      "photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjXj-cvyuvjGosE6zCXJMb9EfSEiOv1XdWxn_YbFqTwhHH2Z-jw=s96-c",
+      "suspended": false,
+      "admin": false
+    },
+    {
+      "email": "customer.letters@letme.co.uk",
+      "name": "customer letters",
+      "given": "customer",
+      "family": "letters",
+      "title": "",
+      "department": "",
+      "photo_url": "",
+      "suspended": false,
+      "admin": false
+    },
+    {
+      "email": "phil.oneill@letme.co.uk",
+      "name": "phil oneill",
+      "given": "phil",
+      "family": "oneill",
+      "title": "",
+      "department": "",
+      "photo_url": "",
+      "suspended": false,
+      "admin": false
+    },
+    {
+      "email": "printer@letme.co.uk",
+      "name": "Office Printer",
+      "given": "Office",
+      "family": "Printer",
+      "title": "",
+      "department": "",
+      "photo_url": "",
+      "suspended": false,
+      "admin": false
+    },
+    {
+      "email": "mark.prior@letme.co.uk",
+      "name": "Mark Prior",
+      "given": "Mark",
+      "family": "Prior",
+      "title": "",
+      "department": "",
+      "photo_url": "",
+      "suspended": false,
+      "admin": false
+    },
+    {
+      "email": "lucian.teodoroiu@letme.co.uk",
+      "name": "Lucian Teodoroiu",
+      "given": "Lucian",
+      "family": "Teodoroiu",
+      "title": "",
+      "department": "",
+      "photo_url": "",
+      "suspended": false,
+      "admin": false
+    },
+    {
+      "email": "adnan.turken@letme.co.uk",
+      "name": "Adnan Türken",
+      "given": "Adnan",
+      "family": "Türken",
+      "title": "",
+      "department": "",
+      "photo_url": "",
+      "suspended": false,
+      "admin": false
+    },
+    {
+      "email": "james.webster@letme.co.uk",
+      "name": "James Webster",
+      "given": "James",
+      "family": "Webster",
+      "title": "",
+      "department": "",
+      "photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjVwpY_O3pVJecQJHEwr7YwaK1z9lL4aFHA-cp0lAORYB4MQ3kw=s96-c",
+      "suspended": false,
+      "admin": false
+    },
+    {
+      "email": "matthew.wood@letme.co.uk",
+      "name": "matthew wood",
+      "given": "matthew",
+      "family": "wood",
+      "title": "",
+      "department": "",
+      "photo_url": "",
+      "suspended": false,
+      "admin": false
+    },
+    {
+      "email": "natasha.wright@letme.co.uk",
+      "name": "Natasha Wright",
+      "given": "Natasha",
+      "family": "Wright",
+      "title": "",
+      "department": "",
+      "photo_url": "",
+      "suspended": false,
+      "admin": true
+    }
+  ]
+}
