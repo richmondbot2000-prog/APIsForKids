@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778346602">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778346602">
-<link rel="stylesheet" href="quiet.css?v=1778346602">
-<link rel="stylesheet" href="quiet-extras.css?v=1778346602">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778346602">
+<link rel="stylesheet" href="style.css?v=1778363873">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778363873">
+<link rel="stylesheet" href="quiet.css?v=1778363873">
+<link rel="stylesheet" href="quiet-extras.css?v=1778363873">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778363873">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -183,6 +183,40 @@
     margin-top: 2px;
   }
 
+  .dir-activity {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--divider, rgba(0,0,0,0.12));
+    display: flex; flex-direction: column; gap: 4px;
+    font-family: var(--font-display, "Newsreader", Georgia, serif);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .dir-last { color: var(--ink-700, #2C3E66); }
+  .dir-last b { font-weight: 500; color: var(--ink-900, #11192E); font-style: italic; }
+  .dir-tenants { display: flex; flex-wrap: wrap; gap: 4px; }
+  .dir-tenant {
+    display: inline-block;
+    font: 500 10px/1.4 var(--font-mono, "JetBrains Mono", ui-monospace, monospace);
+    color: var(--brass-600, #A47829);
+    background: var(--paper-200, #F5ECD4);
+    border: 1px solid var(--paper-300, #ECDFB6);
+    padding: 1px 6px;
+    border-radius: 3px;
+    text-transform: lowercase;
+    letter-spacing: 0.02em;
+  }
+  .dir-warehouse {
+    color: var(--ink-600, #4A5878);
+    font-style: italic;
+    font-size: 12px;
+  }
+  .dir-warehouse em {
+    color: var(--ink-900, #11192E);
+    font-style: italic;
+    font-weight: 500;
+  }
+
   .dir-empty {
     background: var(--bg-soft);
     border: 1px dashed var(--border);
@@ -209,7 +243,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778346602" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778363873" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -255,21 +289,42 @@
   let allUsers = [];
   let activeDept = "all";
   let searchTerm = "";
+  let activityByEmail = {};   // email (lowercase) → { writes_60d, last_active_utc, tenants, top_warehouse }
 
-  fetch("staff.json", { cache: "no-store" })
-    .then(r => r.ok ? r.json() : Promise.reject("HTTP " + r.status))
-    .then(data => {
-      allUsers = data.users || [];
-      const updated = data.updated_at ? data.updated_at.replace("T", " ").replace("Z", " UTC") : "—";
-      const totalUsers = data.totals?.users ?? allUsers.length;
-      document.getElementById("dirMeta").textContent =
-        `Updated ${updated} · ${totalUsers} active ${data.domain || "letme.com"} accounts`;
-      buildDeptPills(data.totals?.by_department || {});
+  Promise.all([
+    fetch("staff.json", { cache: "no-store" }).then(r => r.ok ? r.json() : Promise.reject("staff.json HTTP " + r.status)),
+    fetch("staff-activity.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+  ])
+    .then(([staff, activity]) => {
+      const allWorkspaceUsers = staff.users || [];
+      // Build email-keyed lookup of activity
+      activityByEmail = {};
+      if (activity && activity.active_users) {
+        for (const a of activity.active_users) {
+          activityByEmail[(a.email || "").toLowerCase()] = a;
+        }
+      }
+      // Filter the directory to people with activity in the last 60 days
+      allUsers = allWorkspaceUsers.filter(u => activityByEmail[(u.email || "").toLowerCase()]);
+
+      const updated = staff.updated_at ? staff.updated_at.replace("T", " ").replace("Z", " UTC") : "—";
+      const meta = activity
+        ? `Updated ${updated} · ${allUsers.length} active in last ${activity.window_days} days · ${allWorkspaceUsers.length} total Workspace accounts`
+        : `Updated ${updated} · ${allWorkspaceUsers.length} ${staff.domain || "letme.co.uk"} accounts (activity data not yet available)`;
+      document.getElementById("dirMeta").textContent = meta;
+
+      // Recount departments to reflect the active subset
+      const byDept = {};
+      for (const u of allUsers) {
+        const d = u.department || "(unspecified)";
+        byDept[d] = (byDept[d] || 0) + 1;
+      }
+      buildDeptPills(byDept);
       document.getElementById("dirControls").hidden = allUsers.length === 0;
       renderGrid();
     })
     .catch(err => {
-      document.getElementById("dirMeta").textContent = "Couldn't load staff.json — " + err;
+      document.getElementById("dirMeta").textContent = "Couldn't load directory — " + err;
       document.getElementById("dirEmpty").hidden = false;
     });
 
@@ -340,6 +395,21 @@
       ? `<img class="dir-photo" src="${escapeHtml(u.photo_url)}" alt="${escapeHtml(u.name)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=&quot;dir-photo-placeholder&quot;>${escapeHtml(initials)}</div>'">`
       : `<div class="dir-photo-placeholder">${escapeHtml(initials)}</div>`;
 
+    const a = activityByEmail[(u.email || "").toLowerCase()];
+    let activityHtml = "";
+    if (a) {
+      const lastDate = a.last_active_utc
+        ? new Date(a.last_active_utc).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
+        : null;
+      const tenants = (a.tenants || []).map(t => `<span class="dir-tenant">${escapeHtml(t)}</span>`).join("");
+      activityHtml = `
+        <div class="dir-activity">
+          ${lastDate ? `<div class="dir-last">last seen <b>${escapeHtml(lastDate)}</b></div>` : ""}
+          ${tenants ? `<div class="dir-tenants">${tenants}</div>` : ""}
+          ${a.top_warehouse ? `<div class="dir-warehouse">mostly <em>${escapeHtml(a.top_warehouse)}</em></div>` : ""}
+        </div>`;
+    }
+
     return `
       <a class="dir-card" href="mailto:${escapeHtml(u.email)}" title="Email ${escapeHtml(u.name || u.email)}">
         ${photo}
@@ -347,6 +417,7 @@
         ${u.title ? `<div class="dir-title">${escapeHtml(u.title)}</div>` : ""}
         ${u.department ? `<div class="dir-department">${escapeHtml(u.department)}</div>` : ""}
         <div class="dir-email">${escapeHtml(u.email)}</div>
+        ${activityHtml}
       </a>
     `;
   }
