@@ -72,10 +72,9 @@ ROBOT_CLIENT_TYPES = {
     "TranscriptionRobot",
 }
 
-# Whitelist of user-meaningful TaskTypeIds. Anything not in here is hidden so
-# we don't drown the timeline in 25 system tasks all stamped at the same
-# minute when the application terminates.
-TASK_WHITELIST: dict[int, str] = {
+# Fallback labels for TaskTypeIds when the TaskTypes lookup table isn't
+# available. Used only if dbo.TaskTypes has no row for an id we encounter.
+TASK_FALLBACK_LABELS: dict[int, str] = {
     41:  "Page 1 details (Apply1)",
     48:  "Sign contract",
     49:  "Bank linked",
@@ -292,6 +291,106 @@ def main() -> None:
                 break
         except Exception as e:
             print(f"#   {tname}: lookup failed: {e}", flush=True)
+
+    # ──────── TaskTypes lookup ─────────────────────────────────────
+    # Per the Applications schema diagram: dbo.TaskTypes has
+    # (TaskTypeId, TaskName, ParentTaskTypeId, SubTaskName).
+    task_type_labels: dict[int, str] = {}
+    try:
+        tt_cols = discover_columns(cur, "TaskTypes")
+    except Exception:
+        tt_cols = set()
+    if tt_cols:
+        tt_id = pick(tt_cols, "TaskTypeId", "TaskTypeID", "Id")
+        tt_name = pick(tt_cols, "TaskName", "Name")
+        tt_sub = pick(tt_cols, "SubTaskName", "SubName")
+        if tt_id and tt_name:
+            sub_sql = f", [{tt_sub}]" if tt_sub else ", NULL"
+            cur.execute(f"SELECT [{tt_id}], [{tt_name}]{sub_sql} FROM dbo.TaskTypes")
+            for tid, name, sub in cur.fetchall():
+                if tid is None: continue
+                n = (name or "").strip()
+                s = (sub or "").strip() if sub else ""
+                if n and s and s.lower() != "all":
+                    label = f"{n}: {s}"
+                elif n:
+                    label = n
+                else:
+                    label = f"Task #{tid}"
+                task_type_labels[int(tid)] = label
+            print(f"# TaskTypes: loaded {len(task_type_labels)} labels", flush=True)
+    else:
+        print("# TaskTypes table not found — falling back to hardcoded labels", flush=True)
+
+    # ──────── Brokers Sources + Campaigns lookups ──────────────────
+    # Sources.FriendlyName turns 'broker 421' into the affiliate's name.
+    # Brokers.Campaigns.CampaignFriendlyName gives the campaign label.
+    # BrokerStatuses.BrokerStatusDescription resolves the broker status code.
+    broker_sources: dict[int, str] = {}
+    broker_campaigns: dict[int, dict] = {}
+    broker_statuses: dict[int, str] = {}
+
+    def _try_load_brokers(database: str) -> bool:
+        try:
+            probe = pyodbc.connect(conn_str(database), timeout=10)
+            probe.timeout = 60
+        except Exception as e:
+            print(f"# Brokers probe in {database}: connect failed ({e})", flush=True)
+            return False
+        loaded_any = False
+        try:
+            pc = probe.cursor()
+            # Sources
+            if not broker_sources:
+                cols = discover_columns(pc, "Sources")
+                if cols:
+                    sid = pick(cols, "SourceId", "SourceID")
+                    sname = pick(cols, "FriendlyName", "ShortName", "CompanyName", "Name")
+                    if sid and sname:
+                        pc.execute(f"SELECT [{sid}], [{sname}] FROM dbo.Sources")
+                        for i, n in pc.fetchall():
+                            if i is not None: broker_sources[int(i)] = (n or "").strip() or f"Source {i}"
+                        print(f"# Brokers.Sources in {database}: loaded {len(broker_sources)} rows", flush=True)
+                        loaded_any = True
+            # Campaigns (Brokers namespace — has CampaignFriendlyName, not MessageType)
+            if not broker_campaigns:
+                cols = discover_columns(pc, "Campaigns")
+                if cols:
+                    cid = pick(cols, "CampaignId", "CampaignID")
+                    cname = pick(cols, "CampaignFriendlyName", "CampaignName", "FriendlyName")
+                    csrc = pick(cols, "SourceId", "SourceID")
+                    if cid and cname:
+                        src_sql = f", [{csrc}]" if csrc else ", NULL"
+                        pc.execute(f"SELECT [{cid}], [{cname}]{src_sql} FROM dbo.Campaigns")
+                        for i, n, s in pc.fetchall():
+                            if i is None: continue
+                            broker_campaigns[int(i)] = {
+                                "name": (n or "").strip() or None,
+                                "source_id": int(s) if s is not None else None,
+                            }
+                        if broker_campaigns:
+                            print(f"# Brokers.Campaigns in {database}: loaded {len(broker_campaigns)} rows", flush=True)
+                            loaded_any = True
+            # BrokerStatuses
+            if not broker_statuses:
+                cols = discover_columns(pc, "BrokerStatuses")
+                if cols:
+                    bsid = pick(cols, "BrokerStatusId", "BrokerStatusID", "Id")
+                    bsname = pick(cols, "BrokerStatusDescription", "Description", "Name")
+                    if bsid and bsname:
+                        pc.execute(f"SELECT [{bsid}], [{bsname}] FROM dbo.BrokerStatuses")
+                        for i, n in pc.fetchall():
+                            if i is not None: broker_statuses[int(i)] = (n or "").strip() or f"Status {i}"
+                        print(f"# Brokers.BrokerStatuses in {database}: loaded {len(broker_statuses)} rows", flush=True)
+                        loaded_any = True
+        finally:
+            probe.close()
+        return loaded_any
+
+    for db_candidate in ("ReportingBrokers", "ReportingApplications"):
+        _try_load_brokers(db_candidate)
+        if broker_sources and broker_campaigns and broker_statuses:
+            break
 
     apps_aref = pick(apps_cols, "ARef")
     apps_lender = pick(apps_cols, "LenderId")
@@ -684,7 +783,6 @@ def main() -> None:
 
     # ──────────── (c) Tasks ────────────────────────────────────────
     print(f"# pulling Tasks for {len(family_arefs)} ARefs (incl. historical)…", flush=True)
-    placeholder_in = ",".join(str(t) for t in TASK_WHITELIST.keys())
     for chunk in chunked(family_arefs, 1500):
         ph = ",".join(["?"] * len(chunk))
         cur.execute(
@@ -694,20 +792,22 @@ def main() -> None:
             FROM dbo.Tasks
             WHERE [{tasks_aref}] IN ({ph})
               AND [{tasks_done}] IS NOT NULL
-              AND [{tasks_type}] IN ({placeholder_in})
             """,
             chunk,
         )
         for aref, ttid, gtref, done, descr in cur.fetchall():
             ttid = int(ttid)
             who = "GT" if gtref is not None else "BRW"
-            human_label = TASK_WHITELIST.get(ttid, f"Task #{ttid}")
-            descr_str = (descr or "").strip()
-            # Tasks.Description is the bare suffix ("All", "ColumboPage" etc).
-            # Prepend the whitelist human label so the timeline reads cleanly.
+            # Prefer warehouse TaskTypes.TaskName; fall back to our hardcoded
+            # labels for any id missing from the lookup; final fallback the
+            # Tasks.Description column.
+            human_label = (
+                task_type_labels.get(ttid)
+                or TASK_FALLBACK_LABELS.get(ttid)
+                or (descr or "").strip()
+                or f"Task #{ttid}"
+            )
             label_stem = human_label
-            if descr_str and descr_str.lower() not in human_label.lower():
-                label_stem = f"{human_label} ({descr_str})"
             ev = {
                 "kind": "task_completed",
                 "at": iso(done),
@@ -869,8 +969,10 @@ def main() -> None:
     leads_aref = pick(leads_cols, "ARef", "Aref")
     leads_dt = pick(leads_cols, "DateCreatedUtc", "DateCreatedUTC", "DateReceivedUtc", "InterestingDateTimeUtc")
     leads_result = pick(leads_cols, "LeadResultTypeId", "LeadResultId", "ResultTypeId")
-    leads_broker = pick(leads_cols, "BrokerId")
-    leads_source = pick(leads_cols, "SourceId")
+    # Leads in the warehouse holds CampaignId (Brokers-namespace) but not
+    # BrokerId or SourceId directly — we resolve those via Brokers.Campaigns.
+    leads_broker = pick(leads_cols, "BrokerId", "CampaignId")
+    leads_source = pick(leads_cols, "SourceId", "sourcehistoryid")
     leads_amount = pick(leads_cols, "LoanAmountRequested", "LoanAmount", "RequestedLoanAmount")
     leads_term = pick(leads_cols, "TermRequested", "Term")
     leads_purpose = pick(leads_cols, "LoanPurposeTypeId", "LoanPurposeId", "LoanPurpose")
@@ -958,10 +1060,29 @@ def main() -> None:
                     p_label = fmt_purpose(purpose)
                     if p_label:
                         details.append(["Lead purpose", p_label])
-                    if broker is not None:
-                        details.append(["Broker", str(broker)])
+                    # Resolve broker via CampaignId → Campaigns.SourceId →
+                    # Sources.FriendlyName. The Lead.CampaignId we have here
+                    # is the Brokers-namespace campaign, not the Message
+                    # Factory one.
+                    resolved_source_id = None
+                    resolved_campaign_name = None
+                    if broker is not None and int(broker) in broker_campaigns:
+                        meta_c = broker_campaigns[int(broker)]
+                        resolved_campaign_name = meta_c.get("name")
+                        resolved_source_id = meta_c.get("source_id")
+                    if source is None and resolved_source_id is not None:
+                        source = resolved_source_id
                     if source is not None:
-                        details.append(["Source", str(source)])
+                        try:
+                            s_label = broker_sources.get(int(source))
+                        except (ValueError, TypeError):
+                            s_label = None
+                        details.append(["Broker", s_label or f"Source {source}"])
+                    if resolved_campaign_name:
+                        details.append(["Broker campaign", resolved_campaign_name])
+                    elif broker is not None:
+                        # Couldn't resolve — show raw CampaignId for traceability
+                        details.append(["Broker campaign id", str(broker)])
                     if rtype is not None:
                         try:
                             r_label = lead_result_labels.get(int(rtype), f"Result code {int(rtype)}")
