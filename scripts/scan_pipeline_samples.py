@@ -1040,6 +1040,22 @@ def main() -> None:
         finally:
             probe.close()
 
+    # First list every campaign-related table we can see in
+    # ReportingCommunications so we know what's actually available.
+    try:
+        cur.execute(
+            """
+            SELECT TABLE_SCHEMA, TABLE_NAME
+            FROM INFORMATION_SCHEMA.TABLES
+            WHERE TABLE_NAME LIKE '%ampaign%' OR TABLE_NAME LIKE '%essage%'
+            ORDER BY TABLE_NAME
+            """
+        )
+        comms_tables = [(r[0], r[1]) for r in cur.fetchall()]
+        print(f"# ReportingCommunications campaign/message tables: {comms_tables}", flush=True)
+    except Exception as e:
+        print(f"# table-list probe failed: {e}", flush=True)
+
     for db_candidate in (
         "ReportingCommunications",  # next to Messages
         "ReportingCRM",
@@ -1050,8 +1066,42 @@ def main() -> None:
         if load_campaigns_from(db_candidate):
             break
 
+    # Per-message MessageType from MessagesToSend (per wiki §9.2). This table
+    # may have been pruned for already-sent messages, so it's a best-effort
+    # backfill for any campaigns we couldn't resolve.
+    msg_type_by_msgid: dict[int, str] = {}
+    try:
+        mts_cols = discover_columns(cur, "MessagesToSend")
+    except Exception:
+        mts_cols = set()
+    if mts_cols:
+        mts_id = pick(mts_cols, "MessageId", "MessagesToSendId")
+        mts_type = pick(mts_cols, "MessageType", "Type", "Channel")
+        mts_camp = pick(mts_cols, "CampaignId")
+        print(f"# MessagesToSend cols: id={mts_id} type={mts_type} camp={mts_camp}", flush=True)
+        if mts_id and mts_type:
+            cur.execute(f"SELECT TOP 1 [{mts_type}] FROM dbo.MessagesToSend")
+            sample = cur.fetchall()
+            print(f"#   MessagesToSend sample type: {sample}", flush=True)
+            # Could be huge — load distinct (CampaignId, MessageType) pairs as
+            # a campaign-level fallback rather than per-message.
+            if mts_camp:
+                cur.execute(
+                    f"SELECT DISTINCT [{mts_camp}], [{mts_type}] FROM dbo.MessagesToSend WHERE [{mts_type}] IS NOT NULL"
+                )
+                added = 0
+                for cid, mtype in cur.fetchall():
+                    if cid is None: continue
+                    cid_i = int(cid)
+                    if cid_i not in campaign_meta:
+                        campaign_meta[cid_i] = {"name": None, "type": (mtype or "").strip() or None, "description": None}
+                        added += 1
+                print(f"#   filled {added} campaign types from MessagesToSend", flush=True)
+
     if not campaign_meta:
-        print("# No Campaigns table found anywhere — falling back to (S)/(E) heuristic", flush=True)
+        print("# No Campaign metadata available — falling back to (S)/(E) heuristic", flush=True)
+    else:
+        print(f"# Total campaigns with metadata: {len(campaign_meta)}", flush=True)
     if msg_aref and msg_dt:
         for chunk in chunked(family_arefs, 1500):
             ph = ",".join(["?"] * len(chunk))
