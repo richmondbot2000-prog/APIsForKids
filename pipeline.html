@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Pipeline</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778438233">
-<link rel="stylesheet" href="quiet.css?v=1778438233">
-<link rel="stylesheet" href="quiet-extras.css?v=1778438233">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778440019">
+<link rel="stylesheet" href="quiet.css?v=1778440019">
+<link rel="stylesheet" href="quiet-extras.css?v=1778440019">
 <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js" crossorigin="anonymous"></script>
 <style>
@@ -205,13 +205,137 @@
     font: italic 400 15px/1.5 var(--font-display);
     color: var(--ink-500);
   }
+
+  /* ── Per-endpoint customer samples ───────────────────────────────── */
+  .pl-samples-hint {
+    font: italic 400 12px/1.4 var(--font-display);
+    color: var(--ink-500);
+    margin: -6px 0 12px;
+  }
+  .pl-samples-panel {
+    background: var(--paper-50);
+    border: 1px solid var(--paper-300);
+    padding: 18px 18px 6px;
+    margin: 0 0 14px;
+    position: relative;
+  }
+  .pl-samples-panel::before {
+    content: ""; position: absolute; inset: 4px;
+    border: 1px solid var(--brass-300); opacity: 0.4; pointer-events: none;
+  }
+  .pl-samples-empty {
+    font: italic 400 14px/1.5 var(--font-display);
+    color: var(--ink-500);
+    text-align: center;
+    padding: 14px 0;
+  }
+  .pl-samples-head {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px;
+    margin: 0 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--paper-300);
+  }
+  .pl-samples-title {
+    font: italic 500 18px/1.2 var(--font-display);
+    color: var(--red-500);
+    margin: 0;
+  }
+  .pl-samples-meta {
+    font: 500 11px/1 var(--font-mono);
+    color: var(--ink-500);
+    letter-spacing: 0.04em;
+  }
+  .pl-samples-close {
+    margin-left: auto;
+    background: transparent;
+    border: 1px solid var(--ink-300);
+    color: var(--ink-700);
+    font: 500 11px/1 var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 6px 10px;
+    cursor: pointer;
+  }
+  .pl-samples-close:hover { background: var(--paper-100); border-color: var(--ink-500); }
+
+  .pl-customer {
+    border-top: 1px dashed var(--paper-300);
+    padding: 0;
+  }
+  .pl-customer:first-of-type { border-top: none; }
+  .pl-customer summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 10px 4px;
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 14px;
+  }
+  .pl-customer summary::-webkit-details-marker { display: none; }
+  .pl-customer summary::before {
+    content: "▸"; color: var(--ink-500); font-size: 12px;
+    transition: transform 0.12s;
+    display: inline-block;
+  }
+  .pl-customer[open] > summary::before { transform: rotate(90deg); }
+  .pl-customer-aref {
+    font: 500 14px/1 var(--font-mono);
+    color: var(--ink-900);
+  }
+  .pl-customer-count {
+    font: 400 12px/1 var(--font-display);
+    color: var(--ink-500);
+    font-style: italic;
+  }
+  .pl-timeline {
+    list-style: none;
+    margin: 4px 0 14px;
+    padding: 0 8px 8px 28px;
+    border-left: 1px solid var(--paper-300);
+  }
+  .pl-event {
+    padding: 4px 0;
+    font: 400 13px/1.4 var(--font-display);
+    color: var(--ink-700);
+    display: grid;
+    grid-template-columns: 152px 110px 1fr;
+    gap: 10px;
+  }
+  .pl-event-when {
+    font: 500 11px/1.4 var(--font-mono);
+    color: var(--ink-500);
+    white-space: nowrap;
+  }
+  .pl-event-kind {
+    font: 500 10px/1.4 var(--font-body);
+    text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--ink-500);
+  }
+  .pl-event-body { color: var(--ink-900); }
+  .pl-event.app    { background: rgba(180, 145, 80, 0.08); }
+  .pl-event.task   .pl-event-kind { color: var(--brass-600); }
+  .pl-event.sig    .pl-event-kind { color: var(--brass-600); }
+  .pl-event.web    .pl-event-kind { color: var(--ink-500); }
+  .pl-event.msg-in .pl-event-kind { color: var(--sage-600, #5e7a48); }
+  .pl-event.msg-out .pl-event-kind { color: var(--ink-700); }
+  .pl-event.msg-redacted .pl-event-body {
+    font-style: italic; color: var(--ink-500);
+  }
+  .pl-event-channel {
+    font: 500 10px/1.2 var(--font-mono);
+    color: var(--ink-500);
+    margin-right: 6px;
+  }
+
+  .pl-samples-panel.is-target {
+    box-shadow: 0 0 0 2px var(--brass-500);
+    transition: box-shadow 0.5s;
+  }
 </style>
 </head>
 <body>
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778438233" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778440019" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -257,6 +381,9 @@
       <div id="plAppCanvas"></div>
     </div>
 
+    <p class="pl-samples-hint" id="plSamplesHint" hidden>Click any red drop on the diagram above to see 25 random customers who ended their journey there, with every web visit, application step, signature, message and call in date order.</p>
+    <div id="plSamplesPanel"></div>
+
     <div class="pl-canvas-wrap" id="plRejectWrap" hidden>
       <h2 class="pl-canvas-title">Lead result detail</h2>
       <p class="pl-canvas-sub">Every LeadResultTypeId code, sorted by volume.</p>
@@ -286,14 +413,35 @@
 </main>
 
 <script>
-  fetch("pipeline.json", { cache: "no-store" })
-    .then(r => r.ok ? r.json() : Promise.reject("pipeline.json HTTP " + r.status))
-    .then(render)
-    .catch(err => {
-      const c = document.getElementById("plCanvas");
-      c.innerHTML = `<div class="pl-empty">No data yet. The refresh-pipeline workflow will populate <code>pipeline.json</code> on its next run. (${err})</div>`;
-      document.getElementById("plMeta").textContent = "pipeline.json not loaded — " + err;
-    });
+  let SAMPLES = null;  // populated when pipeline-samples.json arrives
+
+  Promise.all([
+    fetch("pipeline.json", { cache: "no-store" }).then(r => r.ok ? r.json() : Promise.reject("pipeline.json HTTP " + r.status)),
+    fetch("pipeline-samples.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+  ]).then(([pipeline, samples]) => {
+    SAMPLES = samples;
+    if (samples && samples.endpoints) {
+      const hint = document.getElementById("plSamplesHint");
+      if (hint) hint.hidden = false;
+    }
+    render(pipeline);
+  }).catch(err => {
+    const c = document.getElementById("plLeadCanvas");
+    c.innerHTML = `<div class="pl-empty">No data yet. The refresh-pipeline workflow will populate <code>pipeline.json</code> on its next run. (${err})</div>`;
+    document.getElementById("plMeta").textContent = "pipeline.json not loaded — " + err;
+  });
+
+  // Maps drop-node names in the application progression Sankey to the
+  // matching endpoint key in pipeline-samples.json. Built dynamically once
+  // we know the actual drop_label strings used by pipeline.json.
+  const STAGE_KEY_TO_ENDPOINT = {
+    apply1:      "abandoned_before_page1",
+    invite_gt:   "dropped_before_brw_signed",
+    gt_accepted: "no_accepted_guarantor",
+    vc_ready:    "no_vc_reached",
+    paid_out:    "vc_ready_not_paid_out",
+  };
+  let DROP_NAME_TO_ENDPOINT = {};
 
   function render(d) {
     document.getElementById("plMonth").textContent = `in ${d.month_label || d.month}`;
@@ -462,6 +610,12 @@
       .append("title")
       .text(l => `${l.source.name} → ${l.target.name}\n${formatNumber(l.value)} (${((l.value / l.source.value) * 100).toFixed(1)}% of ${l.source.name})`);
 
+    const isClickable = n => !!n.endpointKey;
+    const onNodeClick = n => {
+      if (!isClickable(n)) return;
+      showSamples(n.endpointKey, n.name);
+    };
+
     const nodeG = svg.append("g")
       .attr("stroke", "var(--ink-700)")
       .attr("stroke-width", 0.5)
@@ -472,8 +626,10 @@
       .attr("y", n => n.y0)
       .attr("height", n => Math.max(1, n.y1 - n.y0))
       .attr("width", n => n.x1 - n.x0)
-      .attr("fill", colour);
-    nodeG.append("title").text(n => `${n.name}\n${formatNumber(n.value)}`);
+      .attr("fill", colour)
+      .style("cursor", n => isClickable(n) ? "pointer" : "default")
+      .on("click", (_, n) => onNodeClick(n));
+    nodeG.append("title").text(n => `${n.name}\n${formatNumber(n.value)}` + (isClickable(n) ? "\n\n(click to see 25 random customers who ended here)" : ""));
 
     svg.append("g")
       .selectAll("text")
@@ -484,6 +640,9 @@
       .attr("dy", "0.35em")
       .attr("text-anchor", n => n.x0 < W / 2 ? "start" : "end")
       .attr("class", n => n.kind === "drop" ? "pl-drop-label" : "pl-stage-label")
+      .style("cursor", n => isClickable(n) ? "pointer" : "default")
+      .style("text-decoration", n => isClickable(n) ? "underline" : "none")
+      .on("click", (_, n) => onNodeClick(n))
       .each(function (n) {
         const sel = d3.select(this);
         sel.append("tspan").text(n.name);
@@ -531,6 +690,8 @@
     const purchasedToApp = d.apps.purchased_path || 0;       // 592k — actually became applications in March
     const purchasedNoApp = Math.max(0, purchasedTotal - purchasedToApp);
 
+    DROP_NAME_TO_ENDPOINT = {};   // reset on each render
+
     const nodes = [
       { name: "Leads purchased", kind: "purchased" },
       { name: "Direct applications", kind: "entry" },
@@ -541,16 +702,23 @@
       { source: "Direct applications", target: "Application started", value: d.apps.direct_path || 0 },
     ];
     if (purchasedNoApp > 0) {
+      // No ARef on these — sample data isn't available, so this stays
+      // non-interactive.
       nodes.push({ name: "Purchased lead — no application yet", kind: "drop" });
       links.push({ source: "Leads purchased", target: "Purchased lead — no application yet", value: purchasedNoApp });
     }
 
     function pipelineStage(fromName, toStage) {
-      nodes.push({ name: toStage.label, kind: toStage.key === "paid_out" ? "terminal" : "stage" });
+      const isPaidOut = toStage.key === "paid_out";
+      // Continuing flow → next stage node (interactive only for "paid out"
+      // drop, which is "VC ready but not paid out").
+      nodes.push({ name: toStage.label, kind: isPaidOut ? "terminal" : "stage" });
       links.push({ source: fromName, target: toStage.label, value: toStage.count || 0 });
       if (toStage.drop_count > 0) {
         const dropName = toStage.drop_label || `Dropped at ${toStage.label}`;
-        nodes.push({ name: dropName, kind: "drop" });
+        const endpointKey = STAGE_KEY_TO_ENDPOINT[toStage.key] || null;
+        if (endpointKey) DROP_NAME_TO_ENDPOINT[dropName] = endpointKey;
+        nodes.push({ name: dropName, kind: "drop", endpointKey });
         links.push({ source: fromName, target: dropName, value: toStage.drop_count });
       }
       return toStage.label;
@@ -693,6 +861,102 @@
 
   function stageByKey(d, key) {
     return d.stages.find(s => s.key === key) || { count: 0, drop_count: 0 };
+  }
+
+  // ─── Per-endpoint customer samples ────────────────────────────────
+  function showSamples(endpointKey, dropNodeName) {
+    const panel = document.getElementById("plSamplesPanel");
+    if (!SAMPLES) {
+      panel.innerHTML = `<div class="pl-samples-panel"><div class="pl-samples-empty">Customer samples haven't been generated yet — the refresh-pipeline-samples workflow needs to run.</div></div>`;
+      panel.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    const customers = (SAMPLES.endpoints && SAMPLES.endpoints[endpointKey]) || [];
+    const label = (SAMPLES.endpoint_labels && SAMPLES.endpoint_labels[endpointKey]) || dropNodeName;
+    if (!customers.length) {
+      panel.innerHTML = `<div class="pl-samples-panel">
+        <div class="pl-samples-head">
+          <h3 class="pl-samples-title">${escapeHtml(dropNodeName)}</h3>
+          <button class="pl-samples-close" onclick="closeSamples()">close</button>
+        </div>
+        <div class="pl-samples-empty">No sampled customers for this endpoint yet.</div>
+      </div>`;
+    } else {
+      const stamp = SAMPLES.snapshot_at
+        ? new Date(SAMPLES.snapshot_at).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "UTC" }) + " UTC"
+        : "";
+      const rowsHtml = customers.map(c => renderCustomer(c)).join("");
+      panel.innerHTML = `<div class="pl-samples-panel is-target">
+        <div class="pl-samples-head">
+          <h3 class="pl-samples-title">${escapeHtml(dropNodeName)}</h3>
+          <span class="pl-samples-meta">${customers.length} random customers · sampled ${escapeHtml(stamp)}</span>
+          <button class="pl-samples-close" onclick="closeSamples()">close</button>
+        </div>
+        ${rowsHtml}
+      </div>`;
+      // Drop the highlight after a moment
+      setTimeout(() => {
+        const el = panel.querySelector(".pl-samples-panel");
+        if (el) el.classList.remove("is-target");
+      }, 1200);
+    }
+    panel.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function closeSamples() {
+    document.getElementById("plSamplesPanel").innerHTML = "";
+  }
+
+  function renderCustomer(c) {
+    const events = (c.interactions || []).map(renderEvent).join("");
+    return `<details class="pl-customer">
+      <summary>
+        <span class="pl-customer-aref">${escapeHtml(c.aref)}</span>
+        <span class="pl-customer-count">${c.interaction_count} event${c.interaction_count === 1 ? "" : "s"}</span>
+      </summary>
+      <ol class="pl-timeline">${events || '<li class="pl-event"><span class="pl-event-when">—</span><span class="pl-event-kind"></span><span class="pl-event-body"><em>(no recorded interactions)</em></span></li>'}</ol>
+    </details>`;
+  }
+
+  function renderEvent(e) {
+    const when = formatEventTime(e.at);
+    let cls, kindLabel, body;
+    switch (e.kind) {
+      case "application_started":
+        cls = "app"; kindLabel = "Application"; body = e.label || "Application started"; break;
+      case "task_completed":
+        cls = "task"; kindLabel = "Task"; body = e.label || ""; break;
+      case "signature":
+        cls = "sig"; kindLabel = "Signature"; body = e.label || "Signature"; break;
+      case "web_visit":
+        cls = "web"; kindLabel = "Web"; body = e.label || "Web visit"; break;
+      case "message_in":
+        cls = "msg-in"; kindLabel = e.channel || "Inbound";
+        body = e.redacted ? `<em>${escapeHtml(e.label || "redacted")}</em>` : escapeHtml(e.body || "");
+        if (e.redacted) cls += " msg-redacted";
+        break;
+      case "message_out":
+        cls = "msg-out"; kindLabel = e.channel || "Outbound";
+        body = e.redacted ? `<em>&lt;${escapeHtml(formatEventTime(e.at))}, ${escapeHtml(e.label || "Message from MessageBot")}&gt;</em>` : escapeHtml(e.body || "");
+        if (e.redacted) cls += " msg-redacted";
+        break;
+      default:
+        cls = ""; kindLabel = e.kind || ""; body = e.label || "";
+    }
+    return `<li class="pl-event ${cls}">
+      <span class="pl-event-when">${escapeHtml(when)}</span>
+      <span class="pl-event-kind">${escapeHtml(kindLabel)}</span>
+      <span class="pl-event-body">${body}</span>
+    </li>`;
+  }
+
+  function formatEventTime(iso) {
+    if (!iso) return "—";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    const date = d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "2-digit", timeZone: "UTC" });
+    const time = d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" });
+    return `${date} ${time}`;
   }
 
   function formatNumber(n) {
