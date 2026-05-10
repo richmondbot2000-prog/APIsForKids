@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Top Ups</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778407491">
-<link rel="stylesheet" href="quiet.css?v=1778407491">
-<link rel="stylesheet" href="quiet-extras.css?v=1778407491">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778409312">
+<link rel="stylesheet" href="quiet.css?v=1778409312">
+<link rel="stylesheet" href="quiet-extras.css?v=1778409312">
 <style>
   .tu-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .tu-section { padding: 2px 0 32px; } }
@@ -76,7 +76,8 @@
     display: inline-block; width: 14px; height: 14px;
     border: 1px solid var(--ink-700);
   }
-  .tu-legend-swatch.bar { background: var(--ink-300); border-color: var(--ink-500); }
+  .tu-legend-swatch.bar-primary { background: var(--ink-300); border-color: var(--ink-500); }
+  .tu-legend-swatch.bar-topup   { background: var(--brass-300); border-color: var(--brass-500); }
   .tu-legend-swatch.line {
     height: 2px; border: none; background: var(--red-500); width: 22px;
     position: relative;
@@ -100,8 +101,9 @@
   .tu-x-label { font: 500 10px/1 var(--font-mono); fill: var(--ink-600); }
   .tu-x-label-current { fill: var(--red-500); font-weight: 700; }
 
-  .tu-bar { fill: var(--ink-300); stroke: var(--ink-500); stroke-width: 0.5; }
-  .tu-bar:hover { fill: var(--brass-300); }
+  .tu-bar-primary { fill: var(--ink-300); stroke: var(--ink-500); stroke-width: 0.5; }
+  .tu-bar-topup   { fill: var(--brass-300); stroke: var(--brass-500); stroke-width: 0.5; }
+  .tu-bar-primary:hover, .tu-bar-topup:hover { opacity: 0.85; }
   .tu-line { fill: none; stroke: var(--red-500); stroke-width: 2; }
   .tu-dot {
     fill: var(--red-500); stroke: var(--paper-50); stroke-width: 1.5;
@@ -172,7 +174,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778407491" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778409312" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -201,9 +203,10 @@
 
     <div class="tu-chart-wrap">
       <h2 class="tu-chart-title">Monthly counts, last 24 months</h2>
-      <p class="tu-chart-sub">Each bar is the number of distinct Transform Credit loans that were live in that month. The line tracks how many of those loans were <em>top-up eligible</em> at any point that month.</p>
+      <p class="tu-chart-sub">Each bar is the number of distinct Transform Credit loans that were live in that month, split between <em>primary</em> loans (the customer's first loan) and <em>top-up</em> loans (the customer already had a loan when this one was paid out — the existing loan was settled at payout). The line tracks how many of those loans were <em>top-up eligible</em> at any point that month.</p>
       <div class="tu-legend">
-        <span class="tu-legend-item"><span class="tu-legend-swatch bar"></span>Live loans</span>
+        <span class="tu-legend-item"><span class="tu-legend-swatch bar-primary"></span>Primary loans</span>
+        <span class="tu-legend-item"><span class="tu-legend-swatch bar-topup"></span>Top-up loans</span>
         <span class="tu-legend-item"><span class="tu-legend-swatch line"></span>Top-up eligible</span>
       </div>
       <div id="tuChart"></div>
@@ -213,7 +216,9 @@
       <table class="tu-table" id="tuTable" aria-label="Monthly counts">
         <thead><tr>
           <th>Month</th>
-          <th>Live loans</th>
+          <th>Primary loans</th>
+          <th>Top-up loans</th>
+          <th>Live total</th>
           <th>Top-up eligible</th>
           <th>Eligible %</th>
         </tr></thead>
@@ -290,14 +295,20 @@
       svg.push(`<text class="tu-axis-tick" x="${PAD.left - 8}" y="${y + 3}" text-anchor="end">${formatNumber(v)}</text>`);
     });
 
-    // Bars (live loans)
+    // Stacked bars: primary at the bottom, top-up on top.
     const barW = Math.max(xStep * 0.62, 4);
     series.forEach((s, i) => {
       const cx = xScale(i, true);
       const x = cx - barW / 2;
-      const y = yScale(s.live_loans);
-      const h = (PAD.top + innerH) - y;
-      svg.push(`<rect class="tu-bar" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}"><title>${escapeHtml(s.month)}: ${formatNumber(s.live_loans)} live loans</title></rect>`);
+      const yPrimary = yScale(s.live_primary);
+      const yTotal = yScale(s.live_loans);
+      const baseline = PAD.top + innerH;
+      const hPrimary = baseline - yPrimary;
+      const hTopup = yPrimary - yTotal;
+      svg.push(`<rect class="tu-bar-primary" x="${x.toFixed(1)}" y="${yPrimary.toFixed(1)}" width="${barW.toFixed(1)}" height="${hPrimary.toFixed(1)}"><title>${escapeHtml(s.month)}: ${formatNumber(s.live_primary)} primary loans</title></rect>`);
+      if (hTopup > 0.5) {
+        svg.push(`<rect class="tu-bar-topup" x="${x.toFixed(1)}" y="${yTotal.toFixed(1)}" width="${barW.toFixed(1)}" height="${hTopup.toFixed(1)}"><title>${escapeHtml(s.month)}: ${formatNumber(s.live_topup)} top-up loans</title></rect>`);
+      }
     });
 
     // Line (TUE eligible)
@@ -339,6 +350,8 @@
       const pct = s.live_loans > 0 ? ((s.tue_eligible / s.live_loans) * 100) : 0;
       return `<tr>
         <td>${escapeHtml(longMonth(s.month))}</td>
+        <td class="num">${formatNumber(s.live_primary)}</td>
+        <td class="num">${formatNumber(s.live_topup)}</td>
         <td class="num">${formatNumber(s.live_loans)}</td>
         <td class="num">${formatNumber(s.tue_eligible)}</td>
         <td class="pct">${pct.toFixed(1)}%</td>

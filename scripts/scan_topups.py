@@ -211,9 +211,59 @@ def main() -> None:
     # warehouse vintage). We pre-filter LoanbookIds in a CTE then aggregate
     # snapshots — keeps the join cheap on the 197M-row source.
     lender_table = discover_lender_table(cur) if LENDER_ID is not None else None
-    if LENDER_ID is not None:
-        if not lender_table:
-            sys.exit(f"error: no table in {DATABASE}.{TABLE_SCHEMA}.* has both LoanbookId AND LenderId columns")
+    if LENDER_ID is not None and not lender_table:
+        sys.exit(f"error: no table in {DATABASE}.{TABLE_SCHEMA}.* has both LoanbookId AND LenderId columns")
+
+    # Detect whether the lender_table has TopUpAmountAtInception so we can
+    # split live loans into Primary vs Top-Up. Per the wiki this column is
+    # set at payout for top-up loans only and null otherwise.
+    if lender_table:
+        cur.execute(
+            """
+            SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND COLUMN_NAME = 'TopUpAmountAtInception'
+            """,
+            [TABLE_SCHEMA, lender_table],
+        )
+        has_topup_col = cur.fetchone() is not None
+    else:
+        has_topup_col = False
+    print(f"# top-up classifier on {lender_table}: TopUpAmountAtInception present = {has_topup_col}", flush=True)
+
+    if LENDER_ID is not None and has_topup_col:
+        q = f"""
+            WITH lender_loans AS (
+                SELECT LoanbookId,
+                       CASE WHEN TopUpAmountAtInception IS NOT NULL THEN 1 ELSE 0 END AS is_topup
+                FROM [{TABLE_SCHEMA}].[{lender_table}]
+                WHERE LenderId = ?
+            ),
+            per_loan_month AS (
+                SELECT
+                    DATEFROMPARTS(YEAR(lh.[{ts}]), MONTH(lh.[{ts}]), 1) AS month_start,
+                    lh.LoanbookId,
+                    ll.is_topup,
+                    MAX(CASE WHEN lh.TueStatus = 1 THEN 1 ELSE 0 END) AS was_tue
+                FROM [{TABLE_SCHEMA}].[{TABLE_NAME}] lh
+                INNER JOIN lender_loans ll ON ll.LoanbookId = lh.LoanbookId
+                WHERE lh.[{ts}] >= ?
+                  AND lh.LoanbookId IS NOT NULL
+                GROUP BY DATEFROMPARTS(YEAR(lh.[{ts}]), MONTH(lh.[{ts}]), 1), lh.LoanbookId, ll.is_topup
+            )
+            SELECT
+                month_start,
+                SUM(CASE WHEN is_topup = 0 THEN 1 ELSE 0 END) AS live_primary,
+                SUM(CASE WHEN is_topup = 1 THEN 1 ELSE 0 END) AS live_topup,
+                SUM(was_tue) AS tue_eligible
+            FROM per_loan_month
+            GROUP BY month_start
+            ORDER BY month_start;
+        """
+        params = [LENDER_ID, cutoff]
+        cur.execute(q, params)
+        rows = [(r[0], int(r[1]), int(r[2]), int(r[3])) for r in cur.fetchall()]
+    elif LENDER_ID is not None:
+        # Fallback: lender filter only, no primary/topup split.
         q = f"""
             WITH lender_loans AS (
                 SELECT DISTINCT LoanbookId
@@ -231,12 +281,14 @@ def main() -> None:
                   AND lh.LoanbookId IS NOT NULL
                 GROUP BY DATEFROMPARTS(YEAR(lh.[{ts}]), MONTH(lh.[{ts}]), 1), lh.LoanbookId
             )
-            SELECT month_start, COUNT(*) AS live_loans, SUM(was_tue) AS tue_eligible
+            SELECT month_start, COUNT(*) AS live_loans, 0 AS live_topup, SUM(was_tue) AS tue_eligible
             FROM per_loan_month
             GROUP BY month_start
             ORDER BY month_start;
         """
         params = [LENDER_ID, cutoff]
+        cur.execute(q, params)
+        rows = [(r[0], int(r[1]), int(r[2]), int(r[3])) for r in cur.fetchall()]
     else:
         q = f"""
             WITH per_loan_month AS (
@@ -249,20 +301,16 @@ def main() -> None:
                   AND LoanbookId IS NOT NULL
                 GROUP BY DATEFROMPARTS(YEAR([{ts}]), MONTH([{ts}]), 1), LoanbookId
             )
-            SELECT month_start, COUNT(*) AS live_loans, SUM(was_tue) AS tue_eligible
+            SELECT month_start, COUNT(*) AS live_loans, 0 AS live_topup, SUM(was_tue) AS tue_eligible
             FROM per_loan_month
             GROUP BY month_start
             ORDER BY month_start;
         """
         params = [cutoff]
+        cur.execute(q, params)
+        rows = [(r[0], int(r[1]), int(r[2]), int(r[3])) for r in cur.fetchall()]
     print(f"# running aggregation query…  lender filter: {LENDER_LABEL if LENDER_ID is not None else 'NONE (all lenders)'}", flush=True)
-    cur.execute(q, params)
-    rows = [(r[0], int(r[1]), int(r[2])) for r in cur.fetchall()]
     print(f"# returned {len(rows)} month rows", flush=True)
-    try:
-        c.close()
-    except Exception:
-        pass
 
     # Build the output: ensure every month in the window is present (zeros if
     # absent) so the chart's x-axis is dense.
@@ -272,12 +320,14 @@ def main() -> None:
     for _ in range(WINDOW_MONTHS):
         bucket = by_month.get((y, m))
         if bucket:
-            _, live, tue = bucket
+            _, live_primary, live_topup, tue = bucket
         else:
-            live, tue = 0, 0
+            live_primary, live_topup, tue = 0, 0, 0
         series.append({
             "month": f"{y:04d}-{m:02d}",
-            "live_loans": live,
+            "live_primary": live_primary,
+            "live_topup":   live_topup,
+            "live_loans":   live_primary + live_topup,
             "tue_eligible": tue,
         })
         m += 1
@@ -286,7 +336,9 @@ def main() -> None:
             y += 1
 
     # Totals across the window — useful headline numbers.
-    total_live = sum(s["live_loans"] for s in series)
+    total_primary = sum(s["live_primary"] for s in series)
+    total_topup = sum(s["live_topup"] for s in series)
+    total_live = total_primary + total_topup
     total_tue = sum(s["tue_eligible"] for s in series)
 
     # Pull this lender's actual TUE thresholds. Try the lender_table we already
@@ -302,6 +354,11 @@ def main() -> None:
             except Exception as e:
                 print(f"# threshold fallback failed: {e}", flush=True)
 
+    try:
+        c.close()
+    except Exception:
+        pass
+
     output = {
         "snapshot_at": started.isoformat(),
         "snapshot_date": today.isoformat(),
@@ -314,6 +371,8 @@ def main() -> None:
         "lender_thresholds": lender_thresholds,
         "totals": {
             "live_loans_loan_months":   total_live,   # SUM, not distinct
+            "live_primary_loan_months": total_primary,
+            "live_topup_loan_months":   total_topup,
             "tue_eligible_loan_months": total_tue,
         },
         "series": series,
