@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778365323">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778365323">
-<link rel="stylesheet" href="quiet.css?v=1778365323">
-<link rel="stylesheet" href="quiet-extras.css?v=1778365323">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778365323">
+<link rel="stylesheet" href="style.css?v=1778402906">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778402906">
+<link rel="stylesheet" href="quiet.css?v=1778402906">
+<link rel="stylesheet" href="quiet-extras.css?v=1778402906">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778402906">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -257,7 +257,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778365323" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778402906" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -282,9 +282,14 @@
 
       <div class="dir-controls" id="dirControls" hidden>
         <input type="search" class="dir-search" id="dirSearch" placeholder="Search by name, title, email, or department…">
+        <div class="dir-filter-row" id="dirTenantRow">
+          <span class="dir-filter-label">Tenant</span>
+          <button class="dir-pill dir-pill--tenant active" data-value="all">All <span class="dir-pill-count" id="dirTenantCountAll">0</span></button>
+          <!-- tenant pills injected dynamically -->
+        </div>
         <div class="dir-filter-row" id="dirDeptRow">
           <span class="dir-filter-label">Department</span>
-          <button class="dir-pill active" data-value="all">All <span class="dir-pill-count" id="dirCountAll">0</span></button>
+          <button class="dir-pill dir-pill--dept active" data-value="all">All <span class="dir-pill-count" id="dirCountAll">0</span></button>
           <!-- department pills injected dynamically from the data -->
         </div>
       </div>
@@ -304,6 +309,7 @@
   // Staff entries always have user; external entries always have activity.
   let allEntries = [];
   let activeDept = "all";
+  let activeTenant = "all";
   let searchTerm = "";
 
   // Tenant priority: transform/together → RG internal (rgroup, rgdc, letme) → other.
@@ -371,7 +377,15 @@
         const d = e.user.department || "(unspecified)";
         byDept[d] = (byDept[d] || 0) + 1;
       }
+      // Tenant pills count both staff and external active people.
+      const byTenant = {};
+      for (const e of allEntries) {
+        const t = e.activity?.primary_tenant;
+        if (!t) continue;
+        byTenant[t] = (byTenant[t] || 0) + 1;
+      }
       buildDeptPills(byDept);
+      buildTenantPills(byTenant);
       document.getElementById("dirControls").hidden = allEntries.length === 0;
       renderGrid();
     })
@@ -387,14 +401,14 @@
       .sort((a, b) => b[1] - a[1])
       .forEach(([name, n]) => {
         const btn = document.createElement("button");
-        btn.className = "dir-pill";
+        btn.className = "dir-pill dir-pill--dept";
         btn.dataset.value = name;
         btn.innerHTML = `${escapeHtml(name)} <span class="dir-pill-count">${n}</span>`;
         row.appendChild(btn);
       });
-    document.querySelectorAll(".dir-pill").forEach(p => {
+    document.querySelectorAll(".dir-pill--dept").forEach(p => {
       p.addEventListener("click", () => {
-        document.querySelectorAll(".dir-pill").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".dir-pill--dept").forEach(b => b.classList.remove("active"));
         p.classList.add("active");
         activeDept = p.dataset.value;
         renderGrid();
@@ -403,6 +417,34 @@
     document.getElementById("dirSearch").addEventListener("input", e => {
       searchTerm = e.target.value.trim().toLowerCase();
       renderGrid();
+    });
+  }
+
+  function buildTenantPills(byTenant) {
+    const row = document.getElementById("dirTenantRow");
+    document.getElementById("dirTenantCountAll").textContent = allEntries.length;
+    // Sort by tenant priority then name so the buckets render in the same
+    // order as the cards themselves.
+    Object.entries(byTenant)
+      .sort((a, b) => {
+        const r = tenantRank(a[0]) - tenantRank(b[0]);
+        if (r !== 0) return r;
+        return a[0].localeCompare(b[0]);
+      })
+      .forEach(([name, n]) => {
+        const btn = document.createElement("button");
+        btn.className = "dir-pill dir-pill--tenant";
+        btn.dataset.value = name;
+        btn.innerHTML = `${escapeHtml(name)} <span class="dir-pill-count">${n}</span>`;
+        row.appendChild(btn);
+      });
+    document.querySelectorAll(".dir-pill--tenant").forEach(p => {
+      p.addEventListener("click", () => {
+        document.querySelectorAll(".dir-pill--tenant").forEach(b => b.classList.remove("active"));
+        p.classList.add("active");
+        activeTenant = p.dataset.value;
+        renderGrid();
+      });
     });
   }
 
@@ -423,6 +465,10 @@
   }
 
   function visible(entry) {
+    if (activeTenant !== "all") {
+      // Tenant filter applies to anyone with activity data, staff or external.
+      if (!entry.activity || entry.activity.primary_tenant !== activeTenant) return false;
+    }
     if (activeDept !== "all") {
       // The dept filter is for Workspace staff; external entries are excluded
       // from the filter view entirely (they don't have a department).
