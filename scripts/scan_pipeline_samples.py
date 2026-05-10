@@ -994,39 +994,64 @@ def main() -> None:
     print(f"# Messages chosen: aref={msg_aref} dt={msg_dt} ct={msg_ctype} body={msg_body} subj={msg_subject} descr={msg_descr} campaign={msg_campaign} campId={msg_camp_id}", flush=True)
 
     # ──────────── Campaign lookup (authoritative SMS/Email/Letter/Push)
-    # Per the wiki §9.1 Campaigns table lives in Central CRM. In the
-    # warehouse we look for it in ReportingCommunications next to
-    # Messages, but probe defensively in case it's been replicated
-    # elsewhere or not at all.
-    campaign_meta: dict[int, dict] = {}  # campaign_id → {type, description, name}
-    try:
-        camp_cols = discover_columns(cur, "Campaigns")
-    except Exception:
-        camp_cols = set()
-    if camp_cols:
-        camp_id = pick(camp_cols, "CampaignId", "CampaignID")
-        camp_name = pick(camp_cols, "CampaignName", "Name")
-        camp_type = pick(camp_cols, "MessageType", "Type", "Channel")
-        camp_desc = pick(camp_cols, "Description", "DisplayName", "Label")
-        print(f"# Campaigns cols: id={camp_id} name={camp_name} type={camp_type} desc={camp_desc}", flush=True)
-        if camp_id and (camp_type or camp_desc):
+    # Per wiki §9.1 the Message Factory Campaigns table is in Central CRM.
+    # Probe Communications first (Messages lives here), then a few other
+    # likely warehouse DBs.
+    campaign_meta: dict[int, dict] = {}
+
+    def load_campaigns_from(database: str) -> int:
+        try:
+            probe = pyodbc.connect(conn_str(database), timeout=10)
+            probe.timeout = 60
+        except Exception as e:
+            print(f"# Campaigns probe in {database}: connect failed ({e})", flush=True)
+            return 0
+        try:
+            pc = probe.cursor()
+            cols = discover_columns(pc, "Campaigns")
+            if not cols:
+                print(f"# Campaigns probe in {database}: no Campaigns table", flush=True)
+                return 0
+            camp_id = pick(cols, "CampaignId", "CampaignID")
+            camp_name = pick(cols, "CampaignName", "Name")
+            camp_type = pick(cols, "MessageType", "Type", "Channel")
+            camp_desc = pick(cols, "Description", "DisplayName", "Label")
+            print(f"# Campaigns probe in {database}: cols id={camp_id} name={camp_name} type={camp_type} desc={camp_desc}", flush=True)
+            if not (camp_id and (camp_type or camp_desc)):
+                return 0
             sel = ", ".join([
                 f"[{camp_id}]",
                 f"[{camp_name}]" if camp_name else "NULL",
                 f"[{camp_type}]" if camp_type else "NULL",
                 f"[{camp_desc}]" if camp_desc else "NULL",
             ])
-            cur.execute(f"SELECT {sel} FROM dbo.Campaigns")
-            for cid, name, mtype, desc in cur.fetchall():
+            pc.execute(f"SELECT {sel} FROM dbo.Campaigns")
+            n = 0
+            for cid, name, mtype, desc in pc.fetchall():
                 if cid is None: continue
                 campaign_meta[int(cid)] = {
                     "name": name,
                     "type": (mtype or "").strip() or None,
                     "description": (desc or "").strip() or None,
                 }
-            print(f"#   loaded {len(campaign_meta)} campaigns", flush=True)
-    else:
-        print("# Campaigns table not found in this database — falling back to (S)/(E) heuristic", flush=True)
+                n += 1
+            print(f"#   {database}.Campaigns: loaded {n} rows", flush=True)
+            return n
+        finally:
+            probe.close()
+
+    for db_candidate in (
+        "ReportingCommunications",  # next to Messages
+        "ReportingCRM",
+        "ReportingApplications",
+        "ReportingMessageFactory",
+        "ReportingAdmin",
+    ):
+        if load_campaigns_from(db_candidate):
+            break
+
+    if not campaign_meta:
+        print("# No Campaigns table found anywhere — falling back to (S)/(E) heuristic", flush=True)
     if msg_aref and msg_dt:
         for chunk in chunked(family_arefs, 1500):
             ph = ",".join(["?"] * len(chunk))
