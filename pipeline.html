@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TogetherBOOK — Pipeline</title>
+<link rel="icon" type="image/png" href="site-icon.png">
+<link rel="apple-touch-icon" href="site-icon.png">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778432585">
+<link rel="stylesheet" href="quiet.css?v=1778432585">
+<link rel="stylesheet" href="quiet-extras.css?v=1778432585">
+<style>
+  .pl-section { max-width: 1200px; margin: 0 auto; padding: 24px 0 48px; }
+  @media (max-width: 800px) { .pl-section { padding: 2px 0 32px; } }
+  .pl-section h1 {
+    font: 400 56px/1.05 var(--font-display);
+    color: var(--ink-900);
+    letter-spacing: -0.018em;
+    margin: 8px 0 12px;
+  }
+  .pl-section .lead {
+    font: 400 17px/1.55 var(--font-display);
+    color: var(--ink-700);
+    margin: 0 0 6px; max-width: 760px;
+  }
+  .pl-section .lead em { color: var(--red-500); font-style: italic; }
+  .pl-meta {
+    color: var(--ink-500);
+    font: 500 11px/1 var(--font-mono);
+    letter-spacing: 0.04em; margin: 12px 0 24px;
+  }
+  .pl-refresh {
+    display: inline-flex; flex-wrap: wrap; align-items: baseline;
+    gap: 10px; padding: 8px 14px;
+    background: var(--paper-50);
+    border: 1px solid var(--paper-300);
+    margin: 12px 0 24px;
+    position: relative;
+  }
+  .pl-refresh::before {
+    content: ""; position: absolute; inset: 3px;
+    border: 1px solid var(--brass-300); opacity: 0.4; pointer-events: none;
+  }
+  .pl-refresh-label {
+    font: 500 10px/1 var(--font-body);
+    text-transform: uppercase; letter-spacing: 0.18em;
+    color: var(--ink-500);
+  }
+  .pl-refresh-stamp {
+    font: italic 500 16px/1.2 var(--font-display);
+    color: var(--ink-900);
+  }
+  .pl-refresh-stamp.is-stale { color: var(--red-500); }
+  .pl-refresh-note {
+    font: italic 400 12px/1.4 var(--font-display);
+    color: var(--ink-500);
+    margin-left: auto;
+  }
+
+  .pl-canvas-wrap {
+    position: relative;
+    background: var(--paper-50);
+    border: 1px solid var(--paper-300);
+    padding: 28px 24px 18px;
+    margin: 0 0 14px;
+    overflow-x: auto;
+  }
+  .pl-canvas-wrap::before {
+    content: ""; position: absolute; inset: 4px;
+    border: 1px solid var(--brass-300); opacity: 0.4; pointer-events: none;
+  }
+  .pl-canvas-title {
+    font: italic 400 15px/1 var(--font-display);
+    color: var(--red-500); letter-spacing: 0.02em;
+    display: flex; align-items: center; gap: 14px;
+    margin: 0 0 14px;
+  }
+  .pl-canvas-title::before {
+    content: ""; flex: 0 0 36px; height: 1px; background: var(--brass-300);
+  }
+
+  .pl-svg { display: block; width: 100%; height: auto; max-height: 620px; }
+  .pl-stage-bar { fill: var(--ink-300); stroke: var(--ink-500); stroke-width: 0.5; }
+  .pl-stage-bar.entry { fill: var(--brass-300); stroke: var(--brass-500); }
+  .pl-stage-bar.terminal { fill: var(--sage-500); stroke: var(--sage-700); }
+  .pl-flow { fill: var(--ink-300); opacity: 0.55; }
+  .pl-flow.entry { fill: var(--brass-300); opacity: 0.55; }
+  .pl-flow.drop { fill: var(--red-500); opacity: 0.40; }
+  .pl-stage-label {
+    font: 500 13px/1.25 var(--font-display);
+    fill: var(--ink-900);
+  }
+  .pl-stage-count {
+    font: 500 14px/1 var(--font-mono);
+    fill: var(--ink-900);
+  }
+  .pl-stage-pct {
+    font: italic 400 12px/1 var(--font-display);
+    fill: var(--ink-600);
+  }
+  .pl-drop-label {
+    font: italic 400 11px/1.3 var(--font-display);
+    fill: var(--red-500);
+  }
+  .pl-drop-count {
+    font: 500 11px/1 var(--font-mono);
+    fill: var(--red-500);
+  }
+
+  /* Tabular fallback below the SVG */
+  .pl-table-wrap {
+    background: var(--paper-50);
+    border: 1px solid var(--paper-300);
+    padding: 12px 14px;
+    margin: 24px 0 8px;
+    position: relative;
+    overflow-x: auto;
+  }
+  .pl-table-wrap::before {
+    content: ""; position: absolute; inset: 4px;
+    border: 1px solid var(--brass-300); opacity: 0.35; pointer-events: none;
+  }
+  table.pl-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+    position: relative;
+  }
+  table.pl-table th, table.pl-table td {
+    padding: 6px 10px; border-bottom: 1px dashed var(--divider);
+    text-align: right; vertical-align: middle;
+  }
+  table.pl-table th:first-child, table.pl-table td:first-child {
+    text-align: left;
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--ink-900);
+  }
+  table.pl-table th {
+    font-family: var(--font-body);
+    font-size: 10px; font-weight: 600; color: var(--ink-500);
+    text-transform: uppercase; letter-spacing: 0.16em;
+    border-bottom: 1px solid var(--ink-300);
+    white-space: nowrap;
+  }
+  table.pl-table tr:last-child td { border-bottom: none; }
+  table.pl-table td.num {
+    font: 500 12px/1 var(--font-mono);
+    color: var(--ink-900);
+  }
+  table.pl-table td.pct {
+    font: 500 12px/1 var(--font-mono);
+    color: var(--brass-600);
+  }
+
+  .pl-empty {
+    background: var(--paper-100);
+    border: 1px dashed var(--ink-300);
+    padding: 24px 22px;
+    text-align: center;
+    font: italic 400 15px/1.5 var(--font-display);
+    color: var(--ink-500);
+  }
+</style>
+</head>
+<body>
+
+<header class="qb-topbar">
+  <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778432585" alt="TogetherBOOK">
+  </a>
+  <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
+          onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="qb-nav">
+    <a class="qb-nav-link" href="index.html">About our systems</a>
+    <a class="qb-nav-link" href="yesterday.html">Yesterday</a>
+    <a class="qb-nav-link" href="brandwatch.html">Brandwatch</a>
+    <a class="qb-nav-link" href="1stcontact.html">1stContact</a>
+    <a class="qb-nav-link" href="directory.html">Directory</a>
+    <a class="qb-nav-link" href="topups.html">TopUps</a>
+    <a class="qb-nav-link is-active" href="pipeline.html">Pipeline</a>
+    <a class="qb-nav-link" href="database.html">Schema</a>
+    <a class="qb-nav-link" href="stats.html">Code</a>
+  </nav>
+</header>
+<div class="qb-nav-backdrop" onclick="document.body.classList.remove('nav-open')"></div>
+
+<main class="qb-page">
+  <section class="pl-section">
+    <h1>Application pipeline</h1>
+    <p class="lead">How customers who started a Transform Credit application <em id="plMonth">in March 2026</em> are progressing through underwriting, as of today. Outcomes still develop — applicants from late in the month are mostly still in flight.</p>
+    <p class="lead">Two entry points converge: <strong>leads we purchased</strong> from affiliates (broker / PPC inventory bid in the Brokers API) and <strong>direct applications</strong> that came straight to the website without a paid lead.</p>
+
+    <div class="pl-refresh" id="plRefresh" hidden>
+      <span class="pl-refresh-label">Last refreshed</span>
+      <span class="pl-refresh-stamp" id="plRefreshStamp">—</span>
+      <span class="pl-refresh-note">auto-refreshes daily from the warehouse</span>
+    </div>
+
+    <p class="pl-meta" id="plMeta">Loading…</p>
+
+    <div class="pl-canvas-wrap">
+      <h2 class="pl-canvas-title">March funnel — Transform Credit, USA</h2>
+      <div id="plCanvas"></div>
+    </div>
+
+    <div class="pl-table-wrap">
+      <table class="pl-table" id="plTable" aria-label="Pipeline stage breakdown">
+        <thead><tr>
+          <th>Stage</th>
+          <th>Count</th>
+          <th>% of starting</th>
+          <th>% of previous</th>
+          <th>Drop-off</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script>
+  fetch("pipeline.json", { cache: "no-store" })
+    .then(r => r.ok ? r.json() : Promise.reject("pipeline.json HTTP " + r.status))
+    .then(render)
+    .catch(err => {
+      const c = document.getElementById("plCanvas");
+      c.innerHTML = `<div class="pl-empty">No data yet. The refresh-pipeline workflow will populate <code>pipeline.json</code> on its next run. (${err})</div>`;
+      document.getElementById("plMeta").textContent = "pipeline.json not loaded — " + err;
+    });
+
+  function render(d) {
+    document.getElementById("plMonth").textContent = `in ${d.month_label || d.month}`;
+    document.getElementById("plMeta").textContent =
+      `${d.lender_label} · ${d.month_label} · ${(d.leads.presented).toLocaleString()} leads presented · ${(d.apps.total).toLocaleString()} applications started`;
+    renderRefresh(d);
+    drawSankey(d);
+    drawTable(d);
+  }
+
+  function renderRefresh(d) {
+    const wrap = document.getElementById("plRefresh");
+    const stamp = document.getElementById("plRefreshStamp");
+    if (!d.snapshot_at) { wrap.hidden = true; return; }
+    const dt = new Date(d.snapshot_at);
+    const datePart = dt.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+    const timePart = dt.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" });
+    stamp.textContent = `${datePart} at ${timePart} UTC`;
+    const ageHours = (Date.now() - dt.getTime()) / 36e5;
+    stamp.classList.toggle("is-stale", ageHours > 36);
+    wrap.hidden = false;
+  }
+
+  function drawSankey(d) {
+    // The funnel has two entry rows that converge. We draw it horizontally:
+    //   Row 1 (top):  [Leads presented] → [Leads purchased] → ┐
+    //                                     drop ↘             │
+    //                                                         ├→ [Apply1] → [Invite GT] → [GT accepted] → [VC ready] → [Paid out]
+    //   Row 2 (mid):  [Direct applications]                   ┘     drop ↘     drop ↘        drop ↘         drop ↘
+    //
+    // Each stage column has a vertical green-ish bar whose height encodes its
+    // count. Flows between bars are quad ribbons; drops are red ribbons going
+    // off to the right margin.
+
+    const W = 1180, H = 540;
+    const PAD = { top: 20, right: 20, bottom: 36, left: 110 };
+    const innerW = W - PAD.left - PAD.right;
+    const innerH = H - PAD.top - PAD.bottom;
+
+    const leadsPresented   = stageByKey(d, "leads_presented").count;
+    const leadsPurchased   = stageByKey(d, "leads_purchased").count;
+    const leadsRejected    = stageByKey(d, "leads_purchased").drop_count;
+    const directApps       = stageByKey(d, "direct_apps").count;
+    const appsStarted      = stageByKey(d, "apps_started").count;
+    const apply1           = stageByKey(d, "apply1");
+    const inviteGt         = stageByKey(d, "invite_gt");
+    const gtAccepted       = stageByKey(d, "gt_accepted");
+    const vcReady          = stageByKey(d, "vc_ready");
+    const paidOut          = stageByKey(d, "paid_out");
+
+    // Y-axis scale — single domain so heights are comparable.
+    const yMax = Math.max(leadsPresented, appsStarted, leadsPurchased + directApps);
+    const yScale = v => (v / yMax) * (innerH * 0.75);
+
+    // Column layout — 8 columns across the canvas
+    const colCount = 8;
+    const colSpacing = innerW / (colCount - 1);
+    const colX = i => PAD.left + i * colSpacing;
+    const barW = Math.min(50, colSpacing * 0.32);
+
+    // Position everything around a central horizontal line that represents
+    // the converged stream. Row 1 sits ABOVE the centre line; Row 2 below.
+    const cy = PAD.top + innerH / 2;
+
+    function bar(x, count, opts = {}) {
+      const h = yScale(count);
+      const y = cy - h / 2;
+      return { x, y, h, w: barW, count, ...opts };
+    }
+
+    // Layout per column:
+    // 0: Leads presented (top row)
+    // 1: Leads purchased
+    // 2: Direct apps (single bar in mid row, slightly different y)
+    // 3: Apps started (convergence)
+    // 4: Apply1
+    // 5: Invite GT
+    // 6: GT accepted
+    // 7: VC ready
+    // (we'll squeeze Paid out as col 8 partial)
+
+    // Use 9 columns instead — re-layout
+    const cols = 9;
+    const cs = innerW / (cols - 1);
+    const cx = i => PAD.left + i * cs;
+    const bw = Math.min(46, cs * 0.34);
+
+    // Row vertical offsets for the two entry rows
+    const upperCy = PAD.top + innerH * 0.30;   // for leads presented + leads purchased
+    const lowerCy = PAD.top + innerH * 0.74;   // for direct apps
+    const midCy   = PAD.top + innerH * 0.50;   // for apps started + onwards
+
+    function mkBar(col, count, baselineCy, cls = "") {
+      const h = yScale(count);
+      return {
+        col, count, cls,
+        x: cx(col) - bw / 2,
+        y: baselineCy - h / 2,
+        h: h,
+        cyAt: baselineCy,
+      };
+    }
+
+    const bars = {
+      leadsPresented: mkBar(0, leadsPresented, upperCy, "entry"),
+      leadsPurchased: mkBar(1, leadsPurchased, upperCy),
+      directApps:     mkBar(1, directApps, lowerCy, "entry"),
+      appsStarted:    mkBar(2, appsStarted, midCy),
+      apply1:         mkBar(3, apply1.count, midCy),
+      inviteGt:       mkBar(4, inviteGt.count, midCy),
+      gtAccepted:     mkBar(5, gtAccepted.count, midCy),
+      vcReady:        mkBar(6, vcReady.count, midCy),
+      paidOut:        mkBar(7, paidOut.count, midCy, "terminal"),
+    };
+
+    const svg = [];
+    svg.push(`<svg class="pl-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Application pipeline funnel">`);
+
+    // ─── Flows ────────────────────────────────────────────────────
+    function flow(fromBar, toBar, magnitude, cls = "") {
+      const h1 = yScale(magnitude);
+      const fromY = fromBar.cyAt - h1 / 2;
+      const fromYBot = fromBar.cyAt + h1 / 2;
+      const x1 = fromBar.x + fromBar.w;
+      const x2 = toBar.x;
+      const toCy = toBar.cyAt;
+      const toY = toCy - h1 / 2;
+      const toYBot = toCy + h1 / 2;
+      const cx1 = x1 + (x2 - x1) * 0.5;
+      const cx2 = cx1;
+      // Quad path: top edge (cubic) + right edge + bottom edge (cubic) + left edge
+      return `<path class="pl-flow ${cls}" d="
+        M ${x1} ${fromY}
+        C ${cx1} ${fromY}, ${cx2} ${toY}, ${x2} ${toY}
+        L ${x2} ${toYBot}
+        C ${cx2} ${toYBot}, ${cx1} ${fromYBot}, ${x1} ${fromYBot}
+        Z"/>`;
+    }
+
+    function dropFlow(fromBar, magnitude, dropY) {
+      const h1 = yScale(magnitude);
+      const fromY = fromBar.cyAt - h1 / 2;
+      const fromYBot = fromBar.cyAt + h1 / 2;
+      const x1 = fromBar.x + fromBar.w;
+      const x2 = x1 + 28;
+      const dropTop = dropY - h1 / 2;
+      const dropBot = dropY + h1 / 2;
+      const cx1 = x1 + (x2 - x1) * 0.5;
+      return `<path class="pl-flow drop" d="
+        M ${x1} ${fromY}
+        C ${cx1} ${fromY}, ${cx1} ${dropTop}, ${x2} ${dropTop}
+        L ${x2} ${dropBot}
+        C ${cx1} ${dropBot}, ${cx1} ${fromYBot}, ${x1} ${fromYBot}
+        Z"/>`;
+    }
+
+    // Lead path: presented → purchased + drop to rejected
+    svg.push(flow(bars.leadsPresented, bars.leadsPurchased, leadsPurchased, "entry"));
+    if (leadsRejected > 0) {
+      const dropMidY = upperCy - yScale(leadsPurchased) / 2 - yScale(leadsRejected) / 2 - 8;
+      svg.push(dropFlow(bars.leadsPresented, leadsRejected, Math.max(PAD.top + 14, dropMidY)));
+    }
+
+    // Convergence: leadsPurchased → appsStarted (purchased portion), directApps → appsStarted
+    const purAppsCount = d.apps.purchased_path;
+    const dirAppsCount = d.apps.direct_path;
+    if (purAppsCount > 0) svg.push(flow(bars.leadsPurchased, bars.appsStarted, purAppsCount));
+    if (dirAppsCount > 0) svg.push(flow(bars.directApps, bars.appsStarted, dirAppsCount, "entry"));
+
+    // Each subsequent stage: continue + drop
+    function pipelineStage(fromBar, toBar, count, dropCount) {
+      svg.push(flow(fromBar, toBar, count));
+      if (dropCount > 0) {
+        const dropY = midCy + yScale(count) / 2 + yScale(dropCount) / 2 + 12;
+        const cappedDropY = Math.min(H - PAD.bottom - 14, dropY);
+        svg.push(dropFlow(fromBar, dropCount, cappedDropY));
+      }
+    }
+    pipelineStage(bars.appsStarted, bars.apply1,     apply1.count,     apply1.drop_count);
+    pipelineStage(bars.apply1,      bars.inviteGt,   inviteGt.count,   inviteGt.drop_count);
+    pipelineStage(bars.inviteGt,    bars.gtAccepted, gtAccepted.count, gtAccepted.drop_count);
+    pipelineStage(bars.gtAccepted,  bars.vcReady,    vcReady.count,    vcReady.drop_count);
+    pipelineStage(bars.vcReady,     bars.paidOut,    paidOut.count,    paidOut.drop_count);
+
+    // ─── Bars + labels ────────────────────────────────────────────
+    const labels = {
+      leadsPresented: ["Leads presented", upperCy],
+      leadsPurchased: ["Leads purchased", upperCy],
+      directApps:     ["Direct apps", lowerCy],
+      appsStarted:    ["Application started", midCy],
+      apply1:         ["Apply1 (Page 1)", midCy],
+      inviteGt:       ["Invite GT (BRW signed)", midCy],
+      gtAccepted:     ["GT accepted", midCy],
+      vcReady:        ["VC ready", midCy],
+      paidOut:        ["Paid out", midCy],
+    };
+
+    Object.entries(bars).forEach(([key, b]) => {
+      svg.push(`<rect class="pl-stage-bar ${b.cls}" x="${b.x.toFixed(1)}" y="${b.y.toFixed(1)}" width="${b.w}" height="${b.h.toFixed(1)}"><title>${labels[key][0]}: ${formatNumber(b.count)}</title></rect>`);
+      // Stage label below the bar
+      const [labelText, labelCy] = labels[key];
+      const labelY = labelCy + b.h / 2 + 16;
+      const cxText = b.x + b.w / 2;
+      svg.push(`<text class="pl-stage-label" x="${cxText.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle">${escapeHtml(labelText)}</text>`);
+      svg.push(`<text class="pl-stage-count" x="${cxText.toFixed(1)}" y="${(labelY + 14).toFixed(1)}" text-anchor="middle">${formatNumber(b.count)}</text>`);
+      // % of leads_presented (or apps_started for stages after convergence)
+      const denom = key === "leadsPresented" ? null
+        : (["leadsPurchased", "directApps"].includes(key)
+           ? leadsPresented + directApps
+           : appsStarted);
+      if (denom && denom > 0 && b.count != null) {
+        const pct = (b.count / denom) * 100;
+        svg.push(`<text class="pl-stage-pct" x="${cxText.toFixed(1)}" y="${(labelY + 28).toFixed(1)}" text-anchor="middle">${pct.toFixed(0)}%</text>`);
+      }
+    });
+
+    // Drop labels at the right margin (rejected lead label)
+    if (leadsRejected > 0) {
+      const dropMidY = upperCy - yScale(leadsPurchased) / 2 - yScale(leadsRejected) / 2 - 8;
+      const yc = Math.max(PAD.top + 14, dropMidY);
+      svg.push(`<text class="pl-drop-label" x="${(bars.leadsPresented.x + bars.leadsPresented.w + 32).toFixed(1)}" y="${yc.toFixed(1)}">Lead rejected</text>`);
+      svg.push(`<text class="pl-drop-count" x="${(bars.leadsPresented.x + bars.leadsPresented.w + 32).toFixed(1)}" y="${(yc + 12).toFixed(1)}">${formatNumber(leadsRejected)}</text>`);
+    }
+
+    svg.push(`</svg>`);
+    document.getElementById("plCanvas").innerHTML = svg.join("");
+  }
+
+  function drawTable(d) {
+    const tbody = document.querySelector("#plTable tbody");
+    const stages = d.stages.filter(s => s.kind !== "entry" || s.key === "leads_presented");
+    // Universe = leads_presented + direct_apps for "% of starting" denominator
+    const universe = (d.leads.presented || 0) + (d.apps.direct_path || 0);
+    const rows = stages.map((s, i) => {
+      const prev = i === 0 ? null : stages[i - 1];
+      const pctOfStart = universe > 0 ? (s.count / universe) * 100 : 0;
+      const pctOfPrev = prev && prev.count > 0 ? (s.count / prev.count) * 100 : null;
+      return `<tr>
+        <td>${escapeHtml(s.label)}</td>
+        <td class="num">${formatNumber(s.count)}</td>
+        <td class="pct">${pctOfStart.toFixed(1)}%</td>
+        <td class="pct">${pctOfPrev != null ? pctOfPrev.toFixed(1) + "%" : "—"}</td>
+        <td class="num">${s.drop_count != null ? formatNumber(s.drop_count) : "—"}</td>
+      </tr>`;
+    }).join("");
+    tbody.innerHTML = rows;
+  }
+
+  function stageByKey(d, key) {
+    return d.stages.find(s => s.key === key) || { count: 0, drop_count: 0 };
+  }
+
+  function formatNumber(n) {
+    if (n == null) return "—";
+    return Number(n).toLocaleString("en-US");
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    })[c]);
+  }
+</script>
+
+<script>
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.body.classList.remove('nav-open');
+  });
+  document.querySelectorAll('.qb-nav-link').forEach(a =>
+    a.addEventListener('click', () => document.body.classList.remove('nav-open'))
+  );
+</script>
+
+</body>
+</html>
