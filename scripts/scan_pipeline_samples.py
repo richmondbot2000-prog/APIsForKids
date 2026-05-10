@@ -990,7 +990,43 @@ def main() -> None:
     msg_body = pick(msg_cols, "MessageBody", "Body", "Content", "Message")
     msg_subject = pick(msg_cols, "MessageTitle", "Subject")
     msg_campaign = pick(msg_cols, "CampaignName", "Campaign")
-    print(f"# Messages chosen: aref={msg_aref} dt={msg_dt} ct={msg_ctype} body={msg_body} subj={msg_subject} descr={msg_descr} campaign={msg_campaign}", flush=True)
+    msg_camp_id = pick(msg_cols, "CampaignId", "CampaignID")
+    print(f"# Messages chosen: aref={msg_aref} dt={msg_dt} ct={msg_ctype} body={msg_body} subj={msg_subject} descr={msg_descr} campaign={msg_campaign} campId={msg_camp_id}", flush=True)
+
+    # ──────────── Campaign lookup (authoritative SMS/Email/Letter/Push)
+    # Per the wiki §9.1 Campaigns table lives in Central CRM. In the
+    # warehouse we look for it in ReportingCommunications next to
+    # Messages, but probe defensively in case it's been replicated
+    # elsewhere or not at all.
+    campaign_meta: dict[int, dict] = {}  # campaign_id → {type, description, name}
+    try:
+        camp_cols = discover_columns(cur, "Campaigns")
+    except Exception:
+        camp_cols = set()
+    if camp_cols:
+        camp_id = pick(camp_cols, "CampaignId", "CampaignID")
+        camp_name = pick(camp_cols, "CampaignName", "Name")
+        camp_type = pick(camp_cols, "MessageType", "Type", "Channel")
+        camp_desc = pick(camp_cols, "Description", "DisplayName", "Label")
+        print(f"# Campaigns cols: id={camp_id} name={camp_name} type={camp_type} desc={camp_desc}", flush=True)
+        if camp_id and (camp_type or camp_desc):
+            sel = ", ".join([
+                f"[{camp_id}]",
+                f"[{camp_name}]" if camp_name else "NULL",
+                f"[{camp_type}]" if camp_type else "NULL",
+                f"[{camp_desc}]" if camp_desc else "NULL",
+            ])
+            cur.execute(f"SELECT {sel} FROM dbo.Campaigns")
+            for cid, name, mtype, desc in cur.fetchall():
+                if cid is None: continue
+                campaign_meta[int(cid)] = {
+                    "name": name,
+                    "type": (mtype or "").strip() or None,
+                    "description": (desc or "").strip() or None,
+                }
+            print(f"#   loaded {len(campaign_meta)} campaigns", flush=True)
+    else:
+        print("# Campaigns table not found in this database — falling back to (S)/(E) heuristic", flush=True)
     if msg_aref and msg_dt:
         for chunk in chunked(family_arefs, 1500):
             ph = ",".join(["?"] * len(chunk))
@@ -999,16 +1035,17 @@ def main() -> None:
             ctype_sql = f", [{msg_ctype}]" if msg_ctype else ", NULL"
             subj_sql = f", [{msg_subject}]" if msg_subject else ", NULL"
             camp_sql = f", [{msg_campaign}]" if msg_campaign else ", NULL"
+            campid_sql = f", [{msg_camp_id}]" if msg_camp_id else ", NULL"
             cur.execute(
                 f"""
-                SELECT [{msg_aref}], [{msg_dt}]{body_sql}{descr_sql}{ctype_sql}{subj_sql}{camp_sql}
+                SELECT [{msg_aref}], [{msg_dt}]{body_sql}{descr_sql}{ctype_sql}{subj_sql}{camp_sql}{campid_sql}
                 FROM dbo.Messages
                 WHERE [{msg_aref}] IN ({ph})
                   AND [{msg_dt}] IS NOT NULL
                 """,
                 chunk,
             )
-            for aref, dt, body, descr, ctype, subj, campaign in cur.fetchall():
+            for aref, dt, body, descr, ctype, subj, campaign, camp_id_val in cur.fetchall():
                 ctype_str = (ctype or "").strip()
                 descr_int = int(descr) if descr is not None and str(descr).strip() != "" else None
                 # Description enum: 0/1/2 = inbound (SMS/Email/Call), 3+ = outbound
@@ -1025,17 +1062,28 @@ def main() -> None:
                 }
                 campaign_str = (campaign or "").strip() if campaign else ""
                 campaign_clean, derived_channel = expand_campaign_tokens(campaign_str)
-                # Channel hint: prefer the inbound enum, then the (S)/(E) tag
-                # that the campaign suffix decoded into.
-                if not is_inbound and derived_channel:
-                    msg["channel"] = derived_channel
-                    msg["channel_kind"] = derived_channel
+                # Look up the authoritative MessageType from the Campaigns
+                # table (per wiki §9.1) before falling back to the (S)/(E)
+                # suffix heuristic.
+                meta = None
+                if camp_id_val is not None:
+                    try:
+                        meta = campaign_meta.get(int(camp_id_val))
+                    except (ValueError, TypeError):
+                        meta = None
+                authoritative_channel = (meta or {}).get("type")
+                campaign_desc = (meta or {}).get("description")
+                if not is_inbound and (authoritative_channel or derived_channel):
+                    msg["channel"] = authoritative_channel or derived_channel
+                    msg["channel_kind"] = authoritative_channel or derived_channel
                 elif is_inbound:
                     msg["channel_kind"] = {0: "SMS", 1: "Email", 2: "Call"}.get(descr_int)
                 if is_robot:
                     label = f"Message from {ctype_str}Bot"
                     if campaign_clean:
                         label += f" — {campaign_clean}"
+                    if campaign_desc and campaign_desc.lower() not in (campaign_clean or "").lower():
+                        label += f" — {campaign_desc}"
                     msg["label"] = label
                     msg["redacted"] = True
                 else:
