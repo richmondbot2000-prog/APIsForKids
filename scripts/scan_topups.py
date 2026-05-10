@@ -111,31 +111,51 @@ def main() -> None:
     cur = c.cursor()
     ts = discover_timestamp_column(cur)
 
-    # One sweep, grouped by month + LoanbookId so a loan with 30 snapshots
-    # in a month counts once. Then sum to per-month rows. The CTE keeps the
-    # query memory-efficient on the 197M-row source.
-    lender_filter = "AND LenderId = ?" if LENDER_ID is not None else ""
-    q = f"""
-        WITH per_loan_month AS (
-            SELECT
-                DATEFROMPARTS(YEAR([{ts}]), MONTH([{ts}]), 1) AS month_start,
-                LoanbookId,
-                MAX(CASE WHEN TueStatus = 1 THEN 1 ELSE 0 END) AS was_tue
-            FROM [{TABLE_SCHEMA}].[{TABLE_NAME}]
-            WHERE [{ts}] >= ?
-              AND LoanbookId IS NOT NULL
-              {lender_filter}
-            GROUP BY DATEFROMPARTS(YEAR([{ts}]), MONTH([{ts}]), 1), LoanbookId
-        )
-        SELECT
-            month_start,
-            COUNT(*) AS live_loans,
-            SUM(was_tue) AS tue_eligible
-        FROM per_loan_month
-        GROUP BY month_start
-        ORDER BY month_start;
-    """
-    params = [cutoff] + ([LENDER_ID] if LENDER_ID is not None else [])
+    # `LenderId` is on `LoanAtInception` (one row per loan), not `Loan_History`.
+    # We pre-filter LoanbookIds in a CTE, then aggregate snapshots — keeps
+    # the join cheap on the 197M-row source.
+    if LENDER_ID is not None:
+        q = f"""
+            WITH lender_loans AS (
+                SELECT LoanbookId
+                FROM [{TABLE_SCHEMA}].[LoanAtInception]
+                WHERE LenderId = ?
+            ),
+            per_loan_month AS (
+                SELECT
+                    DATEFROMPARTS(YEAR(lh.[{ts}]), MONTH(lh.[{ts}]), 1) AS month_start,
+                    lh.LoanbookId,
+                    MAX(CASE WHEN lh.TueStatus = 1 THEN 1 ELSE 0 END) AS was_tue
+                FROM [{TABLE_SCHEMA}].[{TABLE_NAME}] lh
+                INNER JOIN lender_loans ll ON ll.LoanbookId = lh.LoanbookId
+                WHERE lh.[{ts}] >= ?
+                  AND lh.LoanbookId IS NOT NULL
+                GROUP BY DATEFROMPARTS(YEAR(lh.[{ts}]), MONTH(lh.[{ts}]), 1), lh.LoanbookId
+            )
+            SELECT month_start, COUNT(*) AS live_loans, SUM(was_tue) AS tue_eligible
+            FROM per_loan_month
+            GROUP BY month_start
+            ORDER BY month_start;
+        """
+        params = [LENDER_ID, cutoff]
+    else:
+        q = f"""
+            WITH per_loan_month AS (
+                SELECT
+                    DATEFROMPARTS(YEAR([{ts}]), MONTH([{ts}]), 1) AS month_start,
+                    LoanbookId,
+                    MAX(CASE WHEN TueStatus = 1 THEN 1 ELSE 0 END) AS was_tue
+                FROM [{TABLE_SCHEMA}].[{TABLE_NAME}]
+                WHERE [{ts}] >= ?
+                  AND LoanbookId IS NOT NULL
+                GROUP BY DATEFROMPARTS(YEAR([{ts}]), MONTH([{ts}]), 1), LoanbookId
+            )
+            SELECT month_start, COUNT(*) AS live_loans, SUM(was_tue) AS tue_eligible
+            FROM per_loan_month
+            GROUP BY month_start
+            ORDER BY month_start;
+        """
+        params = [cutoff]
     print(f"# running aggregation query…  lender filter: {LENDER_LABEL if LENDER_ID is not None else 'NONE (all lenders)'}", flush=True)
     cur.execute(q, params)
     rows = [(r[0], int(r[1]), int(r[2])) for r in cur.fetchall()]
