@@ -241,7 +241,9 @@ def main() -> None:
         try:
             tcols = discover_columns(cur, tname)
             id_col = pick(tcols, "LoanPurposeTypeId", "LoanPurposeId", "Id", "TypeId")
-            name_col = pick(tcols, "Name", "Label", "Description", "DisplayName", "Text")
+            name_col = pick(tcols, "LoanPurposeDescription", "PurposeDescription",
+                            "PurposeName", "Description", "Name", "Label",
+                            "DisplayName", "Text")
             if not (id_col and name_col):
                 print(f"#   {tname}: missing id/name pair (cols={sorted(tcols)})", flush=True)
                 continue
