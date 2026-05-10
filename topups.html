@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Top Ups</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778409312">
-<link rel="stylesheet" href="quiet.css?v=1778409312">
-<link rel="stylesheet" href="quiet-extras.css?v=1778409312">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778409788">
+<link rel="stylesheet" href="quiet.css?v=1778409788">
+<link rel="stylesheet" href="quiet-extras.css?v=1778409788">
 <style>
   .tu-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .tu-section { padding: 2px 0 32px; } }
@@ -174,7 +174,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778409312" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778409788" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -203,7 +203,7 @@
 
     <div class="tu-chart-wrap">
       <h2 class="tu-chart-title">Monthly counts, last 24 months</h2>
-      <p class="tu-chart-sub">Each bar is the number of distinct Transform Credit loans that were live in that month, split between <em>primary</em> loans (the customer's first loan) and <em>top-up</em> loans (the customer already had a loan when this one was paid out — the existing loan was settled at payout). The line tracks how many of those loans were <em>top-up eligible</em> at any point that month.</p>
+      <p class="tu-chart-sub">Each bar is the number of distinct Transform Credit loans that were live in that month — defined as <em id="tuLiveFilter">DIA &lt; 90 days AND CurrentBalance &gt; $10</em> — split between <em>primary</em> loans (the customer's first loan) and <em>top-up</em> loans (the customer already had a loan when this one was paid out; the existing loan was settled at payout). The line tracks how many of those loans were <em>top-up eligible</em> at any point that month.</p>
       <div class="tu-legend">
         <span class="tu-legend-item"><span class="tu-legend-swatch bar-primary"></span>Primary loans</span>
         <span class="tu-legend-item"><span class="tu-legend-swatch bar-topup"></span>Top-up loans</span>
@@ -242,6 +242,7 @@
     const series = d.series || [];
     const updated = (d.snapshot_at || "").replace("T", " ").slice(0, 19) + " UTC";
     if (d.lender_label) document.getElementById("tuScope").textContent = d.lender_label;
+    if (d.live_filter) document.getElementById("tuLiveFilter").textContent = d.live_filter;
     renderThresholds(d.lender_thresholds);
     document.getElementById("tuMeta").textContent =
       `${d.window_months} months · source ${d.source_table} (${d.timestamp_column}) · updated ${updated}`;

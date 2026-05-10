@@ -214,30 +214,52 @@ def main() -> None:
     if LENDER_ID is not None and not lender_table:
         sys.exit(f"error: no table in {DATABASE}.{TABLE_SCHEMA}.* has both LoanbookId AND LenderId columns")
 
-    # Detect whether the lender_table has TopUpAmountAtInception so we can
-    # split live loans into Primary vs Top-Up. Per the wiki this column is
-    # set at payout for top-up loans only and null otherwise.
-    if lender_table:
-        cur.execute(
-            """
-            SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND COLUMN_NAME = 'TopUpAmountAtInception'
-            """,
-            [TABLE_SCHEMA, lender_table],
-        )
-        has_topup_col = cur.fetchone() is not None
-    else:
-        has_topup_col = False
-    print(f"# top-up classifier on {lender_table}: TopUpAmountAtInception present = {has_topup_col}", flush=True)
+    # Detect whether LoanAtInception has TopUpAmountAtInception (the per-loan
+    # top-up flag). If yes, JOIN it into the lender_loans CTE so we can split
+    # bars Primary vs Top-Up.
+    cur.execute("""
+        SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'LoanAtInception'
+          AND COLUMN_NAME = 'TopUpAmountAtInception'
+    """, [TABLE_SCHEMA])
+    has_topup_classifier = cur.fetchone() is not None
+    print(f"# top-up classifier: LoanAtInception.TopUpAmountAtInception present = {has_topup_classifier}", flush=True)
 
-    if LENDER_ID is not None and has_topup_col:
+    # Live-loan filter: a snapshot only counts as "live" if DIA < 90 AND
+    # CurrentBalance > 10. Verify both columns exist on Loan_History.
+    cur.execute("""
+        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
+          AND COLUMN_NAME IN ('DIA', 'CurrentBalance')
+    """, [TABLE_SCHEMA, TABLE_NAME])
+    live_cols = {r[0] for r in cur.fetchall()}
+    has_live_filter = ('DIA' in live_cols and 'CurrentBalance' in live_cols)
+    live_filter_sql = "AND lh.DIA < 90 AND lh.CurrentBalance > 10" if has_live_filter else ""
+    print(f"# live-loan filter: DIA<90 AND CurrentBalance>10 — applied = {has_live_filter} (cols present: {sorted(live_cols)})", flush=True)
+
+    if LENDER_ID is not None:
+        # Build lender_loans CTE: LenderId from Loan, top-up flag from LoanAtInception.
+        if has_topup_classifier:
+            lender_loans_cte = f"""
+                lender_loans AS (
+                    SELECT
+                        l.LoanbookId,
+                        CASE WHEN li.TopUpAmountAtInception IS NOT NULL THEN 1 ELSE 0 END AS is_topup
+                    FROM [{TABLE_SCHEMA}].[{lender_table}] l
+                    LEFT JOIN [{TABLE_SCHEMA}].[LoanAtInception] li ON li.LoanbookId = l.LoanbookId
+                    WHERE l.LenderId = ?
+                )
+            """
+        else:
+            lender_loans_cte = f"""
+                lender_loans AS (
+                    SELECT DISTINCT LoanbookId, 0 AS is_topup
+                    FROM [{TABLE_SCHEMA}].[{lender_table}]
+                    WHERE LenderId = ?
+                )
+            """
         q = f"""
-            WITH lender_loans AS (
-                SELECT LoanbookId,
-                       CASE WHEN TopUpAmountAtInception IS NOT NULL THEN 1 ELSE 0 END AS is_topup
-                FROM [{TABLE_SCHEMA}].[{lender_table}]
-                WHERE LenderId = ?
-            ),
+            WITH {lender_loans_cte},
             per_loan_month AS (
                 SELECT
                     DATEFROMPARTS(YEAR(lh.[{ts}]), MONTH(lh.[{ts}]), 1) AS month_start,
@@ -248,6 +270,7 @@ def main() -> None:
                 INNER JOIN lender_loans ll ON ll.LoanbookId = lh.LoanbookId
                 WHERE lh.[{ts}] >= ?
                   AND lh.LoanbookId IS NOT NULL
+                  {live_filter_sql}
                 GROUP BY DATEFROMPARTS(YEAR(lh.[{ts}]), MONTH(lh.[{ts}]), 1), lh.LoanbookId, ll.is_topup
             )
             SELECT
@@ -260,25 +283,17 @@ def main() -> None:
             ORDER BY month_start;
         """
         params = [LENDER_ID, cutoff]
-        cur.execute(q, params)
-        rows = [(r[0], int(r[1]), int(r[2]), int(r[3])) for r in cur.fetchall()]
-    elif LENDER_ID is not None:
-        # Fallback: lender filter only, no primary/topup split.
+    else:
         q = f"""
-            WITH lender_loans AS (
-                SELECT DISTINCT LoanbookId
-                FROM [{TABLE_SCHEMA}].[{lender_table}]
-                WHERE LenderId = ?
-            ),
-            per_loan_month AS (
+            WITH per_loan_month AS (
                 SELECT
                     DATEFROMPARTS(YEAR(lh.[{ts}]), MONTH(lh.[{ts}]), 1) AS month_start,
                     lh.LoanbookId,
                     MAX(CASE WHEN lh.TueStatus = 1 THEN 1 ELSE 0 END) AS was_tue
                 FROM [{TABLE_SCHEMA}].[{TABLE_NAME}] lh
-                INNER JOIN lender_loans ll ON ll.LoanbookId = lh.LoanbookId
                 WHERE lh.[{ts}] >= ?
                   AND lh.LoanbookId IS NOT NULL
+                  {live_filter_sql}
                 GROUP BY DATEFROMPARTS(YEAR(lh.[{ts}]), MONTH(lh.[{ts}]), 1), lh.LoanbookId
             )
             SELECT month_start, COUNT(*) AS live_loans, 0 AS live_topup, SUM(was_tue) AS tue_eligible
@@ -286,30 +301,10 @@ def main() -> None:
             GROUP BY month_start
             ORDER BY month_start;
         """
-        params = [LENDER_ID, cutoff]
-        cur.execute(q, params)
-        rows = [(r[0], int(r[1]), int(r[2]), int(r[3])) for r in cur.fetchall()]
-    else:
-        q = f"""
-            WITH per_loan_month AS (
-                SELECT
-                    DATEFROMPARTS(YEAR([{ts}]), MONTH([{ts}]), 1) AS month_start,
-                    LoanbookId,
-                    MAX(CASE WHEN TueStatus = 1 THEN 1 ELSE 0 END) AS was_tue
-                FROM [{TABLE_SCHEMA}].[{TABLE_NAME}]
-                WHERE [{ts}] >= ?
-                  AND LoanbookId IS NOT NULL
-                GROUP BY DATEFROMPARTS(YEAR([{ts}]), MONTH([{ts}]), 1), LoanbookId
-            )
-            SELECT month_start, COUNT(*) AS live_loans, 0 AS live_topup, SUM(was_tue) AS tue_eligible
-            FROM per_loan_month
-            GROUP BY month_start
-            ORDER BY month_start;
-        """
         params = [cutoff]
-        cur.execute(q, params)
-        rows = [(r[0], int(r[1]), int(r[2]), int(r[3])) for r in cur.fetchall()]
     print(f"# running aggregation query…  lender filter: {LENDER_LABEL if LENDER_ID is not None else 'NONE (all lenders)'}", flush=True)
+    cur.execute(q, params)
+    rows = [(r[0], int(r[1]), int(r[2]), int(r[3])) for r in cur.fetchall()]
     print(f"# returned {len(rows)} month rows", flush=True)
 
     # Build the output: ensure every month in the window is present (zeros if
@@ -368,6 +363,7 @@ def main() -> None:
         "timestamp_column": ts,
         "lender_id": LENDER_ID,
         "lender_label": LENDER_LABEL,
+        "live_filter": "DIA < 90 days AND CurrentBalance > $10" if has_live_filter else "(none — DIA / CurrentBalance columns not present on Loan_History)",
         "lender_thresholds": lender_thresholds,
         "totals": {
             "live_loans_loan_months":   total_live,   # SUM, not distinct
