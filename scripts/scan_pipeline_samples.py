@@ -1305,6 +1305,69 @@ def main() -> None:
     for ar, primary in aref_to_primary.items():
         primary_to_family[primary].append(ar)
 
+    # ── PII redaction ────────────────────────────────────────────────
+    # Mask all PII before writing JSON. Everything served to the browser
+    # is masked at source, so the live page can't leak PII via
+    # devtools/network inspection. Visible:
+    #   - ARefs: last 5 chars only ('***************251627' style)
+    #   - Surnames: replaced with ****** in both display fields and any
+    #     mention inside message bodies / details.
+    #   - Phone numbers (E.164 / local US formats): replaced with *******
+    #   - Email addresses and DOBs: kept for now per the user's spec.
+    ARE_RE_FULL = re.compile(r"\b\d{18,24}\b")  # ARefs are 22 digits but be lenient
+    PHONE_RE = re.compile(
+        r"(?<!\w)(?:\+?1[\s\-.]?)?\(?\d{3}\)?[\s\-.]?\d{3}[\s\-.]?\d{4}(?!\w)"
+    )
+
+    def mask_aref(a):
+        if not a: return a
+        s = str(a)
+        if len(s) <= 5: return s
+        return "*" * (len(s) - 5) + s[-5:]
+
+    def mask_arefs_in_text(text):
+        if not text: return text
+        return ARE_RE_FULL.sub(lambda m: mask_aref(m.group(0)), str(text))
+
+    def mask_phones_in_text(text):
+        if not text: return text
+        return PHONE_RE.sub("*******", str(text))
+
+    def mask_surname_in_text(text, surnames):
+        if not text: return text
+        out = str(text)
+        for sn in surnames:
+            if sn and len(sn) >= 3:
+                out = re.sub(re.escape(sn), "******", out, flags=re.IGNORECASE)
+        return out
+
+    def mask_full_name_string(name):
+        """'ALEX PERRY' → 'ALEX ******'. Keeps every part except the last."""
+        if not name: return name
+        parts = str(name).split()
+        if len(parts) <= 1:
+            return "******"
+        return " ".join(parts[:-1] + ["******"])
+
+    def redact_text(text, surnames):
+        """Apply ARef + phone + surname masking to a free-text string."""
+        t = mask_arefs_in_text(text)
+        t = mask_phones_in_text(t)
+        t = mask_surname_in_text(t, surnames)
+        return t
+
+    def redact_detail_pair(k, v, surnames):
+        """Mask the value of a details [key, value] pair appropriately."""
+        if v is None: return [k, v]
+        sv = str(v)
+        if "name" in k.lower() and "campaign" not in k.lower():
+            return [k, mask_full_name_string(sv)]
+        if "address" in k.lower():
+            # Strip phones from addresses (rare) but keep street.
+            return [k, mask_phones_in_text(sv)]
+        # Default: apply text redaction (ARef + phone + surname).
+        return [k, redact_text(sv, surnames)]
+
     out_endpoints = {}
     for ep, arefs in samples.items():
         rows = []
@@ -1312,13 +1375,51 @@ def main() -> None:
             cust = customers_by_aref.get(aref, {})
             brw = cust.get("BRW", {})
             family = sorted(primary_to_family.get(aref, [aref]))
+
+            # Build the set of surnames to scrub from this customer's
+            # message bodies / detail values. Includes BRW + GT surnames
+            # from every linked ARef in the family.
+            surnames: set[str] = set()
+            for fam_aref in family:
+                fam_cust = customers_by_aref.get(fam_aref, {})
+                for role_data in fam_cust.values():
+                    sn = (role_data.get("surname") or "").strip()
+                    if sn:
+                        surnames.add(sn)
+
+            # Walk each event and replace text fields with masked versions.
+            masked_events = []
+            for ev in interactions.get(aref, []):
+                me = dict(ev)
+                if "aref" in me:
+                    me["aref"] = mask_aref(me["aref"])
+                if "label" in me and me["label"]:
+                    me["label"] = redact_text(me["label"], surnames)
+                if "body" in me and me["body"]:
+                    me["body"] = redact_text(me["body"], surnames)
+                if "channel" in me and me["channel"]:
+                    me["channel"] = mask_arefs_in_text(me["channel"])
+                if "items" in me and isinstance(me["items"], list):
+                    me["items"] = [redact_text(t, surnames) for t in me["items"]]
+                if "details" in me and isinstance(me["details"], list):
+                    me["details"] = [redact_detail_pair(k, v, surnames) for k, v in me["details"]]
+                masked_events.append(me)
+
+            # Mask the customer-summary fields too.
+            display_name = None
+            first = (brw.get("first_name") or "").strip()
+            if first:
+                display_name = f"{first} ******"
+            elif brw.get("surname"):
+                display_name = "******"
+
             rows.append({
-                "aref": aref,
-                "brw_name": fmt_name(brw) or None,
-                "all_arefs": family,
+                "aref": mask_aref(aref),
+                "brw_name": display_name,
+                "all_arefs": [mask_aref(a) for a in family],
                 "application_count": len(family),
-                "interaction_count": len(interactions.get(aref, [])),
-                "interactions": interactions.get(aref, []),
+                "interaction_count": len(masked_events),
+                "interactions": masked_events,
             })
         out_endpoints[ep] = rows
 
