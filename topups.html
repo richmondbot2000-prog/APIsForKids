@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Top Ups</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778406738">
-<link rel="stylesheet" href="quiet.css?v=1778406738">
-<link rel="stylesheet" href="quiet-extras.css?v=1778406738">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778407491">
+<link rel="stylesheet" href="quiet.css?v=1778407491">
+<link rel="stylesheet" href="quiet-extras.css?v=1778407491">
 <style>
   .tu-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .tu-section { padding: 2px 0 32px; } }
@@ -26,6 +26,11 @@
     text-wrap: pretty;
   }
   .tu-section .lead em { color: var(--red-500); font-style: italic; }
+  .tu-threshold-note {
+    color: var(--ink-500);
+    font-size: 14px;
+    font-style: italic;
+  }
   .tu-meta {
     color: var(--ink-500);
     font: 500 11px/1 var(--font-mono);
@@ -167,7 +172,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778406738" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778407491" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -191,6 +196,7 @@
     <h1>Top Ups</h1>
     <p class="lead">A <strong>top-up</strong> is a brand-new loan that pays off the customer's existing live loan and gives them more cash on top. A live loan becomes <em>top-up eligible</em> (TueStatus = true) when its balance, arrears history, and age all clear the lender's TUE thresholds.</p>
     <p class="lead"><strong>Scope:</strong> US loans under the <em id="tuScope">Transform Credit (LenderId 6, USA)</em> brand only.</p>
+    <p class="lead" id="tuThresholds" hidden>Loading thresholds…</p>
     <p class="tu-meta" id="tuMeta">Loading…</p>
 
     <div class="tu-chart-wrap">
@@ -231,10 +237,25 @@
     const series = d.series || [];
     const updated = (d.snapshot_at || "").replace("T", " ").slice(0, 19) + " UTC";
     if (d.lender_label) document.getElementById("tuScope").textContent = d.lender_label;
+    renderThresholds(d.lender_thresholds);
     document.getElementById("tuMeta").textContent =
       `${d.window_months} months · source ${d.source_table} (${d.timestamp_column}) · updated ${updated}`;
     drawChart(series);
     drawTable(series);
+  }
+
+  function renderThresholds(t) {
+    const el = document.getElementById("tuThresholds");
+    if (!t || !t.primary) { el.hidden = true; return; }
+    const p = t.primary;
+    const fmtMoney = v => v == null ? "—" : "$" + Number(v).toLocaleString("en-US", { maximumFractionDigits: 0 });
+    const fmtArrears = v => v == null ? "—" : (v === 0 ? "no prior arrears" : `prior arrears ≤ $${Number(v).toLocaleString("en-US", { maximumFractionDigits: 0 })}`);
+    const fmtDays = v => v == null ? "—" : (v % 30 === 0 ? `${v / 30} months` : `${v} days`);
+    const tail = (t.distinct > 1)
+      ? ` <span class="tu-threshold-note">(most-common combination across ${p.loan_count.toLocaleString("en-US")} loans; ${t.distinct - 1} other variant${t.distinct - 1 === 1 ? "" : "s"} on the rest)</span>`
+      : ``;
+    el.innerHTML = `<strong>Transform Credit's TUE thresholds:</strong> balance ≤ <em>${fmtMoney(p.max_balance)}</em>, ${fmtArrears(p.arrears_position)}, loan ≥ <em>${fmtDays(p.days_old)}</em> old.${tail}`;
+    el.hidden = false;
   }
 
   function drawChart(series) {

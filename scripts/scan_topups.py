@@ -71,6 +71,73 @@ def conn_str() -> str:
     )
 
 
+def discover_threshold_columns(cur, table: str) -> dict:
+    """The wiki uses TUEMaxBalance / TUE_MaxBalance / TUEArrearsPosition /
+    TUE_ArrearsPosition / TUEDaysOld interchangeably depending on schema
+    vintage. Find what's actually present on the given table.
+    """
+    cur.execute(
+        """
+        SELECT COLUMN_NAME
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
+        """,
+        [TABLE_SCHEMA, table],
+    )
+    cols = {c[0] for c in cur.fetchall()}
+    def pick(*candidates):
+        return next((c for c in candidates if c in cols), None)
+    return {
+        "max_balance":      pick("TUEMaxBalance", "TUE_MaxBalance"),
+        "arrears_position": pick("TUEArrearsPosition", "TUE_ArrearsPosition"),
+        "days_old":         pick("TUEDaysOld", "TUE_DaysOld"),
+    }
+
+
+def fetch_lender_thresholds(cur, lender_table: str) -> dict | None:
+    """Read the per-loan TUE thresholds for our target lender, find the
+    distribution. Returns {primary: {…}, variations: [{…count}], distinct: int}.
+    Returns None if any required column is missing on the table.
+    """
+    cols = discover_threshold_columns(cur, lender_table)
+    missing = [k for k, v in cols.items() if not v]
+    if missing:
+        print(f"# threshold columns missing on {lender_table}: {missing}", flush=True)
+        return None
+    print(f"# threshold columns on {lender_table}: {cols}", flush=True)
+
+    q = f"""
+        SELECT
+            [{cols['max_balance']}]      AS max_balance,
+            [{cols['arrears_position']}] AS arrears_position,
+            [{cols['days_old']}]         AS days_old,
+            COUNT(*) AS loan_count
+        FROM [{TABLE_SCHEMA}].[{lender_table}]
+        WHERE LenderId = ?
+        GROUP BY [{cols['max_balance']}], [{cols['arrears_position']}], [{cols['days_old']}]
+        ORDER BY loan_count DESC
+    """
+    cur.execute(q, [LENDER_ID])
+    rows = [
+        {
+            "max_balance":      float(r[0]) if r[0] is not None else None,
+            "arrears_position": float(r[1]) if r[1] is not None else None,
+            "days_old":         int(r[2])   if r[2] is not None else None,
+            "loan_count":       int(r[3]),
+        }
+        for r in cur.fetchall()
+    ]
+    if not rows:
+        return None
+    return {
+        "primary":   rows[0],   # most-common combination
+        "variations": rows,
+        "distinct":  len(rows),
+        "source":    f"{TABLE_SCHEMA}.{lender_table}",
+        "columns":   cols,
+    }
+
+
 def discover_lender_table(cur) -> str | None:
     """Find a table in this DB that has both LoanbookId AND LenderId columns,
     so we can JOIN against it to filter Loan_History to a single lender. We
@@ -143,8 +210,8 @@ def main() -> None:
     # auto-discover the right table rather than hard-coding (it varies by
     # warehouse vintage). We pre-filter LoanbookIds in a CTE then aggregate
     # snapshots — keeps the join cheap on the 197M-row source.
+    lender_table = discover_lender_table(cur) if LENDER_ID is not None else None
     if LENDER_ID is not None:
-        lender_table = discover_lender_table(cur)
         if not lender_table:
             sys.exit(f"error: no table in {DATABASE}.{TABLE_SCHEMA}.* has both LoanbookId AND LenderId columns")
         q = f"""
@@ -222,6 +289,19 @@ def main() -> None:
     total_live = sum(s["live_loans"] for s in series)
     total_tue = sum(s["tue_eligible"] for s in series)
 
+    # Pull this lender's actual TUE thresholds. Try the lender_table we already
+    # found; if it doesn't have the threshold columns, fall back to
+    # LoanAtInception (which the wiki says owns them).
+    lender_thresholds = None
+    if LENDER_ID is not None:
+        if lender_table:
+            lender_thresholds = fetch_lender_thresholds(cur, lender_table)
+        if lender_thresholds is None and lender_table != "LoanAtInception":
+            try:
+                lender_thresholds = fetch_lender_thresholds(cur, "LoanAtInception")
+            except Exception as e:
+                print(f"# threshold fallback failed: {e}", flush=True)
+
     output = {
         "snapshot_at": started.isoformat(),
         "snapshot_date": today.isoformat(),
@@ -231,6 +311,7 @@ def main() -> None:
         "timestamp_column": ts,
         "lender_id": LENDER_ID,
         "lender_label": LENDER_LABEL,
+        "lender_thresholds": lender_thresholds,
         "totals": {
             "live_loans_loan_months":   total_live,   # SUM, not distinct
             "tue_eligible_loan_months": total_tue,
