@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Pipeline</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778437754">
-<link rel="stylesheet" href="quiet.css?v=1778437754">
-<link rel="stylesheet" href="quiet-extras.css?v=1778437754">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778438233">
+<link rel="stylesheet" href="quiet.css?v=1778438233">
+<link rel="stylesheet" href="quiet-extras.css?v=1778438233">
 <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js" crossorigin="anonymous"></script>
 <style>
@@ -211,7 +211,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778437754" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778438233" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -408,10 +408,26 @@
       .attr("role", "img")
       .attr("aria-label", options.ariaLabel || "Sankey diagram");
 
+    // Force a consistent vertical order in every column: stage / entry /
+    // purchased / terminal nodes sit ABOVE drop nodes, so the "continuing"
+    // ribbon always exits at the top half and red drops fall below. Without
+    // this, d3-sankey's default crossings-minimisation will sometimes flip
+    // the order column-by-column.
+    const nodeKindRank = n => (n.kind === "drop" ? 1 : 0);
+    const linkKindRank = l => (l.target.kind === "drop" ? 1 : 0);
+
     const sankey = d3.sankey()
-      .nodeAlign(d3.sankeyLeft)   // pin drop/leaf nodes immediately after the
-                                  // stage they branch off from, instead of
-                                  // pushing them all to the far right column
+      .nodeAlign(d3.sankeyLeft)
+      .nodeSort((a, b) => {
+        const r = nodeKindRank(a) - nodeKindRank(b);
+        if (r !== 0) return r;
+        return (b.value || 0) - (a.value || 0);  // bigger nodes first within same kind
+      })
+      .linkSort((a, b) => {
+        const r = linkKindRank(a) - linkKindRank(b);
+        if (r !== 0) return r;
+        return (b.value || 0) - (a.value || 0);
+      })
       .nodeWidth(14)
       .nodePadding(14)
       .extent([[margin.left, margin.top], [W - margin.right, H - margin.bottom]]);
