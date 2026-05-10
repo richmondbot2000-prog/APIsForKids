@@ -226,21 +226,30 @@ def main() -> None:
     print(f"# top-up classifier: LoanAtInception.TopUpAmountAtInception present = {has_topup_classifier}", flush=True)
 
     # Live-loan filter: a snapshot only counts as "live" if DIA < 90 AND
-    # CurrentBalance > 10. Column names vary by warehouse vintage, so we
-    # discover them via INFORMATION_SCHEMA.
+    # CurrentBalance > 10.
+    #
+    # There's no `DIA` column on Loan_History; the wiki defines DIA as
+    # "today - DateInArrearsUTC" so we compute it inline via DATEDIFF, and
+    # treat NULL DateInArrearsUTC (not in arrears at all) as DIA = 0. The
+    # comparison uses DateTimeUTC of the snapshot row, not server-side today,
+    # so back-dated history rows still get the right DIA-as-of-snapshot.
     cur.execute("""
-        SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS
+        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
         WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
-        ORDER BY COLUMN_NAME
     """, [TABLE_SCHEMA, TABLE_NAME])
-    all_cols = [(c, t) for c, t in cur.fetchall()]
-    print(f"# {TABLE_NAME} columns: {[c for c, _ in all_cols]}", flush=True)
-    col_names = {c for c, _ in all_cols}
-    dia_col = next((c for c in ('DIA', 'DaysInArrears', 'DIADays', 'DaysSinceArrears') if c in col_names), None)
-    bal_col = next((c for c in ('CurrentBalance', 'Balance', 'CurrentBal', 'OutstandingBalance', 'Outstanding') if c in col_names), None)
-    has_live_filter = bool(dia_col and bal_col)
-    live_filter_sql = f"AND lh.[{dia_col}] < 90 AND lh.[{bal_col}] > 10" if has_live_filter else ""
-    print(f"# live-loan filter: applied = {has_live_filter}  dia_col={dia_col}  bal_col={bal_col}", flush=True)
+    col_names = {r[0] for r in cur.fetchall()}
+    arrears_date_col = next((c for c in ('DateInArrearsUTC', 'DateInArrearsLocal') if c in col_names), None)
+    bal_col = next((c for c in ('CurrentBalance', 'Balance', 'OutstandingBalance') if c in col_names), None)
+    has_live_filter = bool(arrears_date_col and bal_col)
+    if has_live_filter:
+        live_filter_sql = (
+            f"AND (lh.[{arrears_date_col}] IS NULL "
+            f"     OR DATEDIFF(day, lh.[{arrears_date_col}], lh.[{ts}]) < 90) "
+            f"AND lh.[{bal_col}] > 10"
+        )
+    else:
+        live_filter_sql = ""
+    print(f"# live-loan filter: applied = {has_live_filter}  arrears_date_col={arrears_date_col}  bal_col={bal_col}", flush=True)
 
     if LENDER_ID is not None:
         # Build lender_loans CTE: LenderId from Loan, top-up flag from LoanAtInception.
@@ -369,8 +378,9 @@ def main() -> None:
         "lender_id": LENDER_ID,
         "lender_label": LENDER_LABEL,
         "live_filter": (
-            f"{dia_col} < 90 days AND {bal_col} > $10" if has_live_filter
-            else "(none — DIA / CurrentBalance columns not present on Loan_History)"
+            f"DIA < 90 days (computed from {arrears_date_col}) AND {bal_col} > $10"
+            if has_live_filter
+            else "(none — arrears-date / balance columns not present on Loan_History)"
         ),
         "lender_thresholds": lender_thresholds,
         "totals": {
