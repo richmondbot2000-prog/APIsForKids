@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Pipeline</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778432585">
-<link rel="stylesheet" href="quiet.css?v=1778432585">
-<link rel="stylesheet" href="quiet-extras.css?v=1778432585">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778433557">
+<link rel="stylesheet" href="quiet.css?v=1778433557">
+<link rel="stylesheet" href="quiet-extras.css?v=1778433557">
 <style>
   .pl-section { max-width: 1200px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .pl-section { padding: 2px 0 32px; } }
@@ -165,7 +165,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778432585" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778433557" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -252,205 +252,102 @@
   }
 
   function drawSankey(d) {
-    // The funnel has two entry rows that converge. We draw it horizontally:
-    //   Row 1 (top):  [Leads presented] → [Leads purchased] → ┐
-    //                                     drop ↘             │
-    //                                                         ├→ [Apply1] → [Invite GT] → [GT accepted] → [VC ready] → [Paid out]
-    //   Row 2 (mid):  [Direct applications]                   ┘     drop ↘     drop ↘        drop ↘         drop ↘
+    // Vertical funnel: a stack of horizontal rows, top to bottom.
+    // Each row's full width represents the cohort entering that stage.
+    // The continuing portion (left) is ink-300, the dropping portion (right)
+    // is manuscript red. The next row's full width = previous row's
+    // continuing width — so the funnel naturally narrows.
     //
-    // Each stage column has a vertical green-ish bar whose height encodes its
-    // count. Flows between bars are quad ribbons; drops are red ribbons going
-    // off to the right margin.
+    // The "leads presented → purchased" stage has a much bigger drop than
+    // anything else (38.5M → 864k), so we render it on its own scale at
+    // the top, then re-baseline to "Application started" for the rest of
+    // the funnel.
 
-    const W = 1180, H = 540;
-    const PAD = { top: 20, right: 20, bottom: 36, left: 110 };
+    const leadsPresented = stageByKey(d, "leads_presented").count;
+    const leadsPurchased = stageByKey(d, "leads_purchased").count;
+    const leadsRejected  = stageByKey(d, "leads_purchased").drop_count;
+    const directApps     = stageByKey(d, "direct_apps").count;
+    const appsStarted    = stageByKey(d, "apps_started").count;
+    const apply1         = stageByKey(d, "apply1");
+    const inviteGt       = stageByKey(d, "invite_gt");
+    const gtAccepted     = stageByKey(d, "gt_accepted");
+    const vcReady        = stageByKey(d, "vc_ready");
+    const paidOut        = stageByKey(d, "paid_out");
+
+    const W = 1100;
+    const PAD = { top: 16, right: 30, bottom: 16, left: 30 };
+    const ROW_H = 56;       // bar height
+    const ROW_GAP = 18;     // vertical gap between rows
     const innerW = W - PAD.left - PAD.right;
-    const innerH = H - PAD.top - PAD.bottom;
+    const labelW = 240;     // left-side label column
+    const numW = 180;       // right-side number column
+    const barAreaW = innerW - labelW - numW;
 
-    const leadsPresented   = stageByKey(d, "leads_presented").count;
-    const leadsPurchased   = stageByKey(d, "leads_purchased").count;
-    const leadsRejected    = stageByKey(d, "leads_purchased").drop_count;
-    const directApps       = stageByKey(d, "direct_apps").count;
-    const appsStarted      = stageByKey(d, "apps_started").count;
-    const apply1           = stageByKey(d, "apply1");
-    const inviteGt         = stageByKey(d, "invite_gt");
-    const gtAccepted       = stageByKey(d, "gt_accepted");
-    const vcReady          = stageByKey(d, "vc_ready");
-    const paidOut          = stageByKey(d, "paid_out");
-
-    // Y-axis scale — single domain so heights are comparable.
-    const yMax = Math.max(leadsPresented, appsStarted, leadsPurchased + directApps);
-    const yScale = v => (v / yMax) * (innerH * 0.75);
-
-    // Column layout — 8 columns across the canvas
-    const colCount = 8;
-    const colSpacing = innerW / (colCount - 1);
-    const colX = i => PAD.left + i * colSpacing;
-    const barW = Math.min(50, colSpacing * 0.32);
-
-    // Position everything around a central horizontal line that represents
-    // the converged stream. Row 1 sits ABOVE the centre line; Row 2 below.
-    const cy = PAD.top + innerH / 2;
-
-    function bar(x, count, opts = {}) {
-      const h = yScale(count);
-      const y = cy - h / 2;
-      return { x, y, h, w: barW, count, ...opts };
+    // Two-scale rows: the lead row uses leadsPresented as its full width,
+    // every row from "Application started" onwards uses appsStarted.
+    function row(yIdx, label, count, denom, cls = "", drop = null) {
+      const y = PAD.top + yIdx * (ROW_H + ROW_GAP);
+      const x0 = PAD.left + labelW;
+      const stayedW = denom > 0 ? (count / denom) * barAreaW : 0;
+      const dropFrac = drop && denom > 0 ? (drop / denom) * barAreaW : 0;
+      const totalW = stayedW + dropFrac;
+      const stayedX = x0;
+      const dropX = stayedX + stayedW;
+      const parts = [];
+      // Container outline (full width from previous row's continuing part)
+      // Subtle outline so the empty area has a frame
+      // (we'll draw rects so no need for separate outline)
+      parts.push(`<rect class="pl-stage-bar ${cls}" x="${stayedX.toFixed(1)}" y="${y}" width="${stayedW.toFixed(1)}" height="${ROW_H}"><title>${escapeHtml(label)}: ${formatNumber(count)} continuing</title></rect>`);
+      if (dropFrac > 0) {
+        parts.push(`<rect x="${dropX.toFixed(1)}" y="${y}" width="${dropFrac.toFixed(1)}" height="${ROW_H}" fill="var(--red-500)" fill-opacity="0.55" stroke="var(--red-500)" stroke-width="0.5"><title>Drop at this stage: ${formatNumber(drop)}</title></rect>`);
+      }
+      // Left label
+      const labelY = y + ROW_H / 2;
+      parts.push(`<text class="pl-stage-label" x="${(PAD.left + labelW - 12).toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="end" dominant-baseline="middle">${escapeHtml(label)}</text>`);
+      // Right number
+      const num = formatNumber(count);
+      const pct = denom > 0 ? ((count / denom) * 100).toFixed(1) + "%" : "";
+      parts.push(`<text class="pl-stage-count" x="${(PAD.left + labelW + barAreaW + 8).toFixed(1)}" y="${(labelY - 6).toFixed(1)}" dominant-baseline="middle">${num}</text>`);
+      if (pct) parts.push(`<text class="pl-stage-pct" x="${(PAD.left + labelW + barAreaW + 8).toFixed(1)}" y="${(labelY + 10).toFixed(1)}" dominant-baseline="middle">${pct} of cohort</text>`);
+      // Drop label inside the red part
+      if (drop && drop > 0 && dropFrac > 50) {
+        parts.push(`<text class="pl-drop-label" x="${(dropX + 8).toFixed(1)}" y="${(labelY - 2).toFixed(1)}" dominant-baseline="middle">${escapeHtml(stageByKey(d, dropStageKey(yIdx)).drop_label || "drop")}: ${formatNumber(drop)}</text>`);
+      }
+      return parts.join("\n");
     }
 
-    // Layout per column:
-    // 0: Leads presented (top row)
-    // 1: Leads purchased
-    // 2: Direct apps (single bar in mid row, slightly different y)
-    // 3: Apps started (convergence)
-    // 4: Apply1
-    // 5: Invite GT
-    // 6: GT accepted
-    // 7: VC ready
-    // (we'll squeeze Paid out as col 8 partial)
-
-    // Use 9 columns instead — re-layout
-    const cols = 9;
-    const cs = innerW / (cols - 1);
-    const cx = i => PAD.left + i * cs;
-    const bw = Math.min(46, cs * 0.34);
-
-    // Row vertical offsets for the two entry rows
-    const upperCy = PAD.top + innerH * 0.30;   // for leads presented + leads purchased
-    const lowerCy = PAD.top + innerH * 0.74;   // for direct apps
-    const midCy   = PAD.top + innerH * 0.50;   // for apps started + onwards
-
-    function mkBar(col, count, baselineCy, cls = "") {
-      const h = yScale(count);
-      return {
-        col, count, cls,
-        x: cx(col) - bw / 2,
-        y: baselineCy - h / 2,
-        h: h,
-        cyAt: baselineCy,
+    function dropStageKey(yIdx) {
+      const map = {
+        1: "leads_purchased",
+        4: "apply1",
+        5: "invite_gt",
+        6: "gt_accepted",
+        7: "vc_ready",
+        8: "paid_out",
       };
+      return map[yIdx] || "";
     }
-
-    const bars = {
-      leadsPresented: mkBar(0, leadsPresented, upperCy, "entry"),
-      leadsPurchased: mkBar(1, leadsPurchased, upperCy),
-      directApps:     mkBar(1, directApps, lowerCy, "entry"),
-      appsStarted:    mkBar(2, appsStarted, midCy),
-      apply1:         mkBar(3, apply1.count, midCy),
-      inviteGt:       mkBar(4, inviteGt.count, midCy),
-      gtAccepted:     mkBar(5, gtAccepted.count, midCy),
-      vcReady:        mkBar(6, vcReady.count, midCy),
-      paidOut:        mkBar(7, paidOut.count, midCy, "terminal"),
-    };
 
     const svg = [];
+    const totalRows = 9;
+    const H = PAD.top + totalRows * (ROW_H + ROW_GAP) + PAD.bottom + 20;
     svg.push(`<svg class="pl-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Application pipeline funnel">`);
 
-    // ─── Flows ────────────────────────────────────────────────────
-    function flow(fromBar, toBar, magnitude, cls = "") {
-      const h1 = yScale(magnitude);
-      const fromY = fromBar.cyAt - h1 / 2;
-      const fromYBot = fromBar.cyAt + h1 / 2;
-      const x1 = fromBar.x + fromBar.w;
-      const x2 = toBar.x;
-      const toCy = toBar.cyAt;
-      const toY = toCy - h1 / 2;
-      const toYBot = toCy + h1 / 2;
-      const cx1 = x1 + (x2 - x1) * 0.5;
-      const cx2 = cx1;
-      // Quad path: top edge (cubic) + right edge + bottom edge (cubic) + left edge
-      return `<path class="pl-flow ${cls}" d="
-        M ${x1} ${fromY}
-        C ${cx1} ${fromY}, ${cx2} ${toY}, ${x2} ${toY}
-        L ${x2} ${toYBot}
-        C ${cx2} ${toYBot}, ${cx1} ${fromYBot}, ${x1} ${fromYBot}
-        Z"/>`;
-    }
+    // ── Lead funnel rows (scale: leadsPresented) ──
+    svg.push(row(0, "Leads presented", leadsPresented, leadsPresented, "entry"));
+    svg.push(row(1, "Leads purchased", leadsPurchased, leadsPresented, "", leadsRejected));
 
-    function dropFlow(fromBar, magnitude, dropY) {
-      const h1 = yScale(magnitude);
-      const fromY = fromBar.cyAt - h1 / 2;
-      const fromYBot = fromBar.cyAt + h1 / 2;
-      const x1 = fromBar.x + fromBar.w;
-      const x2 = x1 + 28;
-      const dropTop = dropY - h1 / 2;
-      const dropBot = dropY + h1 / 2;
-      const cx1 = x1 + (x2 - x1) * 0.5;
-      return `<path class="pl-flow drop" d="
-        M ${x1} ${fromY}
-        C ${cx1} ${fromY}, ${cx1} ${dropTop}, ${x2} ${dropTop}
-        L ${x2} ${dropBot}
-        C ${cx1} ${dropBot}, ${cx1} ${fromYBot}, ${x1} ${fromYBot}
-        Z"/>`;
-    }
+    // ── Convergence note ──
+    const convergeY = PAD.top + 2 * (ROW_H + ROW_GAP) + ROW_H / 2;
+    svg.push(`<text class="pl-stage-pct" x="${(PAD.left + labelW + barAreaW / 2).toFixed(1)}" y="${convergeY.toFixed(1)}" text-anchor="middle" dominant-baseline="middle">+ ${formatNumber(directApps)} direct applications join here →</text>`);
 
-    // Lead path: presented → purchased + drop to rejected
-    svg.push(flow(bars.leadsPresented, bars.leadsPurchased, leadsPurchased, "entry"));
-    if (leadsRejected > 0) {
-      const dropMidY = upperCy - yScale(leadsPurchased) / 2 - yScale(leadsRejected) / 2 - 8;
-      svg.push(dropFlow(bars.leadsPresented, leadsRejected, Math.max(PAD.top + 14, dropMidY)));
-    }
-
-    // Convergence: leadsPurchased → appsStarted (purchased portion), directApps → appsStarted
-    const purAppsCount = d.apps.purchased_path;
-    const dirAppsCount = d.apps.direct_path;
-    if (purAppsCount > 0) svg.push(flow(bars.leadsPurchased, bars.appsStarted, purAppsCount));
-    if (dirAppsCount > 0) svg.push(flow(bars.directApps, bars.appsStarted, dirAppsCount, "entry"));
-
-    // Each subsequent stage: continue + drop
-    function pipelineStage(fromBar, toBar, count, dropCount) {
-      svg.push(flow(fromBar, toBar, count));
-      if (dropCount > 0) {
-        const dropY = midCy + yScale(count) / 2 + yScale(dropCount) / 2 + 12;
-        const cappedDropY = Math.min(H - PAD.bottom - 14, dropY);
-        svg.push(dropFlow(fromBar, dropCount, cappedDropY));
-      }
-    }
-    pipelineStage(bars.appsStarted, bars.apply1,     apply1.count,     apply1.drop_count);
-    pipelineStage(bars.apply1,      bars.inviteGt,   inviteGt.count,   inviteGt.drop_count);
-    pipelineStage(bars.inviteGt,    bars.gtAccepted, gtAccepted.count, gtAccepted.drop_count);
-    pipelineStage(bars.gtAccepted,  bars.vcReady,    vcReady.count,    vcReady.drop_count);
-    pipelineStage(bars.vcReady,     bars.paidOut,    paidOut.count,    paidOut.drop_count);
-
-    // ─── Bars + labels ────────────────────────────────────────────
-    const labels = {
-      leadsPresented: ["Leads presented", upperCy],
-      leadsPurchased: ["Leads purchased", upperCy],
-      directApps:     ["Direct apps", lowerCy],
-      appsStarted:    ["Application started", midCy],
-      apply1:         ["Apply1 (Page 1)", midCy],
-      inviteGt:       ["Invite GT (BRW signed)", midCy],
-      gtAccepted:     ["GT accepted", midCy],
-      vcReady:        ["VC ready", midCy],
-      paidOut:        ["Paid out", midCy],
-    };
-
-    Object.entries(bars).forEach(([key, b]) => {
-      svg.push(`<rect class="pl-stage-bar ${b.cls}" x="${b.x.toFixed(1)}" y="${b.y.toFixed(1)}" width="${b.w}" height="${b.h.toFixed(1)}"><title>${labels[key][0]}: ${formatNumber(b.count)}</title></rect>`);
-      // Stage label below the bar
-      const [labelText, labelCy] = labels[key];
-      const labelY = labelCy + b.h / 2 + 16;
-      const cxText = b.x + b.w / 2;
-      svg.push(`<text class="pl-stage-label" x="${cxText.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle">${escapeHtml(labelText)}</text>`);
-      svg.push(`<text class="pl-stage-count" x="${cxText.toFixed(1)}" y="${(labelY + 14).toFixed(1)}" text-anchor="middle">${formatNumber(b.count)}</text>`);
-      // % of leads_presented (or apps_started for stages after convergence)
-      const denom = key === "leadsPresented" ? null
-        : (["leadsPurchased", "directApps"].includes(key)
-           ? leadsPresented + directApps
-           : appsStarted);
-      if (denom && denom > 0 && b.count != null) {
-        const pct = (b.count / denom) * 100;
-        svg.push(`<text class="pl-stage-pct" x="${cxText.toFixed(1)}" y="${(labelY + 28).toFixed(1)}" text-anchor="middle">${pct.toFixed(0)}%</text>`);
-      }
-    });
-
-    // Drop labels at the right margin (rejected lead label)
-    if (leadsRejected > 0) {
-      const dropMidY = upperCy - yScale(leadsPurchased) / 2 - yScale(leadsRejected) / 2 - 8;
-      const yc = Math.max(PAD.top + 14, dropMidY);
-      svg.push(`<text class="pl-drop-label" x="${(bars.leadsPresented.x + bars.leadsPresented.w + 32).toFixed(1)}" y="${yc.toFixed(1)}">Lead rejected</text>`);
-      svg.push(`<text class="pl-drop-count" x="${(bars.leadsPresented.x + bars.leadsPresented.w + 32).toFixed(1)}" y="${(yc + 12).toFixed(1)}">${formatNumber(leadsRejected)}</text>`);
-    }
+    // ── Application pipeline rows (scale: appsStarted) ──
+    svg.push(row(3, "Application started", appsStarted, appsStarted));
+    svg.push(row(4, "Apply1 complete (Page 1)", apply1.count, appsStarted, "", apply1.drop_count));
+    svg.push(row(5, "Invite GT (BRW signed)", inviteGt.count, appsStarted, "", inviteGt.drop_count));
+    svg.push(row(6, "GT accepted (passed checks)", gtAccepted.count, appsStarted, "", gtAccepted.drop_count));
+    svg.push(row(7, "VC ready", vcReady.count, appsStarted, "", vcReady.drop_count));
+    svg.push(row(8, "Paid out", paidOut.count, appsStarted, "terminal", paidOut.drop_count));
 
     svg.push(`</svg>`);
     document.getElementById("plCanvas").innerHTML = svg.join("");
