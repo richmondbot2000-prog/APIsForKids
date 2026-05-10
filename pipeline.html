@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Pipeline</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778434292">
-<link rel="stylesheet" href="quiet.css?v=1778434292">
-<link rel="stylesheet" href="quiet-extras.css?v=1778434292">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778437443">
+<link rel="stylesheet" href="quiet.css?v=1778437443">
+<link rel="stylesheet" href="quiet-extras.css?v=1778437443">
 <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js" crossorigin="anonymous"></script>
 <style>
@@ -211,7 +211,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778434292" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778437443" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -509,15 +509,23 @@
 
   function drawAppProgression(d) {
     const stages = Object.fromEntries(d.stages.map(s => [s.key, s]));
+    const purchasedTotal = d.leads.purchased || 0;          // 864k — what we paid for
+    const purchasedToApp = d.apps.purchased_path || 0;       // 592k — actually became applications in March
+    const purchasedNoApp = Math.max(0, purchasedTotal - purchasedToApp);
+
     const nodes = [
       { name: "Leads purchased", kind: "purchased" },
       { name: "Direct applications", kind: "entry" },
       { name: "Application started", kind: "stage" },
     ];
     const links = [
-      { source: "Leads purchased", target: "Application started", value: d.apps.purchased_path || 0 },
+      { source: "Leads purchased", target: "Application started", value: purchasedToApp },
       { source: "Direct applications", target: "Application started", value: d.apps.direct_path || 0 },
     ];
+    if (purchasedNoApp > 0) {
+      nodes.push({ name: "Purchased lead — no application yet", kind: "drop" });
+      links.push({ source: "Leads purchased", target: "Purchased lead — no application yet", value: purchasedNoApp });
+    }
 
     function pipelineStage(fromName, toStage) {
       nodes.push({ name: toStage.label, kind: toStage.key === "paid_out" ? "terminal" : "stage" });
