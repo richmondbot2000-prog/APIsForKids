@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-10T10:44:03.637090Z",
+  "updated_at": "2026-05-10T14:38:38.522174Z",
   "target_date": "2026-05-08",
   "totals": {
     "borrowers": 149
@@ -1260,20 +1260,20 @@
     {
       "first_name": "William",
       "state": "TX",
-      "city": "Cibolo",
-      "county": "Guadalupe",
-      "amount": 3000.0,
-      "lat": 29.575,
-      "lng": -98.228
-    },
-    {
-      "first_name": "William",
-      "state": "TX",
       "city": "Waco",
       "county": "McLennan",
       "amount": 4500.0,
       "lat": 31.5545,
       "lng": -97.1627
+    },
+    {
+      "first_name": "William",
+      "state": "TX",
+      "city": "Cibolo",
+      "county": "Guadalupe",
+      "amount": 3000.0,
+      "lat": 29.575,
+      "lng": -98.228
     },
     {
       "first_name": "Gabrielle",
