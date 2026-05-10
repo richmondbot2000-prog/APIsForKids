@@ -169,7 +169,6 @@ def main() -> None:
             return False
         try:
             cur = conn.cursor()
-            cur.timeout = QUERY_TIMEOUT
             # Sources
             cols = discover_columns(cur, "Sources")
             if cols and not sources:
