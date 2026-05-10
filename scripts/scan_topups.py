@@ -226,16 +226,21 @@ def main() -> None:
     print(f"# top-up classifier: LoanAtInception.TopUpAmountAtInception present = {has_topup_classifier}", flush=True)
 
     # Live-loan filter: a snapshot only counts as "live" if DIA < 90 AND
-    # CurrentBalance > 10. Verify both columns exist on Loan_History.
+    # CurrentBalance > 10. Column names vary by warehouse vintage, so we
+    # discover them via INFORMATION_SCHEMA.
     cur.execute("""
-        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+        SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS
         WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
-          AND COLUMN_NAME IN ('DIA', 'CurrentBalance')
+        ORDER BY COLUMN_NAME
     """, [TABLE_SCHEMA, TABLE_NAME])
-    live_cols = {r[0] for r in cur.fetchall()}
-    has_live_filter = ('DIA' in live_cols and 'CurrentBalance' in live_cols)
-    live_filter_sql = "AND lh.DIA < 90 AND lh.CurrentBalance > 10" if has_live_filter else ""
-    print(f"# live-loan filter: DIA<90 AND CurrentBalance>10 — applied = {has_live_filter} (cols present: {sorted(live_cols)})", flush=True)
+    all_cols = [(c, t) for c, t in cur.fetchall()]
+    print(f"# {TABLE_NAME} columns: {[c for c, _ in all_cols]}", flush=True)
+    col_names = {c for c, _ in all_cols}
+    dia_col = next((c for c in ('DIA', 'DaysInArrears', 'DIADays', 'DaysSinceArrears') if c in col_names), None)
+    bal_col = next((c for c in ('CurrentBalance', 'Balance', 'CurrentBal', 'OutstandingBalance', 'Outstanding') if c in col_names), None)
+    has_live_filter = bool(dia_col and bal_col)
+    live_filter_sql = f"AND lh.[{dia_col}] < 90 AND lh.[{bal_col}] > 10" if has_live_filter else ""
+    print(f"# live-loan filter: applied = {has_live_filter}  dia_col={dia_col}  bal_col={bal_col}", flush=True)
 
     if LENDER_ID is not None:
         # Build lender_loans CTE: LenderId from Loan, top-up flag from LoanAtInception.
@@ -363,7 +368,10 @@ def main() -> None:
         "timestamp_column": ts,
         "lender_id": LENDER_ID,
         "lender_label": LENDER_LABEL,
-        "live_filter": "DIA < 90 days AND CurrentBalance > $10" if has_live_filter else "(none — DIA / CurrentBalance columns not present on Loan_History)",
+        "live_filter": (
+            f"{dia_col} < 90 days AND {bal_col} > $10" if has_live_filter
+            else "(none — DIA / CurrentBalance columns not present on Loan_History)"
+        ),
         "lender_thresholds": lender_thresholds,
         "totals": {
             "live_loans_loan_months":   total_live,   # SUM, not distinct
