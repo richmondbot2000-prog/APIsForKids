@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778438233">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778438233">
-<link rel="stylesheet" href="quiet.css?v=1778438233">
-<link rel="stylesheet" href="quiet-extras.css?v=1778438233">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778438233">
+<link rel="stylesheet" href="style.css?v=1778494049">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778494049">
+<link rel="stylesheet" href="quiet.css?v=1778494049">
+<link rel="stylesheet" href="quiet-extras.css?v=1778494049">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778494049">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -216,6 +216,19 @@
     font-style: italic;
     font-weight: 500;
   }
+  /* Workspace-tenant chip on each staff card. Only rendered when there's
+     more than one tenant in staff.json (multi-tenant deployments). */
+  .dir-workspace-chip {
+    display: inline-block;
+    font: 500 10px/1.4 var(--font-mono, "JetBrains Mono", ui-monospace, monospace);
+    color: var(--sage-700, #5A7041);
+    background: rgba(116, 145, 90, 0.10);
+    border: 1px solid rgba(116, 145, 90, 0.30);
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin: 2px 0 4px;
+    letter-spacing: 0.02em;
+  }
 
   .dir-card--external {
     opacity: 0.92;
@@ -257,7 +270,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778438233" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778494049" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -290,6 +303,11 @@
           <button class="dir-pill dir-pill--tenant active" data-value="all">All <span class="dir-pill-count" id="dirTenantCountAll">0</span></button>
           <!-- tenant pills injected dynamically -->
         </div>
+        <div class="dir-filter-row" id="dirWorkspaceRow" hidden>
+          <span class="dir-filter-label">Workspace</span>
+          <button class="dir-pill dir-pill--workspace active" data-value="all">All <span class="dir-pill-count" id="dirWorkspaceCountAll">0</span></button>
+          <!-- workspace tenant pills injected dynamically when staff.json has 2+ tenants -->
+        </div>
         <div class="dir-filter-row" id="dirDeptRow">
           <span class="dir-filter-label">Department</span>
           <button class="dir-pill dir-pill--dept active" data-value="all">All <span class="dir-pill-count" id="dirCountAll">0</span></button>
@@ -313,6 +331,7 @@
   let allEntries = [];
   let activeDept = "all";
   let activeTenant = "all";
+  let activeWorkspace = "all";   // Google Workspace tenant (letme.co.uk vs rgroup vs etc.)
   let searchTerm = "";
 
   // Tenant priority: transform/together → RG internal (rgroup, rgdc, letme) → other.
@@ -387,8 +406,18 @@
         if (!t) continue;
         byTenant[t] = (byTenant[t] || 0) + 1;
       }
+      // Workspace pills count distinct Google Workspace tenants — only show
+      // when staff.json has 2+ tenants configured (otherwise this row is
+      // visual noise).
+      const byWorkspace = {};
+      for (const e of allEntries) {
+        if (e.type !== "staff" || !e.user) continue;
+        const list = e.user.tenants || (e.user.tenant ? [e.user.tenant] : []);
+        for (const t of list) byWorkspace[t] = (byWorkspace[t] || 0) + 1;
+      }
       buildDeptPills(byDept);
       buildTenantPills(byTenant);
+      buildWorkspacePills(byWorkspace);
       document.getElementById("dirControls").hidden = allEntries.length === 0;
       renderGrid();
     })
@@ -451,6 +480,35 @@
     });
   }
 
+  function buildWorkspacePills(byWorkspace) {
+    const row = document.getElementById("dirWorkspaceRow");
+    const distinct = Object.keys(byWorkspace);
+    if (distinct.length < 2) {
+      row.hidden = true;
+      return;   // single-tenant — don't bother showing a one-option filter
+    }
+    row.hidden = false;
+    const total = Object.values(byWorkspace).reduce((a, b) => a + b, 0);
+    document.getElementById("dirWorkspaceCountAll").textContent = total;
+    Object.entries(byWorkspace)
+      .sort((a, b) => -a[1] + b[1] || a[0].localeCompare(b[0]))
+      .forEach(([name, n]) => {
+        const btn = document.createElement("button");
+        btn.className = "dir-pill dir-pill--workspace";
+        btn.dataset.value = name;
+        btn.innerHTML = `${escapeHtml(name)} <span class="dir-pill-count">${n}</span>`;
+        row.appendChild(btn);
+      });
+    document.querySelectorAll(".dir-pill--workspace").forEach(p => {
+      p.addEventListener("click", () => {
+        document.querySelectorAll(".dir-pill--workspace").forEach(b => b.classList.remove("active"));
+        p.classList.add("active");
+        activeWorkspace = p.dataset.value;
+        renderGrid();
+      });
+    });
+  }
+
   function renderGrid() {
     const grid = document.getElementById("dirGrid");
     const empty = document.getElementById("dirEmpty");
@@ -471,6 +529,12 @@
     if (activeTenant !== "all") {
       // Tenant filter applies to anyone with activity data, staff or external.
       if (!entry.activity || entry.activity.primary_tenant !== activeTenant) return false;
+    }
+    if (activeWorkspace !== "all") {
+      // Workspace filter: staff-only (external users have no Google account).
+      if (entry.type !== "staff" || !entry.user) return false;
+      const list = entry.user.tenants || (entry.user.tenant ? [entry.user.tenant] : []);
+      if (!list.includes(activeWorkspace)) return false;
     }
     if (activeDept !== "all") {
       // The dept filter is for Workspace staff; external entries are excluded
@@ -526,12 +590,21 @@
       ? `<img class="dir-photo" src="${escapeHtml(u.photo_url)}" alt="${escapeHtml(u.name)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=&quot;dir-photo-placeholder&quot;>${escapeHtml(initials)}</div>'">`
       : `<div class="dir-photo-placeholder">${escapeHtml(initials)}</div>`;
 
+    // Only show the Workspace-tenant chip when 2+ tenants exist (avoids
+    // visual noise in single-tenant deployments).
+    const tenantList = u.tenants || (u.tenant ? [u.tenant] : []);
+    const showWorkspaceChip = !document.getElementById("dirWorkspaceRow").hidden && tenantList.length;
+    const workspaceChip = showWorkspaceChip
+      ? `<div class="dir-workspace-chip" title="Google Workspace tenant">${tenantList.map(t => escapeHtml(t)).join(" + ")}</div>`
+      : "";
+
     return `
       <a class="dir-card" href="mailto:${escapeHtml(u.email)}" title="Email ${escapeHtml(u.name || u.email)}">
         ${photo}
         <div class="dir-name">${escapeHtml(u.name || u.email)}</div>
         ${u.title ? `<div class="dir-title">${escapeHtml(u.title)}</div>` : ""}
         ${u.department ? `<div class="dir-department">${escapeHtml(u.department)}</div>` : ""}
+        ${workspaceChip}
         <div class="dir-email">${escapeHtml(u.email)}</div>
         ${activityHtml(a)}
       </a>

@@ -65,6 +65,12 @@ jobs:
           # and the rest of the job (commit + push) skips, so the workflow
           # is a no-op until the secret arrives.
           WORKSPACE_SERVICE_ACCOUNT_JSON: ${{ secrets.WORKSPACE_SERVICE_ACCOUNT_JSON }}
+          # WORKSPACE_TENANTS is the multi-tenant form — a JSON array of
+          # {name, delegate, domain} dicts. If set, it wins over the legacy
+          # single-tenant fallback below.
+          WORKSPACE_TENANTS:              ${{ secrets.WORKSPACE_TENANTS }}
+          # Legacy single-tenant fallback (kept for backward compat — if
+          # WORKSPACE_TENANTS isn't set, the scanner uses these instead).
           WORKSPACE_DELEGATE_USER:        ${{ secrets.WORKSPACE_DELEGATE_USER }}
           WORKSPACE_DOMAIN:               letme.co.uk
         run: python scripts/scan_directory.py
