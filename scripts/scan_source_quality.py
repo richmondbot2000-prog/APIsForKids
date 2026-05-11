@@ -492,33 +492,12 @@ def main() -> None:
     SAMPLE_PER_CAMPAIGN = int(os.environ.get("SQ_SAMPLE_PER_CAMPAIGN", "1500"))
     print(f"# Part B: sampling up to {SAMPLE_PER_CAMPAIGN} rejected leads per candidate campaign…", flush=True)
 
-    # Build the list of candidate CampaignIds: those whose SourceId rolls
-    # up to one of our >=MIN_EXCLUDED-excluded sources.
-    candidate_source_ids = set(candidate_sources.keys())
-    candidate_campaign_ids = list({
-        cid for cid, sid in campaign_to_source.items()
-        if sid in candidate_source_ids
-    })
-    # If 'Unknown source' (None) is itself a candidate (i.e. lots of
-    # source-excluded leads came in via campaigns we couldn't map), pick
-    # up the unmapped CampaignIds via a separate query.
-    if None in candidate_source_ids:
-        cur.execute(
-            f"""
-            SELECT DISTINCT [{L_camp}]
-            FROM dbo.Leads
-            WHERE [{L_date}] >= ? AND [{L_date}] < ?
-              AND [{L_lender}] = ?
-              AND [{L_result}] = ?
-              AND [{L_camp}] IS NOT NULL
-            """,
-            [window_start, window_end, LENDER_ID, EXCLUDED_RESULT_ID],
-        )
-        for (cid,) in cur.fetchall():
-            cid_int = int(cid)
-            if campaign_to_source.get(cid_int) is None:
-                candidate_campaign_ids.append(cid_int)
-        candidate_campaign_ids = list(set(candidate_campaign_ids))
+    # Candidate set is the CampaignIds with >= MIN_EXCLUDED excluded
+    # leads — we already keyed candidate_sources on CampaignId since the
+    # broker→campaign refactor. (The previous version filtered by
+    # checking BrokerIds against this set, which only matched by
+    # numeric coincidence.)
+    candidate_campaign_ids = [c for c in candidate_sources.keys() if c is not None]
     print(f"#   candidate campaigns to sample: {len(candidate_campaign_ids)}", flush=True)
 
     sampled: list[dict] = []
@@ -559,10 +538,13 @@ def main() -> None:
     print(f"#   sampled rejected leads: {len(sampled):,}", flush=True)
 
     # Pull purchased leads (~3-5M rows). Need: ARef, CampaignId,
-    # identity fields, paid_out flag.
+    # identity fields, paid_out flag, plus BidAmount + Date for the
+    # duplicate-pricing analysis (Part C).
     purchased: list[dict] = []
     if L_phone and L_dob and L_aref:
-        gov_sel = f"l.[{L_gov}]" if L_gov else "NULL"
+        gov_sel = f"l.[{L_gov}]"  if L_gov  else "NULL"
+        bid_sel = f"l.[{L_bid}]"  if L_bid  else "NULL"
+        date_sel = f"l.[{L_date}]"
         print("# Part B: pulling purchased-side leads + paid-out status…", flush=True)
         cur.execute(
             f"""
@@ -572,6 +554,8 @@ def main() -> None:
                    l.[{L_dob}]   AS DOB,
                    l.[{L_email}] AS Email,
                    {gov_sel} AS GovId,
+                   {bid_sel} AS BidAmount,
+                   MIN({date_sel}) AS DateReceived,
                    MAX(CASE WHEN a.[{A_status}] = 5 THEN 1 ELSE 0 END) AS paid
             FROM dbo.Leads l
             INNER JOIN dbo.Applications a
@@ -580,11 +564,11 @@ def main() -> None:
               AND l.[{L_lender}] = ?
               AND l.[{L_result}] IN ({",".join(str(x) for x in PURCHASED_RESULT_IDS)})
               AND l.[{L_aref}] IS NOT NULL
-            GROUP BY l.[{L_aref}], l.[{L_camp}], l.[{L_phone}], l.[{L_dob}], l.[{L_email}], {gov_sel}
+            GROUP BY l.[{L_aref}], l.[{L_camp}], l.[{L_phone}], l.[{L_dob}], l.[{L_email}], {gov_sel}, {bid_sel}
             """,
             [LENDER_ID, window_start, window_end, LENDER_ID],
         )
-        for aref, camp_id, phone, dob, email, gov_id, paid in cur.fetchall():
+        for aref, camp_id, phone, dob, email, gov_id, bid_amount, date_received, paid in cur.fetchall():
             purchased.append({
                 "aref":     aref,
                 "camp_id":  int(camp_id) if camp_id is not None else None,
@@ -593,6 +577,8 @@ def main() -> None:
                 "dob":      dob,
                 "email":    (email or "").strip().lower() if email else "",
                 "gov_id":   (gov_id or "").strip() if gov_id else "",
+                "bid":      float(bid_amount) if bid_amount is not None else None,
+                "date":     date_received,
                 "paid":     bool(paid),
             })
     print(f"#   purchased leads pulled: {len(purchased):,}", flush=True)
@@ -696,6 +682,109 @@ def main() -> None:
     # the most paid loans rise to the top.
     blocked_rows.sort(key=lambda r: -(r.get("bounceback_paid_per_excluded") or 0))
 
+    # ─── Part C: duplicate-pricing analysis ───────────────────────────
+    # Question this answers: "Same person bought expensive via campaign X
+    # at $3 — do they later show up cheaper via another campaign at $1?
+    # If yes, we overpaid; we could have waited."
+    #
+    # Only meaningful for upfront-paid commission models (CPL + BID).
+    # CPF/REV cost nothing per-lead, only on funding — so those leads
+    # being duplicated has no overpay angle.
+    print("# Part C: duplicate-pricing analysis on purchased leads…", flush=True)
+
+    def _per_lead_cost(p) -> float | None:
+        meta = campaign_meta.get(p["camp_id"]) or {}
+        ct = str(meta.get("commission_type"))
+        rate = meta.get("commission_rate") or 0
+        if ct == "4":
+            # Auction-priced: actual bid if recorded, else floor rate
+            return p.get("bid") if (p.get("bid") is not None and p.get("bid") > 0) else rate
+        if ct == "2":
+            return rate
+        return None
+
+    by_aref = {p["aref"]: p for p in purchased}
+    clone_stats: dict[int, dict] = {}
+    overspend_total = 0.0
+    scanned = 0
+    for p in purchased:
+        cost_here = _per_lead_cost(p)
+        if cost_here is None or cost_here <= 0 or p.get("date") is None:
+            continue
+        scanned += 1
+        match_arefs: set = set()
+        if p["gov_id"]:
+            for m in by_gov.get(p["gov_id"], []):
+                match_arefs.add(m["aref"])
+        if p["phone"] and p["dob"] is not None:
+            for m in by_phone_dob.get((p["phone"], p["dob"]), []):
+                match_arefs.add(m["aref"])
+        if p["email"] and p["dob"] is not None:
+            for m in by_email_dob.get((p["email"], p["dob"]), []):
+                match_arefs.add(m["aref"])
+        match_arefs.discard(p["aref"])
+        if not match_arefs:
+            continue
+
+        cheapest_later: float | None = None
+        cheapest_date = None
+        for a in match_arefs:
+            m = by_aref.get(a)
+            if not m or m.get("date") is None:
+                continue
+            if m["date"] <= p["date"]:
+                continue  # must be LATER than this purchase to be a "could have waited" signal
+            mc = _per_lead_cost(m)
+            if mc is None:
+                continue
+            if mc < cost_here and (cheapest_later is None or mc < cheapest_later):
+                cheapest_later = mc
+                cheapest_date = m["date"]
+
+        if cheapest_later is None:
+            continue
+        savings = cost_here - cheapest_later
+        wait_days = (cheapest_date - p["date"]).days if cheapest_date and p["date"] else 0
+        overspend_total += savings
+        cid = p["camp_id"]
+        slot = clone_stats.setdefault(cid, {
+            "campaign_id":   cid,
+            "source_name":   _source_name(cid),
+            "broker_id":     campaign_to_source.get(cid) if cid is not None else None,
+            "broker_name":   _broker_name(campaign_to_source.get(cid) if cid is not None else None),
+            "_savings_list": [],
+            "_wait_list":    [],
+        })
+        slot["_savings_list"].append(savings)
+        slot["_wait_list"].append(wait_days)
+
+    cheaper_rows = []
+    for cid, slot in clone_stats.items():
+        sav = slot.pop("_savings_list")
+        wait = slot.pop("_wait_list")
+        n = len(sav)
+        total_savings = sum(sav)
+        total_leads = (weak_data.get(cid, {}) or {}).get("leads_purchased") or 0
+        slot.update({
+            "leads_with_cheaper_later": n,
+            "total_savings_if_waited":  total_savings,
+            "avg_savings_per_lead":     total_savings / n if n else 0,
+            "median_savings_per_lead":  statistics.median(sav) if sav else 0,
+            "avg_wait_days":            sum(wait) / n if n else 0,
+            "median_wait_days":         statistics.median(wait) if wait else 0,
+            "leads_purchased":          total_leads,
+            "cheaper_clone_rate":       (n / total_leads) if total_leads else None,
+        })
+        cheaper_rows.append(slot)
+
+    cheaper_rows.sort(key=lambda r: -(r.get("total_savings_if_waited") or 0))
+    print(
+        f"#   scanned {scanned:,} upfront-paid leads; found cheaper-later clone on "
+        f"{sum(r['leads_with_cheaper_later'] for r in cheaper_rows):,} leads across "
+        f"{len(cheaper_rows)} campaigns; total 60d overspend: ${overspend_total:,.0f}",
+        flush=True,
+    )
+
     # ─── Finalise Part A output ───────────────────────────────────────
     # Drop rows where weak_data is missing leads_purchased (means they had
     # apps without a Lead row, edge case).
@@ -721,6 +810,11 @@ def main() -> None:
             "sources":               weak_rows,
         },
         "blocked_to_reconsider":    blocked_rows,
+        "cheaper_clones": {
+            "total_overspend":      overspend_total,
+            "leads_with_cheaper":   sum(r["leads_with_cheaper_later"] for r in cheaper_rows),
+            "campaigns":            cheaper_rows,
+        },
     }
     out_path = Path("source-quality.json")
     out_path.write_text(json.dumps(output, indent=2, default=str))
