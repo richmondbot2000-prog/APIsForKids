@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "snapshot_date": "2026-05-10",
-  "updated_at": "2026-05-10T10:42:42Z",
+  "snapshot_date": "2026-05-11",
+  "updated_at": "2026-05-11T16:42:14Z",
   "brands": [
     "Together Loans",
     "TransformCredit"
   ],
   "totals": {
-    "all": 268,
+    "all": 269,
     "by_source": {
-      "trustpilot": 216,
-      "bbb": 11,
-      "reddit": 27,
+      "trustpilot": 218,
+      "bbb": 12,
+      "reddit": 25,
       "bluesky": 0,
       "lemmy": 0,
       "hackernews": 0,
@@ -21,14 +21,14 @@
       "youtube": 7
     },
     "by_brand": {
-      "together_loans": 250,
+      "together_loans": 251,
       "transform_credit": 18
     }
   },
   "source_status": {
     "trustpilot": {
       "ok": true,
-      "fetched": 11,
+      "fetched": 2,
       "error": null
     },
     "bbb": {
@@ -63,7 +63,7 @@
     },
     "google_news": {
       "ok": true,
-      "fetched": 75,
+      "fetched": 70,
       "error": null
     },
     "cfpb": {
@@ -79,6 +79,20 @@
   },
   "mentions": [
     {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a00f98d012dd46e1df3fd0e",
+      "title": "Customer service was wonderful and the process was very easy.",
+      "snippet": "Together loan came to my aid.I will forever remember the i stitution.",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a00f98d012dd46e1df3fd0e",
+      "date": "2026-05-10",
+      "author": "Martin",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
       "source": "reddit",
       "brand": "together_loans",
       "id": "rd-1t7wy3h",
@@ -93,18 +107,18 @@
       "site_domain": "reddit.com"
     },
     {
-      "source": "reddit",
+      "source": "trustpilot",
       "brand": "together_loans",
-      "id": "rd-1t7wxyj",
-      "title": "Anyone know about Together Loans? I co-signed for a family member and he can’t…..",
-      "snippet": "…ry month since I co-signed for him (14 months). This month he can’t make the payment. Will they debit the payment from my bank account? Yes Together loans has my banking info because they deposited the money in my account. I called their customer service and they said no but when ",
-      "url": "https://www.reddit.com/r/povertyfinance/comments/1t7wxyj/anyone_know_about_together_loans_i_cosigned_for_a/",
-      "date": "2026-05-09",
-      "author": "u/uncommonbrand",
-      "score": 0,
-      "score_max": null,
-      "site_name": "r/povertyfinance",
-      "site_domain": "reddit.com"
+      "id": "tp-6a01ad10948675e2890384ae",
+      "title": "It was so easy",
+      "snippet": "It was so easy, they confirmed my cosigner, and one two three it was in my bank, very easy, they were very knowledgeable, this was the easiest loan for me to get.",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a01ad10948675e2890384ae",
+      "date": "2026-05-08",
+      "author": "Teresa Best",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
     },
     {
       "source": "trustpilot",
@@ -301,6 +315,20 @@
       "score_max": 5,
       "site_name": "Trustpilot",
       "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "bbb",
+      "brand": "together_loans",
+      "id": "bbb-0654_90019971_673524",
+      "title": "Together Loans — 5-star review",
+      "snippet": "Very fast,and reliable and they were super friendly thank God for them they are great and thank you ***** for everything",
+      "url": "https://www.bbb.org/us/il/chicago/profile/consumer-finance-companies/together-loans-0654-90019971/customer-reviews",
+      "date": "2026-05-06",
+      "author": "Benjamin H",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "BBB",
+      "site_domain": "bbb.org"
     },
     {
       "source": "trustpilot",
@@ -819,20 +847,6 @@
       "score_max": 5,
       "site_name": "Trustpilot",
       "site_domain": "trustpilot.com"
-    },
-    {
-      "source": "reddit",
-      "brand": "together_loans",
-      "id": "rd-1t1432e",
-      "title": "Looking for a co-signer",
-      "snippet": "…w this sub is full of scammers but I was hoping to see if I could get someone who’s willing to help me out. I’m looking for a co-signer for together loans 700+ credit score needed willing to pay once it’s been processed. I’ve already gotten scammed here once and honestly idk what ",
-      "url": "https://www.reddit.com/r/findacosigner/comments/1t1432e/looking_for_a_cosigner/",
-      "date": "2026-05-01",
-      "author": "u/lurkercauseyolo",
-      "score": 1,
-      "score_max": null,
-      "site_name": "r/findacosigner",
-      "site_domain": "reddit.com"
     },
     {
       "source": "trustpilot",
@@ -3223,7 +3237,7 @@
       "url": "https://www.reddit.com/r/findacosigner/comments/1sa4v8k/scammer_alert/",
       "date": "2026-04-02",
       "author": "u/dlopez2018",
-      "score": 6,
+      "score": 4,
       "score_max": null,
       "site_name": "r/findacosigner",
       "site_domain": "reddit.com"
@@ -3321,7 +3335,7 @@
       "url": "https://www.reddit.com/r/debtfree/comments/1rjs7hz/anyone_have_experience_with_together_loans_seems/",
       "date": "2026-03-03",
       "author": "u/PM_Me_Money_Daddy",
-      "score": 5,
+      "score": 6,
       "score_max": null,
       "site_name": "r/debtfree",
       "site_domain": "reddit.com"
@@ -3461,7 +3475,7 @@
       "url": "https://www.reddit.com/r/findacosigner/comments/1q7hl9n/co_signers_beware/",
       "date": "2026-01-08",
       "author": "u/Dirftboat95",
-      "score": 11,
+      "score": 10,
       "score_max": null,
       "site_name": "r/findacosigner",
       "site_domain": "reddit.com"
@@ -3657,7 +3671,7 @@
       "url": "https://www.reddit.com/r/findacosigner/comments/1oh5p65/co_sign/",
       "date": "2025-10-27",
       "author": "u/Flimsy_Suspect3208",
-      "score": 3,
+      "score": 2,
       "score_max": null,
       "site_name": "r/findacosigner",
       "site_domain": "reddit.com"
@@ -3671,7 +3685,7 @@
       "url": "https://www.reddit.com/r/findacosigner/comments/1ocmme8/need_a_cosigner/",
       "date": "2025-10-21",
       "author": "u/CodyPalmer7",
-      "score": 3,
+      "score": 4,
       "score_max": null,
       "site_name": "r/findacosigner",
       "site_domain": "reddit.com"
