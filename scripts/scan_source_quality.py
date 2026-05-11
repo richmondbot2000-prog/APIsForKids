@@ -144,6 +144,55 @@ def main() -> None:
         flush=True,
     )
 
+    # ─── DIAGNOSTIC: SourceReference1/2/3 distribution ────────────────
+    # User hypothesis: the actual upstream Source granularity lives in
+    # SourceReference1/2/3 on Leads. Dump existence + distinct-value
+    # counts + top-20 most-common values from the rolling window so we
+    # can confirm before refactoring the analysis around them.
+    sref_cols = [c for c in ("SourceReference1", "SourceReference2", "SourceReference3") if c in leads_cols]
+    if not sref_cols:
+        print("# SourceReference1/2/3: NONE of these columns exist on dbo.Leads", flush=True)
+    else:
+        print(f"# SourceReference columns present: {sref_cols}", flush=True)
+        for col in sref_cols:
+            try:
+                cur.execute(
+                    f"""
+                    SELECT TOP 20 [{col}] AS v, COUNT(*) AS n
+                    FROM dbo.Leads
+                    WHERE [{L_date}] >= ? AND [{L_date}] < ?
+                      AND [{L_lender}] = ?
+                      AND [{col}] IS NOT NULL
+                      AND LTRIM(RTRIM(CAST([{col}] AS NVARCHAR(200)))) <> ''
+                    GROUP BY [{col}]
+                    ORDER BY COUNT(*) DESC
+                    """,
+                    [window_start, window_end, LENDER_ID],
+                )
+                rows = cur.fetchall()
+                cur.execute(
+                    f"""
+                    SELECT COUNT(DISTINCT [{col}]) AS distinct_vals,
+                           SUM(CASE WHEN [{col}] IS NOT NULL AND LTRIM(RTRIM(CAST([{col}] AS NVARCHAR(200)))) <> '' THEN 1 ELSE 0 END) AS non_null_rows,
+                           COUNT(*) AS total_rows
+                    FROM dbo.Leads
+                    WHERE [{L_date}] >= ? AND [{L_date}] < ?
+                      AND [{L_lender}] = ?
+                    """,
+                    [window_start, window_end, LENDER_ID],
+                )
+                d_count, non_null, total = cur.fetchone()
+                print(
+                    f"#   {col}: {d_count:,} distinct values, "
+                    f"{non_null:,}/{total:,} non-null rows ({(non_null/total*100 if total else 0):.1f}%)",
+                    flush=True,
+                )
+                for v, n in rows[:20]:
+                    sv = (str(v)[:60] if v is not None else "(NULL)").replace("\n", " ")
+                    print(f"#     {n:>10,}  {sv!r}", flush=True)
+            except Exception as e:
+                print(f"#   {col}: query failed — {e}", flush=True)
+
     # ─── Brokers, Campaigns + SourceType lookups ──────────────────────
     # Terminology in this scanner:
     #   Source     = an upstream sub-broker our Brokers resell from. In
