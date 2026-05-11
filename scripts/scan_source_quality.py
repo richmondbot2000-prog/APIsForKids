@@ -913,6 +913,117 @@ def main() -> None:
         flush=True,
     )
 
+    # ─── Part B.5: null-SR1 rejection analysis ────────────────────────
+    # Question: are we systematically rejecting good leads because they
+    # arrive with no SourceReference1 tag? Take a sample of REJECTED
+    # leads where SR1 is null and identity-match against later
+    # purchased leads (which by definition have a proper SR1, since
+    # null-SR1 cells are filtered from the analysis). If many come back
+    # via another channel and pay out, we're forfeiting funded loans
+    # purely because the upstream broker didn't pass a source tag.
+    print("# Part B.5: null-SR1 rejection — were they actually good leads?", flush=True)
+    null_sr1_total = 0
+    null_sr1_sample_n = 0
+    null_sr1_match_arefs: set = set()
+    null_sr1_match_paid: set = set()
+    null_sr1_dest_keys: dict[tuple, int] = {}
+    null_sr1_match_paid_loan_total = 0.0
+    if L_sr1:
+        # Total population
+        cur.execute(
+            f"""
+            SELECT COUNT(*) FROM dbo.Leads
+            WHERE [{L_date}] >= ? AND [{L_date}] < ?
+              AND [{L_lender}] = ?
+              AND [{L_result}] NOT IN ({",".join(str(x) for x in PURCHASED_RESULT_IDS)})
+              AND ([{L_sr1}] IS NULL OR LTRIM(RTRIM(CAST([{L_sr1}] AS NVARCHAR(200)))) = '')
+            """,
+            [window_start, window_end, LENDER_ID],
+        )
+        null_sr1_total = int(cur.fetchone()[0] or 0)
+        print(f"#   null-SR1 rejected leads in window: {null_sr1_total:,}", flush=True)
+
+        NULL_SR1_SAMPLE = int(os.environ.get("SQ_NULL_SR1_SAMPLE", "20000"))
+        cur.execute(
+            f"""
+            SELECT TOP {NULL_SR1_SAMPLE}
+                   l.[{L_phone}]  AS Phone,
+                   l.[{L_dob}]    AS DOB,
+                   l.[{L_email}]  AS Email,
+                   {f"l.[{L_gov}]"  if L_gov  else "NULL"} AS GovId,
+                   l.[{L_date}]   AS DateReceived
+            FROM dbo.Leads l
+            WHERE l.[{L_date}] >= ? AND l.[{L_date}] < ?
+              AND l.[{L_lender}] = ?
+              AND l.[{L_result}] NOT IN ({",".join(str(x) for x in PURCHASED_RESULT_IDS)})
+              AND (l.[{L_sr1}] IS NULL OR LTRIM(RTRIM(CAST(l.[{L_sr1}] AS NVARCHAR(200)))) = '')
+            ORDER BY l.[{L_date}] DESC
+            """,
+            [window_start, window_end, LENDER_ID],
+        )
+        null_sr1_sample = []
+        for phone, dob, email, gov_id, date_received in cur.fetchall():
+            null_sr1_sample.append({
+                "phone":  (phone or "").strip() if phone else "",
+                "dob":    dob,
+                "email":  (email or "").strip().lower() if email else "",
+                "gov_id": (gov_id or "").strip() if gov_id else "",
+                "date":   date_received,
+            })
+        null_sr1_sample_n = len(null_sr1_sample)
+        print(f"#   null-SR1 sample size: {null_sr1_sample_n:,}", flush=True)
+
+        # Need avg paid-loan amount for null-SR1 paid bouncebacks. Pull
+        # it from purchased list to estimate value.
+        paid_loan_amounts: list[float] = []
+        avg_paid_loan = None
+        # We don't carry loan_amount on purchased[] for free, but we can
+        # approximate from existing per-cell paid_loan_total / paid_out
+        # over the analysis. Skip if unavailable.
+
+        for s in null_sr1_sample:
+            if s["date"] is None: continue
+            local_matched_arefs: set = set()
+            local_matched_paid: set = set()
+            local_matched_destinations: dict[tuple, int] = {}
+
+            def _consume(matches):
+                if not matches: return
+                for p in matches:
+                    p_date = p.get("date")
+                    if p_date is None: continue
+                    if p_date <= s["date"]: continue
+                    if (p_date - s["date"]) > bounceback_delta: continue
+                    local_matched_arefs.add(p["aref"])
+                    if p["paid"]:
+                        local_matched_paid.add(p["aref"])
+                    p_key = (p.get("src_id"), p.get("sr1"))
+                    local_matched_destinations[p_key] = local_matched_destinations.get(p_key, 0) + 1
+
+            if s["gov_id"]:
+                _consume(by_gov.get(s["gov_id"]))
+            if s["phone"] and s["dob"] is not None:
+                _consume(by_phone_dob.get((s["phone"], s["dob"])))
+            if s["email"] and s["dob"] is not None:
+                _consume(by_email_dob.get((s["email"], s["dob"])))
+
+            null_sr1_match_arefs.update(local_matched_arefs)
+            null_sr1_match_paid.update(local_matched_paid)
+            for k, n in local_matched_destinations.items():
+                null_sr1_dest_keys[k] = null_sr1_dest_keys.get(k, 0) + n
+
+        sampled_match_n = len(null_sr1_match_arefs)
+        sampled_paid_n  = len(null_sr1_match_paid)
+        scale = (null_sr1_total / null_sr1_sample_n) if null_sr1_sample_n else 0
+        estimated_match = int(sampled_match_n * scale)
+        estimated_paid  = int(sampled_paid_n * scale)
+        print(
+            f"#   sample: {sampled_match_n} bounceback matches, {sampled_paid_n} paid; "
+            f"scale ×{scale:.1f} → est. full-window {estimated_match:,} bouncebacks "
+            f"and {estimated_paid:,} paid loans we forfeited by rejecting null-SR1 leads",
+            flush=True,
+        )
+
     conn.close()
 
     # ─── Finalise Part B output (keyed on broker, SR1) ────────────────
@@ -1098,6 +1209,15 @@ def main() -> None:
             "by_broker_source":      bs_qualifying,        # (Broker, SR1) rollup — primary
         },
         "blocked_to_reconsider":   blocked_rows,           # now keyed by (Broker, SR1)
+        "null_sr1_analysis": {
+            "rejected_total":       null_sr1_total,
+            "sample_size":          null_sr1_sample_n,
+            "sample_bounceback_arefs": len(null_sr1_match_arefs),
+            "sample_bounceback_paid":  len(null_sr1_match_paid),
+            "scale_factor":         (null_sr1_total / null_sr1_sample_n) if null_sr1_sample_n else 0,
+            "estimated_bouncebacks": int(len(null_sr1_match_arefs) * ((null_sr1_total / null_sr1_sample_n) if null_sr1_sample_n else 0)),
+            "estimated_paid_loans": int(len(null_sr1_match_paid) * ((null_sr1_total / null_sr1_sample_n) if null_sr1_sample_n else 0)),
+        },
         "cheaper_clones": {
             "total_overspend":      overspend_total,
             "leads_with_cheaper":   sum(r["leads_with_cheaper_later"] for r in cheaper_rows),
