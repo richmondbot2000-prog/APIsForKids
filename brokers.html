@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Brokers</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778539049">
-<link rel="stylesheet" href="quiet.css?v=1778539049">
-<link rel="stylesheet" href="quiet-extras.css?v=1778539049">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778539151">
+<link rel="stylesheet" href="quiet.css?v=1778539151">
+<link rel="stylesheet" href="quiet-extras.css?v=1778539151">
 <style>
   .br-section { max-width: 1280px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .br-section { padding: 2px 0 32px; } }
@@ -501,7 +501,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778539049" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778539151" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -654,6 +654,11 @@
     for (const r of (d.sources || [])) {
       r.volume_share = totalLeads ? (r.leads_presented / totalLeads) : null;
     }
+    // Stash the cohort-average paid-loan amount for $-forfeit estimates
+    // in the source-quality section. Computed from broker-wide totals.
+    const totalPaid = (d.totals && d.totals.paid_out) || 0;
+    const totalFunded = (d.totals && d.totals.paid_out_loan_total) || 0;
+    window.COHORT_AVG_LOAN = totalPaid ? (totalFunded / totalPaid) : 0;
     render();
     renderRefresh(d);
     renderMeta(d);
@@ -711,8 +716,10 @@
     const unblock = blocked.slice(0, 15);
     const totalExcluded = blocked.reduce((a, b) => a + (b.excluded_count || 0), 0);
     const totalBouncePaid = blocked.reduce((a, b) => a + (b.bounceback_paid || 0), 0);
+    const totalForfeit = totalBouncePaid * (window.COHORT_AVG_LOAN || 0);
+    const forfeitMeta = totalForfeit > 0 ? ` · ≈ $${formatNumber(Math.round(totalForfeit))} originated via fallback` : "";
     document.getElementById("brBlockedMeta").textContent =
-      `${blocked.length} (Broker, Source) cells with ≥${(sq.min_excluded_for_ranking||200).toLocaleString()} excluded leads · ${totalExcluded.toLocaleString()} total excluded · ${totalBouncePaid.toLocaleString()} same-identity paid loans within 30 days via other cells`;
+      `${blocked.length} (Broker, Source) cells with ≥${(sq.min_excluded_for_ranking||200).toLocaleString()} excluded leads · ${totalExcluded.toLocaleString()} total excluded · ${totalBouncePaid.toLocaleString()} same-identity paid loans within 30 days via other cells${forfeitMeta}`;
     document.getElementById("brBlockedList").innerHTML = unblock.length
       ? unblock.map(renderBlockedBsRow).join("")
       : '<div class="br-rec-empty">No blocked (Broker, Source) cells met the volume threshold.</div>';
@@ -799,6 +806,13 @@
     const destText = (b.top_destinations || []).slice(0, 3)
       .map(d => `${escapeHtml(d.broker_name || "?")} / ${escapeHtml(String(d.source_ref1 || "(no SR1)"))} (${formatNumber(d.bounced_count)})`)
       .join(" · ");
+    // Estimated $ forfeit: paid bouncebacks × cohort avg paid-loan
+    // amount (set on window.COHORT_AVG_LOAN by renderRecommendations).
+    const avgLoan = window.COHORT_AVG_LOAN || 0;
+    const forfeit = paid * avgLoan;
+    const forfeitText = forfeit > 0
+      ? `≈ $${formatNumber(Math.round(forfeit))} originated via fallback`
+      : "";
     return `
       <div class="br-rec-row ${paid > 0 ? "is-good" : ""}">
         <div class="br-rec-name">
@@ -806,7 +820,7 @@
         </div>
         <div class="br-rec-metric">${formatNumber(paid)}<div class="br-rec-metric-sub">paid via others (30d)</div></div>
         <div class="br-rec-metric">${pct(b.bounceback_rate, 1)}<div class="br-rec-metric-sub">post-block bounceback</div></div>
-        <div class="br-rec-sub">${formatNumber(b.excluded_count || 0)} excluded leads · ${formatNumber(b.bounceback_leads || 0)} same-identity buys via other cells within 30d${destText ? ` · top destinations: ${destText}` : ""}</div>
+        <div class="br-rec-sub">${formatNumber(b.excluded_count || 0)} excluded leads · ${formatNumber(b.bounceback_leads || 0)} same-identity buys via other cells within 30d${forfeitText ? ` · <strong>${forfeitText}</strong>` : ""}${destText ? ` · top destinations: ${destText}` : ""}</div>
       </div>`;
   }
 
