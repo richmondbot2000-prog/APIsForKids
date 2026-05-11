@@ -63,12 +63,13 @@ The site is a flat set of HTML files. **No router, no SPA, no build step.** Each
 | **TopUps** | `/topups.html` | 24-month chart of distinct Transform Credit (LenderId 6) live loans split Primary / Top-Up, with a TUE-eligible-count line overlay; "last refreshed" badge | `topups.json` |
 | **Pipeline** | `/pipeline.html` | March-cohort application-pipeline analysis with two d3-sankey diagrams (Lead funnel + Application progression), per-stage drop-off table, and click-to-expand sampled customer timelines per dead-end endpoint. All PII masked server-side. | `pipeline.json` + `pipeline-samples.json` |
 | **Brokers** | `/brokers.html` | Per-affiliate-source 90-day scorecard. KPI band, top-10 leaderboard chart, sortable table with inline mini-funnel + volume share + lead→paid ratio + funded $. Click row to see stage-by-stage detail and top rejection reasons. | `brokers.json` |
+| **Declines** | `/declines.html` | 90-day decline-reasons analysis. Lead rejections by `LeadResultTypeId` + application-stage declines from `Flags` (Decline / DNL / Cancelled / FraudRisk). Per flag-type cards with top reasons, daily trend SVG, and ClientType breakdown. | `declines.json` |
 | **Schema** | `/database.html` | Full DB schema (renders `database.md` via marked.js + mermaid theme), plus per-table row counts as flipboards | `row-counts.json` + `database.md` |
 | **Code** | `/stats.html` | Codebase size dashboard (Solari split-flap digits) + by-language and by-repo tables | inline manual snapshot (live refresh pending Azure access) |
 | _(unlinked)_ | `/apis.html` | Per-helper detail page — kept for any deep-link bookmarks; not in nav | inline |
 | _(unlinked)_ | `/robots.html` | Per-robot list page — kept for any deep-link bookmarks; not in nav | inline |
 
-**Topbar nav (every page):** `About our systems · Yesterday · Brandwatch · 1stContact · Directory · TopUps · Pipeline · Brokers · Schema · Code`. Plus a hamburger drawer ≤960px viewport.
+**Topbar nav (every page):** `About our systems · Yesterday · Brandwatch · 1stContact · Directory · TopUps · Pipeline · Brokers · Declines · Schema · Code`. Plus a hamburger drawer ≤960px viewport.
 
 ---
 
@@ -121,6 +122,7 @@ All refresh workflows live in `.github/workflows/refresh-*.yml`. They share a co
 | `refresh-staff-activity.yml` | hourly :15 | `staff-activity.json` | Fabric warehouse | `FABRIC_*` secrets |
 | `refresh-topups.yml` | hourly :30 | `topups.json` | Fabric warehouse | `FABRIC_*` secrets |
 | `refresh-brokers.yml` | hourly :35 | `brokers.json` | Fabric warehouse (`Leads` × `Brokers.Campaigns` × `Brokers.Sources`) | `FABRIC_*` secrets |
+| `refresh-declines.yml` | hourly :50 | `declines.json` | Fabric warehouse (`Leads` rejections + `Flags`-via-`Applications`-lender-join) | `FABRIC_*` secrets |
 | `refresh-pipeline.yml` | hourly :45 | `pipeline.json` | Fabric warehouse | `FABRIC_*` secrets |
 | `refresh-pipeline-samples.yml` | hourly :50 | `pipeline-samples.json` | Fabric warehouse (PII-masked output) | `FABRIC_*` secrets |
 | `refresh-telegram.yml` | hourly :40 | `telegram-mentions.json` | Public Telegram channels via Telethon | `TG_API_ID`, `TG_API_HASH`, `TG_SESSION_B64` (dormant until set) |
@@ -172,6 +174,7 @@ Each refresh workflow runs one Python script under `scripts/`. They all read env
 | `scan_pipeline.py` | `Applications` (March cohort) × `Leads` × `Tasks` | `pipeline.json` | Lead-result enum aggregated for the Sankey funnel; strict-stage definitions per TaskTypeId + GtRef; produces the data for the two-Sankey diagram on the Pipeline page |
 | `scan_pipeline_samples.py` | Same tables + `Customers` + `Addresses` + `ESignatures` + `WebBehaviours` + `Communications.Messages` + `Brokers.Sources` + `Brokers.Campaigns` + `LoanPurposes` + `LeadResultTypes` + `TaskTypes` + `BrokerStatuses` | `pipeline-samples.json` | Per dead-end endpoint: 25 random ARefs with full interaction timeline. Identity-links by (FirstName, Surname, DOB) so the timeline spans every application the same person made. All PII masked server-side: ARefs to last-5, surnames to ******, DOB to ****-**-**, addresses to state only, plus email / phone / SSN / card-number redaction in message bodies. |
 | `scan_brokers.py` | `Leads` × `Brokers.Campaigns` × `Brokers.Sources` × `Applications` × `Tasks` × `BrokerStatuses` | `brokers.json` | Server-side CTE aggregation over 90-day window — never pulls multi-million-row Leads to the runner. Per source: 7-stage funnel + average loan + paid-out $ + top-3 rejection reasons. Tunable via `BROKER_WINDOW_DAYS` / `BROKER_LENDER_ID` env vars. |
+| `scan_declines.py` | `Leads` (LeadResultTypeId) + `Flags` joined to `Applications` for lender filter | `declines.json` | 90-day window. Reason text is whitespace + case + trailing-period normalised before group-by so 'BANK CHECK FAILED' and 'bank check failed.' fold into the same bucket. Emits top reasons per flag type + daily trend per type + ClientType breakdown + top-20 ClientUsernames raising declines. |
 | `scan_telegram.py` + `telegram_monitor.py` + `discord_monitor.py` | Public Telegram channels (Telethon) + public Discord servers (discord.py), read-only on dedicated accounts → shared `monitor.db` → public-safe `telegram-mentions.json` + `discord-mentions.json` | `telegram-mentions.json`, `discord-mentions.json` | Match lists in `telegram-watchlist.json` / `discord-watchlist.json`. Excerpts go through email / phone / SSN / card / ARef-shape redaction before being written. Workflows dormant until secrets configured. |
 | `scan_security.py` + `hibp_monitor.py` + `lookalike_monitor.py` | Have I Been Pwned domain API + DNSTwist permutation generator + crt.sh CT log searches | `security-alerts.json` | HIBP breach counts/domains (never local-parts), active lookalike domains, recent CT certificates. Each collector's workflow is dormant until its secrets / config are set. |
 
