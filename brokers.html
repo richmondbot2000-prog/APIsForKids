@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Brokers</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778529703">
-<link rel="stylesheet" href="quiet.css?v=1778529703">
-<link rel="stylesheet" href="quiet-extras.css?v=1778529703">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778535515">
+<link rel="stylesheet" href="quiet.css?v=1778535515">
+<link rel="stylesheet" href="quiet-extras.css?v=1778535515">
 <style>
   .br-section { max-width: 1280px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .br-section { padding: 2px 0 32px; } }
@@ -501,7 +501,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778529703" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778535515" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -561,13 +561,13 @@
     <div class="br-recommend-grid" id="brRecommendGrid" hidden>
       <div class="br-canvas-wrap">
         <h2 class="br-canvas-title">Sources to consider <em>blocking</em></h2>
-        <p class="br-canvas-sub">Aggregated by <strong>Source</strong> (the upstream sub-broker classification — `Brokers.Sources.SourceTypeID` → `dbo.SourceTypes`). Sources whose effective <strong>cost per paid loan</strong> exceeds <strong>$600</strong> are surfaced as candidates to throttle. Volume-gated; we exclude rev-share / CPF-with-no-billed-loans rows since "$0 per paid loan" is not a blocking signal. Window: 60 days ending 30 days ago to let outcomes mature. Each row sums the constituent Campaigns we run with the Brokers tagged as that Source type.</p>
+        <p class="br-canvas-sub">Aggregated by <strong>(Broker, Source)</strong> — each row is a Broker + their `SourceReference1` value (the upstream sub-source code passed on each lead). Cells whose effective <strong>cost per paid loan</strong> exceeds <strong>$600</strong> surface as candidates to throttle. Volume-gated to <span id="brSqMinVol">200</span>+ purchased leads; cells with no recorded cost (rev-share / CPF with no billed loans yet) are excluded. Window: 60 days ending 30 days ago for outcome maturation. Campaigns active within each cell are listed underneath as detail.</p>
         <div class="br-recommend-meta" id="brWeakMeta"></div>
         <div id="brWeakList"></div>
       </div>
       <div class="br-canvas-wrap">
         <h2 class="br-canvas-title">Blocked Sources to consider <em>re-enabling</em></h2>
-        <p class="br-canvas-sub">Sources where we currently block one or more campaigns (LeadResultTypeId = -1 — <em>Source excluded</em>). Aggregated to <strong>Source</strong> level. We identity-match rejected leads against subsequent same-person purchases via other campaigns — by SSN, Phone+DOB, or Email+DOB — counting only matches landing <strong>strictly after the rejection</strong> and within <strong>30 days</strong>. Earlier or unrelated purchases don't count; we already had those customers. High bounceback-paid counts mean blocking this Source is forfeiting funded loans we'd otherwise have written.</p>
+        <p class="br-canvas-sub">(Broker, Source) cells where we currently reject leads (LeadResultTypeId = -1 — <em>Source excluded</em>). We identity-match each rejected lead against subsequent purchases via a <strong>different (Broker, Source) cell</strong> — by SSN, Phone+DOB, or Email+DOB — counting only matches landing <strong>strictly after the rejection</strong> and within <strong>30 days</strong>. High bounceback-paid counts mean blocking this cell is forfeiting funded loans we'd otherwise have written.</p>
         <div class="br-recommend-meta" id="brBlockedMeta"></div>
         <div id="brBlockedList"></div>
       </div>
@@ -576,7 +576,7 @@
     <!-- ── Cheaper-clones (overpay) section ────────────────────────── -->
     <div class="br-canvas-wrap" id="brCheaperWrap" hidden style="margin-bottom: 24px;">
       <h2 class="br-canvas-title">Sources where <em>we overpay</em></h2>
-      <p class="br-canvas-sub">Aggregated by <strong>Source</strong>. For every purchased lead bought at an upfront per-lead price (CPL or auction-bid models), we identity-match the same person against later purchases in the window (60 days ending 30 days ago — a lag that lets outcomes mature). When a cheaper version of the same person reappears via a different campaign, the first buy was an overpay — we could have waited. Ranked by total overspend.</p>
+      <p class="br-canvas-sub">Aggregated by <strong>(Broker, Source)</strong>. For every purchased lead bought at an upfront per-lead price (CPL or auction-bid models), we identity-match the same person against later purchases in the window. When a cheaper version of the same person reappears via a <strong>different (Broker, Source) cell</strong>, the first buy was an overpay — we could have waited. Ranked by total overspend.</p>
       <div class="br-recommend-meta" id="brCheaperMeta"></div>
       <div id="brCheaperList"></div>
     </div>
@@ -664,59 +664,67 @@
 
     const COST_PER_PAID_THRESHOLD = 600;
 
-    // ── Sources to consider blocking (SourceType rollup + per-campaign drill) ──
-    const weakSt = (sq.weak_accepted && sq.weak_accepted.by_source_type) || [];
-    const blockSources = weakSt
+    // ── Sources to consider blocking — (Broker, SourceReference1) cells ──
+    const weakBs = (sq.weak_accepted && sq.weak_accepted.by_broker_source) || [];
+    const blockSources = weakBs
       .filter(s => (s.cost_per_paid_loan || 0) >= COST_PER_PAID_THRESHOLD)
       .sort((a, b) => (b.cost_per_paid_loan || 0) - (a.cost_per_paid_loan || 0))
       .slice(0, 15);
     document.getElementById("brWeakMeta").textContent =
-      `${weakSt.length} Sources analysed · ${blockSources.length} above the $${COST_PER_PAID_THRESHOLD}/paid-loan threshold`;
+      `${weakBs.length} (Broker, Source) cells analysed · ${blockSources.length} above the $${COST_PER_PAID_THRESHOLD}/paid-loan threshold`;
     document.getElementById("brWeakList").innerHTML = blockSources.length
-      ? blockSources.map(renderWeakSourceRow).join("")
-      : '<div class="br-rec-empty">No Sources clear the $600/paid-loan threshold.</div>';
+      ? blockSources.map(renderWeakBsRow).join("")
+      : '<div class="br-rec-empty">No (Broker, Source) cells clear the $600/paid-loan threshold.</div>';
 
-    // ── Blocked Sources to consider re-enabling (SourceType only, no campaign drill) ──
-    const blockedSt = (sq.blocked_to_reconsider_by_source) || [];
-    const unblockSources = blockedSt.slice(0, 15);
-    const totalExcluded = blockedSt.reduce((a, b) => a + (b.excluded_count || 0), 0);
-    const totalBouncePaid = blockedSt.reduce((a, b) => a + (b.bounceback_paid || 0), 0);
+    // ── Blocked Sources to consider re-enabling — (Broker, SR1) only, no campaign drill ──
+    const blocked = sq.blocked_to_reconsider || [];
+    const unblock = blocked.slice(0, 15);
+    const totalExcluded = blocked.reduce((a, b) => a + (b.excluded_count || 0), 0);
+    const totalBouncePaid = blocked.reduce((a, b) => a + (b.bounceback_paid || 0), 0);
     document.getElementById("brBlockedMeta").textContent =
-      `${blockedSt.length} Sources with blocked campaigns · ${totalExcluded.toLocaleString()} excluded leads · ${totalBouncePaid.toLocaleString()} same-identity paid loans within 30 days via other campaigns`;
-    document.getElementById("brBlockedList").innerHTML = unblockSources.length
-      ? unblockSources.map(renderBlockedSourceRow).join("")
-      : '<div class="br-rec-empty">No blocked Sources met the volume threshold.</div>';
+      `${blocked.length} (Broker, Source) cells with ≥${(sq.min_excluded_for_ranking||200).toLocaleString()} excluded leads · ${totalExcluded.toLocaleString()} total excluded · ${totalBouncePaid.toLocaleString()} same-identity paid loans within 30 days via other cells`;
+    document.getElementById("brBlockedList").innerHTML = unblock.length
+      ? unblock.map(renderBlockedBsRow).join("")
+      : '<div class="br-rec-empty">No blocked (Broker, Source) cells met the volume threshold.</div>';
 
-    // ── Sources where we overpay (SourceType rollup + campaign drill) ──
+    // ── Sources where we overpay ──
     const cc = sq.cheaper_clones || {};
-    const cheaperSt = (cc.by_source_type) || [];
-    const cheaperSourceRows = cheaperSt
+    const cheaperBs = (cc.by_broker_source) || [];
+    const cheaperRows = cheaperBs
       .filter(s => (s.total_savings_if_waited || 0) > 0)
       .sort((a, b) => (b.total_savings_if_waited || 0) - (a.total_savings_if_waited || 0))
       .slice(0, 15);
     const ccWrap = document.getElementById("brCheaperWrap");
-    if (cheaperSourceRows.length) {
+    if (cheaperRows.length) {
       ccWrap.hidden = false;
       document.getElementById("brCheaperMeta").textContent =
-        `${cheaperSt.length} Sources flagged · ${(cc.leads_with_cheaper || 0).toLocaleString()} leads had a cheaper later clone · $${Math.round(cc.total_overspend || 0).toLocaleString()} total 60-day overspend`;
+        `${cheaperBs.length} cells flagged · ${(cc.leads_with_cheaper || 0).toLocaleString()} leads had a cheaper later clone · $${Math.round(cc.total_overspend || 0).toLocaleString()} total overspend`;
       document.getElementById("brCheaperList").innerHTML =
-        cheaperSourceRows.map(renderCheaperSourceRow).join("");
+        cheaperRows.map(renderCheaperBsRow).join("");
     } else {
       ccWrap.hidden = true;
     }
   }
 
-  function renderWeakSourceRow(s) {
+  function _bsTitle(s) {
+    const broker = escapeHtml(s.broker_name || "Unknown broker");
+    const sr1 = s.source_ref1 != null ? escapeHtml(String(s.source_ref1)) : "(no Source)";
+    return `${broker} <span style="color:var(--ink-500); font-style: normal;"> · </span><span style="font-family:var(--font-mono); font-style: normal; font-size: 12px;">${sr1}</span>`;
+  }
+
+  function renderWeakBsRow(s) {
     const cpp = s.cost_per_paid_loan != null
       ? `$${formatNumber(Math.round(s.cost_per_paid_loan))}`
       : "—";
     const cpl = s.cost_per_lead != null ? `$${s.cost_per_lead.toFixed(2)}` : "—";
     const totalSpent = s.total_cost ? formatMoneyBig(s.total_cost) : null;
     const campaignsHtml = (s.campaigns || []).slice(0, 8).map(c => {
-      const ccpp = c.cost_per_paid_loan != null ? `$${formatNumber(Math.round(c.cost_per_paid_loan))}` : "—";
+      const ccpp = c.has_cost && c.paid_out
+        ? `$${formatNumber(Math.round((c.total_cost || 0) / c.paid_out))}`
+        : "—";
       return `<div class="br-rec-campaign">
         <span class="br-rec-campaign-name">${escapeHtml(c.campaign_name || ("Campaign " + c.campaign_id))}</span>
-        <span class="br-rec-campaign-broker">${escapeHtml(c.broker_name || "")}</span>
+        <span class="br-rec-campaign-broker">${escapeHtml(c.cost_model || "")}</span>
         <span class="br-rec-campaign-metric">${ccpp} / paid</span>
         <span class="br-rec-campaign-volume">${formatNumber(c.paid_out || 0)} / ${formatNumber(c.leads_purchased || 0)}</span>
       </div>`;
@@ -725,12 +733,12 @@
     return `
       <div class="br-rec-row is-bad">
         <div class="br-rec-name">
-          ${escapeHtml(s.source_type_name || "Unknown Source")}
-          <div class="br-rec-broker">${(s.campaigns || []).length} campaign${(s.campaigns||[]).length === 1 ? "" : "s"}${totalSpent ? ` · ${totalSpent} spent` : ""}</div>
+          ${_bsTitle(s)}
+          <div class="br-rec-broker">${(s.campaigns || []).length} active campaign${(s.campaigns||[]).length === 1 ? "" : "s"}${totalSpent ? ` · ${totalSpent} spent` : ""}</div>
         </div>
         <div class="br-rec-metric">${cpp}<div class="br-rec-metric-sub">cost / paid loan</div></div>
         <div class="br-rec-metric">${cpl}<div class="br-rec-metric-sub">cost / lead</div></div>
-        <div class="br-rec-sub">${pct(s.paid_out_rate, 3)} paid · ${formatNumber(s.paid_out || 0)}/${formatNumber(s.leads_purchased || 0)} purchased leads across this Source</div>
+        <div class="br-rec-sub">${pct(s.paid_out_rate, 3)} paid · ${formatNumber(s.paid_out || 0)}/${formatNumber(s.leads_purchased || 0)} purchased</div>
         <div class="br-rec-campaigns">
           ${campaignsHtml}
           ${moreCount > 0 ? `<div class="br-rec-campaign-more">+ ${moreCount} more campaigns</div>` : ""}
@@ -738,46 +746,34 @@
       </div>`;
   }
 
-  function renderBlockedSourceRow(b) {
+  function renderBlockedBsRow(b) {
     const paid = b.bounceback_paid || 0;
+    const destText = (b.top_destinations || []).slice(0, 3)
+      .map(d => `${escapeHtml(d.broker_name || "?")} / ${escapeHtml(String(d.source_ref1 || "(no SR1)"))} (${formatNumber(d.bounced_count)})`)
+      .join(" · ");
     return `
       <div class="br-rec-row ${paid > 0 ? "is-good" : ""}">
         <div class="br-rec-name">
-          ${escapeHtml(b.source_type_name || "Unknown Source")}
-          <div class="br-rec-broker">${(b.campaigns || []).length} blocked campaign${(b.campaigns||[]).length === 1 ? "" : "s"} on this Source</div>
+          ${_bsTitle(b)}
         </div>
         <div class="br-rec-metric">${formatNumber(paid)}<div class="br-rec-metric-sub">paid via others (30d)</div></div>
         <div class="br-rec-metric">${pct(b.bounceback_rate, 1)}<div class="br-rec-metric-sub">post-block bounceback</div></div>
-        <div class="br-rec-sub">${formatNumber(b.excluded_count || 0)} excluded leads · ${formatNumber(b.bounceback_leads || 0)} same-identity buys via other campaigns within 30d · ${formatNumber(b.bounceback_arefs || 0)} unique borrowers</div>
+        <div class="br-rec-sub">${formatNumber(b.excluded_count || 0)} excluded leads · ${formatNumber(b.bounceback_leads || 0)} same-identity buys via other cells within 30d${destText ? ` · top destinations: ${destText}` : ""}</div>
       </div>`;
   }
 
-  function renderCheaperSourceRow(c) {
+  function renderCheaperBsRow(c) {
     const total = c.total_savings_if_waited || 0;
     const avg = c.avg_savings_per_lead || 0;
     const rate = c.cheaper_clone_rate || 0;
-    const campaignsHtml = (c.campaigns || []).slice(0, 6).map(cc => {
-      return `<div class="br-rec-campaign">
-        <span class="br-rec-campaign-name">${escapeHtml(cc.campaign_name || ("Campaign " + cc.campaign_id))}</span>
-        <span class="br-rec-campaign-broker">${escapeHtml(cc.broker_name || "")}</span>
-        <span class="br-rec-campaign-metric">$${Math.round(cc.total_savings_if_waited || 0).toLocaleString()}</span>
-        <span class="br-rec-campaign-volume">${formatNumber(cc.leads_with_cheaper_later || 0)} leads</span>
-      </div>`;
-    }).join("");
-    const moreCount = (c.campaigns || []).length - 6;
     return `
       <div class="br-rec-row is-bad">
         <div class="br-rec-name">
-          ${escapeHtml(c.source_type_name || "Unknown Source")}
-          <div class="br-rec-broker">${(c.campaigns || []).length} campaign${(c.campaigns||[]).length === 1 ? "" : "s"} contribute</div>
+          ${_bsTitle(c)}
         </div>
-        <div class="br-rec-metric">$${Math.round(total).toLocaleString()}<div class="br-rec-metric-sub">overspend (60d)</div></div>
+        <div class="br-rec-metric">$${Math.round(total).toLocaleString()}<div class="br-rec-metric-sub">overspend</div></div>
         <div class="br-rec-metric">$${avg.toFixed(2)}<div class="br-rec-metric-sub">avg / overpaid lead</div></div>
-        <div class="br-rec-sub">${formatNumber(c.leads_with_cheaper_later || 0)} / ${formatNumber(c.leads_purchased || 0)} purchased leads (${pct(rate, 2)}) re-appeared cheaper via another campaign</div>
-        <div class="br-rec-campaigns">
-          ${campaignsHtml}
-          ${moreCount > 0 ? `<div class="br-rec-campaign-more">+ ${moreCount} more campaigns</div>` : ""}
-        </div>
+        <div class="br-rec-sub">${formatNumber(c.leads_with_cheaper_later || 0)} / ${formatNumber(c.leads_purchased || 0)} purchased leads (${pct(rate, 2)}) re-appeared cheaper via another (Broker, Source) cell · median wait ${c.median_wait_days || 0}d</div>
       </div>`;
   }
 
