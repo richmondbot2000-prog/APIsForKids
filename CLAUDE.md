@@ -1,0 +1,119 @@
+# CLAUDE.md — How to work with this user on this repo
+
+_This file is auto-loaded into every Claude Code session in this repo. Read all of it. The accompanying **SPEC.md** is the deep operational manual — read it on first contact to understand the site._
+
+---
+
+## 1. Who you're working with
+
+A non-technical user at Richmond Group (`richmondbot2000@gmail.com`). Works on Central Services — the platform that powers Transform Credit and the other Richmond Group lenders. **They do not write code.** They have strong product instincts and will direct strategy; you handle implementation.
+
+They use the site (`book.togetherbook.net`) as an operational dashboard and as a living explanation of how their platform works.
+
+## 2. Working style — non-negotiable
+
+- **Be terse.** One sentence per update is almost always enough. End-of-turn summaries should be one or two sentences max.
+- **Ship to live immediately.** This repo's `main` branch deploys via GitHub Pages — every commit goes live within 30-60 seconds. The user expects you to commit + push your changes within the same turn, not stage them for later review.
+- **Don't over-ask.** Before asking a clarifying question, spend up to a minute on read-only investigation (grep, file reads). A specific question after research beats a vague one upfront. When you do ask, AskUserQuestion with concrete options beats prose.
+- **They correct bluntly when wrong.** Take it on the chin and adjust. Don't apologise or rehash — just incorporate the correction and continue.
+- **Avoid emojis** in code, comments, commits, page copy, or anywhere on the site unless explicitly requested.
+- **No filler.** "Working on it…" is not useful. Either do the work or state the specific obstacle.
+
+## 3. Design philosophy — every element teaches
+
+The user has rejected decorative-only design choices multiple times. Every UI element on this site must communicate something — an icon must teach, a colour must categorise, a chart axis must inform. If you can't articulate what an element teaches the viewer in one sentence, the user will probably ask to remove it.
+
+The visual treatment is the **Quiet Edition** — cream paper + ink blue + brass + sparing manuscript red. Editorial / antique-book feel. No box-shadows, no transforms on hover, only colour transitions. Tokens are in `quiet-tokens.css`. See SPEC §4 for the palette.
+
+## 4. The repo — orientation in 60 seconds
+
+- **Location:** `/Users/richmondrobot/Desktop/APIsForKids/`
+- **Live URLs:** `book.togetherbook.net` (Cloudflare Access gated) + `richmondbot2000-prog.github.io/APIsForKids/` (public backdoor)
+- **GitHub auth:** `gh` CLI is logged in as `richmondbot2000-prog` (PAT in macOS keychain)
+- **Deploy flow:** `git push` to `main` → GitHub Pages rebuild (~30s) → Cloudflare edge propagation (~10s). Cache-bust CSS/image/JSON refs on every push (see SPEC §15 — "Cache-bust pattern").
+- **Data:** flat HTML files fetch JSON files at the repo root. JSON files are refreshed by `.github/workflows/refresh-*.yml` Action workflows that run Python scripts in `scripts/`. All data ultimately comes from the **Fabric data warehouse** (the Richmond Group warehouse that mirrors Central Services nightly).
+- **No build step.** No SPA. No bundler. Edits are direct.
+
+## 5. The terminology that will trip you up
+
+This is the most error-prone bit of the schema. Get it wrong and the source-quality analysis silently lies. Full detail in SPEC §13. The 30-second version:
+
+| User term | Lives in DB at | Roughly |
+|---|---|---|
+| Broker | `Brokers.Sources` (table) | The affiliate company we have a contract with |
+| Source | `Leads.SourceReference1` (column) | The upstream sub-broker that fed leads INTO that broker — a free-text affiliate code |
+| Campaign | `Brokers.Campaigns` (table) | Our per-pricing-tier agreement WITH that broker. Ephemeral (gets killed + respawned) |
+
+The DB table named `Brokers.Sources` is what the user calls "Broker". `Brokers.SourceTypeID` is NOT the granular Source dimension — it's a 2-value enum ("Broker"/"PPC"). Use `Leads.SourceReference1` for actual Source rollup. The analysis unit is the tuple **(Broker, SourceReference1)**.
+
+## 6. Tooling preferences
+
+- **Auto-memory is on.** Save user info, working-style feedback, project context, and external references using the auto-memory format. Don't save things derivable from the code or git history.
+- **Sub-agents:** spawn `Explore` for broad codebase searches (>3 queries). For targeted lookups use grep/find directly.
+- **Background workflows:** the user often kicks off long-running workflow_dispatch runs. Use `ScheduleWakeup` for sensible delays (don't poll, don't pick exactly 5 min — see ScheduleWakeup tool description for cache-window heuristics). When a wakeup fires with a re-fired prompt and the user has paused or moved on, honour the pause, not the wakeup.
+- **gh CLI:** `gh run view <id> --log` to read full run output. `gh workflow run <name>.yml --ref main` to trigger. `gh secret list` / `gh secret set`. The `--repo richmondbot2000-prog/APIsForKids` flag is implicit when you're already cd'd into the repo.
+- **Don't use the gh CLI for setting JSON-shaped secrets via stdin** — heredoc escaping is brittle. Use the GitHub Web UI for those.
+
+## 7. Documentation responsibilities — the nightly directive
+
+**Every overnight session, before signing off, you MUST:**
+
+1. **Update `SPEC.md`** (this repo) with anything structurally new or changed: new pages, new analysis sections, new workflow files, new env vars / secrets, new database joins, new design decisions, new lessons learned. SPEC.md is the source of truth for "how does this site work" — keep it complete enough that a successor Claude can pick it up cold and operate competently.
+2. **Update `~/Desktop/wiki/Overview/07_APIsForKids_Site.md`** to stay in structural sync. That document is the wiki-wide entry for this site, integrated alongside other Central Services docs. Pull from SPEC.md where appropriate but recognise the audience there is broader (also the engineering team).
+3. **Commit and push both.** Don't stage them. If a section is genuinely incomplete, write the heading + a one-line "TBD: …" note rather than leaving a blank gap.
+
+You don't need permission to update these — it's a standing instruction.
+
+The user goes to sleep and trusts you to use the time productively. They'd rather come back to slightly-over-documented than under-documented. **Reading what you already shipped is a fine way to catch yourself up next morning.**
+
+## 8. Memory references — useful pointers
+
+- `project_apisforkids.md` — high-level project state
+- `project_apisforkids_brokers.md` — Brokers page + Source-quality companion (terminology, cost models, the (Broker, SR1) decision)
+- `project_apisforkids_brandwatch_email.md` — Brandwatch email notification setup
+- `project_apisforkids_directory.md` — Directory page (multi-tenant Workspace)
+- `project_apisforkids_topups.md` — TopUps page (TUE concept)
+- `project_apisforkids_telegram.md` — Brand monitoring stack (Telegram + Discord + HIBP + Lookalike, dormant)
+- `project_data_warehouse.md` — Fabric warehouse pointers
+- `reference_apisforkids_paths.md` — repo location, live URL, deployment flow
+- `reference_rg_wiki.md` — where source pages and overviews live in the user's filesystem
+- `reference_rg_schema_diagrams.md` — ER-diagram images for all 5 Central Services DBs
+- `feedback_working_style.md` — terse, few questions, push to live immediately
+- `feedback_design_must_communicate.md` — every design element must teach
+- `feedback_apisforkids_spec.md` — keep SPEC.md and the wiki version in sync
+
+## 9. Common operations cheatsheet
+
+```sh
+# Force-refresh a single data file (bypasses same-day guard)
+gh workflow run refresh-brokers.yml --ref main
+gh run list --workflow=refresh-brokers.yml --limit 1
+
+# Pull what the bot just committed
+git pull --rebase --quiet
+
+# Read failure-only logs from a specific run
+gh run view <run-id> --log-failed | tail -40
+
+# Bump cache-bust on one file
+NEW=$(date +%s); OLD=$(grep -oE '\?v=[0-9]+' brokers.html | head -1 | sed 's/?v=//'); sed -i '' "s|?v=${OLD}|?v=${NEW}|g" brokers.html
+
+# Manually trigger source-quality refresh + watch
+gh workflow run refresh-source-quality.yml --ref main
+sleep 240
+gh run list --workflow=refresh-source-quality.yml --limit 1
+```
+
+## 10. Things you should NOT do
+
+- Don't add features the user didn't ask for. Don't refactor opportunistically.
+- Don't add validation or error handling for scenarios that can't happen. Trust the schema where you've already confirmed it.
+- Don't write comments explaining WHAT the code does. Write them only when WHY is non-obvious (a hidden constraint, a workaround for a specific bug, a surprising invariant).
+- Don't create planning, decision, or analysis documents unless the user asks. Work from conversation context, not intermediate files.
+- Don't ask "should I proceed?" or "is the plan ready?" Just do the work — if the user disagrees they'll tell you.
+- Don't claim work is done that you haven't verified. UI changes need a visual check; data changes need a workflow run + JSON inspection.
+- Don't use `git push --force`, `git reset --hard`, `git branch -D`, or any other destructive git operation unless explicitly asked.
+
+---
+
+_End. SPEC.md is much longer and goes deep on every section. Read it on first contact with this repo._

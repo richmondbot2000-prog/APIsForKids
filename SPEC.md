@@ -1,8 +1,8 @@
 # TogetherBOOK — Site Specification
 
-_The source-of-truth document for `togetherbook.net` / `richmondbot2000-prog/APIsForKids`. Lives in this repo so future maintainers find it next to the code._
+_The source-of-truth document for `togetherbook.net` / `richmondbot2000-prog/APIsForKids`. Lives in this repo so future maintainers find it next to the code. **A successor Claude or engineer should be able to pick this up cold and operate the site competently.**_
 
-**Last reviewed:** 2026-05-10
+**Last reviewed:** 2026-05-12 (overnight rewrite to cover the source-quality analysis, brandwatch email notifications, multi-tenant Directory, and Cloudflare Access policy update)
 
 ## Contents
 
@@ -16,13 +16,22 @@ _The source-of-truth document for `togetherbook.net` / `richmondbot2000-prog/API
 7. [Database schema reference](#7-database-schema-reference)
 8. [External APIs and data sources](#8-external-apis-and-data-sources)
 9. [GitHub Actions secrets](#9-github-actions-secrets)
-10. [The Workspace + GCP setup (Directory page)](#10-the-workspace--gcp-setup-directory-page)
+10. [Workspace + GCP setup (Directory page)](#10-workspace--gcp-setup-directory-page)
 11. [Specific page details](#11-specific-page-details)
+   - 11.1 [Directory page](#111-directory-page-directoryhtml)
+   - 11.2 [TopUps page](#112-topups-page-topupshtml)
+   - 11.3 [Brandwatch page](#113-brandwatch-page-brandwatchhtml)
+   - 11.4 [Yesterday page](#114-yesterday-page-yesterdayhtml)
+   - 11.5 [Brokers page + Source-quality analysis](#115-brokers-page--source-quality-analysis-brokershtml)
+   - 11.6 [Declines page](#116-declines-page-declineshtml)
+   - 11.7 [Pipeline page](#117-pipeline-page-pipelinehtml)
 12. [Concept reference: Top-Up Eligibility (TUE)](#12-concept-reference-top-up-eligibility-tue)
-13. [Dev workflow + procedures](#13-dev-workflow--procedures)
-14. [Lessons learned](#14-lessons-learned)
-15. [Pending / blocked work](#15-pending--blocked-work)
-16. [Cross-references](#16-cross-references)
+13. [Concept reference: Brokers / Sources / Campaigns terminology](#13-concept-reference-brokers--sources--campaigns-terminology)
+14. [Brandwatch email notifications](#14-brandwatch-email-notifications)
+15. [Dev workflow + procedures](#15-dev-workflow--procedures)
+16. [Lessons learned](#16-lessons-learned)
+17. [Pending / blocked work](#17-pending--blocked-work)
+18. [Cross-references](#18-cross-references)
 
 ---
 
@@ -45,7 +54,18 @@ A static-hosted internal site (cream paper / ink-blue / brass theme) that explai
 
 **Cloudflare Access setup**: Cloudflare One team `togetherbook` (Free plan). DNS for `book.togetherbook.net` proxied (orange cloud) to GitHub Pages IPs `185.199.108-111.153`. Cloudflare Universal SSL serves HTTPS to users; the GitHub Pages backend stays on HTTP. (We routed around `bad_authz` on Pages' Let's Encrypt for 12+ hours by enabling Cloudflare proxy.)
 
-**Identity provider for the gate**: plain Google IdP (not Workspace). OAuth client lives in the Brandwatch GCP project. Authorised redirect URI: `https://togetherbook.cloudflareaccess.com/cdn-cgi/access/callback`. The single Access policy is `Letme staff = Include: emails ending in @letme.com`.
+**Identity provider for the gate**: plain Google IdP (not Workspace). OAuth client lives in the Brandwatch GCP project. Authorised redirect URI: `https://togetherbook.cloudflareaccess.com/cdn-cgi/access/callback`.
+
+**Access policies on app `book`** (configured 2026-05-11, both Allow policies — they OR together):
+
+| Policy | Include | Require | Effect |
+|---|---|---|---|
+| Letme staff | Email ending in `@letme.com` | — | Lets any Letme employee in from anywhere |
+| RG group from office | Email ending in `@transformcredit.com` OR `@togetherloans.com` OR `@rgroup.co.uk` | IP range `62.254.12.244/32` | Lets the wider Richmond Group team in **only from the office static IP** |
+
+To edit: Zero Trust dashboard (`one.dash.cloudflare.com`) → **Access → Applications → `book` → Configure → Policies**.
+
+Identity-provider note for policy 2: all three additional domains (`transformcredit.com`, `togetherloans.com`, `rgroup.co.uk`) are also on Google Workspace, so Google login authenticates them too. No OTP fallback IdP is needed. If those Workspaces ever migrate away from Google, add a one-time-PIN IdP and re-test.
 
 ---
 
@@ -62,7 +82,7 @@ The site is a flat set of HTML files. **No router, no SPA, no build step.** Each
 | **Directory** | `/directory.html` | All 61 letme.* Workspace users + 140 warehouse-only operators who write into the platform but aren't in Workspace; sorted by primary tenant (transform → rgroup-cluster → other → inactive); filterable by tenant + department | `staff.json` + `staff-activity.json` |
 | **TopUps** | `/topups.html` | 24-month chart of distinct Transform Credit (LenderId 6) live loans split Primary / Top-Up, with a TUE-eligible-count line overlay; "last refreshed" badge | `topups.json` |
 | **Pipeline** | `/pipeline.html` | March-cohort application-pipeline analysis with two d3-sankey diagrams (Lead funnel + Application progression), per-stage drop-off table, and click-to-expand sampled customer timelines per dead-end endpoint. All PII masked server-side. | `pipeline.json` + `pipeline-samples.json` |
-| **Brokers** | `/brokers.html` | Per-affiliate-source 90-day scorecard. KPI band, top-10 leaderboard chart, sortable table with inline mini-funnel + volume share + lead→paid ratio + funded $. Click row to see stage-by-stage detail and top rejection reasons. | `brokers.json` |
+| **Brokers** | `/brokers.html` | Per-Broker funnel scorecard PLUS three Source-quality analysis sections — (a) Sources to consider blocking, (b) Blocked Sources to consider re-enabling, (c) Sources where we overpay. KPI band, two top-10 leaderboards (volume + paid), worst-quality leaderboard (ghost rate), sortable table with inline mini-funnel. Click row to expand stage-by-stage detail + top rejection reasons. | `brokers.json` + `source-quality.json` |
 | **Declines** | `/declines.html` | 90-day decline-reasons analysis. Lead rejections by `LeadResultTypeId` + application-stage declines from `Flags` (Decline / DNL / Cancelled / FraudRisk). Per flag-type cards with top reasons, daily trend SVG, and ClientType breakdown. | `declines.json` |
 | **Schema** | `/database.html` | Full DB schema (renders `database.md` via marked.js + mermaid theme), plus per-table row counts as flipboards | `row-counts.json` + `database.md` |
 | **Code** | `/stats.html` | Codebase size dashboard (Solari split-flap digits) + by-language and by-repo tables | inline manual snapshot (live refresh pending Azure access) |
@@ -125,6 +145,7 @@ All refresh workflows live in `.github/workflows/refresh-*.yml`. They share a co
 | `refresh-declines.yml` | hourly :50 | `declines.json` | Fabric warehouse (`Leads` rejections + `Flags`-via-`Applications`-lender-join) | `FABRIC_*` secrets |
 | `refresh-pipeline.yml` | hourly :45 | `pipeline.json` | Fabric warehouse | `FABRIC_*` secrets |
 | `refresh-pipeline-samples.yml` | hourly :50 | `pipeline-samples.json` | Fabric warehouse (PII-masked output) | `FABRIC_*` secrets |
+| `refresh-source-quality.yml` | daily 07:05 | `source-quality.json` | Fabric warehouse (heavy join over 60d of Leads) | `FABRIC_*` secrets. Daily not hourly — analysis takes ~3-5 min and the underlying signal is stable over a day. 45-min timeout configured. |
 | `refresh-telegram.yml` | hourly :40 | `telegram-mentions.json` | Public Telegram channels via Telethon | `TG_API_ID`, `TG_API_HASH`, `TG_SESSION_B64` (dormant until set) |
 | `refresh-discord.yml` | hourly :45 | `discord-mentions.json` | Public Discord servers via discord.py | `DISCORD_TOKEN` (dormant until set) |
 | `refresh-hibp.yml` | every 6h :20 | `security-alerts.json` (hibp section) | Have I Been Pwned domain API | `HIBP_API_KEY` (dormant until set) |
@@ -175,6 +196,8 @@ Each refresh workflow runs one Python script under `scripts/`. They all read env
 | `scan_pipeline_samples.py` | Same tables + `Customers` + `Addresses` + `ESignatures` + `WebBehaviours` + `Communications.Messages` + `Brokers.Sources` + `Brokers.Campaigns` + `LoanPurposes` + `LeadResultTypes` + `TaskTypes` + `BrokerStatuses` | `pipeline-samples.json` | Per dead-end endpoint: 25 random ARefs with full interaction timeline. Identity-links by (FirstName, Surname, DOB) so the timeline spans every application the same person made. All PII masked server-side: ARefs to last-5, surnames to ******, DOB to ****-**-**, addresses to state only, plus email / phone / SSN / card-number redaction in message bodies. |
 | `scan_brokers.py` | `Leads` × `Brokers.Campaigns` × `Brokers.Sources` × `Applications` × `Tasks` × `BrokerStatuses` | `brokers.json` | Server-side CTE aggregation over 90-day window — never pulls multi-million-row Leads to the runner. Per source: 7-stage funnel + average loan + paid-out $ + top-3 rejection reasons. Tunable via `BROKER_WINDOW_DAYS` / `BROKER_LENDER_ID` env vars. |
 | `scan_declines.py` | `Leads` (LeadResultTypeId) + `Flags` joined to `Applications` for lender filter | `declines.json` | 90-day window. Reason text is whitespace + case + trailing-period normalised before group-by so 'BANK CHECK FAILED' and 'bank check failed.' fold into the same bucket. Emits top reasons per flag type + daily trend per type + ClientType breakdown + top-20 ClientUsernames raising declines. |
+| `scan_source_quality.py` | `Leads` × `Brokers.Sources` × `Brokers.Campaigns` × `dbo.SourceTypes` × `Applications` | `source-quality.json` | **The heaviest scanner.** Three analyses keyed on **(Broker, SourceReference1)** cells over a 60-day window ending 30 days ago (maturation lag). See §11.5 for the full spec — too detailed to compress here. Tunables: `SQ_WINDOW_DAYS`, `SQ_MATURATION_DAYS`, `SQ_BOUNCEBACK_WINDOW_DAYS`, `SQ_MIN_VOLUME`, `SQ_MIN_EXCLUDED`, `SQ_SAMPLE_PER_CAMPAIGN`, `SQ_NULL_SR1_SAMPLE`. |
+| `diff_brandwatch_mentions.py` | `brandwatch.json` + `brandwatch-seen.json` | `notify-mentions.json` + updated `brandwatch-seen.json` | Tracks already-notified mention IDs. Filters out sources `bbb` and `reviewcentre` before notification. See §14 for the email integration. |
 | `scan_telegram.py` + `telegram_monitor.py` + `discord_monitor.py` | Public Telegram channels (Telethon) + public Discord servers (discord.py), read-only on dedicated accounts → shared `monitor.db` → public-safe `telegram-mentions.json` + `discord-mentions.json` | `telegram-mentions.json`, `discord-mentions.json` | Match lists in `telegram-watchlist.json` / `discord-watchlist.json`. Excerpts go through email / phone / SSN / card / ARef-shape redaction before being written. Workflows dormant until secrets configured. |
 | `scan_security.py` + `hibp_monitor.py` + `lookalike_monitor.py` | Have I Been Pwned domain API + DNSTwist permutation generator + crt.sh CT log searches | `security-alerts.json` | HIBP breach counts/domains (never local-parts), active lookalike domains, recent CT certificates. Each collector's workflow is dormant until its secrets / config are set. |
 
@@ -357,11 +380,14 @@ There's no Cloudflare API integration. If we ever need one, the old DNS-flip tok
 
 | Secret | Used by | What it is |
 |---|---|---|
-| `FABRIC_CLIENT_SECRET` | row-counts, yesterday-payouts, 1st-contact, staff-activity, topups | Service-principal client secret for the Fabric warehouse |
+| `FABRIC_CLIENT_SECRET` | all warehouse-bound workflows (row-counts, yesterday-payouts, 1st-contact, staff-activity, topups, pipeline, pipeline-samples, brokers, declines, source-quality) | Service-principal client secret for the Fabric warehouse |
 | `SCRAPERAPI_KEY` | brandwatch | ScraperAPI residential-proxy API key (for Trustpilot / BBB / Reddit which 403 cloud IPs) |
 | `YOUTUBE_API_KEY` | brandwatch | YouTube Data API v3 key |
 | `WORKSPACE_SERVICE_ACCOUNT_JSON` | directory | Full JSON key for `directory-reader@letme-directory.iam.gserviceaccount.com` (Google Cloud SA with domain-wide delegation) |
-| `WORKSPACE_DELEGATE_USER` | directory | `james.benamor@letme.co.uk` — the Workspace super-admin the SA impersonates |
+| `WORKSPACE_DELEGATE_USER` | directory (legacy single-tenant path) | `james.benamor@letme.co.uk` — the Workspace super-admin the SA impersonates. Retained as a fallback when `WORKSPACE_TENANTS` is unset. |
+| `WORKSPACE_TENANTS` | directory (multi-tenant path) | JSON array, one entry per Workspace tenant. Schema: `[{"name":"letme","delegate":"james.benamor@letme.co.uk","domain":"letme.co.uk"},{"name":"rgroup","delegate":"ben.gardner@rgroup.co.uk","domain":"rgroup.co.uk"}]`. Each tenant must have DWD enabled and the SA Client ID (`116293508437634653191`) plus user.readonly scope authorised in that Workspace's Admin Console. |
+| `SMTP_USERNAME` | brandwatch email | `noreply@togetherbook.net` — the Workspace user that sends new-mention notification emails. See §14. |
+| `SMTP_PASSWORD` | brandwatch email | 16-character Gmail App Password for the `noreply@togetherbook.net` account. Generated at `myaccount.google.com/apppasswords` while signed in as that user; requires 2-Step Verification turned on. |
 
 Non-secret values (`FABRIC_SQL_ENDPOINT`, `FABRIC_TENANT_ID`, `FABRIC_CLIENT_ID`) are inline in workflow `env:` blocks.
 
@@ -433,6 +459,128 @@ Renders one chart and one table from `topups.json`.
 
 Two Leaflet maps wrapped with `position: relative; z-index: 0` so Leaflet's internal pane z-indexes (200–800) stay clamped and don't escape over the topbar / mobile drawer. Per-state breakdown tables below.
 
+### 11.5 Brokers page + Source-quality analysis (`brokers.html`)
+
+The single most complex page on the site. It overlays TWO data sources:
+
+1. **`brokers.json`** — per-Broker 90-day funnel scorecard (from `scan_brokers.py`)
+2. **`source-quality.json`** — three analytical recommendations + ghost-rate leaderboard signal (from `scan_source_quality.py`)
+
+**Read the terminology section (§13) BEFORE editing anything on this page.** Confusing "Broker" / "Source" / "Campaign" will silently produce wrong recommendations.
+
+#### 11.5.1 Layout, top to bottom
+
+1. **KPI band** (6 tiles): Leads presented · Bought · Applications · Paid out · Lead→paid ratio · Funded $ total
+2. **Top 10 leaderboard by lead volume** (left column) + **Top 10 by paid-out loans** (right column) — side-by-side
+3. **Worst quality — highest ghost rate** (full-width leaderboard, replaced the prior "highest decline %" view on 2026-05-11) — ranks brokers by share of purchased leads who **never even started an application**. See §11.5.4 for why.
+4. **Sources to consider blocking** (left column of the recommend-grid, from `source-quality.json`)
+5. **Blocked Sources to consider re-enabling** (right column, from `source-quality.json`)
+6. **Sources where we overpay** (full-width section below the grid, from `source-quality.json`)
+7. **Per-Broker sortable table** with click-to-expand rows showing stage-by-stage retention + top decline reasons
+
+#### 11.5.2 The three source-quality recommendations
+
+All three are aggregated by **(Broker, SourceReference1)** — the user's "Source" granularity (see §13). Window is **60 days ending 30 days ago** so paid-out outcomes have time to mature. CPC/PPC campaigns (`CommissionType=3`) are excluded from analysis since they aren't broker leads. Cells where `SourceReference1` is null/blank are filtered out (not actionable — you can't re-enable "Broker X's no-Source code").
+
+**(a) Sources to consider blocking** — `weak_accepted.by_broker_source`
+- Threshold: cost per paid loan **>= $600**
+- Sorted descending so worst overpayers lead
+- Each row expands to show constituent Campaigns (campaign-level cost detail is informative here per user direction)
+- Per-cell cost is computed using the campaign's CommissionType: see §11.5.3
+
+**(b) Blocked Sources to consider re-enabling** — `blocked_to_reconsider`
+- Operates on `LeadResultTypeId = -1` ("Source excluded") rejections
+- Sampled rejected leads identity-match (SSN | Phone+DOB | Email+DOB) against later purchases via OTHER (Broker, SR1) cells
+- Temporal filter: match must occur **strictly after** the rejection AND **within 30 days** (`SQ_BOUNCEBACK_WINDOW_DAYS`). This is critical — earlier purchases mean they were already our customer, not a missed opportunity
+- Sorted by `bounceback_paid` descending — sources where blocking is forfeiting the most funded loans
+- **No campaign-level drill-down on this section** per user direction (blocking decisions happen at Broker/Source level)
+
+**(c) Sources where we overpay** — `cheaper_clones.by_broker_source`
+- Walks every upfront-paid lead (CPL + BID commission models — CPF and REV don't have upfront costs)
+- For each, identity-matches against LATER purchases in the window
+- When a cheaper version of the same person reappears via a DIFFERENT (Broker, SR1) cell, the original buy was an overpay
+- Reports total overspend, average overspend per overpaid lead, median wait days
+
+#### 11.5.3 Cost-model derivation (CommissionType enum)
+
+The DB's `Brokers.Campaigns.CommissionType` is an integer enum. Decoded 2026-05-11 from the rate-and-name diagnostic:
+
+| Type | Meaning | Cost formula | Notes |
+|---|---|---|---|
+| 1 | CPF (cost per funded loan) | `rate × paid_out_count` | Some rates 0.10/0.12 look mis-typed (probably should be type 5); treated literally |
+| 2 | CPL (cost per lead, flat) | `rate × leads_purchased` | Small population (2 campaigns) |
+| 3 | CPC (cost per click, PPC) | excluded from analysis | Bing/Google PPC, Money Lion `$3 cpc` — not a broker lead, no upstream Source |
+| 4 | BID (auction) | `SUM(Leads.BidAmount)` with fallback to `rate × leads_purchased` if bid was never set | The only type that populates `Leads.BidAmount` |
+| 5 | REV (rev-share / EPC) | `rate × SUM(paid-out loan amount)` | Rates like 0.12 = 12% of paid-out loan revenue |
+
+For null / unknown types the cell has no cost figure and `cost_per_paid_loan` is omitted.
+
+#### 11.5.4 Ghost rate (worst-quality leaderboard)
+
+The old "highest decline rate" leaderboard rewarded the wrong thing: a broker whose leads NEVER engage has zero declines and ranked as "best quality". A broker who brings real, engaged customers sees real declines downstream AND real paid loans.
+
+New metric: **ghost rate = (leads_purchased − applications) / leads_purchased** — the share of purchased leads who never even started an application. Plus each row shows the broker's paid count as the downstream signal.
+
+This is computed client-side in `brokers.html` from `brokers.json` fields; no scanner change needed.
+
+#### 11.5.5 Null-SR1 rejection analysis (Part B.5)
+
+Answers the question: "are we systematically rejecting good leads because the broker didn't pass a SourceReference1?"
+
+- Samples up to 20,000 rejected leads where `SourceReference1` is null/blank
+- Identity-matches against the in-memory purchased-lead index (same SSN/Phone+DOB/Email+DOB strategy)
+- Same temporal filter (post-rejection, 30d)
+- Extrapolates by `total_population / sample_size`
+- Surfaces in `source-quality.json` under top-level key `null_sr1_analysis`
+
+First-run findings (2026-05-11): ~258k null-SR1 rejected leads in 60d → estimated ~77 funded loans those people came back through other channels and paid. Modest, but not zero. The decision is whether buying null-SR1 leads upfront would save money vs picking them up later via the back door.
+
+#### 11.5.6 Workflow tunables (env vars on `refresh-source-quality.yml`)
+
+| Var | Default | Meaning |
+|---|---|---|
+| `SQ_WINDOW_DAYS` | 60 | Analysis window length in days |
+| `SQ_MATURATION_DAYS` | 30 | How many days back the window ends, to let paid-out outcomes settle |
+| `SQ_BOUNCEBACK_WINDOW_DAYS` | 30 | Max days between rejection and a bounceback to count |
+| `SQ_MIN_VOLUME` | 200 | Per-cell minimum purchased leads to qualify for ranking |
+| `SQ_MIN_EXCLUDED` | 200 | Per-cell minimum excluded leads to qualify for Blocked analysis |
+| `SQ_SAMPLE_PER_CAMPAIGN` | 1500 | Sampling cap for rejected leads per candidate campaign in Part B |
+| `SQ_NULL_SR1_SAMPLE` | 20000 | Sampling cap for null-SR1 rejection analysis |
+| `SQ_LENDER_ID` | 6 | Lender filter (Transform Credit) |
+
+#### 11.5.7 JSON output shape
+
+Top-level keys in `source-quality.json`:
+- `snapshot_at`, `snapshot_date`, `lender_id`, `lender_label`
+- `window_days`, `window_start`, `window_end`, `maturation_days`, `bounceback_window_days`
+- `min_volume_for_ranking`, `min_excluded_for_ranking`
+- `weak_accepted`: `{ median_paid_out_rate, q1_paid_out_rate, qualifying_sources, sources[], by_broker_source[] }` — the **page consumes `by_broker_source`** as the primary; `sources[]` is legacy per-campaign detail
+- `blocked_to_reconsider[]` — already keyed at (Broker, SR1)
+- `null_sr1_analysis`: `{ rejected_total, sample_size, sample_bounceback_arefs, sample_bounceback_paid, scale_factor, estimated_bouncebacks, estimated_paid_loans }`
+- `cheaper_clones`: `{ total_overspend, leads_with_cheaper, by_broker_source[] }`
+
+#### 11.5.8 Performance notes
+
+- The scanner takes 3-5 minutes typically. Initial implementation timed out at 35min on a 3-way SQL self-join over 75M rows; rewrote as sample-and-match-in-Python (O(N+M) hash lookup instead of O(N×M) join). Don't revert to SQL self-joins.
+- Memory: holds 2-3M purchased leads in RAM with identity indexes. Runner has 7GB, fits comfortably.
+
+### 11.6 Declines page (`declines.html`)
+
+90-day rolling analysis of two distinct decline pools (powered by `scan_declines.py`):
+
+1. **Lead rejections** — `Leads.LeadResultTypeId` enum (negative values + specific "rejected" types). Grouped by reason text.
+2. **Application-stage declines** — `Flags` table joined to `Applications` (for lender filter). FlagTypeId 2 = Decline, 3 = DNL (do not lend), 4 = Cancelled, 6 = FraudRisk.
+
+For each pool: top reasons table, daily trend SVG, ClientType breakdown, and top-20 ClientUsernames raising decline flags.
+
+**Reason-text normalisation** in the scanner: lowercase + trim + strip trailing period, so `'BANK CHECK FAILED'` and `'bank check failed.'` fold into the same bucket. Critical — without this the top-reasons distribution fragments.
+
+### 11.7 Pipeline page (`pipeline.html`)
+
+March-cohort application-pipeline analysis with two d3-sankey diagrams (Lead funnel + Application progression). Powered by `scan_pipeline.py` + `scan_pipeline_samples.py`.
+
+Per dead-end endpoint, the samples scanner pulls 25 random ARefs with their full interaction timeline (Tasks, Events, Messages, ESignatures). Identity-links by `(FirstName, Surname, DOB)` so the timeline spans every application the same person made. **All PII masked server-side** — ARefs to last-5, surnames to `******`, DOB to `****-**-**`, addresses to state only, plus email/phone/SSN/card redaction in message bodies.
+
 ---
 
 ## 12. Concept reference: Top-Up Eligibility (TUE)
@@ -457,7 +605,89 @@ Per-loan TUE parameters (`TUEMaxBalance`, `TUEArrearsPosition`, `TUEDaysOld`) ar
 
 ---
 
-## 13. Dev workflow + procedures
+## 13. Concept reference: Brokers / Sources / Campaigns terminology
+
+This is the single most error-prone part of the warehouse schema because the DB names don't match the business terminology. **Get this wrong and the source-quality analysis silently lies.** Confirmed with the user 2026-05-11.
+
+| User term | DB location | What it actually is |
+|---|---|---|
+| **Broker** | `Brokers.Sources` (table) → one row per | A company we have a direct contractual relationship with. The affiliate we pay invoices to. ~50-100 distinct rows in the window. Examples: "Lead Economy", "Search ROI, LLC", "Pingyo", "TruePath Leads". The DB table is awkwardly named — "Sources" in the DB ≠ "Source" in the user's terminology, which is the most common source of confusion. |
+| **Source** | `Leads.SourceReference1` (column) → free-text per lead | The upstream sub-broker / affiliate code passed THROUGH a Broker. The Broker resells leads from many Sources. ~78k distinct values in the window, 99.5% fill rate. Same value across different Brokers means different things, so the analysis unit is the tuple **(Broker, SourceReference1)**. SR2 and SR3 also exist on Leads but SR2 is sub-ID (8M distinct values) and SR3 is near-per-lead noise — both ignored. |
+| **Campaign** | `Brokers.Campaigns` (table) → one row per | Our pricing tier with a Broker. Each Broker has many Campaigns at different price points / commission models. Ephemeral — when one is killed, a similar one is typically re-spun under the same Broker. The cost-model (`CommissionType` + `CommissionRate`) lives on the Campaign. Each lead's `Leads.CampaignId` joins to one Campaign. |
+
+**What `Brokers.SourceTypeID` is NOT:** I initially mistook this for the Source granularity. It is not. The lookup table `dbo.SourceTypes` only contains 2 values ("Broker", "PPC") — a high-level categorisation of the Broker itself, not the upstream sub-source. Do not use this for the Source-quality rollup.
+
+**Join paths used by `scan_source_quality.py`:**
+- `Leads.CampaignId` → `Brokers.Campaigns.CampaignId` (gets commission_type + rate + name)
+- `Brokers.Campaigns.SourceId` → `Brokers.Sources.SourceId` (gets broker friendly_name)
+- `Leads.SourceReference1` is read directly off the Lead row, no join
+
+**Where the Campaign lookup lives:** `Brokers.Campaigns` exists in BOTH `ReportingBrokers` and `ReportingApplications` databases. The scanner tries `ReportingBrokers` first. Note: `ReportingApplications` also has a different table also called `Campaigns` (with a `MessageType` column) — used for marketing campaigns, NOT broker pricing tiers. The scanner detects this by checking for `MessageType` in the columns and skips it.
+
+**Ephemerality:** Per the user, "when we shut down one campaign we tend to start another similar one with that Broker." This means **Campaign-level rankings decay quickly** — a campaign with bad numbers gets killed and the same audience is re-spun under a new CampaignId. (Broker, SR1) is much more stable across that churn, which is why it's the right analysis unit even though Campaign is the per-lead joined dimension.
+
+---
+
+## 14. Brandwatch email notifications
+
+Wired 2026-05-11. New brand mentions (excluding BBB and Reviewcentre — those generate routine review-monitoring noise the team handles separately) trigger an email to **james.benamor@rgroup.co.uk** and **compliance@togetherloans.com** as soon as the hourly brandwatch refresh finds them.
+
+### 14.1 Architecture
+
+The notification step lives inside the existing `.github/workflows/refresh-brandwatch.yml` workflow, after the scan completes and before the JSON commit. Flow:
+
+1. **`scripts/diff_brandwatch_mentions.py`** runs. It reads `brandwatch.json` (the live snapshot) and `brandwatch-seen.json` (the state file tracking notified mention IDs). Outputs:
+   - `notify-mentions.json` — list of new mentions (after BBB/Reviewcentre filter)
+   - Updated `brandwatch-seen.json` (adds every newly-observed ID, including filtered ones, so they don't re-trigger next run)
+   - Stdout `has_new=true|false`
+2. If `has_new=true`, the workflow builds a small HTML email body (one table row per new mention) and shells out to `dawidd6/action-send-mail@v3`
+3. SMTP send via `smtp.gmail.com:465` (TLS), authenticated as the `noreply@togetherbook.net` Workspace user using an App Password
+4. The seen-state file is committed alongside `brandwatch.json` so the next run remembers what's been notified
+
+### 14.2 Sender mailbox setup
+
+`noreply@togetherbook.net` was created as a regular Workspace user in the **togetherloans.com Google Workspace**. The togetherbook.net domain was added as a **secondary domain** to that Workspace (Admin Console → Account → Domains → Manage domains → Add a domain → Secondary domain, then verify ownership via TXT record at the registrar — Cloudflare DNS for this domain).
+
+No MX records added; the mailbox is send-only. If reply-capable mail is ever needed, add the standard Google MX records + SPF TXT.
+
+2-Step Verification is on for the account. App Password is generated at `myaccount.google.com/apppasswords` while signed in as the user (incognito session recommended). The 16-character password lives in the GH secret `SMTP_PASSWORD`.
+
+### 14.3 What's excluded from notifications
+
+Sources with `source == 'bbb' | 'reviewcentre' | 'review_centre'` (case-insensitive). Hardcoded in `EXCLUDED_SOURCES` at the top of `scripts/diff_brandwatch_mentions.py`. To change:
+
+```python
+EXCLUDED_SOURCES = {"bbb", "reviewcentre", "review_centre"}
+```
+
+To add/remove email recipients, edit the `to:` field on the `Send email` step in `.github/workflows/refresh-brandwatch.yml`.
+
+### 14.4 Testing the path
+
+To force a test send when no new mentions are coming in organically, pop an ID from `brandwatch-seen.json`:
+
+```python
+import json, pathlib
+brand = json.load(open('brandwatch.json'))
+seen = json.load(open('brandwatch-seen.json'))
+target = next(m for m in brand['mentions']
+              if (m.get('source') or '').lower() not in {'bbb','reviewcentre','review_centre'}
+              and m.get('id') in seen['ids'])
+seen['ids'] = [i for i in seen['ids'] if i != target['id']]
+pathlib.Path('brandwatch-seen.json').write_text(json.dumps(seen, indent=2))
+```
+
+Then `git add brandwatch-seen.json && git commit && git push && gh workflow run refresh-brandwatch.yml`.
+
+First arrival from this brand-new sender will likely land in spam — flag as Not Spam once and Gmail trains.
+
+### 14.5 To pause notifications without breaking the scan
+
+Comment out the `Send email` step in `.github/workflows/refresh-brandwatch.yml`. The diff step still runs and the seen-state still updates, so no backlog accumulates.
+
+---
+
+## 15. Dev workflow + procedures
 
 ### Editing copy or HTML
 
@@ -480,7 +710,7 @@ Follow the established pattern in `refresh-row-counts.yml`:
    - commit message
 3. Push. The workflow will appear in the Actions tab; trigger it manually first time with `gh workflow run refresh-X.yml`.
 
-### Cache-bust pattern
+### Cache-bust pattern (multi-page)
 
 ```python
 import re, time
@@ -488,7 +718,8 @@ from pathlib import Path
 ROOT = Path('/Users/richmondrobot/Desktop/APIsForKids')
 v = str(int(time.time()))
 pages = ['index.html','apis.html','robots.html','yesterday.html','brandwatch.html',
-         '1stcontact.html','directory.html','database.html','stats.html','topups.html']
+         '1stcontact.html','directory.html','database.html','stats.html','topups.html',
+         'brokers.html','declines.html','pipeline.html']
 for f in pages:
     p = ROOT / f
     s = p.read_text()
@@ -498,7 +729,25 @@ for f in pages:
     p.write_text(s)
 ```
 
-### 13.1 Manually refresh a single page's data
+### Cache-bust pattern (single-page, terminal one-liner)
+
+```sh
+NEW=$(date +%s)
+OLD=$(grep -oE '\?v=[0-9]+' brokers.html | head -1 | sed 's/?v=//')
+sed -i '' "s|?v=${OLD}|?v=${NEW}|g" brokers.html
+```
+
+### JSON cache-busting (for fetches inside HTML)
+
+If a page fetches a JSON file (e.g. `brokers.json`, `source-quality.json`), the fetch URL must include `?bust=` + a fresh timestamp so the GitHub Pages CDN doesn't serve stale JSON when the scanner has just updated it:
+
+```js
+fetch("source-quality.json?bust=" + Date.now(), { cache: "no-store" })
+```
+
+Without this, you'll see the page render with an old JSON schema while the new scanner code expects new fields, producing visible "undefined" cells. Diagnosed and fixed on the brokers page after multiple incidents 2026-05-10/11.
+
+### 15.1 Manually refresh a single page's data
 
 ```sh
 gh workflow run refresh-topups.yml --repo richmondbot2000-prog/APIsForKids
@@ -509,7 +758,7 @@ git pull --rebase
 
 The `workflow_dispatch` trigger bypasses the same-day guard so the refresh always runs work, useful after a column-name fix or a data-source change.
 
-### 13.2 Refresh ALL data immediately
+### 15.2 Refresh ALL data immediately
 
 ```sh
 for w in refresh-yesterday-payouts refresh-row-counts refresh-brandwatch \
@@ -521,7 +770,7 @@ done
 
 Useful after a global change (e.g. updating a shared filter or reformatting JSON output schemas).
 
-### 13.3 Rotate a GH Actions secret
+### 15.3 Rotate a GH Actions secret
 
 ```sh
 # JSON-shaped secrets (Workspace service account)
@@ -534,7 +783,7 @@ printf 'NEW_VALUE' | gh secret set FABRIC_CLIENT_SECRET --repo richmondbot2000-p
 
 After rotation, manually trigger any affected workflow to confirm it still runs.
 
-### 13.4 Inspect why a workflow run failed
+### 15.4 Inspect why a workflow run failed
 
 ```sh
 gh run list --workflow=refresh-topups.yml --repo richmondbot2000-prog/APIsForKids --limit 5
@@ -543,7 +792,7 @@ gh run view <run-id> --repo richmondbot2000-prog/APIsForKids --log-failed | tail
 
 The `--log-failed` flag returns only the failing step's stdout/stderr — much faster than scrolling through the full log.
 
-### 13.5 Add a new lender to the TopUps chart
+### 15.5 Add a new lender to the TopUps chart
 
 Currently hardcoded to `LENDER_ID = 6` in `scripts/scan_topups.py`. To support another lender:
 
@@ -553,7 +802,29 @@ Currently hardcoded to `LENDER_ID = 6` in `scripts/scan_topups.py`. To support a
 
 To support multiple lenders side-by-side, restructure: add a `lenders[]` array to the JSON output, expose a tenant pill row similar to the directory page, render one bar series per lender. Plan for it being mostly empty for non-Transform-Credit lenders since the TUE program is currently TC-only.
 
-### 13.6 Update the database schema doc (`database.md`)
+### 15.6 Add another Workspace tenant to the Directory page
+
+The Directory scanner (`scan_directory.py`) now supports multiple Google Workspace tenants via the `WORKSPACE_TENANTS` JSON-array secret. To add a new tenant (e.g. when a new acquired company's Workspace needs to feed into the Directory):
+
+1. **In the target Workspace's Admin Console** (signed in as a Super Admin of THAT tenant):
+   - Security → Access and data control → API controls → Manage Domain-Wide Delegation → Add new
+   - Client ID: `116293508437634653191` (the existing service account's OAuth client — same one across all tenants)
+   - OAuth scopes: `https://www.googleapis.com/auth/admin.directory.user.readonly` (single scope works here when the entry's being added; the multi-scope quirk only bit the first-tenant setup)
+   - Wait ~10 minutes for propagation
+2. **Update the `WORKSPACE_TENANTS` secret in this repo:**
+   ```json
+   [
+     {"name":"letme","delegate":"james.benamor@letme.co.uk","domain":"letme.co.uk"},
+     {"name":"rgroup","delegate":"ben.gardner@rgroup.co.uk","domain":"rgroup.co.uk"},
+     {"name":"NEW","delegate":"super-admin@newdomain.com","domain":"newdomain.com"}
+   ]
+   ```
+   Each entry's `delegate` must be a Super Admin user IN that Workspace. The service account impersonates them via DWD.
+3. Trigger `refresh-directory.yml`. The output `staff.json` will gain a `tenants[]` field at the top level enumerating which tenants were fetched, plus per-user `tenant` tags. Failures are surfaced in `fetch_errors[]` so partial successes don't break the page.
+
+The legacy single-tenant fallback (`WORKSPACE_DELEGATE_USER`) is retained for backwards compatibility — if `WORKSPACE_TENANTS` is unset, the scanner reverts to the original single-tenant code path.
+
+### 15.7 Update the database schema doc (`database.md`)
 
 `database.md` is mirrored from `~/Desktop/wiki/Overview/06_Database_Schema.md`. To update:
 
@@ -563,7 +834,7 @@ To support multiple lenders side-by-side, restructure: add a `lenders[]` array t
 
 (Currently this is manual. Could be automated with another GH Actions workflow that watches the wiki repo, but the schema rarely changes — manual is fine.)
 
-### 13.7 Replace the Quiet logo
+### 15.8 Replace the Quiet logo
 
 1. Drop the new transparent PNG into `~/Desktop/APIsForKids/togetherbook-logo.png` (overwriting).
 2. **Trim transparent padding before deploying** — the logo's visible glyph height should equal its image height. Pillow snippet:
@@ -586,30 +857,67 @@ To support multiple lenders side-by-side, restructure: add a `lenders[]` array t
 
 ---
 
-## 14. Lessons learned
+## 16. Lessons learned
 
 A short list of footguns to avoid, kept brief; longer detail in `~/Desktop/wiki/CLAUDE_CONTEXT.md` §9.
 
-- **GitHub Pages + browser cache lies for ~10 minutes.** Always cache-bust CSS+image links.
+### Site / deploy
+
+- **GitHub Pages + browser cache lies for ~10 minutes.** Always cache-bust CSS+image links AND any JSON the page fetches (`?bust=` + Date.now()).
 - **Hamburger toggle:** inline `onclick` only, never both inline AND `addEventListener` on the same element — they double-fire.
 - **Leaflet z-indexes escape `.leaflet-container`.** Wrap maps in `position: relative; z-index: 0`.
 - **For first-run JSON files, `git diff --quiet -- file` returns 0** even though the file is brand new and untracked. Stage first, then `git diff --cached --quiet`.
+
+### Workspace / Directory
+
 - **Workspace tenant `letme.co.uk` ≠ user emails.** Most user primaries are on `@letme.com` alias. Use `customer='my_customer'`, never `domain=`.
-- **`admin.google.com` Domain-Wide Delegation** silently rejects single-scope adds with `Can't add OAuth client X with 1 scope`. Add two scopes at once.
+- **`admin.google.com` Domain-Wide Delegation** silently rejects single-scope adds with `Can't add OAuth client X with 1 scope`. Add two scopes at once on first setup. Subsequent edits accept single-scope changes fine.
+- **Multi-tenant DWD setup:** each new Workspace's Super Admin must authorise the SAME service account Client ID separately. The SA itself doesn't need re-keying; it just impersonates a delegate in each tenant.
+- **App Password requires 2-Step Verification on.** Google hides the App Passwords page from accounts without 2SV. Direct URL `myaccount.google.com/apppasswords` works once 2SV is enabled.
+
+### Data / queries
+
 - **Activity-scan timestamp columns vary by table.** Don't hardcode column names — query `INFORMATION_SCHEMA` for any datetime-typed column, prefer known names from a fallback list.
 - **`ClientUsername` matching:** strict `local-part@<known-domain>` only. Bare first-name matches are too risky given multiple staff share first names.
 - **The `Loan_History` table doesn't have a `DIA` column** — DIA is computed inline as `DATEDIFF(day, DateInArrearsUTC, DateTimeUTC)`, with NULL `DateInArrearsUTC` meaning "not in arrears".
 - **`LenderId` is on `Loan`, not `LoanAtInception`.** `TopUpAmountAtInception` is on `LoanAtInception`, not `Loan`. Auto-discover via `INFORMATION_SCHEMA` rather than guess.
+- **`Brokers.Sources.SourceTypeID` only has 2 values** ("Broker", "PPC"). It is NOT the granular Source dimension. Use `Leads.SourceReference1` instead. See §13.
+- **`Brokers.Campaigns` exists in TWO databases** (`ReportingBrokers` AND `ReportingApplications`). The `ReportingApplications` one has a `MessageType` column and is for marketing campaigns, not broker pricing tiers. Detect via column presence and skip it.
+
+### Workflows
+
+- **Free-tier GH Actions cron silently skips under load.** Use `0 6-23 * * *` + a guard step instead of a single daily slot. (Exception: `refresh-source-quality.yml` is daily 07:05 because the analysis is heavy.)
+- **gh CLI heredoc body input is brittle** with multi-line content and shell-quoting. For long values (like JSON secrets), use the GitHub Web UI instead. Confirmed pain 2026-05-10 with `WORKSPACE_TENANTS`.
+
+### Source-quality scanner
+
+- **3-way SQL self-join over 75M Leads rows times out at 35min.** Use the sample-and-match-in-Python pattern instead — O(N+M) via hash indexes, not O(N×M) via join cardinality.
+- **The (Broker, SR1) refactor left a candidate-filter bug** in Part B where CampaignId set was being compared against BrokerId values (different keyspaces, only random hits survive). Always check that filter dimensions match keyspace when refactoring aggregation units.
+- **`source-quality.json` JSON cache-busting is mandatory** on the brokers page fetches. Page renders before scanner updates → schema mismatch → visible "undefined" cells. Diagnosed and fixed 2026-05-10.
+- **Bounceback temporal constraint matters:** without `purchase_date > rejection_date`, you double-count people who were already our customers before the rejection. Cuts noise ~72% per the 2026-05-11 fix.
+- **Window-end maturation lag matters too:** measuring "last 60 days ending today" understates paid_out for recent buys because they haven't had time to fund yet. Shift the window to end 30 days ago. Cuts cost-per-paid noise on recent volume.
+
+### Brandwatch
+
 - **Trustpilot caps public pagination at page 10**, and uses `experiencedDate` not `publishedDate` for review dates. BBB stores dates as a `{day, month, year}` zero-padded string dict.
-- **Free-tier GH Actions cron silently skips under load.** Use `0 6-23 * * *` + a guard step instead of a single daily slot.
+- **Reddit anonymous .json endpoint 403s from cloud IPs.** OAuth code path is wired but Reddit's developer registration is impossible via Google sign-in. Use ScraperAPI residential proxy fallback.
+- **Bbb on ScraperAPI:** use `&premium=true` only, NOT `&render=true&premium=true` — the combination breaks. Trustpilot needs `&render=true` (without premium).
+- **First arrival from a brand-new SMTP sender lands in spam.** Mark "Not Spam" once and Gmail trains. Allow ~30min for the spam-reputation update to propagate.
+
+### Conceptual
+
+- **Decline-rate is NOT a quality metric.** A broker whose leads never engage has zero declines and looks great by that measure. Use ghost rate `(purchased - applications) / purchased` instead. See §11.5.4.
 
 ---
 
-## 15. Pending / blocked work
+## 17. Pending / blocked work
 
 | Item | Status | Blocker |
 |---|---|---|
+| `rgroup.co.uk` Workspace as second Directory tenant | Pending Ben Gardner's DWD setup confirm | Set up wired locally and `WORKSPACE_TENANTS` secret is configured. Ben (Super Admin on rgroup.co.uk Workspace) authorised the service account but the test fetches were still 403ing as of last check — likely needs verification that he's actually Super Admin (not Admin) and that the OAuth scope string is exactly `https://www.googleapis.com/auth/admin.directory.user.readonly`. Resume by triggering `refresh-directory.yml` and checking `fetch_errors[]` in the resulting `staff.json`. |
 | Per-API response time + call count on home page | Plan ready, not built | Awaiting Kamran Kamaei's response to the email request for `Reader` access on the rgcore Azure subscription's Application Insights resources. Plan: GH Actions workflow that queries each App Insights resource for yesterday's `requests \| where timestamp > ago(1d) \| summarize count(), avg(duration) by cloud_RoleName`, writes `api-stats.json`, renders a `48ms · 2.1M calls` line under each helper card. |
+| Type 1 (CPF) rate=0.10/0.12 ambiguity | Awaiting user clarification | The `scan_source_quality.py` CommissionType decoder treats type 1 literally as `rate × paid_out`. A handful of campaigns have rate 0.10/0.12 which produce near-zero cost and look mis-typed (probably type 5 rev-share entries entered under type 1). Resume by asking the user whether those should be re-coded as rev-share, or whether the literal CPF interpretation stands. |
+| Null-SR1 buy-vs-wait economic decision | Diagnosed not decided | 2026-05-11 analysis found ~77 funded loans per 60d that came back through proper-SR1 channels after we rejected the null-SR1 lead. Decision is whether to buy null-SR1 leads upfront. Needs the price of a null-SR1 lead from the upstream broker to compute net economics. |
 | Humand integration | Plan ready, not built | Awaiting Humand support's response to the email request for Public API access + a production API key. Plan: pull people + org chart + birthdays/anniversaries; enrich directory cards with manager line, team tag, joined date, birthday. |
 | Live code-line stats | Function code written, GH Actions equivalent not built | Currently shows a manual snapshot from 2026-05-06 (1.65M lines / 12.3K files / 45 repos). Either deploy `azure-function-stats/` (blocked on Azure admin) or build a `refresh-code-stats.yml` GH Actions workflow using the existing DevOps PAT. |
 | Three engineering specs (drafts) | Not implemented | `SPEC_AppInsights_CustomDimensions.md` + `SPEC_CentralStats_APIs.md` + `SPEC_QueueTelemetry_Tracing.md` in `~/Desktop/wiki/Overview/`. Need a developer + reviewer to build. |
@@ -618,11 +926,13 @@ A short list of footguns to avoid, kept brief; longer detail in `~/Desktop/wiki/
 
 ---
 
-## 16. Cross-references
+## 18. Cross-references
 
+- `CLAUDE.md` (this repo) — working-style notes + the nightly-update directive for Claude sessions
 - `CLAUDE_CONTEXT.md` (in the wiki repo) — operational notes for AI-assisted iteration; carries pending work and lessons learned in more conversational form
-- `~/Desktop/wiki/Overview/07_APIsForKids_Site.md` — the wiki-wide spec entry for this site, integrated alongside other Central Services docs
+- `~/Desktop/wiki/Overview/07_APIsForKids_Site.md` — the wiki-wide spec entry for this site, integrated alongside other Central Services docs. **Keep this in structural sync with SPEC.md.**
 - `~/Desktop/wiki/TogetherBOOK_handoff/wiki/README.md` — the original Quiet Edition design handoff package
+- `~/Desktop/wiki/Markdown/*` — service-by-service Tettra exports, useful when adding new platform-aware pages
 - `~/Desktop/wiki/Markdown/*` — service-by-service Tettra exports, useful when adding new platform-aware pages
 
 ---
