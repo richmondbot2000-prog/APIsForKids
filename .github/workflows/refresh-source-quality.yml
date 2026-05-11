@@ -1,0 +1,99 @@
+name: Refresh source-quality
+
+# Two analyses over a rolling 60-day window:
+#   - Weak accepted sources (sources we buy from with below-median payout)
+#   - Blocked sources with bounceback (sources we reject whose people we
+#     later buy under different sources and pay out)
+# Writes source-quality.json.
+
+on:
+  schedule:
+    - cron: '5 7 * * *'   # daily at 07:05 UTC — heavy join, only need once
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-source-quality
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Skip if already up to date
+        id: guard
+        run: |
+          set -euo pipefail
+          EXPECTED=$(date -u +%Y-%m-%d)
+          if [ -f source-quality.json ]; then
+            CURRENT=$(python3 -c "import json; print(json.load(open('source-quality.json')).get('snapshot_date',''))")
+          else
+            CURRENT=""
+          fi
+          echo "expected=$EXPECTED  current=$CURRENT"
+          if [ "$CURRENT" = "$EXPECTED" ] && [ "${GITHUB_EVENT_NAME:-}" != "workflow_dispatch" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install Microsoft ODBC Driver 18
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          source /etc/os-release
+          curl -fsSL "https://packages.microsoft.com/config/ubuntu/${VERSION_ID}/packages-microsoft-prod.deb" -o /tmp/packages-microsoft-prod.deb
+          sudo dpkg -i /tmp/packages-microsoft-prod.deb
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
+
+      - name: Set up Python
+        if: steps.guard.outputs.skip != 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python deps
+        if: steps.guard.outputs.skip != 'true'
+        run: pip install --quiet pyodbc==5.*
+
+      - name: Scan source quality
+        if: steps.guard.outputs.skip != 'true'
+        env:
+          FABRIC_SQL_ENDPOINT:  d76gbn5gtayeppltcrsxsvkluq-ruqkpz7fkwpelmnjh4kbg2lqpi.datawarehouse.fabric.microsoft.com
+          FABRIC_TENANT_ID:     b760fc1f-98a6-4730-bd73-146579554ba4
+          FABRIC_CLIENT_ID:     b8fb2709-6e42-4a1e-91e6-8a3807a9884d
+          FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
+          SQ_WINDOW_DAYS:       '60'
+          SQ_LENDER_ID:         '6'
+          SQ_MIN_VOLUME:        '200'
+          SQ_MIN_EXCLUDED:      '200'
+        run: python scripts/scan_source_quality.py
+
+      - name: Commit if source-quality.json changed
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add source-quality.json
+          if git diff --cached --quiet -- source-quality.json; then
+            echo "no changes — nothing to commit"
+            exit 0
+          fi
+          WEAK=$(python -c "import json; print(len(json.load(open('source-quality.json'))['weak_accepted']['sources']))")
+          BLOCKED=$(python -c "import json; print(len(json.load(open('source-quality.json'))['blocked_to_reconsider']))")
+          git commit -m "Refresh source-quality: ${WEAK} accepted ranked, ${BLOCKED} blocked w/ bounceback"
+          for attempt in 1 2 3; do
+            if git push; then break; fi
+            if [ "$attempt" -eq 3 ]; then exit 1; fi
+            git fetch origin main
+            git rebase origin/main
+          done
