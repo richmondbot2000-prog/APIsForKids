@@ -193,9 +193,9 @@ def main() -> None:
                             continue
                         sources[int(i)] = {
                             "source_id": int(i),
-                            "friendly_name": (n or "").strip() or f"Source {i}",
-                            "company_name": (comp or "").strip() or None,
-                            "username": (usr or "").strip() or None,
+                            "friendly_name": (str(n).strip() if n is not None else "") or f"Source {i}",
+                            "company_name": (str(comp).strip() if comp is not None else None) or None,
+                            "username": (str(usr).strip() if usr is not None else None) or None,
                             "lender_id": int(lid) if lid is not None else None,
                         }
                     print(f"# Sources from {database}: {len(sources)} (lender {LENDER_ID})", flush=True)
@@ -229,8 +229,8 @@ def main() -> None:
                         campaign_meta[i_int] = {
                             "campaign_id": i_int,
                             "source_id": int(src) if src is not None else None,
-                            "friendly_name": (nm or "").strip() or None,
-                            "commission_type": (t or "").strip() or None,
+                            "friendly_name": (str(nm).strip() if nm is not None else None) or None,
+                            "commission_type": (str(t).strip() if t is not None else None) or None,
                             "commission_rate": float(r) if r is not None else None,
                         }
                     print(f"# Campaigns from {database}: {len(campaign_meta)}", flush=True)
