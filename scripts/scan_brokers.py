@@ -371,6 +371,57 @@ def main() -> None:
         flush=True,
     )
 
+    # ─── Q4: per-campaign decline counts + top reasons via Flags JOIN
+    flags_cols = discover_columns(apps_cur, "Flags")
+    f_aref = pick(flags_cols, "ARef")
+    f_type = pick(flags_cols, "FlagTypeId")
+    f_reason = pick(flags_cols, "Reason", "Description")
+    f_added = pick(flags_cols, "DateAddedUtc", "DateAddedUTC", "DateCreatedUtc")
+    declines_per_campaign: dict[int | None, dict] = {}
+    if f_aref and f_type and f_added:
+        print("# Q4: per-campaign decline counts + top reasons via Flags join", flush=True)
+        reason_sql = f"f.[{f_reason}]" if f_reason else "NULL"
+        apps_cur.execute(
+            f"""
+            WITH purchased_arefs AS (
+                SELECT l.[{leads_aref}] AS ARef, MAX(l.[{leads_camp}]) AS CampaignId
+                FROM dbo.Leads l
+                WHERE l.[{leads_date}] >= ? AND l.[{leads_date}] < ?
+                  AND l.[{leads_lender}] = ?
+                  AND l.[{leads_result}] IN (1, 30)
+                  AND l.[{leads_aref}] IS NOT NULL
+                GROUP BY l.[{leads_aref}]
+            )
+            SELECT p.CampaignId, f.[{f_type}], {reason_sql} AS reason, COUNT(*) AS n
+            FROM purchased_arefs p
+            INNER JOIN dbo.Flags f ON f.[{f_aref}] = p.ARef
+            WHERE f.[{f_type}] IN (2, 3, 4, 6)
+              AND f.[{f_added}] >= ?
+            GROUP BY p.CampaignId, f.[{f_type}], {reason_sql}
+            """,
+            [window_start, window_end, LENDER_ID, window_start],
+        )
+        rows = apps_cur.fetchall()
+        for cid, ftype, reason, n in rows:
+            cid_int = int(cid) if cid is not None else None
+            ftype_int = int(ftype) if ftype is not None else 0
+            n_int = int(n)
+            slot = declines_per_campaign.setdefault(cid_int, {
+                "total": 0,
+                "by_type": {},   # ftype → count
+                "reasons": {},   # (ftype, reason_str) → count
+            })
+            slot["total"] += n_int
+            slot["by_type"][ftype_int] = slot["by_type"].get(ftype_int, 0) + n_int
+            reason_norm = (str(reason).strip()[:140] if reason else "")
+            key = (ftype_int, reason_norm)
+            slot["reasons"][key] = slot["reasons"].get(key, 0) + n_int
+        print(
+            f"#   campaigns with declines: {len(declines_per_campaign):,}  "
+            f"total declined-after-purchase: {sum(s['total'] for s in declines_per_campaign.values()):,}",
+            flush=True,
+        )
+
     apps_conn.close()
 
     # ─── Roll up campaign-level data to source-level rows ────────────
@@ -400,6 +451,9 @@ def main() -> None:
                 "avg_loan_amount_sum":  0.0,  # weighted by apps count → averaged at end
                 "avg_loan_amount_n":    0,
                 "rejection_counts": {},   # result_id → count
+                "flag_declines":   0,
+                "decline_by_type": {},   # ftype → count
+                "decline_reasons": {},   # (ftype, reason) → count
                 "last_lead_at":    None,
             }
         return sources_data[sid]
@@ -430,6 +484,17 @@ def main() -> None:
         slot = source_slot(sid)
         for rtype, n in reasons:
             slot["rejection_counts"][rtype] = slot["rejection_counts"].get(rtype, 0) + n
+
+    # Roll up post-purchase declines (Flags) per source.
+    for cid, dec in declines_per_campaign.items():
+        sid = campaign_to_source.get(cid) if cid is not None else None
+        slot = source_slot(sid)
+        slot["flag_declines"] += dec["total"]
+        for ftype, n in dec["by_type"].items():
+            slot["decline_by_type"][ftype] = slot["decline_by_type"].get(ftype, 0) + n
+        for (ftype, reason), n in dec["reasons"].items():
+            key = (ftype, reason)
+            slot["decline_reasons"][key] = slot["decline_reasons"].get(key, 0) + n
 
     # Finalise: weighted-avg loan amount, rate columns, top-3 rejections
     LEAD_RESULT_LABELS = {
@@ -472,6 +537,30 @@ def main() -> None:
             for rid, n in rejections
         ]
         slot.pop("rejection_counts", None)
+
+        # Post-purchase decline rate (Flags decline count / purchased leads)
+        slot["flag_decline_rate"] = (
+            slot["flag_declines"] / slot["leads_purchased"]
+            if slot["leads_purchased"] else None
+        )
+        # Top-5 decline reasons across the four flag types
+        FLAG_TYPE_LABELS_LOCAL = {2: "Decline", 3: "DNL", 4: "Cancelled", 6: "FraudRisk"}
+        sorted_reasons = sorted(slot["decline_reasons"].items(), key=lambda kv: -kv[1])[:5]
+        slot["top_decline_reasons"] = [
+            {
+                "flag_type": FLAG_TYPE_LABELS_LOCAL.get(ftype, f"FlagType {ftype}"),
+                "reason":    reason or "(no reason given)",
+                "count":     n,
+            }
+            for (ftype, reason), n in sorted_reasons
+        ]
+        # Per-flag-type counts for the row (Decline / DNL / Cancelled / FraudRisk)
+        slot["declines_by_type"] = {
+            FLAG_TYPE_LABELS_LOCAL.get(ftype, f"FlagType {ftype}"): n
+            for ftype, n in slot["decline_by_type"].items()
+        }
+        slot.pop("decline_by_type", None)
+        slot.pop("decline_reasons", None)
         rows.append(slot)
 
     rows.sort(key=lambda r: -r["leads_presented"])

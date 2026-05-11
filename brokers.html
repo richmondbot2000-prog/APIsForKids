@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Brokers</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778488998">
-<link rel="stylesheet" href="quiet.css?v=1778488998">
-<link rel="stylesheet" href="quiet-extras.css?v=1778488998">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778502897">
+<link rel="stylesheet" href="quiet.css?v=1778502897">
+<link rel="stylesheet" href="quiet-extras.css?v=1778502897">
 <style>
   .br-section { max-width: 1280px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .br-section { padding: 2px 0 32px; } }
@@ -385,7 +385,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778488998" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778502897" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -463,6 +463,8 @@
           <th data-col="gt_accepted">GT pass</th>
           <th data-col="vc_ready">VC</th>
           <th data-col="paid_out">Paid</th>
+          <th data-col="flag_declines">Declined</th>
+          <th data-col="flag_decline_rate">Decline %</th>
           <th data-col="lead_to_paid_rate">Lead → paid</th>
           <th data-col="paid_out_loan_total">Funded $</th>
           <th data-col="avg_loan_amount">Avg loan</th>
@@ -663,6 +665,8 @@
       numCell(r.gt_accepted),
       numCell(r.vc_ready),
       numCell(r.paid_out),
+      numCell(r.flag_declines),
+      pctCell(r.flag_decline_rate, 1),
       ratioCell(r.lead_to_paid_rate),
       moneyBigCell(r.paid_out_loan_total),
       moneyCell(r.avg_loan_amount),
@@ -671,7 +675,7 @@
     const expanded = (EXPANDED === r.source_id);
     let detailRow = "";
     if (expanded) {
-      detailRow = `<tr class="br-detail-row"><td colspan="16">${renderDetail(r)}</td></tr>`;
+      detailRow = `<tr class="br-detail-row"><td colspan="18">${renderDetail(r)}</td></tr>`;
     }
     return `<tr class="br-row" data-sid="${r.source_id == null ? "" : r.source_id}">${cellsHtml}</tr>${detailRow}`;
   }
@@ -736,6 +740,22 @@
         + `</ol>`
       : `<p style="color: var(--ink-500); font-style: italic;">No rejection breakdown.</p>`;
 
+    // Post-purchase decline reasons — for ARefs this broker sent that we
+    // BOUGHT but later flagged Decline / DNL / Cancelled / FraudRisk.
+    const declineHtml = (r.top_decline_reasons && r.top_decline_reasons.length)
+      ? `<ol class="br-reject-list">`
+        + r.top_decline_reasons.map(d =>
+            `<li><span style="font: 500 10px/1.4 var(--font-mono); color: var(--red-500); margin-right: 6px;">[${escapeHtml(d.flag_type)}]</span>`
+            + `${escapeHtml(d.reason)}<span class="br-reject-count">${formatNumber(d.count)}</span></li>`
+          ).join("")
+        + `</ol>`
+        + (r.declines_by_type && Object.keys(r.declines_by_type).length
+          ? `<p style="margin: 8px 0 0; font: 400 11px/1.4 var(--font-display); color: var(--ink-500);">`
+            + Object.entries(r.declines_by_type).map(([k, v]) => `<strong style="color: var(--ink-900);">${formatNumber(v)}</strong> ${escapeHtml(k)}`).join(" · ")
+            + `</p>`
+          : "")
+      : `<p style="color: var(--ink-500); font-style: italic;">No post-purchase declines recorded.</p>`;
+
     const campaignsHtml = (r.campaign_ids && r.campaign_ids.length)
       ? `<p style="font: 400 12px/1.4 var(--font-display); color: var(--ink-700); margin: 0;">`
         + `${r.campaign_ids.length} campaign id${r.campaign_ids.length === 1 ? "" : "s"}: `
@@ -753,8 +773,10 @@
           ${campaignsHtml}
         </div>
         <div class="br-detail-block">
-          <h4>Top rejection reasons (last ${DATA.window_days} days)</h4>
+          <h4>Top lead-rejection reasons (last ${DATA.window_days} days)</h4>
           ${rejHtml}
+          <h4 style="margin-top: 14px;">Top post-purchase decline reasons</h4>
+          ${declineHtml}
         </div>
       </div>
     `;
