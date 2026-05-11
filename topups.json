@@ -1,6 +1,6 @@
 {
-  "snapshot_at": "2026-05-10T15:58:11.661425+00:00",
-  "snapshot_date": "2026-05-10",
+  "snapshot_at": "2026-05-11T00:12:48.815212+00:00",
+  "snapshot_date": "2026-05-11",
   "window_months": 24,
   "cutoff_month": "2024-06-01",
   "source_table": "ReportingLoanbook.dbo.Loan_History",
@@ -329,14 +329,14 @@
         "loan_count": 267
       },
       {
-        "max_balance": 4449.0,
-        "arrears_position": 184.0,
+        "max_balance": 7249.0,
+        "arrears_position": 290.0,
         "days_old": 365,
         "loan_count": 259
       },
       {
-        "max_balance": 7249.0,
-        "arrears_position": 290.0,
+        "max_balance": 4449.0,
+        "arrears_position": 184.0,
         "days_old": 365,
         "loan_count": 259
       },
@@ -444,13 +444,13 @@
       },
       {
         "max_balance": 7249.0,
-        "arrears_position": 244.0,
+        "arrears_position": 317.0,
         "days_old": 365,
         "loan_count": 178
       },
       {
         "max_balance": 7249.0,
-        "arrears_position": 317.0,
+        "arrears_position": 244.0,
         "days_old": 365,
         "loan_count": 178
       },
@@ -569,14 +569,14 @@
         "loan_count": 107
       },
       {
-        "max_balance": 3249.0,
-        "arrears_position": 196.0,
+        "max_balance": 4449.0,
+        "arrears_position": 165.0,
         "days_old": 365,
         "loan_count": 103
       },
       {
-        "max_balance": 4449.0,
-        "arrears_position": 165.0,
+        "max_balance": 3249.0,
+        "arrears_position": 196.0,
         "days_old": 365,
         "loan_count": 103
       },
@@ -654,13 +654,13 @@
       },
       {
         "max_balance": 7249.0,
-        "arrears_position": 326.0,
+        "arrears_position": 195.0,
         "days_old": 365,
         "loan_count": 78
       },
       {
         "max_balance": 7249.0,
-        "arrears_position": 195.0,
+        "arrears_position": 326.0,
         "days_old": 365,
         "loan_count": 78
       },
@@ -683,8 +683,8 @@
         "loan_count": 74
       },
       {
-        "max_balance": 4449.0,
-        "arrears_position": 114.0,
+        "max_balance": 7249.0,
+        "arrears_position": 262.0,
         "days_old": 365,
         "loan_count": 72
       },
@@ -695,8 +695,8 @@
         "loan_count": 72
       },
       {
-        "max_balance": 7249.0,
-        "arrears_position": 262.0,
+        "max_balance": 4449.0,
+        "arrears_position": 114.0,
         "days_old": 365,
         "loan_count": 72
       },
@@ -714,13 +714,13 @@
       },
       {
         "max_balance": 7249.0,
-        "arrears_position": 241.0,
+        "arrears_position": 123.0,
         "days_old": 365,
         "loan_count": 54
       },
       {
         "max_balance": 7249.0,
-        "arrears_position": 123.0,
+        "arrears_position": 241.0,
         "days_old": 365,
         "loan_count": 54
       },
@@ -773,14 +773,14 @@
         "loan_count": 44
       },
       {
-        "max_balance": 3249.0,
-        "arrears_position": 172.0,
+        "max_balance": 6249.0,
+        "arrears_position": 149.0,
         "days_old": 365,
         "loan_count": 43
       },
       {
-        "max_balance": 6249.0,
-        "arrears_position": 149.0,
+        "max_balance": 3249.0,
+        "arrears_position": 172.0,
         "days_old": 365,
         "loan_count": 43
       },
@@ -797,6 +797,12 @@
         "loan_count": 40
       },
       {
+        "max_balance": 3249.0,
+        "arrears_position": 210.0,
+        "days_old": 365,
+        "loan_count": 38
+      },
+      {
         "max_balance": 6249.0,
         "arrears_position": 129.0,
         "days_old": 365,
@@ -810,19 +816,13 @@
       },
       {
         "max_balance": 3249.0,
-        "arrears_position": 210.0,
-        "days_old": 365,
-        "loan_count": 38
-      },
-      {
-        "max_balance": 6249.0,
-        "arrears_position": 362.0,
+        "arrears_position": 182.0,
         "days_old": 365,
         "loan_count": 37
       },
       {
-        "max_balance": 3249.0,
-        "arrears_position": 182.0,
+        "max_balance": 6249.0,
+        "arrears_position": 362.0,
         "days_old": 365,
         "loan_count": 37
       },
@@ -839,12 +839,6 @@
         "loan_count": 36
       },
       {
-        "max_balance": 6249.0,
-        "arrears_position": 159.0,
-        "days_old": 365,
-        "loan_count": 34
-      },
-      {
         "max_balance": 3249.0,
         "arrears_position": 136.0,
         "days_old": 365,
@@ -857,6 +851,12 @@
         "loan_count": 34
       },
       {
+        "max_balance": 6249.0,
+        "arrears_position": 159.0,
+        "days_old": 365,
+        "loan_count": 34
+      },
+      {
         "max_balance": 7249.0,
         "arrears_position": 113.0,
         "days_old": 365,
@@ -864,13 +864,13 @@
       },
       {
         "max_balance": 7249.0,
-        "arrears_position": 229.0,
+        "arrears_position": 376.0,
         "days_old": 365,
         "loan_count": 33
       },
       {
         "max_balance": 7249.0,
-        "arrears_position": 376.0,
+        "arrears_position": 229.0,
         "days_old": 365,
         "loan_count": 33
       },
@@ -893,14 +893,14 @@
         "loan_count": 29
       },
       {
-        "max_balance": 3249.0,
-        "arrears_position": 226.0,
+        "max_balance": 4449.0,
+        "arrears_position": 230.0,
         "days_old": 365,
         "loan_count": 29
       },
       {
-        "max_balance": 4449.0,
-        "arrears_position": 230.0,
+        "max_balance": 3249.0,
+        "arrears_position": 226.0,
         "days_old": 365,
         "loan_count": 29
       },
@@ -917,26 +917,26 @@
         "loan_count": 26
       },
       {
-        "max_balance": 7249.0,
-        "arrears_position": 261.0,
-        "days_old": 365,
-        "loan_count": 25
-      },
-      {
-        "max_balance": 2749.0,
-        "arrears_position": 128.0,
-        "days_old": 365,
-        "loan_count": 25
-      },
-      {
         "max_balance": 4449.0,
         "arrears_position": 135.0,
         "days_old": 365,
         "loan_count": 25
       },
       {
+        "max_balance": 7249.0,
+        "arrears_position": 261.0,
+        "days_old": 365,
+        "loan_count": 25
+      },
+      {
         "max_balance": 3249.0,
         "arrears_position": 153.0,
+        "days_old": 365,
+        "loan_count": 25
+      },
+      {
+        "max_balance": 2749.0,
+        "arrears_position": 128.0,
         "days_old": 365,
         "loan_count": 25
       },
@@ -954,13 +954,13 @@
       },
       {
         "max_balance": 4449.0,
-        "arrears_position": 180.0,
+        "arrears_position": 200.0,
         "days_old": 365,
         "loan_count": 22
       },
       {
         "max_balance": 4449.0,
-        "arrears_position": 200.0,
+        "arrears_position": 180.0,
         "days_old": 365,
         "loan_count": 22
       },
@@ -1020,6 +1020,12 @@
       },
       {
         "max_balance": 6249.0,
+        "arrears_position": 308.0,
+        "days_old": 365,
+        "loan_count": 17
+      },
+      {
+        "max_balance": 6249.0,
         "arrears_position": 207.0,
         "days_old": 365,
         "loan_count": 17
@@ -1032,9 +1038,9 @@
       },
       {
         "max_balance": 6249.0,
-        "arrears_position": 308.0,
+        "arrears_position": 48.0,
         "days_old": 365,
-        "loan_count": 17
+        "loan_count": 16
       },
       {
         "max_balance": 7249.0,
@@ -1055,10 +1061,10 @@
         "loan_count": 16
       },
       {
-        "max_balance": 6249.0,
-        "arrears_position": 48.0,
+        "max_balance": 4449.0,
+        "arrears_position": 235.0,
         "days_old": 365,
-        "loan_count": 16
+        "loan_count": 15
       },
       {
         "max_balance": 7249.0,
@@ -1067,22 +1073,10 @@
         "loan_count": 15
       },
       {
-        "max_balance": 4449.0,
-        "arrears_position": 235.0,
-        "days_old": 365,
-        "loan_count": 15
-      },
-      {
         "max_balance": 3249.0,
         "arrears_position": 198.0,
         "days_old": 365,
         "loan_count": 15
-      },
-      {
-        "max_balance": 6249.0,
-        "arrears_position": 161.0,
-        "days_old": 365,
-        "loan_count": 14
       },
       {
         "max_balance": 3249.0,
@@ -1097,8 +1091,14 @@
         "loan_count": 14
       },
       {
-        "max_balance": 3499.0,
-        "arrears_position": 178.0,
+        "max_balance": 6249.0,
+        "arrears_position": 161.0,
+        "days_old": 365,
+        "loan_count": 14
+      },
+      {
+        "max_balance": 4449.0,
+        "arrears_position": 187.0,
         "days_old": 365,
         "loan_count": 13
       },
@@ -1115,14 +1115,44 @@
         "loan_count": 13
       },
       {
-        "max_balance": 4449.0,
-        "arrears_position": 187.0,
+        "max_balance": 3499.0,
+        "arrears_position": 178.0,
         "days_old": 365,
         "loan_count": 13
       },
       {
+        "max_balance": 7249.0,
+        "arrears_position": 401.0,
+        "days_old": 365,
+        "loan_count": 12
+      },
+      {
+        "max_balance": 4449.0,
+        "arrears_position": 191.0,
+        "days_old": 365,
+        "loan_count": 12
+      },
+      {
         "max_balance": 4449.0,
         "arrears_position": 257.0,
+        "days_old": 365,
+        "loan_count": 12
+      },
+      {
+        "max_balance": 4449.0,
+        "arrears_position": 216.0,
+        "days_old": 365,
+        "loan_count": 12
+      },
+      {
+        "max_balance": 7249.0,
+        "arrears_position": 296.0,
+        "days_old": 365,
+        "loan_count": 12
+      },
+      {
+        "max_balance": 4449.0,
+        "arrears_position": 127.0,
         "days_old": 365,
         "loan_count": 12
       },
@@ -1146,36 +1176,6 @@
       },
       {
         "max_balance": 4449.0,
-        "arrears_position": 216.0,
-        "days_old": 365,
-        "loan_count": 12
-      },
-      {
-        "max_balance": 4449.0,
-        "arrears_position": 191.0,
-        "days_old": 365,
-        "loan_count": 12
-      },
-      {
-        "max_balance": 4449.0,
-        "arrears_position": 127.0,
-        "days_old": 365,
-        "loan_count": 12
-      },
-      {
-        "max_balance": 7249.0,
-        "arrears_position": 296.0,
-        "days_old": 365,
-        "loan_count": 12
-      },
-      {
-        "max_balance": 7249.0,
-        "arrears_position": 401.0,
-        "days_old": 365,
-        "loan_count": 12
-      },
-      {
-        "max_balance": 4449.0,
         "arrears_position": 143.0,
         "days_old": 365,
         "loan_count": 12
@@ -1188,7 +1188,7 @@
       },
       {
         "max_balance": 6249.0,
-        "arrears_position": 226.0,
+        "arrears_position": 277.0,
         "days_old": 365,
         "loan_count": 10
       },
@@ -1200,13 +1200,13 @@
       },
       {
         "max_balance": 6249.0,
-        "arrears_position": 277.0,
+        "arrears_position": 226.0,
         "days_old": 365,
         "loan_count": 10
       },
       {
-        "max_balance": 6249.0,
-        "arrears_position": 281.0,
+        "max_balance": 7249.0,
+        "arrears_position": 153.0,
         "days_old": 365,
         "loan_count": 9
       },
@@ -1217,14 +1217,14 @@
         "loan_count": 9
       },
       {
-        "max_balance": 7249.0,
-        "arrears_position": 153.0,
+        "max_balance": 6249.0,
+        "arrears_position": 281.0,
         "days_old": 365,
         "loan_count": 9
       },
       {
-        "max_balance": 6249.0,
-        "arrears_position": 344.0,
+        "max_balance": 3749.0,
+        "arrears_position": 183.0,
         "days_old": 365,
         "loan_count": 8
       },
@@ -1235,8 +1235,8 @@
         "loan_count": 8
       },
       {
-        "max_balance": 3749.0,
-        "arrears_position": 183.0,
+        "max_balance": 6249.0,
+        "arrears_position": 344.0,
         "days_old": 365,
         "loan_count": 8
       },
@@ -1247,8 +1247,38 @@
         "loan_count": 7
       },
       {
+        "max_balance": 6249.0,
+        "arrears_position": 228.0,
+        "days_old": 365,
+        "loan_count": 7
+      },
+      {
         "max_balance": 4449.0,
         "arrears_position": 196.0,
+        "days_old": 365,
+        "loan_count": 7
+      },
+      {
+        "max_balance": 3749.0,
+        "arrears_position": 195.0,
+        "days_old": 365,
+        "loan_count": 7
+      },
+      {
+        "max_balance": 4449.0,
+        "arrears_position": 144.0,
+        "days_old": 365,
+        "loan_count": 7
+      },
+      {
+        "max_balance": 2749.0,
+        "arrears_position": 48.0,
+        "days_old": 365,
+        "loan_count": 7
+      },
+      {
+        "max_balance": 3499.0,
+        "arrears_position": 198.0,
         "days_old": 365,
         "loan_count": 7
       },
@@ -1260,51 +1290,9 @@
       },
       {
         "max_balance": 6249.0,
-        "arrears_position": 228.0,
-        "days_old": 365,
-        "loan_count": 7
-      },
-      {
-        "max_balance": 3749.0,
-        "arrears_position": 195.0,
-        "days_old": 365,
-        "loan_count": 7
-      },
-      {
-        "max_balance": 3499.0,
-        "arrears_position": 198.0,
-        "days_old": 365,
-        "loan_count": 7
-      },
-      {
-        "max_balance": 4449.0,
-        "arrears_position": 144.0,
-        "days_old": 365,
-        "loan_count": 7
-      },
-      {
-        "max_balance": 6249.0,
         "arrears_position": 252.0,
         "days_old": 365,
         "loan_count": 7
-      },
-      {
-        "max_balance": 2749.0,
-        "arrears_position": 48.0,
-        "days_old": 365,
-        "loan_count": 7
-      },
-      {
-        "max_balance": 6249.0,
-        "arrears_position": 199.0,
-        "days_old": 365,
-        "loan_count": 6
-      },
-      {
-        "max_balance": 6249.0,
-        "arrears_position": 116.0,
-        "days_old": 365,
-        "loan_count": 6
       },
       {
         "max_balance": 7249.0,
@@ -1313,44 +1301,8 @@
         "loan_count": 6
       },
       {
-        "max_balance": 7249.0,
-        "arrears_position": 347.0,
-        "days_old": 365,
-        "loan_count": 6
-      },
-      {
         "max_balance": 6249.0,
-        "arrears_position": 237.0,
-        "days_old": 365,
-        "loan_count": 6
-      },
-      {
-        "max_balance": 7249.0,
-        "arrears_position": 165.0,
-        "days_old": 365,
-        "loan_count": 6
-      },
-      {
-        "max_balance": 4449.0,
-        "arrears_position": 167.0,
-        "days_old": 365,
-        "loan_count": 6
-      },
-      {
-        "max_balance": 6249.0,
-        "arrears_position": 168.0,
-        "days_old": 365,
-        "loan_count": 6
-      },
-      {
-        "max_balance": 4449.0,
-        "arrears_position": 160.0,
-        "days_old": 365,
-        "loan_count": 6
-      },
-      {
-        "max_balance": 7249.0,
-        "arrears_position": 183.0,
+        "arrears_position": 199.0,
         "days_old": 365,
         "loan_count": 6
       },
@@ -1367,14 +1319,86 @@
         "loan_count": 6
       },
       {
+        "max_balance": 4449.0,
+        "arrears_position": 160.0,
+        "days_old": 365,
+        "loan_count": 6
+      },
+      {
+        "max_balance": 6249.0,
+        "arrears_position": 237.0,
+        "days_old": 365,
+        "loan_count": 6
+      },
+      {
         "max_balance": 6249.0,
         "arrears_position": 229.0,
         "days_old": 365,
         "loan_count": 6
       },
       {
+        "max_balance": 4449.0,
+        "arrears_position": 167.0,
+        "days_old": 365,
+        "loan_count": 6
+      },
+      {
+        "max_balance": 6249.0,
+        "arrears_position": 116.0,
+        "days_old": 365,
+        "loan_count": 6
+      },
+      {
+        "max_balance": 7249.0,
+        "arrears_position": 165.0,
+        "days_old": 365,
+        "loan_count": 6
+      },
+      {
+        "max_balance": 7249.0,
+        "arrears_position": 347.0,
+        "days_old": 365,
+        "loan_count": 6
+      },
+      {
+        "max_balance": 6249.0,
+        "arrears_position": 168.0,
+        "days_old": 365,
+        "loan_count": 6
+      },
+      {
+        "max_balance": 7249.0,
+        "arrears_position": 183.0,
+        "days_old": 365,
+        "loan_count": 6
+      },
+      {
+        "max_balance": 4449.0,
+        "arrears_position": 243.0,
+        "days_old": 365,
+        "loan_count": 5
+      },
+      {
+        "max_balance": 6249.0,
+        "arrears_position": 128.0,
+        "days_old": 365,
+        "loan_count": 5
+      },
+      {
         "max_balance": 6249.0,
         "arrears_position": 154.0,
+        "days_old": 365,
+        "loan_count": 5
+      },
+      {
+        "max_balance": 6249.0,
+        "arrears_position": 127.0,
+        "days_old": 365,
+        "loan_count": 5
+      },
+      {
+        "max_balance": 6249.0,
+        "arrears_position": 113.0,
         "days_old": 365,
         "loan_count": 5
       },
@@ -1391,20 +1415,8 @@
         "loan_count": 5
       },
       {
-        "max_balance": 4449.0,
-        "arrears_position": 243.0,
-        "days_old": 365,
-        "loan_count": 5
-      },
-      {
         "max_balance": 6249.0,
-        "arrears_position": 235.0,
-        "days_old": 365,
-        "loan_count": 5
-      },
-      {
-        "max_balance": 6249.0,
-        "arrears_position": 208.0,
+        "arrears_position": 244.0,
         "days_old": 365,
         "loan_count": 5
       },
@@ -1416,85 +1428,19 @@
       },
       {
         "max_balance": 6249.0,
-        "arrears_position": 244.0,
-        "days_old": 365,
-        "loan_count": 5
-      },
-      {
-        "max_balance": 6249.0,
-        "arrears_position": 113.0,
-        "days_old": 365,
-        "loan_count": 5
-      },
-      {
-        "max_balance": 6249.0,
-        "arrears_position": 127.0,
-        "days_old": 365,
-        "loan_count": 5
-      },
-      {
-        "max_balance": 6249.0,
-        "arrears_position": 128.0,
-        "days_old": 365,
-        "loan_count": 5
-      },
-      {
-        "max_balance": 2749.0,
-        "arrears_position": 109.0,
-        "days_old": 365,
-        "loan_count": 4
-      },
-      {
-        "max_balance": 6249.0,
-        "arrears_position": 258.0,
-        "days_old": 365,
-        "loan_count": 4
-      },
-      {
-        "max_balance": 7249.0,
-        "arrears_position": 174.0,
-        "days_old": 365,
-        "loan_count": 4
-      },
-      {
-        "max_balance": 4449.0,
         "arrears_position": 208.0,
         "days_old": 365,
-        "loan_count": 4
-      },
-      {
-        "max_balance": 4449.0,
-        "arrears_position": 202.0,
-        "days_old": 365,
-        "loan_count": 4
-      },
-      {
-        "max_balance": 7249.0,
-        "arrears_position": 196.0,
-        "days_old": 365,
-        "loan_count": 4
+        "loan_count": 5
       },
       {
         "max_balance": 6249.0,
-        "arrears_position": 290.0,
+        "arrears_position": 235.0,
         "days_old": 365,
-        "loan_count": 4
+        "loan_count": 5
       },
       {
-        "max_balance": 4449.0,
-        "arrears_position": 123.0,
-        "days_old": 365,
-        "loan_count": 4
-      },
-      {
-        "max_balance": 2749.0,
-        "arrears_position": 181.0,
-        "days_old": 365,
-        "loan_count": 4
-      },
-      {
-        "max_balance": 7249.0,
-        "arrears_position": 116.0,
+        "max_balance": 6249.0,
+        "arrears_position": 190.0,
         "days_old": 365,
         "loan_count": 4
       },
@@ -1512,25 +1458,7 @@
       },
       {
         "max_balance": 6249.0,
-        "arrears_position": 190.0,
-        "days_old": 365,
-        "loan_count": 4
-      },
-      {
-        "max_balance": 4449.0,
-        "arrears_position": 181.0,
-        "days_old": 365,
-        "loan_count": 4
-      },
-      {
-        "max_balance": 6249.0,
         "arrears_position": 174.0,
-        "days_old": 365,
-        "loan_count": 4
-      },
-      {
-        "max_balance": 3499.0,
-        "arrears_position": 119.0,
         "days_old": 365,
         "loan_count": 4
       },
@@ -1541,40 +1469,82 @@
         "loan_count": 4
       },
       {
-        "max_balance": 3249.0,
-        "arrears_position": 187.0,
+        "max_balance": 6249.0,
+        "arrears_position": 258.0,
+        "days_old": 365,
+        "loan_count": 4
+      },
+      {
+        "max_balance": 7249.0,
+        "arrears_position": 116.0,
+        "days_old": 365,
+        "loan_count": 4
+      },
+      {
+        "max_balance": 4449.0,
+        "arrears_position": 181.0,
+        "days_old": 365,
+        "loan_count": 4
+      },
+      {
+        "max_balance": 7249.0,
+        "arrears_position": 174.0,
+        "days_old": 365,
+        "loan_count": 4
+      },
+      {
+        "max_balance": 4449.0,
+        "arrears_position": 123.0,
+        "days_old": 365,
+        "loan_count": 4
+      },
+      {
+        "max_balance": 3499.0,
+        "arrears_position": 119.0,
         "days_old": 365,
         "loan_count": 4
       },
       {
         "max_balance": 6249.0,
-        "arrears_position": 272.0,
+        "arrears_position": 290.0,
         "days_old": 365,
-        "loan_count": 3
+        "loan_count": 4
       },
       {
         "max_balance": 4449.0,
-        "arrears_position": 226.0,
+        "arrears_position": 208.0,
         "days_old": 365,
-        "loan_count": 3
+        "loan_count": 4
       },
       {
-        "max_balance": 7249.0,
-        "arrears_position": 143.0,
+        "max_balance": 2749.0,
+        "arrears_position": 109.0,
         "days_old": 365,
-        "loan_count": 3
+        "loan_count": 4
       },
       {
-        "max_balance": 7249.0,
+        "max_balance": 2749.0,
+        "arrears_position": 181.0,
+        "days_old": 365,
+        "loan_count": 4
+      },
+      {
+        "max_balance": 4449.0,
         "arrears_position": 202.0,
         "days_old": 365,
-        "loan_count": 3
+        "loan_count": 4
       },
       {
-        "max_balance": 6249.0,
-        "arrears_position": 163.0,
+        "max_balance": 7249.0,
+        "arrears_position": 196.0,
         "days_old": 365,
-        "loan_count": 3
+        "loan_count": 4
+      },
+      {
+        "max_balance": 3249.0,
+        "arrears_position": 187.0,
+        "days_old": 365,
+        "loan_count": 4
       },
       {
         "max_balance": 6249.0,
@@ -1591,6 +1561,36 @@
       {
         "max_balance": 6249.0,
         "arrears_position": 123.0,
+        "days_old": 365,
+        "loan_count": 3
+      },
+      {
+        "max_balance": 6249.0,
+        "arrears_position": 163.0,
+        "days_old": 365,
+        "loan_count": 3
+      },
+      {
+        "max_balance": 4449.0,
+        "arrears_position": 226.0,
+        "days_old": 365,
+        "loan_count": 3
+      },
+      {
+        "max_balance": 7249.0,
+        "arrears_position": 202.0,
+        "days_old": 365,
+        "loan_count": 3
+      },
+      {
+        "max_balance": 7249.0,
+        "arrears_position": 143.0,
+        "days_old": 365,
+        "loan_count": 3
+      },
+      {
+        "max_balance": 6249.0,
+        "arrears_position": 272.0,
         "days_old": 365,
         "loan_count": 3
       },
@@ -1649,14 +1649,14 @@
         "loan_count": 3
       },
       {
-        "max_balance": 4449.0,
-        "arrears_position": 245.0,
+        "max_balance": 7249.0,
+        "arrears_position": 175.0,
         "days_old": 365,
         "loan_count": 3
       },
       {
-        "max_balance": 7249.0,
-        "arrears_position": 175.0,
+        "max_balance": 4449.0,
+        "arrears_position": 245.0,
         "days_old": 365,
         "loan_count": 3
       },
@@ -1698,12 +1698,6 @@
       },
       {
         "max_balance": 7249.0,
-        "arrears_position": 185.0,
-        "days_old": 365,
-        "loan_count": 2
-      },
-      {
-        "max_balance": 7249.0,
         "arrears_position": 257.0,
         "days_old": 365,
         "loan_count": 2
@@ -1715,14 +1709,20 @@
         "loan_count": 2
       },
       {
-        "max_balance": 6249.0,
-        "arrears_position": 333.0,
+        "max_balance": 7249.0,
+        "arrears_position": 185.0,
         "days_old": 365,
         "loan_count": 2
       },
       {
         "max_balance": 2749.0,
         "arrears_position": 170.0,
+        "days_old": 365,
+        "loan_count": 2
+      },
+      {
+        "max_balance": 6249.0,
+        "arrears_position": 333.0,
         "days_old": 365,
         "loan_count": 2
       },
@@ -1763,14 +1763,14 @@
         "loan_count": 2
       },
       {
-        "max_balance": 7249.0,
-        "arrears_position": 210.0,
+        "max_balance": 6249.0,
+        "arrears_position": 167.0,
         "days_old": 365,
         "loan_count": 2
       },
       {
-        "max_balance": 6249.0,
-        "arrears_position": 167.0,
+        "max_balance": 3749.0,
+        "arrears_position": 215.0,
         "days_old": 365,
         "loan_count": 2
       },
@@ -1787,14 +1787,14 @@
         "loan_count": 2
       },
       {
-        "max_balance": 6249.0,
-        "arrears_position": 222.0,
+        "max_balance": 7249.0,
+        "arrears_position": 210.0,
         "days_old": 365,
         "loan_count": 2
       },
       {
-        "max_balance": 3749.0,
-        "arrears_position": 215.0,
+        "max_balance": 6249.0,
+        "arrears_position": 222.0,
         "days_old": 365,
         "loan_count": 2
       },
@@ -1823,14 +1823,8 @@
         "loan_count": 2
       },
       {
-        "max_balance": 4449.0,
-        "arrears_position": 275.0,
-        "days_old": 365,
-        "loan_count": 2
-      },
-      {
-        "max_balance": 3749.0,
-        "arrears_position": 138.0,
+        "max_balance": 7249.0,
+        "arrears_position": 135.0,
         "days_old": 365,
         "loan_count": 2
       },
@@ -1841,38 +1835,14 @@
         "loan_count": 2
       },
       {
-        "max_balance": 6249.0,
-        "arrears_position": 357.0,
-        "days_old": 365,
-        "loan_count": 2
-      },
-      {
-        "max_balance": 7249.0,
-        "arrears_position": 135.0,
-        "days_old": 365,
-        "loan_count": 2
-      },
-      {
-        "max_balance": 4449.0,
-        "arrears_position": 129.0,
-        "days_old": 365,
-        "loan_count": 2
-      },
-      {
-        "max_balance": 7249.0,
-        "arrears_position": 284.0,
-        "days_old": 365,
-        "loan_count": 2
-      },
-      {
         "max_balance": 7249.0,
         "arrears_position": 214.0,
         "days_old": 365,
         "loan_count": 2
       },
       {
-        "max_balance": 6249.0,
-        "arrears_position": 317.0,
+        "max_balance": 7249.0,
+        "arrears_position": 284.0,
         "days_old": 365,
         "loan_count": 2
       },
@@ -1889,8 +1859,44 @@
         "loan_count": 2
       },
       {
+        "max_balance": 6249.0,
+        "arrears_position": 357.0,
+        "days_old": 365,
+        "loan_count": 2
+      },
+      {
         "max_balance": 3749.0,
         "arrears_position": 48.0,
+        "days_old": 365,
+        "loan_count": 2
+      },
+      {
+        "max_balance": 6249.0,
+        "arrears_position": 367.0,
+        "days_old": 365,
+        "loan_count": 2
+      },
+      {
+        "max_balance": 6249.0,
+        "arrears_position": 287.0,
+        "days_old": 365,
+        "loan_count": 2
+      },
+      {
+        "max_balance": 7249.0,
+        "arrears_position": 140.0,
+        "days_old": 365,
+        "loan_count": 2
+      },
+      {
+        "max_balance": 2749.0,
+        "arrears_position": 146.0,
+        "days_old": 365,
+        "loan_count": 2
+      },
+      {
+        "max_balance": 2749.0,
+        "arrears_position": 138.0,
         "days_old": 365,
         "loan_count": 2
       },
@@ -1907,98 +1913,32 @@
         "loan_count": 2
       },
       {
-        "max_balance": 2749.0,
+        "max_balance": 4449.0,
+        "arrears_position": 129.0,
+        "days_old": 365,
+        "loan_count": 2
+      },
+      {
+        "max_balance": 6249.0,
+        "arrears_position": 317.0,
+        "days_old": 365,
+        "loan_count": 2
+      },
+      {
+        "max_balance": 4449.0,
+        "arrears_position": 275.0,
+        "days_old": 365,
+        "loan_count": 2
+      },
+      {
+        "max_balance": 3749.0,
         "arrears_position": 138.0,
         "days_old": 365,
         "loan_count": 2
       },
       {
-        "max_balance": 6249.0,
-        "arrears_position": 367.0,
-        "days_old": 365,
-        "loan_count": 2
-      },
-      {
-        "max_balance": 2749.0,
-        "arrears_position": 146.0,
-        "days_old": 365,
-        "loan_count": 2
-      },
-      {
-        "max_balance": 7249.0,
-        "arrears_position": 140.0,
-        "days_old": 365,
-        "loan_count": 2
-      },
-      {
-        "max_balance": 6249.0,
-        "arrears_position": 287.0,
-        "days_old": 365,
-        "loan_count": 2
-      },
-      {
-        "max_balance": 7249.0,
-        "arrears_position": 242.0,
-        "days_old": 365,
-        "loan_count": 1
-      },
-      {
-        "max_balance": 3499.0,
-        "arrears_position": 163.0,
-        "days_old": 365,
-        "loan_count": 1
-      },
-      {
-        "max_balance": 3749.0,
-        "arrears_position": 119.0,
-        "days_old": 365,
-        "loan_count": 1
-      },
-      {
         "max_balance": 3249.0,
-        "arrears_position": 396.0,
-        "days_old": 365,
-        "loan_count": 1
-      },
-      {
-        "max_balance": 3749.0,
-        "arrears_position": 217.0,
-        "days_old": 365,
-        "loan_count": 1
-      },
-      {
-        "max_balance": 6249.0,
-        "arrears_position": 214.0,
-        "days_old": 365,
-        "loan_count": 1
-      },
-      {
-        "max_balance": 3249.0,
-        "arrears_position": 230.0,
-        "days_old": 365,
-        "loan_count": 1
-      },
-      {
-        "max_balance": 7249.0,
-        "arrears_position": 201.0,
-        "days_old": 365,
-        "loan_count": 1
-      },
-      {
-        "max_balance": 6249.0,
-        "arrears_position": 135.0,
-        "days_old": 365,
-        "loan_count": 1
-      },
-      {
-        "max_balance": 2749.0,
-        "arrears_position": 192.0,
-        "days_old": 365,
-        "loan_count": 1
-      },
-      {
-        "max_balance": 3499.0,
-        "arrears_position": 128.0,
+        "arrears_position": 48.0,
         "days_old": 365,
         "loan_count": 1
       },
@@ -2009,20 +1949,14 @@
         "loan_count": 1
       },
       {
-        "max_balance": 3249.0,
-        "arrears_position": 48.0,
-        "days_old": 365,
-        "loan_count": 1
-      },
-      {
-        "max_balance": 4449.0,
-        "arrears_position": 139.0,
-        "days_old": 365,
-        "loan_count": 1
-      },
-      {
         "max_balance": 6249.0,
         "arrears_position": 251.0,
+        "days_old": 365,
+        "loan_count": 1
+      },
+      {
+        "max_balance": 3499.0,
+        "arrears_position": 128.0,
         "days_old": 365,
         "loan_count": 1
       },
@@ -2039,8 +1973,38 @@
         "loan_count": 1
       },
       {
+        "max_balance": 2749.0,
+        "arrears_position": 192.0,
+        "days_old": 365,
+        "loan_count": 1
+      },
+      {
         "max_balance": 7249.0,
         "arrears_position": 120.0,
+        "days_old": 365,
+        "loan_count": 1
+      },
+      {
+        "max_balance": 4449.0,
+        "arrears_position": 139.0,
+        "days_old": 365,
+        "loan_count": 1
+      },
+      {
+        "max_balance": 7249.0,
+        "arrears_position": 201.0,
+        "days_old": 365,
+        "loan_count": 1
+      },
+      {
+        "max_balance": 6249.0,
+        "arrears_position": 135.0,
+        "days_old": 365,
+        "loan_count": 1
+      },
+      {
+        "max_balance": 6249.0,
+        "arrears_position": 203.0,
         "days_old": 365,
         "loan_count": 1
       },
@@ -2051,8 +2015,8 @@
         "loan_count": 1
       },
       {
-        "max_balance": 6249.0,
-        "arrears_position": 203.0,
+        "max_balance": 3249.0,
+        "arrears_position": 230.0,
         "days_old": 365,
         "loan_count": 1
       },
@@ -2064,13 +2028,31 @@
       },
       {
         "max_balance": 6249.0,
-        "arrears_position": 213.0,
+        "arrears_position": 214.0,
         "days_old": 365,
         "loan_count": 1
       },
       {
         "max_balance": 3499.0,
         "arrears_position": 230.0,
+        "days_old": 365,
+        "loan_count": 1
+      },
+      {
+        "max_balance": 3749.0,
+        "arrears_position": 217.0,
+        "days_old": 365,
+        "loan_count": 1
+      },
+      {
+        "max_balance": 6249.0,
+        "arrears_position": 213.0,
+        "days_old": 365,
+        "loan_count": 1
+      },
+      {
+        "max_balance": 3249.0,
+        "arrears_position": 396.0,
         "days_old": 365,
         "loan_count": 1
       },
@@ -2083,6 +2065,24 @@
       {
         "max_balance": 2749.0,
         "arrears_position": 196.0,
+        "days_old": 365,
+        "loan_count": 1
+      },
+      {
+        "max_balance": 7249.0,
+        "arrears_position": 242.0,
+        "days_old": 365,
+        "loan_count": 1
+      },
+      {
+        "max_balance": 3749.0,
+        "arrears_position": 119.0,
+        "days_old": 365,
+        "loan_count": 1
+      },
+      {
+        "max_balance": 3499.0,
+        "arrears_position": 163.0,
         "days_old": 365,
         "loan_count": 1
       },
@@ -2147,8 +2147,8 @@
         "loan_count": 1
       },
       {
-        "max_balance": 2749.0,
-        "arrears_position": 127.0,
+        "max_balance": 3749.0,
+        "arrears_position": 198.0,
         "days_old": 365,
         "loan_count": 1
       },
@@ -2159,8 +2159,8 @@
         "loan_count": 1
       },
       {
-        "max_balance": 3749.0,
-        "arrears_position": 198.0,
+        "max_balance": 2749.0,
+        "arrears_position": 127.0,
         "days_old": 365,
         "loan_count": 1
       },
@@ -2249,12 +2249,6 @@
         "loan_count": 1
       },
       {
-        "max_balance": 7249.0,
-        "arrears_position": 200.0,
-        "days_old": 365,
-        "loan_count": 1
-      },
-      {
         "max_balance": 4449.0,
         "arrears_position": 270.0,
         "days_old": 365,
@@ -2268,7 +2262,7 @@
       },
       {
         "max_balance": 7249.0,
-        "arrears_position": 206.0,
+        "arrears_position": 200.0,
         "days_old": 365,
         "loan_count": 1
       },
@@ -2279,8 +2273,20 @@
         "loan_count": 1
       },
       {
+        "max_balance": 7249.0,
+        "arrears_position": 206.0,
+        "days_old": 365,
+        "loan_count": 1
+      },
+      {
         "max_balance": 2749.0,
         "arrears_position": 160.0,
+        "days_old": 365,
+        "loan_count": 1
+      },
+      {
+        "max_balance": 7249.0,
+        "arrears_position": 270.0,
         "days_old": 365,
         "loan_count": 1
       },
@@ -2297,26 +2303,20 @@
         "loan_count": 1
       },
       {
-        "max_balance": 7249.0,
-        "arrears_position": 270.0,
-        "days_old": 365,
-        "loan_count": 1
-      },
-      {
         "max_balance": 6249.0,
         "arrears_position": 386.0,
         "days_old": 365,
         "loan_count": 1
       },
       {
-        "max_balance": 7249.0,
-        "arrears_position": 5.0,
+        "max_balance": 3249.0,
+        "arrears_position": 177.0,
         "days_old": 365,
         "loan_count": 1
       },
       {
-        "max_balance": 3249.0,
-        "arrears_position": 177.0,
+        "max_balance": 7249.0,
+        "arrears_position": 5.0,
         "days_old": 365,
         "loan_count": 1
       },
@@ -2375,8 +2375,8 @@
         "loan_count": 1
       },
       {
-        "max_balance": 6249.0,
-        "arrears_position": 261.0,
+        "max_balance": 3249.0,
+        "arrears_position": 321.0,
         "days_old": 365,
         "loan_count": 1
       },
@@ -2387,8 +2387,8 @@
         "loan_count": 1
       },
       {
-        "max_balance": 3249.0,
-        "arrears_position": 321.0,
+        "max_balance": 6249.0,
+        "arrears_position": 261.0,
         "days_old": 365,
         "loan_count": 1
       },
