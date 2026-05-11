@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Brokers</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778488904">
-<link rel="stylesheet" href="quiet.css?v=1778488904">
-<link rel="stylesheet" href="quiet-extras.css?v=1778488904">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778488998">
+<link rel="stylesheet" href="quiet.css?v=1778488998">
+<link rel="stylesheet" href="quiet-extras.css?v=1778488998">
 <style>
   .br-section { max-width: 1280px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .br-section { padding: 2px 0 32px; } }
@@ -294,13 +294,21 @@
     margin-left: 8px;
   }
 
-  /* ── Top-10 leaderboard ──────────────────────────────────────────── */
+  /* ── Top-10 leaderboards (side-by-side) ──────────────────────────── */
+  .br-leaderboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 0 0 22px;
+  }
+  @media (max-width: 980px) {
+    .br-leaderboard-grid { grid-template-columns: 1fr; }
+  }
   .br-leaderboard-wrap {
     position: relative;
     background: var(--paper-50);
     border: 1px solid var(--paper-300);
     padding: 16px 18px 18px;
-    margin: 0 0 22px;
   }
   .br-leaderboard-wrap::before {
     content: ""; position: absolute; inset: 4px;
@@ -377,7 +385,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778488904" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778488998" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -414,10 +422,17 @@
 
     <div class="br-kpis" id="brKpis"></div>
 
-    <div class="br-leaderboard-wrap">
-      <h2 class="br-canvas-title">Top 10 brokers by lead volume</h2>
-      <p class="br-canvas-sub">Each bar shows leads presented (full width = the leader); the coloured strip inside scales each broker's downstream stages against their own leads.</p>
-      <div id="brLeaderboard"></div>
+    <div class="br-leaderboard-grid">
+      <div class="br-leaderboard-wrap">
+        <h2 class="br-canvas-title">Top 10 by lead volume</h2>
+        <p class="br-canvas-sub">Bar width = leads presented (full width = #1). The coloured strip inside scales each broker's downstream stages against the same lead-volume axis.</p>
+        <div id="brLeaderboard"></div>
+      </div>
+      <div class="br-leaderboard-wrap">
+        <h2 class="br-canvas-title">Top 10 by paid-out loans</h2>
+        <p class="br-canvas-sub">Same brokers re-ranked by how many of their leads actually became funded loans. Different list — the volume leader rarely is the conversion leader.</p>
+        <div id="brLeaderboardPaid"></div>
+      </div>
     </div>
 
     <div class="br-filters">
@@ -526,31 +541,48 @@
   }
 
   function renderLeaderboard(d) {
-    const wrap = document.getElementById("brLeaderboard");
-    const top10 = (d.sources || []).slice(0, 10);
-    if (!top10.length) { wrap.innerHTML = ""; return; }
-    const maxLeads = top10[0].leads_presented || 1;
-    wrap.innerHTML = top10.map(r => {
-      const widthLeadsPct = (r.leads_presented / maxLeads) * 100;
-      // Within that bar, render downstream stages proportional to this
-      // broker's own leads — so each segment width is
-      // (stage / leads_presented) * fullBarWidth = (stage / maxLeads) * 100.
+    const sources = d.sources || [];
+    if (!sources.length) return;
+    // Volume-ranked top 10
+    const byVol = sources.slice(0, 10);
+    document.getElementById("brLeaderboard").innerHTML = renderLeaderRows(byVol, "leads_presented", byVol[0].leads_presented || 1);
+    // Paid-out-ranked top 10 (only brokers with paid_out > 0)
+    const byPaid = [...sources]
+      .filter(r => (r.paid_out || 0) > 0)
+      .sort((a, b) => (b.paid_out || 0) - (a.paid_out || 0))
+      .slice(0, 10);
+    document.getElementById("brLeaderboardPaid").innerHTML =
+      byPaid.length
+        ? renderLeaderRows(byPaid, "paid_out", byPaid[0].paid_out || 1)
+        : '<p style="color: var(--ink-500); font-style: italic;">No paid-out loans in this window.</p>';
+  }
+
+  function renderLeaderRows(rows, scaleKey, maxVal) {
+    return rows.map(r => {
+      const scaleVal = r[scaleKey] || 0;
+      const widthPct = (scaleVal / maxVal) * 100;
+      // Render downstream stages proportional to this row's scaleVal so the
+      // funnel inside each bar collapses neatly.
       const seg = (count, cls) => {
-        const w = (count / maxLeads) * 100;
-        return `<span class="br-leader-bar-seg ${cls}" style="left:0;width:${w.toFixed(4)}%" title="${cls.replace('_',' ')}: ${formatNumber(count)}"></span>`;
+        const w = scaleVal > 0 ? (count / scaleVal) * widthPct : 0;
+        return `<span class="br-leader-bar-seg ${cls}" style="left:0;width:${Math.max(0, w).toFixed(4)}%" title="${cls.replace('_',' ')}: ${formatNumber(count)}"></span>`;
       };
+      const rightLabel = scaleKey === "paid_out"
+        ? `${formatBig(r.leads_presented || 0)} leads`
+        : `${formatNumber(r.paid_out || 0)} paid`;
+      const headlineLabel = scaleKey === "paid_out" ? formatNumber(r.paid_out || 0) : formatBig(r.leads_presented || 0);
       return `
         <div class="br-leader" title="${escapeHtml(r.friendly_name || "Source " + r.source_id)}">
           <div class="br-leader-name">${escapeHtml(r.friendly_name || "Source " + r.source_id)}</div>
           <div class="br-leader-bar">
-            <div class="br-leader-bar-fill" style="width:${widthLeadsPct.toFixed(3)}%"></div>
-            ${seg(r.leads_purchased || 0, "purchased")}
-            ${seg(r.apply1          || 0, "apply1")}
-            ${seg(r.brw_signed      || 0, "brw_signed")}
-            ${seg(r.paid_out        || 0, "paid_out")}
+            <div class="br-leader-bar-fill" style="width:${widthPct.toFixed(3)}%"></div>
+            ${scaleKey === "leads_presented" ? seg(r.leads_purchased || 0, "purchased") : ""}
+            ${scaleKey === "leads_presented" ? seg(r.apply1          || 0, "apply1")    : ""}
+            ${scaleKey === "leads_presented" ? seg(r.brw_signed      || 0, "brw_signed"): ""}
+            ${scaleKey === "leads_presented" ? seg(r.paid_out        || 0, "paid_out")  : ""}
           </div>
-          <div class="br-leader-count">${formatBig(r.leads_presented || 0)}</div>
-          <div class="br-leader-paid">${formatNumber(r.paid_out || 0)} paid</div>
+          <div class="br-leader-count">${headlineLabel}</div>
+          <div class="br-leader-paid">${rightLabel}</div>
         </div>`;
     }).join("");
   }
