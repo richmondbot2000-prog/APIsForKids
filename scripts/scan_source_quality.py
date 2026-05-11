@@ -144,15 +144,22 @@ def main() -> None:
         flush=True,
     )
 
-    # ─── Brokers.Sources + Campaigns lookups ──────────────────────────
-    # In the database, `Sources` rows are companies (we call them brokers
-    # in the user-facing terminology), and `Campaigns` rows are the
-    # granular per-source-code level beneath each broker — which is what
-    # the user calls "sources". This scanner reports at the Campaign
-    # level (the user's source), with the parent broker on each row.
-    sources: dict[int, dict] = {}         # broker_id (DB SourceId) → {friendly_name}
-    campaign_to_source: dict[int, int] = {}   # campaign_id → broker_id
-    campaign_meta: dict[int, dict] = {}   # campaign_id → {campaign_id, broker_id, source_name}
+    # ─── Brokers, Campaigns + SourceType lookups ──────────────────────
+    # Terminology in this scanner:
+    #   Source     = an upstream sub-broker our Brokers resell from. In
+    #                the DB this is Brokers.Sources.SourceTypeID joined
+    #                to dbo.SourceTypes for the English label.
+    #   Broker     = a company we have a direct relationship with. In
+    #                the DB this is a Brokers.Sources row (its SourceId).
+    #   Campaign   = our pricing tier with a Broker. In the DB this is a
+    #                Brokers.Campaigns row.
+    #
+    # Each Lead carries a CampaignId. Roll-up:
+    #   Lead.CampaignId -> Campaign.SourceId -> Broker -> SourceTypeID -> Source label.
+    sources: dict[int, dict] = {}            # broker_id → {friendly_name, source_type_id, source_type_name}
+    campaign_to_source: dict[int, int] = {}  # campaign_id → broker_id
+    campaign_meta: dict[int, dict] = {}      # campaign_id → metadata
+    source_type_names: dict[int, str] = {}   # source_type_id → label
 
     def load_brokers_from(database: str) -> bool:
         any_loaded = False
@@ -164,24 +171,49 @@ def main() -> None:
             return False
         try:
             cur2 = c2.cursor()
+            # SourceTypes lookup first — needed when filling in Sources.
+            stcols = discover_columns(cur2, "SourceTypes")
+            if stcols and not source_type_names:
+                stid = pick(stcols, "SourceTypeId", "SourceTypeID", "Id", "ID")
+                stnm = pick(stcols, "FriendlyName", "Name", "SourceTypeName", "Description")
+                if stid and stnm:
+                    cur2.execute(f"SELECT [{stid}], [{stnm}] FROM dbo.SourceTypes")
+                    for i, n in cur2.fetchall():
+                        if i is None: continue
+                        source_type_names[int(i)] = (str(n).strip() if n is not None else None) or f"SourceType {i}"
+                    print(f"# SourceTypes from {database}: {len(source_type_names)} types loaded", flush=True)
+                    any_loaded = True
+
             scols = discover_columns(cur2, "Sources")
             if scols and not sources:
                 sid = pick(scols, "SourceId", "SourceID")
                 snm = pick(scols, "FriendlyName", "ShortName", "CompanyName", "Name")
                 slender = pick(scols, "LenderId")
+                stid_col = pick(scols, "SourceTypeId", "SourceTypeID")
                 if sid and snm:
-                    sel = ", ".join([f"[{sid}]", f"[{snm}]",
-                                     f"[{slender}]" if slender else "NULL"])
+                    sel = ", ".join([
+                        f"[{sid}]",
+                        f"[{snm}]",
+                        f"[{slender}]" if slender else "NULL",
+                        f"[{stid_col}]" if stid_col else "NULL",
+                    ])
                     cur2.execute(f"SELECT {sel} FROM dbo.Sources")
-                    for i, n, lid in cur2.fetchall():
+                    for i, n, lid, st_id in cur2.fetchall():
                         if i is None: continue
                         if lid is not None and slender and int(lid) != LENDER_ID:
                             continue
+                        st_id_int = int(st_id) if st_id is not None else None
                         sources[int(i)] = {
-                            "source_id":     int(i),
-                            "friendly_name": (str(n).strip() if n is not None else "") or f"Source {i}",
+                            "source_id":           int(i),
+                            "friendly_name":       (str(n).strip() if n is not None else "") or f"Source {i}",
+                            "source_type_id":      st_id_int,
+                            "source_type_name":    source_type_names.get(st_id_int) if st_id_int is not None else None,
                         }
-                    print(f"# Sources from {database}: {len(sources)}", flush=True)
+                    print(
+                        f"# Sources from {database}: {len(sources)} brokers "
+                        f"({sum(1 for s in sources.values() if s.get('source_type_id') is not None)} with SourceType)",
+                        flush=True,
+                    )
                     any_loaded = True
             ccols = discover_columns(cur2, "Campaigns")
             if ccols and not campaign_to_source:
@@ -816,6 +848,139 @@ def main() -> None:
         flush=True,
     )
 
+    # ─── Roll up to SourceType (the user's "Source") ──────────────────
+    # The Campaign-level data we just computed is useful detail, but the
+    # decision unit is the SourceType — campaigns are ephemeral (we kill
+    # and re-spin them under the same broker / source type).
+    def _stid_of(cid: int | None) -> int | None:
+        if cid is None: return None
+        bid = campaign_to_source.get(cid)
+        if bid is None: return None
+        return (sources.get(bid) or {}).get("source_type_id")
+
+    def _stid_label(stid: int | None) -> str:
+        if stid is None: return "Unknown Source"
+        return source_type_names.get(stid) or f"SourceType {stid}"
+
+    # Build per-SourceType rollup for weak_accepted.
+    weak_by_st: dict[int | None, dict] = {}
+    for s in qualifying:
+        if not s.get("leads_purchased"):
+            continue
+        stid = _stid_of(s["campaign_id"])
+        slot = weak_by_st.setdefault(stid, {
+            "source_type_id":   stid,
+            "source_type_name": _stid_label(stid),
+            "leads_purchased":  0,
+            "applications":     0,
+            "paid_out":         0,
+            "total_cost":       0.0,
+            "has_cost":         False,
+            "campaigns":        [],
+        })
+        slot["leads_purchased"] += s.get("leads_purchased") or 0
+        slot["applications"]    += s.get("applications")    or 0
+        slot["paid_out"]        += s.get("paid_out")        or 0
+        if s.get("total_cost") is not None:
+            slot["total_cost"] += s["total_cost"]
+            slot["has_cost"]   = True
+        slot["campaigns"].append({
+            "campaign_id":  s["campaign_id"],
+            "campaign_name": s.get("source_name"),
+            "broker_name":  s.get("broker_name"),
+            "leads_purchased": s.get("leads_purchased"),
+            "paid_out":     s.get("paid_out"),
+            "total_cost":   s.get("total_cost"),
+            "cost_per_paid_loan": s.get("cost_per_paid_loan"),
+            "cost_model":   s.get("cost_model"),
+        })
+    weak_rows_by_source: list[dict] = []
+    for slot in weak_by_st.values():
+        lp = slot["leads_purchased"]
+        po = slot["paid_out"]
+        if lp:
+            slot["paid_out_rate"] = po / lp
+            slot["cost_per_lead"] = (slot["total_cost"] / lp) if slot["has_cost"] else None
+        if po and slot["has_cost"]:
+            slot["cost_per_paid_loan"] = slot["total_cost"] / po
+        else:
+            slot["cost_per_paid_loan"] = None
+        slot["campaigns"].sort(key=lambda c: -(c.get("leads_purchased") or 0))
+        weak_rows_by_source.append(slot)
+    weak_rows_by_source.sort(key=lambda r: -(r.get("cost_per_paid_loan") or 0))
+
+    # Per-SourceType rollup for blocked-to-reconsider.
+    blocked_by_st: dict[int | None, dict] = {}
+    for b in blocked_rows:
+        stid = _stid_of(b["campaign_id"])
+        slot = blocked_by_st.setdefault(stid, {
+            "source_type_id":   stid,
+            "source_type_name": _stid_label(stid),
+            "excluded_count":   0,
+            "bounceback_leads": 0,
+            "bounceback_arefs": 0,
+            "bounceback_paid":  0,
+            "campaigns":        [],
+        })
+        slot["excluded_count"]   += b.get("excluded_count")   or 0
+        slot["bounceback_leads"] += b.get("bounceback_leads") or 0
+        slot["bounceback_arefs"] += b.get("bounceback_arefs") or 0
+        slot["bounceback_paid"]  += b.get("bounceback_paid")  or 0
+        slot["campaigns"].append({
+            "campaign_id":      b["campaign_id"],
+            "campaign_name":    b.get("source_name"),
+            "broker_name":      b.get("broker_name"),
+            "excluded_count":   b.get("excluded_count"),
+            "bounceback_leads": b.get("bounceback_leads"),
+            "bounceback_paid":  b.get("bounceback_paid"),
+        })
+    blocked_rows_by_source: list[dict] = []
+    for slot in blocked_by_st.values():
+        excl = slot["excluded_count"]
+        slot["bounceback_rate"]            = (slot["bounceback_leads"] / excl) if excl else None
+        slot["bounceback_paid_per_excluded"] = (slot["bounceback_paid"] / excl) if excl else None
+        slot["campaigns"].sort(key=lambda c: -(c.get("bounceback_paid") or 0))
+        blocked_rows_by_source.append(slot)
+    blocked_rows_by_source.sort(key=lambda r: -(r.get("bounceback_paid") or 0))
+
+    # Per-SourceType rollup for cheaper-clones overpay.
+    cheaper_by_st: dict[int | None, dict] = {}
+    for c in cheaper_rows:
+        stid = _stid_of(c["campaign_id"])
+        slot = cheaper_by_st.setdefault(stid, {
+            "source_type_id":            stid,
+            "source_type_name":          _stid_label(stid),
+            "leads_with_cheaper_later":  0,
+            "total_savings_if_waited":   0.0,
+            "leads_purchased":           0,
+            "campaigns":                 [],
+        })
+        slot["leads_with_cheaper_later"] += c.get("leads_with_cheaper_later") or 0
+        slot["total_savings_if_waited"]  += c.get("total_savings_if_waited")  or 0
+        slot["leads_purchased"]          += c.get("leads_purchased")          or 0
+        slot["campaigns"].append({
+            "campaign_id":               c["campaign_id"],
+            "campaign_name":             c.get("source_name"),
+            "broker_name":               c.get("broker_name"),
+            "leads_with_cheaper_later":  c.get("leads_with_cheaper_later"),
+            "total_savings_if_waited":   c.get("total_savings_if_waited"),
+            "avg_savings_per_lead":      c.get("avg_savings_per_lead"),
+        })
+    cheaper_rows_by_source: list[dict] = []
+    for slot in cheaper_by_st.values():
+        n = slot["leads_with_cheaper_later"]
+        slot["avg_savings_per_lead"] = (slot["total_savings_if_waited"] / n) if n else 0
+        slot["cheaper_clone_rate"]   = (n / slot["leads_purchased"]) if slot["leads_purchased"] else None
+        slot["campaigns"].sort(key=lambda c: -(c.get("total_savings_if_waited") or 0))
+        cheaper_rows_by_source.append(slot)
+    cheaper_rows_by_source.sort(key=lambda r: -(r.get("total_savings_if_waited") or 0))
+
+    print(
+        f"# SourceType rollup: weak={len(weak_rows_by_source)}, "
+        f"blocked={len(blocked_rows_by_source)}, cheaper={len(cheaper_rows_by_source)}",
+        flush=True,
+    )
+
     # ─── Finalise Part A output ───────────────────────────────────────
     # Drop rows where weak_data is missing leads_purchased (means they had
     # apps without a Lead row, edge case).
@@ -840,13 +1005,16 @@ def main() -> None:
             "median_paid_out_rate":  median_rate,
             "q1_paid_out_rate":      q1_rate,
             "qualifying_sources":    len(qualifying),
-            "sources":               weak_rows,
+            "sources":               weak_rows,                # campaign-level (detail)
+            "by_source_type":        weak_rows_by_source,      # SourceType rollup (primary)
         },
-        "blocked_to_reconsider":    blocked_rows,
+        "blocked_to_reconsider":              blocked_rows,                # campaign-level (detail)
+        "blocked_to_reconsider_by_source":    blocked_rows_by_source,      # SourceType rollup (primary)
         "cheaper_clones": {
             "total_overspend":      overspend_total,
             "leads_with_cheaper":   sum(r["leads_with_cheaper_later"] for r in cheaper_rows),
-            "campaigns":            cheaper_rows,
+            "campaigns":            cheaper_rows,                          # campaign-level (detail)
+            "by_source_type":       cheaper_rows_by_source,                # SourceType rollup (primary)
         },
     }
     out_path = Path("source-quality.json")
