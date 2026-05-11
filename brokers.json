@@ -1,0 +1,2265 @@
+{
+  "snapshot_at": "2026-05-11T08:18:11.790317+00:00",
+  "snapshot_date": "2026-05-11",
+  "lender_id": 6,
+  "lender_label": "Transform Credit (LenderId 6, USA)",
+  "window_days": 90,
+  "window_start": "2026-02-10",
+  "window_end": "2026-05-11",
+  "stages": [
+    "leads_presented",
+    "leads_purchased",
+    "applications",
+    "apply1",
+    "brw_signed",
+    "gt_accepted",
+    "vc_ready",
+    "paid_out"
+  ],
+  "stage_labels": {
+    "leads_presented": "Leads presented",
+    "leads_purchased": "Leads purchased",
+    "applications": "Applications started",
+    "apply1": "Page 1 complete",
+    "brw_signed": "BRW signed",
+    "gt_accepted": "GT accepted",
+    "vc_ready": "VC ready",
+    "paid_out": "Paid out"
+  },
+  "totals": {
+    "sources": 51,
+    "leads_presented": 114677394,
+    "leads_purchased": 4393771,
+    "applications": 2385197,
+    "apply1": 1645844,
+    "brw_signed": 1229362,
+    "gt_accepted": 377679,
+    "vc_ready": 10541,
+    "paid_out": 5717,
+    "paid_out_loan_total": 26267000.0,
+    "purchase_rate": 0.03831418596763718,
+    "lead_to_paid_rate": 4.9852894285337524e-05,
+    "paid_out_rate": 0.0023968670093078267
+  },
+  "sources": [
+    {
+      "source_id": 482,
+      "friendly_name": "Search ROI, LLC",
+      "company_name": "Search ROI, LLC",
+      "username": "Search ROI",
+      "campaign_ids": [
+        442,
+        441,
+        440
+      ],
+      "leads_presented": 20007642,
+      "leads_purchased": 344135,
+      "applications": 209140,
+      "apply1": 140444,
+      "brw_signed": 89319,
+      "gt_accepted": 23239,
+      "vc_ready": 719,
+      "paid_out": 480,
+      "paid_out_loan_total": 2201500.0,
+      "avg_loan_amount": 4187.650377737401,
+      "purchase_rate": 0.01720017781205801,
+      "app_rate": 0.607726618914089,
+      "apply1_rate": 0.6715310318446973,
+      "brw_signed_rate": 0.4270775557043129,
+      "gt_accepted_rate": 0.11111695514966051,
+      "vc_ready_rate": 0.003437888495744477,
+      "paid_out_rate": 0.0022951133212202354,
+      "lead_to_paid_rate": 2.399083310267147e-05,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 11206112
+        },
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 4949212
+        },
+        {
+          "label": "Rejected for lead score",
+          "code": 20,
+          "count": 1614945
+        }
+      ]
+    },
+    {
+      "source_id": 143,
+      "friendly_name": "Leadtree Global",
+      "company_name": "Leadtree Global",
+      "username": "Leadtree",
+      "campaign_ids": [
+        627,
+        793,
+        379,
+        708,
+        628,
+        794
+      ],
+      "leads_presented": 17908747,
+      "leads_purchased": 2106456,
+      "applications": 804054,
+      "apply1": 548966,
+      "brw_signed": 415459,
+      "gt_accepted": 130831,
+      "vc_ready": 2954,
+      "paid_out": 1475,
+      "paid_out_loan_total": 6652000.0,
+      "avg_loan_amount": 3855.3056759869364,
+      "purchase_rate": 0.11762162925189573,
+      "app_rate": 0.3817093734689925,
+      "apply1_rate": 0.6827476761511043,
+      "brw_signed_rate": 0.5167053456608636,
+      "gt_accepted_rate": 0.16271419581271904,
+      "vc_ready_rate": 0.003673882599924881,
+      "paid_out_rate": 0.0018344539048372372,
+      "lead_to_paid_rate": 8.236198769238295e-05,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 6962207
+        },
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 4969441
+        },
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 2022111
+        }
+      ]
+    },
+    {
+      "source_id": 488,
+      "friendly_name": "Dot 818",
+      "company_name": "dot 818",
+      "username": "Dot 818",
+      "campaign_ids": [
+        798,
+        702,
+        728,
+        758
+      ],
+      "leads_presented": 7978383,
+      "leads_purchased": 348069,
+      "applications": 264079,
+      "apply1": 181336,
+      "brw_signed": 140084,
+      "gt_accepted": 44081,
+      "vc_ready": 774,
+      "paid_out": 385,
+      "paid_out_loan_total": 1550500.0,
+      "avg_loan_amount": 3339.2539732428554,
+      "purchase_rate": 0.04362650928139198,
+      "app_rate": 0.7586972697942075,
+      "apply1_rate": 0.6866733060940098,
+      "brw_signed_rate": 0.5304624752441505,
+      "gt_accepted_rate": 0.16692353424543413,
+      "vc_ready_rate": 0.0029309411198921533,
+      "paid_out_rate": 0.0014578970686802055,
+      "lead_to_paid_rate": 4.8255392101381946e-05,
+      "top_rejections": [
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 3830457
+        },
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 2442689
+        },
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 1090588
+        }
+      ]
+    },
+    {
+      "source_id": 614,
+      "friendly_name": "TruePath Leads",
+      "company_name": "True Path Leads",
+      "username": "TRL",
+      "campaign_ids": [
+        759,
+        786
+      ],
+      "leads_presented": 7701981,
+      "leads_purchased": 80728,
+      "applications": 74815,
+      "apply1": 52943,
+      "brw_signed": 40580,
+      "gt_accepted": 13548,
+      "vc_ready": 384,
+      "paid_out": 130,
+      "paid_out_loan_total": 556750.0,
+      "avg_loan_amount": 3674.0058811735616,
+      "purchase_rate": 0.010481459250548657,
+      "app_rate": 0.9267540382519076,
+      "apply1_rate": 0.7076522087816615,
+      "brw_signed_rate": 0.5424045980084208,
+      "gt_accepted_rate": 0.18108668047851367,
+      "vc_ready_rate": 0.00513266056272138,
+      "paid_out_rate": 0.0017376194613379669,
+      "lead_to_paid_rate": 1.6878774434785025e-05,
+      "top_rejections": [
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 2551645
+        },
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 2449351
+        },
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 2102158
+        }
+      ]
+    },
+    {
+      "source_id": 581,
+      "friendly_name": "IPW1 LTD",
+      "company_name": "IPW1 LTD",
+      "username": "IPW1 LTD iain williams",
+      "campaign_ids": [
+        682,
+        683,
+        684
+      ],
+      "leads_presented": 6645306,
+      "leads_purchased": 1445,
+      "applications": 1041,
+      "apply1": 362,
+      "brw_signed": 243,
+      "gt_accepted": 62,
+      "vc_ready": 3,
+      "paid_out": 1,
+      "paid_out_loan_total": 7000.0,
+      "avg_loan_amount": 3471.4217098943323,
+      "purchase_rate": 0.00021744672103888067,
+      "app_rate": 0.7204152249134949,
+      "apply1_rate": 0.34774255523535064,
+      "brw_signed_rate": 0.2334293948126801,
+      "gt_accepted_rate": 0.059558117195004805,
+      "vc_ready_rate": 0.002881844380403458,
+      "paid_out_rate": 0.0009606147934678194,
+      "lead_to_paid_rate": 1.5048215988849874e-07,
+      "top_rejections": [
+        {
+          "label": "Throttled",
+          "code": 4,
+          "count": 4545693
+        },
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 1928452
+        },
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 77896
+        }
+      ]
+    },
+    {
+      "source_id": 518,
+      "friendly_name": "Leads Gate",
+      "company_name": "Brainsome Ltd dba Leads Gate",
+      "username": "Brain",
+      "campaign_ids": [
+        519,
+        517,
+        639,
+        518
+      ],
+      "leads_presented": 6411054,
+      "leads_purchased": 199546,
+      "applications": 132076,
+      "apply1": 92349,
+      "brw_signed": 64441,
+      "gt_accepted": 20167,
+      "vc_ready": 417,
+      "paid_out": 212,
+      "paid_out_loan_total": 947000.0,
+      "avg_loan_amount": 4250.730639934583,
+      "purchase_rate": 0.031125303265266524,
+      "app_rate": 0.6618824732141962,
+      "apply1_rate": 0.6992110602986159,
+      "brw_signed_rate": 0.4879084769375208,
+      "gt_accepted_rate": 0.15269238923044307,
+      "vc_ready_rate": 0.0031572730851933736,
+      "paid_out_rate": 0.0016051364365971107,
+      "lead_to_paid_rate": 3.3067885561406906e-05,
+      "top_rejections": [
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 3325665
+        },
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 1024102
+        },
+        {
+          "label": "Throttled",
+          "code": 4,
+          "count": 1000295
+        }
+      ]
+    },
+    {
+      "source_id": 238,
+      "friendly_name": "Zero P",
+      "company_name": "Zero Parallel",
+      "username": "Zero",
+      "campaign_ids": [
+        730,
+        620,
+        768,
+        779
+      ],
+      "leads_presented": 6139337,
+      "leads_purchased": 131924,
+      "applications": 82431,
+      "apply1": 57618,
+      "brw_signed": 44406,
+      "gt_accepted": 11882,
+      "vc_ready": 354,
+      "paid_out": 209,
+      "paid_out_loan_total": 873500.0,
+      "avg_loan_amount": 3403.328238162827,
+      "purchase_rate": 0.021488313803265727,
+      "app_rate": 0.6248370273794003,
+      "apply1_rate": 0.6989846053062562,
+      "brw_signed_rate": 0.5387050988099138,
+      "gt_accepted_rate": 0.14414479989324405,
+      "vc_ready_rate": 0.004294500855260764,
+      "paid_out_rate": 0.0025354538947725976,
+      "lead_to_paid_rate": 3.404276390105316e-05,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 3886418
+        },
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 1165313
+        },
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 320022
+        }
+      ]
+    },
+    {
+      "source_id": 619,
+      "friendly_name": "Bume International LLC",
+      "company_name": "Bume International LLC",
+      "username": "Bume LLC",
+      "campaign_ids": [
+        771,
+        772
+      ],
+      "leads_presented": 5956899,
+      "leads_purchased": 19315,
+      "applications": 17343,
+      "apply1": 12723,
+      "brw_signed": 10006,
+      "gt_accepted": 3430,
+      "vc_ready": 119,
+      "paid_out": 38,
+      "paid_out_loan_total": 165000.0,
+      "avg_loan_amount": 3833.0594476157526,
+      "purchase_rate": 0.0032424588699590173,
+      "app_rate": 0.8979031840538442,
+      "apply1_rate": 0.7336101020584674,
+      "brw_signed_rate": 0.5769474716023756,
+      "gt_accepted_rate": 0.1977743181687136,
+      "vc_ready_rate": 0.0068615579772819,
+      "paid_out_rate": 0.0021910857406446404,
+      "lead_to_paid_rate": 6.379158014933609e-06,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 2654056
+        },
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 2628601
+        },
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 404049
+        }
+      ]
+    },
+    {
+      "source_id": 149,
+      "friendly_name": "Pingyo",
+      "company_name": "PingYo",
+      "username": "Pingyo",
+      "campaign_ids": [
+        640,
+        317
+      ],
+      "leads_presented": 5197873,
+      "leads_purchased": 88509,
+      "applications": 58872,
+      "apply1": 38727,
+      "brw_signed": 28572,
+      "gt_accepted": 8175,
+      "vc_ready": 254,
+      "paid_out": 130,
+      "paid_out_loan_total": 510250.0,
+      "avg_loan_amount": 3236.4451691805953,
+      "purchase_rate": 0.017027926615367478,
+      "app_rate": 0.6651526963359659,
+      "apply1_rate": 0.6578169588259274,
+      "brw_signed_rate": 0.48532409294741136,
+      "gt_accepted_rate": 0.1388605788830004,
+      "vc_ready_rate": 0.0043144448974045384,
+      "paid_out_rate": 0.0022081804593015357,
+      "lead_to_paid_rate": 2.501023014606167e-05,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 1993697
+        },
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 1513092
+        },
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 1330226
+        }
+      ]
+    },
+    {
+      "source_id": 418,
+      "friendly_name": "Acquire Interactive",
+      "company_name": "Acquire Interactive",
+      "username": "Acquire Interactive",
+      "campaign_ids": [
+        567,
+        707,
+        566
+      ],
+      "leads_presented": 4650319,
+      "leads_purchased": 65816,
+      "applications": 47274,
+      "apply1": 29879,
+      "brw_signed": 21456,
+      "gt_accepted": 5402,
+      "vc_ready": 138,
+      "paid_out": 86,
+      "paid_out_loan_total": 276000.0,
+      "avg_loan_amount": 3132.583449676355,
+      "purchase_rate": 0.014153007567867925,
+      "app_rate": 0.7182751914428103,
+      "apply1_rate": 0.6320387528028092,
+      "brw_signed_rate": 0.45386470364259424,
+      "gt_accepted_rate": 0.11427000042306554,
+      "vc_ready_rate": 0.0029191521766721664,
+      "paid_out_rate": 0.0018191817912594662,
+      "lead_to_paid_rate": 1.8493354971992244e-05,
+      "top_rejections": [
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 3396910
+        },
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 486833
+        },
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 314947
+        }
+      ]
+    },
+    {
+      "source_id": 483,
+      "friendly_name": "MARKET BULLET, LLC",
+      "company_name": "marketbullet",
+      "username": "MARKET BULLET",
+      "campaign_ids": [
+        445,
+        446
+      ],
+      "leads_presented": 3497185,
+      "leads_purchased": 72896,
+      "applications": 48023,
+      "apply1": 32017,
+      "brw_signed": 24429,
+      "gt_accepted": 7036,
+      "vc_ready": 310,
+      "paid_out": 149,
+      "paid_out_loan_total": 595000.0,
+      "avg_loan_amount": 3403.3119546883786,
+      "purchase_rate": 0.020844193258292027,
+      "app_rate": 0.6587878621597892,
+      "apply1_rate": 0.6667013722591258,
+      "brw_signed_rate": 0.5086937509110218,
+      "gt_accepted_rate": 0.1465131291256273,
+      "vc_ready_rate": 0.00645524019740541,
+      "paid_out_rate": 0.003102679965849697,
+      "lead_to_paid_rate": 4.260569572384646e-05,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 2258188
+        },
+        {
+          "label": "Rejected for lead score",
+          "code": 20,
+          "count": 1000345
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 86881
+        }
+      ]
+    },
+    {
+      "source_id": 477,
+      "friendly_name": "Intimate Interactive",
+      "company_name": "Intimate Interactive",
+      "username": "Intimate",
+      "campaign_ids": [
+        692
+      ],
+      "leads_presented": 3493814,
+      "leads_purchased": 23485,
+      "applications": 16079,
+      "apply1": 10169,
+      "brw_signed": 7787,
+      "gt_accepted": 2189,
+      "vc_ready": 70,
+      "paid_out": 32,
+      "paid_out_loan_total": 144250.0,
+      "avg_loan_amount": 3305.9269855090492,
+      "purchase_rate": 0.006721880443549657,
+      "app_rate": 0.6846497764530551,
+      "apply1_rate": 0.6324398283475341,
+      "brw_signed_rate": 0.48429628708253003,
+      "gt_accepted_rate": 0.13614030723303688,
+      "vc_ready_rate": 0.0043535045711798,
+      "paid_out_rate": 0.0019901735182536228,
+      "lead_to_paid_rate": 9.159045100855398e-06,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 2321214
+        },
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 616267
+        },
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 323288
+        }
+      ]
+    },
+    {
+      "source_id": 415,
+      "friendly_name": "Round Sky",
+      "company_name": "Round Sky",
+      "username": "Round Sky",
+      "campaign_ids": [
+        780,
+        647
+      ],
+      "leads_presented": 3088620,
+      "leads_purchased": 93400,
+      "applications": 47765,
+      "apply1": 33641,
+      "brw_signed": 26116,
+      "gt_accepted": 7672,
+      "vc_ready": 248,
+      "paid_out": 149,
+      "paid_out_loan_total": 736000.0,
+      "avg_loan_amount": 4514.44572385638,
+      "purchase_rate": 0.030240042478517914,
+      "app_rate": 0.5114025695931478,
+      "apply1_rate": 0.7043023134094002,
+      "brw_signed_rate": 0.5467601800481524,
+      "gt_accepted_rate": 0.16061970061760703,
+      "vc_ready_rate": 0.005192086255626505,
+      "paid_out_rate": 0.0031194389197110855,
+      "lead_to_paid_rate": 4.824160952140438e-05,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 1476374
+        },
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 762905
+        },
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 595820
+        }
+      ]
+    },
+    {
+      "source_id": 480,
+      "friendly_name": "Leap Theory 2.0",
+      "company_name": "Leap Theory",
+      "username": "LEAP 2.0",
+      "campaign_ids": [
+        621,
+        439
+      ],
+      "leads_presented": 2821342,
+      "leads_purchased": 197301,
+      "applications": 137731,
+      "apply1": 92619,
+      "brw_signed": 67851,
+      "gt_accepted": 19566,
+      "vc_ready": 570,
+      "paid_out": 259,
+      "paid_out_loan_total": 1098750.0,
+      "avg_loan_amount": 3749.5868758667257,
+      "purchase_rate": 0.06993161410420998,
+      "app_rate": 0.6980755292674644,
+      "apply1_rate": 0.6724629894504505,
+      "brw_signed_rate": 0.4926341927380183,
+      "gt_accepted_rate": 0.14205952182152165,
+      "vc_ready_rate": 0.004138501862325838,
+      "paid_out_rate": 0.0018804771620041965,
+      "lead_to_paid_rate": 9.180028511254574e-05,
+      "top_rejections": [
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 1533417
+        },
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 969982
+        },
+        {
+          "label": "Rejected for lead score",
+          "code": 20,
+          "count": 48448
+        }
+      ]
+    },
+    {
+      "source_id": 620,
+      "friendly_name": "Highwinds",
+      "company_name": "Highwinds",
+      "username": "Highwinds",
+      "campaign_ids": [
+        785,
+        796
+      ],
+      "leads_presented": 2166084,
+      "leads_purchased": 30379,
+      "applications": 29072,
+      "apply1": 20271,
+      "brw_signed": 15532,
+      "gt_accepted": 5069,
+      "vc_ready": 185,
+      "paid_out": 67,
+      "paid_out_loan_total": 289250.0,
+      "avg_loan_amount": 3502.442212438085,
+      "purchase_rate": 0.014024848528496586,
+      "app_rate": 0.9569768590144507,
+      "apply1_rate": 0.697268849752339,
+      "brw_signed_rate": 0.5342597688497523,
+      "gt_accepted_rate": 0.17436020913593836,
+      "vc_ready_rate": 0.0063635112823335165,
+      "paid_out_rate": 0.0023046230049532197,
+      "lead_to_paid_rate": 3.093139508901778e-05,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 1148412
+        },
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 847501
+        },
+        {
+          "label": "Rejected for lead score",
+          "code": 20,
+          "count": 57385
+        }
+      ]
+    },
+    {
+      "source_id": 188,
+      "friendly_name": "ITMedia",
+      "company_name": "ITMedia",
+      "username": "ITMedia",
+      "campaign_ids": [
+        676,
+        790
+      ],
+      "leads_presented": 1968084,
+      "leads_purchased": 20454,
+      "applications": 16006,
+      "apply1": 11151,
+      "brw_signed": 8460,
+      "gt_accepted": 2881,
+      "vc_ready": 103,
+      "paid_out": 35,
+      "paid_out_loan_total": 149750.0,
+      "avg_loan_amount": 3650.6528801699365,
+      "purchase_rate": 0.010392849085709756,
+      "app_rate": 0.7825364231935074,
+      "apply1_rate": 0.6966762464075972,
+      "brw_signed_rate": 0.5285517930775959,
+      "gt_accepted_rate": 0.17999500187429715,
+      "vc_ready_rate": 0.006435086842434087,
+      "paid_out_rate": 0.0021866799950018743,
+      "lead_to_paid_rate": 1.778379378115975e-05,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 886087
+        },
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 837710
+        },
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 144600
+        }
+      ]
+    },
+    {
+      "source_id": 607,
+      "friendly_name": "PingLogix LLC",
+      "company_name": "PingLogix LLC",
+      "username": "Pinglogix",
+      "campaign_ids": [
+        791,
+        770,
+        799
+      ],
+      "leads_presented": 1803505,
+      "leads_purchased": 76682,
+      "applications": 75294,
+      "apply1": 53519,
+      "brw_signed": 39396,
+      "gt_accepted": 12239,
+      "vc_ready": 303,
+      "paid_out": 92,
+      "paid_out_loan_total": 366000.0,
+      "avg_loan_amount": 3276.4264084787637,
+      "purchase_rate": 0.042518318496483236,
+      "app_rate": 0.9818992723194492,
+      "apply1_rate": 0.7108003293755146,
+      "brw_signed_rate": 0.5232289425452227,
+      "gt_accepted_rate": 0.16254947273355114,
+      "vc_ready_rate": 0.004024225037851621,
+      "paid_out_rate": 0.0012218769091826706,
+      "lead_to_paid_rate": 5.1011779839811925e-05,
+      "top_rejections": [
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 878186
+        },
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 733809
+        },
+        {
+          "label": "Rejected for lead score",
+          "code": 20,
+          "count": 60948
+        }
+      ]
+    },
+    {
+      "source_id": 487,
+      "friendly_name": "Stop Go",
+      "company_name": "Stop Go Networks",
+      "username": "Stop Go",
+      "campaign_ids": [
+        795,
+        672
+      ],
+      "leads_presented": 1646128,
+      "leads_purchased": 21933,
+      "applications": 11902,
+      "apply1": 8407,
+      "brw_signed": 6091,
+      "gt_accepted": 2213,
+      "vc_ready": 51,
+      "paid_out": 26,
+      "paid_out_loan_total": 104500.0,
+      "avg_loan_amount": 3380.4402621408167,
+      "purchase_rate": 0.013323994245890964,
+      "app_rate": 0.5426526239000593,
+      "apply1_rate": 0.7063518736346832,
+      "brw_signed_rate": 0.5117627289531171,
+      "gt_accepted_rate": 0.1859351369517728,
+      "vc_ready_rate": 0.004284994118635524,
+      "paid_out_rate": 0.0021845068055788945,
+      "lead_to_paid_rate": 1.5794640513981902e-05,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 896706
+        },
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 546626
+        },
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 105553
+        }
+      ]
+    },
+    {
+      "source_id": 141,
+      "friendly_name": "AvenueLink",
+      "company_name": "Avenue Link",
+      "username": "AvenueLink",
+      "campaign_ids": [
+        421,
+        389,
+        370
+      ],
+      "leads_presented": 1589453,
+      "leads_purchased": 76322,
+      "applications": 37340,
+      "apply1": 25086,
+      "brw_signed": 19142,
+      "gt_accepted": 5169,
+      "vc_ready": 225,
+      "paid_out": 161,
+      "paid_out_loan_total": 754000.0,
+      "avg_loan_amount": 4033.5832886984467,
+      "purchase_rate": 0.04801777718498125,
+      "app_rate": 0.489242944367286,
+      "apply1_rate": 0.6718264595607927,
+      "brw_signed_rate": 0.5126405998928762,
+      "gt_accepted_rate": 0.13843063738618103,
+      "vc_ready_rate": 0.006025709694697376,
+      "paid_out_rate": 0.004311730048205678,
+      "lead_to_paid_rate": 0.00010129270887531749,
+      "top_rejections": [
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 761128
+        },
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 586506
+        },
+        {
+          "label": "Seen too frequently",
+          "code": 18,
+          "count": 100108
+        }
+      ]
+    },
+    {
+      "source_id": 479,
+      "friendly_name": "Discover Nimbus",
+      "company_name": "Discover Nimbus Media LLC",
+      "username": "DNM",
+      "campaign_ids": [
+        693
+      ],
+      "leads_presented": 1534559,
+      "leads_purchased": 54528,
+      "applications": 38795,
+      "apply1": 26134,
+      "brw_signed": 19724,
+      "gt_accepted": 5957,
+      "vc_ready": 164,
+      "paid_out": 64,
+      "paid_out_loan_total": 240750.0,
+      "avg_loan_amount": 3178.4572754220903,
+      "purchase_rate": 0.03553333563584066,
+      "app_rate": 0.7114693368544601,
+      "apply1_rate": 0.673643510761696,
+      "brw_signed_rate": 0.5084160329939426,
+      "gt_accepted_rate": 0.1535507152983632,
+      "vc_ready_rate": 0.004227348885165614,
+      "paid_out_rate": 0.0016496971259182885,
+      "lead_to_paid_rate": 4.170579299981297e-05,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 650081
+        },
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 604003
+        },
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 125092
+        }
+      ]
+    },
+    {
+      "source_id": 473,
+      "friendly_name": "Lead Economy",
+      "company_name": "n/a",
+      "username": "Lead Economy",
+      "campaign_ids": [
+        422,
+        423,
+        706,
+        430
+      ],
+      "leads_presented": 1055868,
+      "leads_purchased": 28199,
+      "applications": 20395,
+      "apply1": 14143,
+      "brw_signed": 11074,
+      "gt_accepted": 3106,
+      "vc_ready": 101,
+      "paid_out": 41,
+      "paid_out_loan_total": 213750.0,
+      "avg_loan_amount": 4393.147830350576,
+      "purchase_rate": 0.02670693685195498,
+      "app_rate": 0.7232525976098443,
+      "apply1_rate": 0.693454278009316,
+      "brw_signed_rate": 0.5429762196616817,
+      "gt_accepted_rate": 0.15229222848737436,
+      "vc_ready_rate": 0.004952194165236578,
+      "paid_out_rate": 0.00201029664133366,
+      "lead_to_paid_rate": 3.883061140218285e-05,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 730475
+        },
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 166099
+        },
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 74485
+        }
+      ]
+    },
+    {
+      "source_id": 593,
+      "friendly_name": "Dogstar Digital Corp",
+      "company_name": "Dogstar Digital Corp",
+      "username": "Dogstar",
+      "campaign_ids": [
+        712,
+        710,
+        711
+      ],
+      "leads_presented": 413789,
+      "leads_purchased": 36318,
+      "applications": 33016,
+      "apply1": 24827,
+      "brw_signed": 20987,
+      "gt_accepted": 5984,
+      "vc_ready": 160,
+      "paid_out": 124,
+      "paid_out_loan_total": 465750.0,
+      "avg_loan_amount": 3243.8287496971166,
+      "purchase_rate": 0.0877693703795896,
+      "app_rate": 0.909080896525139,
+      "apply1_rate": 0.7519687424279138,
+      "brw_signed_rate": 0.635661497455779,
+      "gt_accepted_rate": 0.18124545674824327,
+      "vc_ready_rate": 0.00484613520717228,
+      "paid_out_rate": 0.003755754785558517,
+      "lead_to_paid_rate": 0.0002996696383905807,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 274989
+        },
+        {
+          "label": "Rejected for lead score",
+          "code": 20,
+          "count": 49428
+        },
+        {
+          "label": "Seen too frequently",
+          "code": 18,
+          "count": 29833
+        }
+      ]
+    },
+    {
+      "source_id": 476,
+      "friendly_name": "Leads Market",
+      "company_name": "Leads Market",
+      "username": "Leads Market",
+      "campaign_ids": [
+        782,
+        546,
+        629
+      ],
+      "leads_presented": 193787,
+      "leads_purchased": 7390,
+      "applications": 5561,
+      "apply1": 3161,
+      "brw_signed": 2056,
+      "gt_accepted": 712,
+      "vc_ready": 12,
+      "paid_out": 6,
+      "paid_out_loan_total": 23500.0,
+      "avg_loan_amount": 3779.7608343823053,
+      "purchase_rate": 0.03813465299529896,
+      "app_rate": 0.7525033829499324,
+      "apply1_rate": 0.5684229455133969,
+      "brw_signed_rate": 0.3697176766768567,
+      "gt_accepted_rate": 0.12803452616435892,
+      "vc_ready_rate": 0.002157885272433016,
+      "paid_out_rate": 0.001078942636216508,
+      "lead_to_paid_rate": 3.09618292248706e-05,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 147690
+        },
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 22195
+        },
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 5436
+        }
+      ]
+    },
+    {
+      "source_id": 498,
+      "friendly_name": "Credit Ninja",
+      "company_name": "Credit Ninja",
+      "username": "Ninja",
+      "campaign_ids": [
+        458
+      ],
+      "leads_presented": 152328,
+      "leads_purchased": 32754,
+      "applications": 26155,
+      "apply1": 12536,
+      "brw_signed": 9512,
+      "gt_accepted": 2263,
+      "vc_ready": 51,
+      "paid_out": 42,
+      "paid_out_loan_total": 139750.0,
+      "avg_loan_amount": 3239.371057159243,
+      "purchase_rate": 0.21502284543878997,
+      "app_rate": 0.7985284240092813,
+      "apply1_rate": 0.4792965016249283,
+      "brw_signed_rate": 0.36367807302619004,
+      "gt_accepted_rate": 0.08652265341234945,
+      "vc_ready_rate": 0.0019499139743834831,
+      "paid_out_rate": 0.0016058115083158095,
+      "lead_to_paid_rate": 0.0002757208129825114,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 77632
+        },
+        {
+          "label": "Seen too frequently",
+          "code": 18,
+          "count": 35446
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 5214
+        }
+      ]
+    },
+    {
+      "source_id": 622,
+      "friendly_name": "Lead FollowUp",
+      "company_name": "Together Loans",
+      "username": "leadfu",
+      "campaign_ids": [
+        789
+      ],
+      "leads_presented": 149182,
+      "leads_purchased": 2454,
+      "applications": 2255,
+      "apply1": 2108,
+      "brw_signed": 1736,
+      "gt_accepted": 718,
+      "vc_ready": 25,
+      "paid_out": 14,
+      "paid_out_loan_total": 73500.0,
+      "avg_loan_amount": 4289.246119733924,
+      "purchase_rate": 0.01644970572857315,
+      "app_rate": 0.9189079054604727,
+      "apply1_rate": 0.9348115299334812,
+      "brw_signed_rate": 0.7698447893569845,
+      "gt_accepted_rate": 0.31840354767184037,
+      "vc_ready_rate": 0.011086474501108648,
+      "paid_out_rate": 0.006208425720620843,
+      "lead_to_paid_rate": 9.384510195600006e-05,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 146162
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 566
+        }
+      ]
+    },
+    {
+      "source_id": 560,
+      "friendly_name": "Money Lion",
+      "company_name": "Engine by Money Lion",
+      "username": "Money Lion",
+      "campaign_ids": [
+        681,
+        651
+      ],
+      "leads_presented": 138267,
+      "leads_purchased": 97101,
+      "applications": 60300,
+      "apply1": 52584,
+      "brw_signed": 40562,
+      "gt_accepted": 12574,
+      "vc_ready": 627,
+      "paid_out": 462,
+      "paid_out_loan_total": 2563500.0,
+      "avg_loan_amount": 5253.200663349917,
+      "purchase_rate": 0.7022716917268763,
+      "app_rate": 0.6210028732968764,
+      "apply1_rate": 0.8720398009950249,
+      "brw_signed_rate": 0.6726699834162521,
+      "gt_accepted_rate": 0.2085240464344942,
+      "vc_ready_rate": 0.010398009950248756,
+      "paid_out_rate": 0.007661691542288557,
+      "lead_to_paid_rate": 0.0033413612792640326,
+      "top_rejections": [
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 22388
+        },
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 18774
+        },
+        {
+          "label": "Invalid campaign",
+          "code": 5,
+          "count": 4
+        }
+      ]
+    },
+    {
+      "source_id": 541,
+      "friendly_name": "Empire Webtech Pvt. Ltd.",
+      "company_name": "Empire Webtech Pvt. Ltd.",
+      "username": "Empire",
+      "campaign_ids": [
+        575
+      ],
+      "leads_presented": 88019,
+      "leads_purchased": 23667,
+      "applications": 15216,
+      "apply1": 10869,
+      "brw_signed": 9414,
+      "gt_accepted": 3079,
+      "vc_ready": 150,
+      "paid_out": 114,
+      "paid_out_loan_total": 524750.0,
+      "avg_loan_amount": 4054.76143533123,
+      "purchase_rate": 0.26888512707483614,
+      "app_rate": 0.6429205222461656,
+      "apply1_rate": 0.714313880126183,
+      "brw_signed_rate": 0.6186908517350158,
+      "gt_accepted_rate": 0.2023527865404837,
+      "vc_ready_rate": 0.009858044164037854,
+      "paid_out_rate": 0.00749211356466877,
+      "lead_to_paid_rate": 0.0012951749054181483,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 54985
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 6149
+        },
+        {
+          "label": "Rejected for lead score",
+          "code": 20,
+          "count": 1976
+        }
+      ]
+    },
+    {
+      "source_id": 40,
+      "friendly_name": "GooglePPC",
+      "company_name": null,
+      "username": "GoogleAdWords",
+      "campaign_ids": [
+        784,
+        512,
+        572,
+        777,
+        720,
+        715,
+        756,
+        763,
+        776,
+        778,
+        755,
+        764,
+        751,
+        507,
+        511,
+        762
+      ],
+      "leads_presented": 56068,
+      "leads_purchased": 29657,
+      "applications": 19495,
+      "apply1": 17720,
+      "brw_signed": 15011,
+      "gt_accepted": 6993,
+      "vc_ready": 562,
+      "paid_out": 399,
+      "paid_out_loan_total": 2286750.0,
+      "avg_loan_amount": 4751.0643754808925,
+      "purchase_rate": 0.5289469929371478,
+      "app_rate": 0.6573490238392286,
+      "apply1_rate": 0.908951013080277,
+      "brw_signed_rate": 0.7699923057194152,
+      "gt_accepted_rate": 0.3587073608617594,
+      "vc_ready_rate": 0.028827904590920748,
+      "paid_out_rate": 0.020466786355475764,
+      "lead_to_paid_rate": 0.007116358707284012,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 18816
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 7595
+        }
+      ]
+    },
+    {
+      "source_id": 551,
+      "friendly_name": "Fix Media, LLC",
+      "company_name": "Fix Media, LLC",
+      "username": "Fix",
+      "campaign_ids": [
+        636
+      ],
+      "leads_presented": 54867,
+      "leads_purchased": 10121,
+      "applications": 8810,
+      "apply1": 3817,
+      "brw_signed": 2931,
+      "gt_accepted": 843,
+      "vc_ready": 39,
+      "paid_out": 20,
+      "paid_out_loan_total": 66750.0,
+      "avg_loan_amount": 3191.572077185017,
+      "purchase_rate": 0.18446424991342703,
+      "app_rate": 0.8704673451239996,
+      "apply1_rate": 0.4332576617480136,
+      "brw_signed_rate": 0.3326901248581158,
+      "gt_accepted_rate": 0.09568671963677639,
+      "vc_ready_rate": 0.004426787741203178,
+      "paid_out_rate": 0.0022701475595913734,
+      "lead_to_paid_rate": 0.0003645178340350302,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 30885
+        },
+        {
+          "label": "Seen too frequently",
+          "code": 18,
+          "count": 11233
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 2628
+        }
+      ]
+    },
+    {
+      "source_id": 306,
+      "friendly_name": "Teapot",
+      "company_name": "Teapot Media",
+      "username": "Tea",
+      "campaign_ids": [
+        359,
+        360,
+        339,
+        478
+      ],
+      "leads_presented": 35640,
+      "leads_purchased": 1507,
+      "applications": 402,
+      "apply1": 261,
+      "brw_signed": 194,
+      "gt_accepted": 75,
+      "vc_ready": 1,
+      "paid_out": 0,
+      "paid_out_loan_total": 0.0,
+      "avg_loan_amount": 3417.2885572139303,
+      "purchase_rate": 0.042283950617283954,
+      "app_rate": 0.2667551426675514,
+      "apply1_rate": 0.6492537313432836,
+      "brw_signed_rate": 0.48258706467661694,
+      "gt_accepted_rate": 0.1865671641791045,
+      "vc_ready_rate": 0.0024875621890547263,
+      "paid_out_rate": 0.0,
+      "lead_to_paid_rate": 0.0,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 17942
+        },
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 15163
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 482
+        }
+      ]
+    },
+    {
+      "source_id": 180,
+      "friendly_name": "LendingTree",
+      "company_name": "LendingTree",
+      "username": "LendingTree",
+      "campaign_ids": [
+        294,
+        800
+      ],
+      "leads_presented": 33926,
+      "leads_purchased": 23607,
+      "applications": 12026,
+      "apply1": 10845,
+      "brw_signed": 8325,
+      "gt_accepted": 3318,
+      "vc_ready": 145,
+      "paid_out": 112,
+      "paid_out_loan_total": 571750.0,
+      "avg_loan_amount": 4751.870946283053,
+      "purchase_rate": 0.695838000353711,
+      "app_rate": 0.5094251705002754,
+      "apply1_rate": 0.9017961084317313,
+      "brw_signed_rate": 0.6922501247297522,
+      "gt_accepted_rate": 0.2759022118742724,
+      "vc_ready_rate": 0.012057209379677365,
+      "paid_out_rate": 0.009313154831199068,
+      "lead_to_paid_rate": 0.0033013028355833285,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 6244
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 4074
+        },
+        {
+          "label": "Invalid state",
+          "code": 15,
+          "count": 1
+        }
+      ]
+    },
+    {
+      "source_id": 539,
+      "friendly_name": "PROFFILIANT, LLC",
+      "company_name": "PROFFILIANT, LLC",
+      "username": "PROFFILIANT",
+      "campaign_ids": [
+        733
+      ],
+      "leads_presented": 32441,
+      "leads_purchased": 10883,
+      "applications": 10201,
+      "apply1": 7587,
+      "brw_signed": 5803,
+      "gt_accepted": 2170,
+      "vc_ready": 18,
+      "paid_out": 10,
+      "paid_out_loan_total": 45500.0,
+      "avg_loan_amount": 3260.2636996372903,
+      "purchase_rate": 0.3354705465306248,
+      "app_rate": 0.9373334558485712,
+      "apply1_rate": 0.7437506126850308,
+      "brw_signed_rate": 0.5688657974708362,
+      "gt_accepted_rate": 0.21272424272130183,
+      "vc_ready_rate": 0.0017645328889324577,
+      "paid_out_rate": 0.000980296049406921,
+      "lead_to_paid_rate": 0.0003082519034555038,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 20457
+        },
+        {
+          "label": "Blacklisted",
+          "code": 16,
+          "count": 542
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 502
+        }
+      ]
+    },
+    {
+      "source_id": null,
+      "friendly_name": "Unknown source",
+      "company_name": null,
+      "username": null,
+      "campaign_ids": [
+        0,
+        999,
+        1,
+        12345
+      ],
+      "leads_presented": 31337,
+      "leads_purchased": 22702,
+      "applications": 12161,
+      "apply1": 10991,
+      "brw_signed": 8055,
+      "gt_accepted": 3336,
+      "vc_ready": 227,
+      "paid_out": 150,
+      "paid_out_loan_total": 826250.0,
+      "avg_loan_amount": 4852.314776745333,
+      "purchase_rate": 0.7244471391645658,
+      "app_rate": 0.535679675799489,
+      "apply1_rate": 0.9037908066770824,
+      "brw_signed_rate": 0.6623632924923937,
+      "gt_accepted_rate": 0.27431954608995973,
+      "vc_ready_rate": 0.018666228106241262,
+      "paid_out_rate": 0.012334511964476606,
+      "lead_to_paid_rate": 0.004786673899862782,
+      "top_rejections": [
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 8604
+        },
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 31
+        }
+      ]
+    },
+    {
+      "source_id": 177,
+      "friendly_name": "Monevo",
+      "company_name": "Monevo",
+      "username": "Monevo",
+      "campaign_ids": [
+        465
+      ],
+      "leads_presented": 14266,
+      "leads_purchased": 4652,
+      "applications": 3102,
+      "apply1": 1460,
+      "brw_signed": 1158,
+      "gt_accepted": 387,
+      "vc_ready": 12,
+      "paid_out": 10,
+      "paid_out_loan_total": 56750.0,
+      "avg_loan_amount": 5029.416505480335,
+      "purchase_rate": 0.32609000420580403,
+      "app_rate": 0.6668099742046432,
+      "apply1_rate": 0.4706640876853643,
+      "brw_signed_rate": 0.3733075435203095,
+      "gt_accepted_rate": 0.12475822050290135,
+      "vc_ready_rate": 0.0038684719535783366,
+      "paid_out_rate": 0.003223726627981947,
+      "lead_to_paid_rate": 0.0007009673349221927,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 7139
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 2370
+        },
+        {
+          "label": "Blacklisted",
+          "code": 16,
+          "count": 105
+        }
+      ]
+    },
+    {
+      "source_id": 625,
+      "friendly_name": "TrySmartly",
+      "company_name": "https://trysmartly.com/",
+      "username": "Smartly",
+      "campaign_ids": [
+        804
+      ],
+      "leads_presented": 5914,
+      "leads_purchased": 1404,
+      "applications": 1384,
+      "apply1": 1074,
+      "brw_signed": 841,
+      "gt_accepted": 307,
+      "vc_ready": 1,
+      "paid_out": 1,
+      "paid_out_loan_total": 3000.0,
+      "avg_loan_amount": 4977.781791907514,
+      "purchase_rate": 0.23740277308082516,
+      "app_rate": 0.9857549857549858,
+      "apply1_rate": 0.7760115606936416,
+      "brw_signed_rate": 0.6076589595375722,
+      "gt_accepted_rate": 0.2218208092485549,
+      "vc_ready_rate": 0.000722543352601156,
+      "paid_out_rate": 0.000722543352601156,
+      "lead_to_paid_rate": 0.00016909029421711193,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 4367
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 126
+        },
+        {
+          "label": "Blacklisted",
+          "code": 16,
+          "count": 16
+        }
+      ]
+    },
+    {
+      "source_id": 353,
+      "friendly_name": "CreditBuilder",
+      "company_name": "Transformcredit",
+      "username": "CreditBuilder",
+      "campaign_ids": [
+        349
+      ],
+      "leads_presented": 3509,
+      "leads_purchased": 1164,
+      "applications": 751,
+      "apply1": 612,
+      "brw_signed": 508,
+      "gt_accepted": 209,
+      "vc_ready": 6,
+      "paid_out": 5,
+      "paid_out_loan_total": 34000.0,
+      "avg_loan_amount": 5614.181091877496,
+      "purchase_rate": 0.3317184383015104,
+      "app_rate": 0.6451890034364262,
+      "apply1_rate": 0.8149134487350199,
+      "brw_signed_rate": 0.6764314247669774,
+      "gt_accepted_rate": 0.2782956058588549,
+      "vc_ready_rate": 0.007989347536617843,
+      "paid_out_rate": 0.006657789613848202,
+      "lead_to_paid_rate": 0.0014249073810202336,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 2217
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 128
+        }
+      ]
+    },
+    {
+      "source_id": 528,
+      "friendly_name": "Bing PPC",
+      "company_name": "TC",
+      "username": "Bing PPC",
+      "campaign_ids": [
+        757,
+        544,
+        540,
+        761
+      ],
+      "leads_presented": 3348,
+      "leads_purchased": 2081,
+      "applications": 552,
+      "apply1": 498,
+      "brw_signed": 334,
+      "gt_accepted": 129,
+      "vc_ready": 17,
+      "paid_out": 14,
+      "paid_out_loan_total": 77500.0,
+      "avg_loan_amount": 5153.985507246377,
+      "purchase_rate": 0.6215651135005974,
+      "app_rate": 0.2652570879384911,
+      "apply1_rate": 0.9021739130434783,
+      "brw_signed_rate": 0.605072463768116,
+      "gt_accepted_rate": 0.23369565217391305,
+      "vc_ready_rate": 0.030797101449275364,
+      "paid_out_rate": 0.025362318840579712,
+      "lead_to_paid_rate": 0.004181600955794504,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 721
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 546
+        }
+      ]
+    },
+    {
+      "source_id": 569,
+      "friendly_name": "United Credit",
+      "company_name": "United Credit",
+      "username": "United",
+      "campaign_ids": [
+        658
+      ],
+      "leads_presented": 2493,
+      "leads_purchased": 2244,
+      "applications": 2161,
+      "apply1": 717,
+      "brw_signed": 535,
+      "gt_accepted": 260,
+      "vc_ready": 13,
+      "paid_out": 3,
+      "paid_out_loan_total": 18000.0,
+      "avg_loan_amount": 7102.498843128182,
+      "purchase_rate": 0.9001203369434416,
+      "app_rate": 0.9630124777183601,
+      "apply1_rate": 0.3317908375751967,
+      "brw_signed_rate": 0.24757056918093476,
+      "gt_accepted_rate": 0.12031466913465988,
+      "vc_ready_rate": 0.006015733456732994,
+      "paid_out_rate": 0.0013882461823229986,
+      "lead_to_paid_rate": 0.0012033694344163659,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 151
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 69
+        },
+        {
+          "label": "Blacklisted",
+          "code": 16,
+          "count": 20
+        }
+      ]
+    },
+    {
+      "source_id": 536,
+      "friendly_name": "YA Solutions",
+      "company_name": "YA Solutions Inc",
+      "username": "YAS",
+      "campaign_ids": [
+        563,
+        562,
+        564
+      ],
+      "leads_presented": 1862,
+      "leads_purchased": 274,
+      "applications": 219,
+      "apply1": 76,
+      "brw_signed": 53,
+      "gt_accepted": 14,
+      "vc_ready": 0,
+      "paid_out": 0,
+      "paid_out_loan_total": 0.0,
+      "avg_loan_amount": 3400.6849315068494,
+      "purchase_rate": 0.14715359828141783,
+      "app_rate": 0.7992700729927007,
+      "apply1_rate": 0.3470319634703196,
+      "brw_signed_rate": 0.2420091324200913,
+      "gt_accepted_rate": 0.0639269406392694,
+      "vc_ready_rate": 0.0,
+      "paid_out_rate": 0.0,
+      "lead_to_paid_rate": 0.0,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 1029
+        },
+        {
+          "label": "Rejected for lead score",
+          "code": 20,
+          "count": 320
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 114
+        }
+      ]
+    },
+    {
+      "source_id": 234,
+      "friendly_name": "Affiliate ROI",
+      "company_name": "Affilaite ROI",
+      "username": "AROI",
+      "campaign_ids": [
+        725
+      ],
+      "leads_presented": 1167,
+      "leads_purchased": 630,
+      "applications": 413,
+      "apply1": 374,
+      "brw_signed": 261,
+      "gt_accepted": 92,
+      "vc_ready": 5,
+      "paid_out": 0,
+      "paid_out_loan_total": 0.0,
+      "avg_loan_amount": 4196.731234866828,
+      "purchase_rate": 0.5398457583547558,
+      "app_rate": 0.6555555555555556,
+      "apply1_rate": 0.9055690072639225,
+      "brw_signed_rate": 0.6319612590799032,
+      "gt_accepted_rate": 0.22276029055690072,
+      "vc_ready_rate": 0.012106537530266344,
+      "paid_out_rate": 0.0,
+      "lead_to_paid_rate": 0.0,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 306
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 231
+        }
+      ]
+    },
+    {
+      "source_id": 170,
+      "friendly_name": "SuperMoney",
+      "company_name": "SuperMoney",
+      "username": "SuperMoney",
+      "campaign_ids": [
+        738
+      ],
+      "leads_presented": 885,
+      "leads_purchased": 706,
+      "applications": 654,
+      "apply1": 561,
+      "brw_signed": 468,
+      "gt_accepted": 128,
+      "vc_ready": 5,
+      "paid_out": 3,
+      "paid_out_loan_total": 20500.0,
+      "avg_loan_amount": 5157.492354740061,
+      "purchase_rate": 0.7977401129943503,
+      "app_rate": 0.9263456090651558,
+      "apply1_rate": 0.8577981651376146,
+      "brw_signed_rate": 0.7155963302752294,
+      "gt_accepted_rate": 0.19571865443425077,
+      "vc_ready_rate": 0.00764525993883792,
+      "paid_out_rate": 0.0045871559633027525,
+      "lead_to_paid_rate": 0.003389830508474576,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 114
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 65
+        }
+      ]
+    },
+    {
+      "source_id": 540,
+      "friendly_name": "Refer a Friend",
+      "company_name": "Transform Credit",
+      "username": "Refer a Friend",
+      "campaign_ids": [
+        571
+      ],
+      "leads_presented": 596,
+      "leads_purchased": 360,
+      "applications": 316,
+      "apply1": 289,
+      "brw_signed": 225,
+      "gt_accepted": 92,
+      "vc_ready": 11,
+      "paid_out": 6,
+      "paid_out_loan_total": 33000.0,
+      "avg_loan_amount": 4910.601265822785,
+      "purchase_rate": 0.6040268456375839,
+      "app_rate": 0.8777777777777778,
+      "apply1_rate": 0.9145569620253164,
+      "brw_signed_rate": 0.7120253164556962,
+      "gt_accepted_rate": 0.2911392405063291,
+      "vc_ready_rate": 0.03481012658227848,
+      "paid_out_rate": 0.0189873417721519,
+      "lead_to_paid_rate": 0.010067114093959731,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 152
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 84
+        }
+      ]
+    },
+    {
+      "source_id": 183,
+      "friendly_name": "TC Test",
+      "company_name": "RG",
+      "username": "tctest",
+      "campaign_ids": [
+        583,
+        591,
+        582,
+        670,
+        581,
+        593,
+        592,
+        590,
+        594,
+        619
+      ],
+      "leads_presented": 434,
+      "leads_purchased": 121,
+      "applications": 106,
+      "apply1": 29,
+      "brw_signed": 9,
+      "gt_accepted": 11,
+      "vc_ready": 2,
+      "paid_out": 1,
+      "paid_out_loan_total": 5000.0,
+      "avg_loan_amount": 5205.188679245283,
+      "purchase_rate": 0.27880184331797236,
+      "app_rate": 0.8760330578512396,
+      "apply1_rate": 0.27358490566037735,
+      "brw_signed_rate": 0.08490566037735849,
+      "gt_accepted_rate": 0.10377358490566038,
+      "vc_ready_rate": 0.018867924528301886,
+      "paid_out_rate": 0.009433962264150943,
+      "lead_to_paid_rate": 0.002304147465437788,
+      "top_rejections": [
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 138
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 104
+        },
+        {
+          "label": "Rejected for lead score",
+          "code": 20,
+          "count": 28
+        }
+      ]
+    },
+    {
+      "source_id": 624,
+      "friendly_name": "Fuss Media",
+      "company_name": "Fuss Media Limited",
+      "username": "Fuss Media",
+      "campaign_ids": [
+        802
+      ],
+      "leads_presented": 290,
+      "leads_purchased": 98,
+      "applications": 98,
+      "apply1": 67,
+      "brw_signed": 20,
+      "gt_accepted": 7,
+      "vc_ready": 0,
+      "paid_out": 0,
+      "paid_out_loan_total": 0.0,
+      "avg_loan_amount": 3303.5714285714284,
+      "purchase_rate": 0.33793103448275863,
+      "app_rate": 1.0,
+      "apply1_rate": 0.6836734693877551,
+      "brw_signed_rate": 0.20408163265306123,
+      "gt_accepted_rate": 0.07142857142857142,
+      "vc_ready_rate": 0.0,
+      "paid_out_rate": 0.0,
+      "lead_to_paid_rate": 0.0,
+      "top_rejections": [
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 98
+        },
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 81
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 8
+        }
+      ]
+    },
+    {
+      "source_id": 623,
+      "friendly_name": "MaxBounty",
+      "company_name": "MaxBounty",
+      "username": "MaxBounty",
+      "campaign_ids": [
+        797
+      ],
+      "leads_presented": 281,
+      "leads_purchased": 212,
+      "applications": 202,
+      "apply1": 174,
+      "brw_signed": 144,
+      "gt_accepted": 42,
+      "vc_ready": 1,
+      "paid_out": 0,
+      "paid_out_loan_total": 0.0,
+      "avg_loan_amount": 3774.7524752475247,
+      "purchase_rate": 0.7544483985765125,
+      "app_rate": 0.9528301886792453,
+      "apply1_rate": 0.8613861386138614,
+      "brw_signed_rate": 0.7128712871287128,
+      "gt_accepted_rate": 0.2079207920792079,
+      "vc_ready_rate": 0.0049504950495049506,
+      "paid_out_rate": 0.0,
+      "lead_to_paid_rate": 0.0,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 41
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 28
+        }
+      ]
+    },
+    {
+      "source_id": 621,
+      "friendly_name": "CreateApplication(App)",
+      "company_name": "Together Loans",
+      "username": "CreateApplication(App)",
+      "campaign_ids": [
+        787
+      ],
+      "leads_presented": 236,
+      "leads_purchased": 51,
+      "applications": 51,
+      "apply1": 51,
+      "brw_signed": 17,
+      "gt_accepted": 8,
+      "vc_ready": 5,
+      "paid_out": 0,
+      "paid_out_loan_total": 0.0,
+      "avg_loan_amount": 5941.176470588235,
+      "purchase_rate": 0.21610169491525424,
+      "app_rate": 1.0,
+      "apply1_rate": 1.0,
+      "brw_signed_rate": 0.3333333333333333,
+      "gt_accepted_rate": 0.1568627450980392,
+      "vc_ready_rate": 0.09803921568627451,
+      "paid_out_rate": 0.0,
+      "lead_to_paid_rate": 0.0,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 112
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 73
+        }
+      ]
+    },
+    {
+      "source_id": 505,
+      "friendly_name": "Quinstreet",
+      "company_name": "Quinstreet",
+      "username": "Quinn",
+      "campaign_ids": [
+        461
+      ],
+      "leads_presented": 126,
+      "leads_purchased": 35,
+      "applications": 24,
+      "apply1": 20,
+      "brw_signed": 14,
+      "gt_accepted": 2,
+      "vc_ready": 0,
+      "paid_out": 0,
+      "paid_out_loan_total": 0.0,
+      "avg_loan_amount": 5427.083333333333,
+      "purchase_rate": 0.2777777777777778,
+      "app_rate": 0.6857142857142857,
+      "apply1_rate": 0.8333333333333334,
+      "brw_signed_rate": 0.5833333333333334,
+      "gt_accepted_rate": 0.08333333333333333,
+      "vc_ready_rate": 0.0,
+      "paid_out_rate": 0.0,
+      "lead_to_paid_rate": 0.0,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 91
+        }
+      ]
+    },
+    {
+      "source_id": 185,
+      "friendly_name": "Tando",
+      "company_name": "n/a",
+      "username": "Tando",
+      "campaign_ids": [
+        331
+      ],
+      "leads_presented": 125,
+      "leads_purchased": 36,
+      "applications": 27,
+      "apply1": 23,
+      "brw_signed": 14,
+      "gt_accepted": 10,
+      "vc_ready": 0,
+      "paid_out": 0,
+      "paid_out_loan_total": 0.0,
+      "avg_loan_amount": 5972.222222222223,
+      "purchase_rate": 0.288,
+      "app_rate": 0.75,
+      "apply1_rate": 0.8518518518518519,
+      "brw_signed_rate": 0.5185185185185185,
+      "gt_accepted_rate": 0.37037037037037035,
+      "vc_ready_rate": 0.0,
+      "paid_out_rate": 0.0,
+      "lead_to_paid_rate": 0.0,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 80
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 9
+        }
+      ]
+    },
+    {
+      "source_id": 575,
+      "friendly_name": "Moonshot Marketing LTD",
+      "company_name": "Moonshot Marketing LTD",
+      "username": "Moonshot",
+      "campaign_ids": [
+        667
+      ],
+      "leads_presented": 26,
+      "leads_purchased": 18,
+      "applications": 11,
+      "apply1": 8,
+      "brw_signed": 7,
+      "gt_accepted": 2,
+      "vc_ready": 0,
+      "paid_out": 0,
+      "paid_out_loan_total": 0.0,
+      "avg_loan_amount": 4818.181818181818,
+      "purchase_rate": 0.6923076923076923,
+      "app_rate": 0.6111111111111112,
+      "apply1_rate": 0.7272727272727273,
+      "brw_signed_rate": 0.6363636363636364,
+      "gt_accepted_rate": 0.18181818181818182,
+      "vc_ready_rate": 0.0,
+      "paid_out_rate": 0.0,
+      "lead_to_paid_rate": 0.0,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 5
+        },
+        {
+          "label": "Duplicate",
+          "code": 3,
+          "count": 3
+        }
+      ]
+    },
+    {
+      "source_id": 35,
+      "friendly_name": "Source 35",
+      "company_name": null,
+      "username": null,
+      "campaign_ids": [
+        100
+      ],
+      "leads_presented": 1,
+      "leads_purchased": 1,
+      "applications": 1,
+      "apply1": 1,
+      "brw_signed": 0,
+      "gt_accepted": 0,
+      "vc_ready": 0,
+      "paid_out": 0,
+      "paid_out_loan_total": 0.0,
+      "avg_loan_amount": 7000.0,
+      "purchase_rate": 1.0,
+      "app_rate": 1.0,
+      "apply1_rate": 1.0,
+      "brw_signed_rate": 0.0,
+      "gt_accepted_rate": 0.0,
+      "vc_ready_rate": 0.0,
+      "paid_out_rate": 0.0,
+      "lead_to_paid_rate": 0.0,
+      "top_rejections": []
+    },
+    {
+      "source_id": 458,
+      "friendly_name": "Transform Credit e-mail",
+      "company_name": "n/a",
+      "username": "EmailMarketing",
+      "campaign_ids": [
+        398
+      ],
+      "leads_presented": 1,
+      "leads_purchased": 1,
+      "applications": 0,
+      "apply1": 0,
+      "brw_signed": 0,
+      "gt_accepted": 0,
+      "vc_ready": 0,
+      "paid_out": 0,
+      "paid_out_loan_total": 0.0,
+      "avg_loan_amount": null,
+      "purchase_rate": 1.0,
+      "app_rate": 0.0,
+      "apply1_rate": null,
+      "brw_signed_rate": null,
+      "gt_accepted_rate": null,
+      "vc_ready_rate": null,
+      "paid_out_rate": null,
+      "lead_to_paid_rate": 0.0,
+      "top_rejections": []
+    }
+  ]
+}
