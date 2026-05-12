@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778622074">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778622074">
-<link rel="stylesheet" href="quiet.css?v=1778622074">
-<link rel="stylesheet" href="quiet-extras.css?v=1778622074">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778622074">
+<link rel="stylesheet" href="style.css?v=1778623161">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778623161">
+<link rel="stylesheet" href="quiet.css?v=1778623161">
+<link rel="stylesheet" href="quiet-extras.css?v=1778623161">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778623161">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -692,7 +692,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778622074" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778623161" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1367,12 +1367,18 @@
     const tenantList = u ? (u.tenants || (u.tenant ? [u.tenant] : [])) : [];
     const mailto = u ? u.email : (a.username || "");
 
-    // Find sibling Workspace accounts (same person, multiple domains/tenants)
-    // and the payroll record's email if it differs from any Workspace email.
+    // Collect every email address belonging to this person:
+    //   1. primary email on this Workspace account
+    //   2. aliases configured on this Workspace account
+    //   3. primary + aliases on sibling Workspace accounts (same given+family)
+    //   4. payroll record's email (if different)
     const siblings = u ? workspaceSiblings(entry) : [];
     const allEmails = new Set();
     for (const s of siblings) {
       if (s.email) allEmails.add(s.email.toLowerCase());
+      for (const a of (s.aliases || [])) {
+        if (a) allEmails.add(a.toLowerCase());
+      }
     }
     const primaryPayroll = payrollFor(entry);
     if (primaryPayroll && primaryPayroll.email) {

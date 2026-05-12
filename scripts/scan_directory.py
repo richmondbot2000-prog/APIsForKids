@@ -101,8 +101,13 @@ def normalize(u: dict, tenant: str) -> dict:
     name = u.get('name') or {}
     orgs = (u.get('organizations') or [{}])
     primary_org = next((o for o in orgs if o.get('primary')), orgs[0]) if orgs else {}
+    # Aliases the admin configured (user-editable). Excludes the auto-generated
+    # *.test-google-a.com domain aliases via the separate nonEditableAliases
+    # bucket, which we intentionally drop.
+    aliases = [a for a in (u.get('aliases') or []) if a]
     return {
         'email':       u.get('primaryEmail') or '',
+        'aliases':     aliases,
         'name':        (name.get('fullName') or '').strip(),
         'given':       (name.get('givenName') or '').strip(),
         'family':      (name.get('familyName') or '').strip(),
