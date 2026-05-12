@@ -599,23 +599,27 @@ The overpay analysis finds same-identity matches across (Broker, SR1) cells with
 
 This is the most likely explanation for option 3: most of our cheaper-clones matches are likely cases where one (Broker, SR1) cell sent a lead we declined (price-reject or scorecard fail), then a different cell sent the same person later and we bought them. That IS a legitimate overpay insight — but the framing should be "we bought them where we could have got them cheaper" rather than "we bought them twice." Worth tightening the page copy.
 
-#### 11.5.11 Suggested improvements (TODO list, generated 2026-05-12 after reading the handbook)
+#### 11.5.11 Improvements landed 2026-05-12 (handbook overhaul)
 
-In rough priority order:
+After reading the Partnerships Handbook, 10 of 13 candidate improvements shipped. Status of each:
 
-1. **Add CPA % as a primary metric** alongside `cost_per_paid_loan` dollars. CPA = `total_cost / paid_loan_total`. The handbook uses CPA % as the single most-important KPI ("target ~12% blended"). Currently the page reports dollars per paid loan but never relates that to loan size, so a $1,500 cost-per-paid is undifferentiated between a 30% CPA (on a $5k loan) and a 15% CPA (on a $10k loan).
-2. **Add the 12% CPA threshold as a benchmark line** — colour cells green if CPA <12%, brass if 12–20%, red if >20%. Replaces the current arbitrary $600 cost threshold with the canonical business benchmark.
-3. **Add apply rate prominently** — it's the autoblock trigger. Show per-cell apply rate (`applications / leads_purchased`) with a red flag at ≤10% (autoblock zone) and amber at 10–20% (manual review zone).
-4. **Add an "AutoBlock would catch" badge** to cells matching the SR1 / SR2 autoblock thresholds. Lets you see whether the autoblock is doing its job AND what's slipping through.
-5. **Surface the 10–20% apply-rate "manual review" zone as its own section** — these are cells that need a human decision and never get caught by the robot.
-6. **Add a LastSeen column per cell** — when did this (Broker, SR1) most recently send a lead? Mirrors the `Affiliate Sub-Source Report` LastSeen column. Cells gone quiet for >7d may already be off; cells gone quiet >30d are effectively dormant.
-7. **Add SR2 drill-down underneath each SR1 row** — particularly for the "consider blocking" section. The handbook strongly prefers SR2 surgical blocks over SR1 parent blocks ("affiliates spin up new children when a parent gets blocked"). The page should surface SR2 evidence so the user can see which child within an SR1 parent is the problem.
-8. **Add the 6-month trend per cell** — mirrors the Affiliate Sub-Source Report. A cell trending DOWN in apply rate over 6 months tells a different story to a cell that's always been bad.
-9. **Add a blended-CPA headline KPI** to the page top — the single most-watched number for the partnerships function.
-10. **Tighten the cheaper-clones copy** per §11.5.10 — frame as "we bought these where a declined-then-accepted-elsewhere pattern shows up at a lower price" rather than "we paid twice."
-11. **Add a state filter** — every campaign has a 24-state geo filter and routes leads to Default vs MedallionBP based on state. State-level CPA breakdowns would let us spot states that drag the blend.
-12. **Cross-link to the canonical reports** — small "Open in reporting.rgcore.com" links on each section pointing to the matching report (Spending on Leads / Affiliate Sub-Source / Bad Sub-Affiliates / Blocked Refs with Accepts).
-13. **Surface the AutoBlock Robot's recent activity** — what did it block last night? A simple "AutoBlock Robot's last 7 days" feed on the page would close the loop between the robot's nightly decisions and our human-review work.
+| # | Improvement | Status | Commit |
+|---|---|---|---|
+| 1 | CPA % as a primary metric | ✓ shipped | aa21739 |
+| 2 | 12% CPA threshold benchmark + colour coding (green ≤12% · brass 12-20% · red >20%) | ✓ shipped | aa21739 |
+| 3 | Apply rate prominent per cell, with zone badges | ✓ shipped | aa21739 |
+| 4 | "AutoBlock would catch" badge on matching cells | ✓ shipped | aa21739, refined in 1c66aa8 (uses 150-threshold when SR2 children present, 50 when SR1 bare) |
+| 5 | Manual-review zone (10–20% apply rate) as its own section | ✓ shipped | aa21739 |
+| 6 | LastSeen per cell | ✓ shipped | 0e1bfdd (scanner) + 50ad86f (UI) — colour: ink ≤3d · brass 7-30d · red ≥30d |
+| 7 | SR2 child drill-down beneath each SR1 row | ✓ shipped | 0e1bfdd (scanner) + 50ad86f (UI) — top 6 SR2 children with apply rate / cost-per-paid / paid-purchased |
+| 8 | 6-month per-cell trend | **deferred** — requires monthly-bucketed scanner with 180d window; bigger reshape than overnight scope |
+| 9 | Blended-CPA headline KPI | ✓ shipped | aa21739 (4 tiles: blended CPA, blended apply, paid loans + originated $, spend + cell count) |
+| 10 | Tighten cheaper-clones copy | ✓ shipped | aa21739 (retitled "Sources where we paid for a previously-declined customer"; reframed per the dedup explanation) |
+| 11 | State filter | **deferred** — per-state aggregation would multiply (cid, sr1, sr2) cardinality by ~24; needs separate scanner pass |
+| 12 | Cross-link to reporting.rgcore.com on each section | ✓ shipped | aa21739 (Spending on Leads / Affiliate Sub-Source / Blocked Refs with Accepts / Bad Sub-Affiliates) |
+| 13 | AutoBlock Robot's recent-activity feed | **deferred** — autoblock runs in the admin platform (`admin.rgcore.com`), not the warehouse; no read path yet. Asking the platform team to expose autoblock events would close this. |
+
+For the three deferred items: each needs either a new data source or a substantial scanner reshape. Document trade-offs here when picking them back up.
 
 ### 11.6 Declines page (`declines.html`)
 
