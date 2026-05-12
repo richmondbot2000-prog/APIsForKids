@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Brokers</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778571442">
-<link rel="stylesheet" href="quiet.css?v=1778571442">
-<link rel="stylesheet" href="quiet-extras.css?v=1778571442">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778572275">
+<link rel="stylesheet" href="quiet.css?v=1778572275">
+<link rel="stylesheet" href="quiet-extras.css?v=1778572275">
 <style>
   .br-section { max-width: 1280px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .br-section { padding: 2px 0 32px; } }
@@ -208,6 +208,102 @@
     color: var(--brass-600);
   }
   td.pct.weak { color: var(--ink-500); }
+
+  /* ── Outcome-distribution chart ──────────────────────────────────── */
+  /* Stage colours: red → brass → sage gradient. Ghost = worst (red),
+     paid = best (sage). */
+  :root {
+    --outcome-ghost:   #C0392B;
+    --outcome-apply1:  #D9A86A;
+    --outcome-brw:     #C8973F;
+    --outcome-gt:      #A47829;
+    --outcome-vc:      #6F8C6A;
+    --outcome-paid:    #4F6B49;
+  }
+  .br-outcome-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 12px 0;
+  }
+  .br-outcome-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--paper-50);
+    border: 1px solid var(--paper-300);
+    padding: 4px 10px;
+    font: 500 11px/1.3 var(--font-body);
+    color: var(--ink-700);
+    cursor: pointer;
+    user-select: none;
+    transition: border-color 0.12s, color 0.12s;
+  }
+  .br-outcome-legend-item:hover { border-color: var(--brass-500); color: var(--ink-900); }
+  .br-outcome-legend-item.is-sort {
+    border-color: var(--brass-500);
+    color: var(--ink-900);
+    background: var(--paper-100);
+  }
+  .br-outcome-legend-item.is-sort::after { content: " ↓"; font: 500 11px var(--font-mono); }
+  .br-outcome-legend-item.is-sort.is-asc::after { content: " ↑"; }
+  .br-outcome-legend-swatch {
+    display: inline-block;
+    width: 14px; height: 10px;
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  .br-outcome-legend-item.is-sort .br-outcome-legend-swatch {
+    box-shadow: 0 0 0 1px var(--brass-500);
+  }
+
+  .br-outcome-row {
+    display: grid;
+    grid-template-columns: 220px 1fr 110px;
+    gap: 12px;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--divider);
+    font: 400 13px/1.3 var(--font-display);
+  }
+  .br-outcome-row:last-child { border-bottom: none; }
+  .br-outcome-row-name {
+    font: italic 500 14px/1.25 var(--font-display);
+    color: var(--ink-900);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .br-outcome-row-sub {
+    font: 400 11px/1.2 var(--font-display);
+    color: var(--ink-500);
+    margin-top: 1px;
+  }
+  .br-outcome-bar {
+    display: flex;
+    height: 18px;
+    width: 100%;
+    border: 1px solid var(--paper-300);
+    background: var(--paper-50);
+    position: relative;
+  }
+  .br-outcome-bar-seg {
+    height: 100%;
+    transition: opacity 0.12s;
+    position: relative;
+  }
+  .br-outcome-bar-seg:hover { opacity: 0.78; }
+  .br-outcome-bar-seg.is-sort-target {
+    box-shadow: 0 0 0 1.5px var(--ink-700) inset;
+  }
+  .br-outcome-row-tail {
+    font: 500 11px/1.25 var(--font-mono);
+    color: var(--ink-500);
+    text-align: right;
+  }
+  .br-outcome-row-tail .paid-num {
+    color: var(--outcome-paid);
+    font-weight: 600;
+  }
 
   /* ── Per-row mini funnel chart ───────────────────────────────────── */
   /* Width 140px, segments are absolute (overlapping bars stacked from
@@ -517,7 +613,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778571442" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778572275" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -567,9 +663,13 @@
         <div id="brLeaderboardPaid"></div>
       </div>
       <div class="br-leaderboard-wrap" style="grid-column: 1 / -1;">
-        <h2 class="br-canvas-title">Worst quality — highest <em>ghost rate</em></h2>
-        <p class="br-canvas-sub">Among brokers we bought at least 1,000 leads from, ranked by the share of those leads who <strong>never even started an application</strong>. These are the leads that arrived, sat there, and never engaged — no apply page, no guarantor invite, no response. <em>Ghosts</em> are the truly bad outcome: a decline at least means the lead engaged enough to fail a real check. A broker whose leads simply vanish brings dead traffic. (The old "highest decline rate" view rewarded this — a pool of silent leads has zero declines because nothing happened. We sort by ghosts instead.)</p>
-        <div id="brLeaderboardDecline"></div>
+        <h2 class="br-canvas-title">Outcome distribution — <em>where every broker's leads end up</em></h2>
+        <p class="br-canvas-sub">For every active broker (including Organic/direct), this stacks each leads-purchased pool by deepest stage reached. <strong>Ghosts</strong> never finished apply page 1 — the worst outcome. <strong>Paid out</strong> is the only outcome that earns. Engagement in the middle stages is real but unmonetised. Click any stage in the legend to sort by that stage descending; click again to flip. The list shows the top 10; expand for all active sources.</p>
+        <div id="brOutcomeLegend" class="br-outcome-legend"></div>
+        <div id="brOutcomeList"></div>
+        <div style="text-align: center; margin-top: 10px;">
+          <button id="brOutcomeToggle" class="br-pill" type="button">Show all sources</button>
+        </div>
       </div>
     </div>
 
@@ -1232,53 +1332,145 @@
         ? renderLeaderRows(byPaid, "paid_out", byPaid[0].paid_out || 1)
         : '<p style="color: var(--ink-500); font-style: italic;">No paid-out loans in this window.</p>';
 
-    // Worst-quality top 10 — highest GHOST rate (purchased but never
-    // started an application). Volume-gated so tiny pools don't
-    // dominate. A ghost is a lead who arrived, sat there, never
-    // engaged. They're the true worst outcome — a declined lead at
-    // least engaged enough to fail a check.
-    const VOL_THRESHOLD = 1000;
-    const byGhost = sources
-      .map(r => {
-        const lp = r.leads_purchased || 0;
-        const apps = r.applications || 0;
-        const ghosts = Math.max(0, lp - apps);
-        return Object.assign({}, r, {
-          _ghost_count: ghosts,
-          _ghost_rate:  lp ? (ghosts / lp) : 0,
-        });
-      })
-      .filter(r => (r.leads_purchased || 0) >= VOL_THRESHOLD)
-      .sort((a, b) => (b._ghost_rate || 0) - (a._ghost_rate || 0))
-      .slice(0, 10);
-    const declineHost = document.getElementById("brLeaderboardDecline");
-    if (!declineHost) return;
-    declineHost.innerHTML = byGhost.length
-      ? renderGhostLeaderRows(byGhost, byGhost[0]._ghost_rate || 0)
-      : '<p style="color: var(--ink-500); font-style: italic;">No engagement data in this window.</p>';
+    // Outcome distribution — all active brokers (including Organic /
+    // direct / Unknown source). No volume gate by default; the chart
+    // visualises the share, so any source with >0 leads is comparable.
+    renderOutcomeDistribution(sources);
   }
 
-  function renderGhostLeaderRows(rows, maxRate) {
-    return rows.map(r => {
-      const rate = r._ghost_rate || 0;
-      const widthPct = (rate / maxRate) * 100;
-      const paidLine = (r.paid_out || 0) > 0
-        ? `${formatNumber(r.paid_out || 0)} paid loans · ${pct(r.paid_out_rate, 4)}`
-        : `0 paid loans`;
-      return `
-        <div class="br-leader" title="${escapeHtml(r.friendly_name || "Source " + r.source_id)}">
-          <div class="br-leader-name">${escapeHtml(r.friendly_name || "Source " + r.source_id)}</div>
-          <div class="br-leader-bar">
-            <div class="br-leader-bar-fill" style="width:${widthPct.toFixed(3)}%; background: var(--red-500); opacity: 0.85;"></div>
-          </div>
-          <div class="br-leader-count">${(rate * 100).toFixed(1)}%</div>
-          <div class="br-leader-paid" style="color: var(--ink-500);">${formatBig(r._ghost_count)} ghosts of ${formatBig(r.leads_purchased || 0)}</div>
-        </div>
-        <div class="br-leader" style="grid-template-columns: 180px 1fr; padding: 0 0 6px; border-bottom: 1px dashed var(--divider);">
-          <div></div>
-          <div><span style="font: italic 400 11px/1.3 var(--font-display); color: var(--ink-500);">downstream: ${paidLine}</span></div>
-        </div>`;
+  // ─── Outcome-distribution stacked-bar chart ───────────────────────
+  // Stages, in funnel order. Each lead is bucketed at its DEEPEST
+  // reached stage (mutually exclusive). 'Ghost' is the user's name
+  // for 'never completed Apply page 1'.
+  const _OUTCOME_STAGES = [
+    { key: "ghost",  label: "Ghost (no Apply 1)", color: "var(--outcome-ghost)"  },
+    { key: "apply1", label: "Apply 1",            color: "var(--outcome-apply1)" },
+    { key: "brw",    label: "BRW signed",         color: "var(--outcome-brw)"    },
+    { key: "gt",     label: "GT accepted",        color: "var(--outcome-gt)"     },
+    { key: "vc",     label: "VC Ready",           color: "var(--outcome-vc)"     },
+    { key: "paid",   label: "Paid out",           color: "var(--outcome-paid)"   },
+  ];
+
+  // Per-row outcome counts. Each stage = leads at that stage's depth
+  // who didn't reach the next deeper one. Sums to leads_purchased.
+  function _outcomeCounts(r) {
+    const lp = r.leads_purchased || 0;
+    const a1 = Math.min(lp, r.apply1 || 0);
+    const bw = Math.min(a1, r.brw_signed || 0);
+    const gt = Math.min(bw, r.gt_accepted || 0);
+    const vc = Math.min(gt, r.vc_ready || 0);
+    const pd = Math.min(vc, r.paid_out || 0);
+    return {
+      ghost:  Math.max(0, lp - a1),
+      apply1: Math.max(0, a1 - bw),
+      brw:    Math.max(0, bw - gt),
+      gt:     Math.max(0, gt - vc),
+      vc:     Math.max(0, vc - pd),
+      paid:   pd,
+      total:  lp,
+    };
+  }
+
+  // Module-level chart state.
+  let _OUTCOME_SOURCES = [];
+  let _OUTCOME_SORT_KEY = "ghost";       // default sort: worst first
+  let _OUTCOME_SORT_DIR = -1;            // -1 desc, 1 asc
+  let _OUTCOME_SHOW_ALL = false;
+
+  function renderOutcomeDistribution(sources) {
+    if (!sources || !sources.length) return;
+    // Cache enriched rows once (counts computed) for later sort flips.
+    _OUTCOME_SOURCES = sources
+      .filter(r => (r.leads_purchased || 0) > 0)
+      .map(r => Object.assign({}, r, { _outcome: _outcomeCounts(r) }));
+    _renderOutcomeLegend();
+    _renderOutcomeList();
+
+    const toggle = document.getElementById("brOutcomeToggle");
+    if (toggle && !toggle.__wired) {
+      toggle.__wired = true;
+      toggle.addEventListener("click", () => {
+        _OUTCOME_SHOW_ALL = !_OUTCOME_SHOW_ALL;
+        toggle.textContent = _OUTCOME_SHOW_ALL
+          ? "Show top 10 only"
+          : "Show all sources";
+        _renderOutcomeList();
+      });
+    }
+  }
+
+  function _renderOutcomeLegend() {
+    const host = document.getElementById("brOutcomeLegend");
+    if (!host) return;
+    host.innerHTML = _OUTCOME_STAGES.map(st => {
+      const isSort = st.key === _OUTCOME_SORT_KEY;
+      const dirCls = isSort && _OUTCOME_SORT_DIR === 1 ? " is-asc" : "";
+      return `<span class="br-outcome-legend-item${isSort ? " is-sort" + dirCls : ""}" data-stage="${st.key}">
+        <span class="br-outcome-legend-swatch" style="background: ${st.color};"></span>
+        ${st.label}
+      </span>`;
     }).join("");
+    // Wire clicks (re-wire is cheap on re-render).
+    host.querySelectorAll(".br-outcome-legend-item").forEach(el => {
+      el.addEventListener("click", () => {
+        const key = el.getAttribute("data-stage");
+        if (key === _OUTCOME_SORT_KEY) {
+          _OUTCOME_SORT_DIR = -_OUTCOME_SORT_DIR;  // flip direction
+        } else {
+          _OUTCOME_SORT_KEY = key;
+          _OUTCOME_SORT_DIR = -1;                  // new key, default desc
+        }
+        _renderOutcomeLegend();
+        _renderOutcomeList();
+      });
+    });
+  }
+
+  function _renderOutcomeList() {
+    const host = document.getElementById("brOutcomeList");
+    if (!host) return;
+    const sortKey = _OUTCOME_SORT_KEY;
+    const dir = _OUTCOME_SORT_DIR;
+    const sorted = [..._OUTCOME_SOURCES].sort((a, b) => {
+      const av = (a._outcome.total ? a._outcome[sortKey] / a._outcome.total : 0);
+      const bv = (b._outcome.total ? b._outcome[sortKey] / b._outcome.total : 0);
+      return dir * (av - bv);
+    });
+    const limit = _OUTCOME_SHOW_ALL ? sorted.length : 10;
+    const visible = sorted.slice(0, limit);
+    host.innerHTML = visible.map(_renderOutcomeRow).join("");
+    // Update toggle visibility based on data size.
+    const toggle = document.getElementById("brOutcomeToggle");
+    if (toggle) toggle.hidden = sorted.length <= 10;
+  }
+
+  function _renderOutcomeRow(r) {
+    const oc = r._outcome;
+    const lp = oc.total;
+    const name = escapeHtml(r.friendly_name || ("Source " + (r.source_id ?? "?")));
+    const segs = _OUTCOME_STAGES.map(st => {
+      const n = oc[st.key] || 0;
+      const pct = lp ? (n / lp) * 100 : 0;
+      const isTarget = st.key === _OUTCOME_SORT_KEY;
+      const titleStr = `${st.label}: ${formatNumber(n)} (${pct.toFixed(1)}%)`;
+      return `<span class="br-outcome-bar-seg${isTarget ? " is-sort-target" : ""}"
+        style="width: ${pct.toFixed(3)}%; background: ${st.color};"
+        title="${titleStr}"></span>`;
+    }).join("");
+    const sortStageLabel = _OUTCOME_STAGES.find(s => s.key === _OUTCOME_SORT_KEY).label;
+    const sortVal = lp ? (oc[_OUTCOME_SORT_KEY] / lp) * 100 : 0;
+    return `
+      <div class="br-outcome-row" title="${name}">
+        <div>
+          <div class="br-outcome-row-name">${name}</div>
+          <div class="br-outcome-row-sub">${formatBig(lp)} bought · <span class="paid-num" style="color: var(--outcome-paid); font-family: var(--font-mono);">${formatNumber(oc.paid || 0)} paid</span></div>
+        </div>
+        <div class="br-outcome-bar">${segs}</div>
+        <div class="br-outcome-row-tail">
+          ${sortVal.toFixed(1)}%
+          <div style="font-style: italic; color: var(--ink-500); font-family: var(--font-display); font-size: 10px; margin-top: 2px;">${escapeHtml(sortStageLabel)}</div>
+        </div>
+      </div>`;
   }
 
   function renderLeaderRows(rows, scaleKey, maxVal) {
