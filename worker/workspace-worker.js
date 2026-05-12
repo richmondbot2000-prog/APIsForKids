@@ -40,21 +40,27 @@ export default {
     }
 
     // GET /api/workspace/payroll — returns the payroll JSON stored in the
-    // PAYROLL_JSON secret. Behind Cloudflare Access only; the github.io
-    // public URL never hits this route, so the PII never leaks via Pages.
+    // PAYROLL_KV namespace under the key `current`. Behind Cloudflare Access
+    // only; the github.io public URL never hits this route, so the PII never
+    // leaks via Pages. KV is used (not a Secret) because the JSON is ~28 KB,
+    // which exceeds the 5.1 KB Worker Secret limit.
     if (req.method === "GET") {
       const url = new URL(req.url);
       if (url.pathname.replace(/\/$/, "").endsWith("/payroll")) {
         if (!req.headers.get("Cf-Access-Jwt-Assertion")) {
           return json({ error: "not authenticated via Cloudflare Access" }, 401, req);
         }
-        if (!env.PAYROLL_JSON) {
-          return json({ error: "PAYROLL_JSON secret not configured yet" }, 503, req);
+        if (!env.PAYROLL_KV) {
+          return json({ error: "PAYROLL_KV binding not configured yet" }, 503, req);
+        }
+        const raw = await env.PAYROLL_KV.get("current");
+        if (!raw) {
+          return json({ error: "PAYROLL_KV has no value at key 'current' yet" }, 503, req);
         }
         try {
-          return json(JSON.parse(env.PAYROLL_JSON), 200, req);
+          return json(JSON.parse(raw), 200, req);
         } catch (e) {
-          return json({ error: "PAYROLL_JSON is not valid JSON: " + e.message }, 500, req);
+          return json({ error: "PAYROLL_KV 'current' is not valid JSON: " + e.message }, 500, req);
         }
       }
       return json({ error: "unknown GET endpoint" }, 404, req);

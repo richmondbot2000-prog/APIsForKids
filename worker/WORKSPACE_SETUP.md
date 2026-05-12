@@ -52,7 +52,6 @@ Worker page → **Settings** → **Variables and Secrets** → **+ Add** (one pe
 | Secret   | `GITHUB_TOKEN`                | The same `github_pat_…` value as the annotations Worker (or a new one)|
 | Variable | `IMPERSONATE_USER`            | `james.benamor@letme.co.uk`                                           |
 | Variable | `ADMIN_EMAILS`                | `james.benamor@letme.com` (comma-separated if you add more later)     |
-| Secret   | `PAYROLL_JSON`                | Output of `python3 scripts/scan_payroll.py` (see §Payroll below) — optional, only needed for the "Payroll" section in the detail card |
 
 (`IMPERSONATE_USER` and `ADMIN_EMAILS` are non-secret — they're fine as plain
 variables. You can also paste them as Secrets if you'd prefer.)
@@ -105,16 +104,33 @@ If the action fails:
 
 ## Payroll data
 
-The detail card's "Payroll" section is fed by GET `book.togetherbook.net/api/workspace/payroll`, which returns the `PAYROLL_JSON` Worker secret behind Cloudflare Access. The data is **never committed to the repo** and **never served via github.io** — it's only reachable through the CF Access-gated route on book.togetherbook.net.
+The detail card's "Payroll" section is fed by GET `book.togetherbook.net/api/workspace/payroll`, which reads from a Workers KV namespace bound to this Worker as `PAYROLL_KV`. The data is **never committed to the repo** and **never served via github.io** — it's only reachable through the CF Access-gated route on book.togetherbook.net.
 
-To populate or refresh it:
+KV is used (not a Worker Secret) because the JSON is ~28 KB, which exceeds the 5.1 KB Secret limit. KV values can be up to 25 MB.
+
+### First-time setup (one-time, ~3 min)
+
+1. Cloudflare dashboard → **Workers & Pages** → **KV** (left nav, under Storage & databases)
+2. **Create a namespace** → name it `apifk-payroll` → **Add**
+3. Back to **Workers & Pages** → open `apifk-workspace-worker` → **Settings** → **Bindings** → **+ Add binding**
+   - Type: **KV namespace**
+   - Variable name: `PAYROLL_KV`
+   - KV namespace: `apifk-payroll`
+4. **Save and Deploy**
+
+### Populate or refresh the data
 
 ```bash
 # Process the two CSVs in ~/Desktop/wiki/Payroll into a single JSON blob:
 python3 ~/Desktop/APIsForKids/scripts/scan_payroll.py | pbcopy
 ```
 
-Then in the Cloudflare dashboard → this Worker → **Settings → Variables and Secrets** → edit the existing `PAYROLL_JSON` secret (or add it the first time) → paste, **Save**, **Redeploy**.
+Then in the Cloudflare dashboard → **Workers & Pages** → **KV** → open `apifk-payroll`:
+
+- **First time:** click **+ Add entry**. Key: `current`. Value: paste. **Save**.
+- **Updating:** find the row with key `current` → click the pencil → paste new value → **Save**.
+
+No Worker redeploy needed after KV updates — the next request reads the new value.
 
 The CSVs are:
 
