@@ -13,3 +13,5 @@ monitor.db-journal
 telegram-monitor.db
 telegram-monitor.db-journal
 .venv/
+.DS_Store
+notify-mentions.json
