@@ -200,6 +200,9 @@
       <p class="yp-map-caption">Total paid out by state</p>
       <div class="yp-map-states" id="ypStateMap"></div>
 
+      <p class="yp-map-caption">Average loan amount by state</p>
+      <div class="yp-map-states" id="ypAvgStateMap"></div>
+
       <div class="yp-states" id="ypStates"></div>
     </section>
   </main>
@@ -260,6 +263,43 @@
       L.marker(c, { icon, interactive: true })
         .addTo(map)
         .bindPopup(`<strong>${state}</strong><br>${fmtUSD2.format(total)}`);
+    }
+  }
+
+  function renderAvgStateMap(items) {
+    const mapEl = document.getElementById('ypAvgStateMap');
+    if (!mapEl || typeof L === 'undefined') return;
+    const map = L.map(mapEl, { worldCopyJump: false, scrollWheelZoom: false })
+                 .setView([39.0, -96.5], 4);
+    map.on('click', () => map.scrollWheelZoom.enable());
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 10,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    const sums = new Map();
+    const counts = new Map();
+    for (const it of items) {
+      const s = (it.state || '').toUpperCase();
+      if (!s) continue;
+      sums.set(s, (sums.get(s) || 0) + (it.amount || 0));
+      counts.set(s, (counts.get(s) || 0) + 1);
+    }
+    for (const [state, total] of sums.entries()) {
+      const c = STATE_CENTROIDS[state];
+      if (!c) continue;
+      const n = counts.get(state) || 0;
+      if (!n) continue;
+      const avg = total / n;
+      const icon = L.divIcon({
+        className: 'state-amount-icon',
+        html: `<span class="amount-pill" title="${state}: avg ${fmtUSD2.format(avg)} across ${n} loan${n === 1 ? '' : 's'}">${fmtUSD0.format(avg)}</span>`,
+        iconSize: null,
+        iconAnchor: [0, 0],
+      });
+      L.marker(c, { icon, interactive: true })
+        .addTo(map)
+        .bindPopup(`<strong>${state}</strong><br>Average: ${fmtUSD2.format(avg)}<br>${n} loan${n === 1 ? '' : 's'} · ${fmtUSD2.format(total)} total`);
     }
   }
 
@@ -377,8 +417,9 @@
       }
       root.appendChild(frag);
 
-      try { renderMap(items); }      catch (e) { console.error('pin map failed', e); }
-      try { renderStateMap(items); } catch (e) { console.error('state map failed', e); }
+      try { renderMap(items); }         catch (e) { console.error('pin map failed', e); }
+      try { renderStateMap(items); }    catch (e) { console.error('state map failed', e); }
+      try { renderAvgStateMap(items); } catch (e) { console.error('avg state map failed', e); }
     })
     .catch(err => {
       const meta = document.getElementById('ypMeta');
