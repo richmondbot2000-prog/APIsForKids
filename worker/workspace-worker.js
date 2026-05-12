@@ -1,13 +1,16 @@
 // workspace-worker.js — Cloudflare Worker that performs Google Workspace
-// admin actions (suspend / unsuspend / delete / create user) on behalf of
-// the Directory page.
+// admin actions on behalf of the Directory page.
 //
 // Routes (POST):
-//   /api/workspace/suspend    { email }
-//   /api/workspace/unsuspend  { email }
-//   /api/workspace/delete     { email }
-//   /api/workspace/create     { given_name, family_name, email, password,
-//                               org_unit_path? }
+//   /api/workspace/suspend-and-route  { email, route_to }
+//     1. Add route_to as a forwardingAddress on the user's mailbox
+//        (in-domain addresses auto-verify; cross-domain needs verification).
+//     2. Enable autoForwarding so incoming mail forwards to route_to.
+//     3. Suspend the Workspace user (Admin SDK).
+//   /api/workspace/unsuspend          { email }
+//     Unsuspends and disables autoForwarding.
+//   /api/workspace/create             { given_name, family_name, email,
+//                                       password, org_unit_path? }
 //
 // Auth chain:
 //   1. Cloudflare Access already gates the route — only @letme.com sessions
@@ -28,10 +31,14 @@ const REPO = "richmondbot2000-prog/togetherbook";
 const AUDIT_PATH = "workspace-actions.json";
 const BRANCH = "main";
 
-const SCOPES = [
+const ADMIN_SCOPES = [
   "https://www.googleapis.com/auth/admin.directory.user",
   "https://www.googleapis.com/auth/apps.licensing",
 ].join(" ");
+// Gmail settings scope — needed for forwardingAddresses + autoForwarding.
+// The Worker impersonates the *target user* (not the admin) for these calls
+// because mailbox-settings APIs run as the mailbox owner under DWD.
+const GMAIL_SCOPES = "https://www.googleapis.com/auth/gmail.settings.basic";
 
 export default {
   async fetch(req, env) {
@@ -94,17 +101,16 @@ export default {
     try { body = await req.json(); }
     catch { return json({ error: "invalid JSON body" }, 400, req); }
 
-    let token;
-    try { token = await getGoogleAccessToken(env); }
-    catch (e) { return json({ error: "google token exchange failed: " + e.message }, 502, req); }
+    let adminToken;
+    try { adminToken = await getGoogleAccessToken(env, env.IMPERSONATE_USER, ADMIN_SCOPES); }
+    catch (e) { return json({ error: "google admin token exchange failed: " + e.message }, 502, req); }
 
     let result;
     try {
       switch (action) {
-        case "suspend":   result = await doSuspend(token, body); break;
-        case "unsuspend": result = await doUnsuspend(token, body); break;
-        case "delete":    result = await doDelete(token, body); break;
-        case "create":    result = await doCreate(token, body); break;
+        case "suspend-and-route": result = await doSuspendAndRoute(env, adminToken, body); break;
+        case "unsuspend":         result = await doUnsuspend(env, adminToken, body); break;
+        case "create":            result = await doCreate(adminToken, body); break;
         default:
           return json({ error: `unknown action: ${action}` }, 404, req);
       }
@@ -120,6 +126,7 @@ export default {
         action,
         target: body.email || body.primaryEmail || "",
         ok: !!result.ok,
+        ...(body.route_to ? { route_to: body.route_to } : {}),
         ...(result.ok ? {} : { error: String(result.error || "").slice(0, 300) }),
       });
     } catch (e) { /* swallow audit failures */ }
@@ -130,18 +137,55 @@ export default {
 
 /* ----------- Google action implementations ----------- */
 
-async function doSuspend(token, body) {
+async function doSuspendAndRoute(env, adminToken, body) {
   if (!body.email) return { ok: false, error: "missing email" };
-  return adminApi(token, "PUT", `users/${encodeURIComponent(body.email)}`, { suspended: true });
+  if (!body.route_to) return { ok: false, error: "missing route_to" };
+
+  // Get a mailbox-owner token (DWD-impersonate the target user).
+  let mailboxToken;
+  try {
+    mailboxToken = await getGoogleAccessToken(env, body.email, GMAIL_SCOPES);
+  } catch (e) {
+    return { ok: false, error: "gmail token exchange failed for " + body.email + ": " + e.message };
+  }
+
+  // 1. Add the forwarding address. In-domain auto-verifies; cross-domain
+  //    returns 200 with verificationStatus=pending. Already-registered
+  //    returns 409 — treat as fine.
+  const addRes = await gmailApi(mailboxToken, body.email, "POST", "settings/forwardingAddresses",
+    { forwardingEmail: body.route_to });
+  if (!addRes.ok && addRes.status !== 409) {
+    return { ok: false, error: "addForwardingAddress: " + addRes.error };
+  }
+
+  // 2. Enable autoForwarding.
+  const fwdRes = await gmailApi(mailboxToken, body.email, "PUT", "settings/autoForwarding", {
+    enabled: true,
+    emailAddress: body.route_to,
+    disposition: "leaveInInbox",
+  });
+  if (!fwdRes.ok) return { ok: false, error: "setAutoForwarding: " + fwdRes.error };
+
+  // 3. Suspend the user via Admin SDK.
+  const susRes = await adminApi(adminToken, "PUT", `users/${encodeURIComponent(body.email)}`, { suspended: true });
+  if (!susRes.ok) return { ok: false, error: "suspendUser: " + susRes.error };
+
+  return { ok: true, data: { suspended: true, forwarded_to: body.route_to } };
 }
-async function doUnsuspend(token, body) {
+
+async function doUnsuspend(env, adminToken, body) {
   if (!body.email) return { ok: false, error: "missing email" };
-  return adminApi(token, "PUT", `users/${encodeURIComponent(body.email)}`, { suspended: false });
+  // Unsuspend first (so subsequent mailbox calls have a live account).
+  const susRes = await adminApi(adminToken, "PUT", `users/${encodeURIComponent(body.email)}`, { suspended: false });
+  if (!susRes.ok) return { ok: false, error: "unsuspendUser: " + susRes.error };
+  // Best-effort: disable autoForwarding (we don't fail the action if this errors).
+  try {
+    const mailboxToken = await getGoogleAccessToken(env, body.email, GMAIL_SCOPES);
+    await gmailApi(mailboxToken, body.email, "PUT", "settings/autoForwarding", { enabled: false });
+  } catch (e) { /* swallow */ }
+  return { ok: true, data: { suspended: false } };
 }
-async function doDelete(token, body) {
-  if (!body.email) return { ok: false, error: "missing email" };
-  return adminApi(token, "DELETE", `users/${encodeURIComponent(body.email)}`);
-}
+
 async function doCreate(token, body) {
   const need = ["given_name", "family_name", "email", "password"];
   for (const f of need) if (!body[f]) return { ok: false, error: `missing ${f}` };
@@ -152,6 +196,29 @@ async function doCreate(token, body) {
     changePasswordAtNextLogin: true,
     ...(body.org_unit_path ? { orgUnitPath: body.org_unit_path } : {}),
   });
+}
+
+async function gmailApi(token, userEmail, method, suffix, payload) {
+  const res = await fetch(
+    `https://gmail.googleapis.com/gmail/v1/users/${encodeURIComponent(userEmail)}/${suffix}`,
+    {
+      method,
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: payload !== undefined ? JSON.stringify(payload) : undefined,
+    },
+  );
+  const text = await res.text();
+  if (!res.ok) {
+    let detail = text;
+    try { detail = JSON.parse(text).error?.message || text; } catch (e) {}
+    return { ok: false, status: res.status, error: detail.slice(0, 500) };
+  }
+  let data = null;
+  if (text) { try { data = JSON.parse(text); } catch (e) { data = text; } }
+  return { ok: true, data };
 }
 
 async function adminApi(token, method, pathSuffix, payload) {
@@ -179,7 +246,7 @@ async function adminApi(token, method, pathSuffix, payload) {
 
 /* ----------- Google service-account JWT → access token ----------- */
 
-async function getGoogleAccessToken(env) {
+async function getGoogleAccessToken(env, subject, scope) {
   const sa = JSON.parse(env.GOOGLE_SERVICE_ACCOUNT_JSON);
   if (!sa.client_email || !sa.private_key) {
     throw new Error("service account JSON missing client_email / private_key");
@@ -188,9 +255,9 @@ async function getGoogleAccessToken(env) {
   const header = { alg: "RS256", typ: "JWT", kid: sa.private_key_id };
   const claims = {
     iss: sa.client_email,
-    sub: env.IMPERSONATE_USER,
+    sub: subject,
     aud: "https://oauth2.googleapis.com/token",
-    scope: SCOPES,
+    scope: scope,
     iat: now,
     exp: now + 3600,
   };

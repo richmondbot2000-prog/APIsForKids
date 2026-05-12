@@ -97,7 +97,11 @@ If the action fails:
 - **502 google token exchange failed** — the service account JSON secret is
   malformed, or DWD scopes aren't authorised. Re-check the
   `domain-wide-delegation` page; the scopes should include
-  `admin.directory.user` and `apps.licensing`.
+  `admin.directory.user`, `apps.licensing`, and
+  `gmail.settings.basic` (the last one is needed for the Suspend + route
+  email-forwarding action — add it via Admin Console → Security → Access
+  and data control → API controls → Domain-wide delegation → edit the
+  Client ID → add scope `https://www.googleapis.com/auth/gmail.settings.basic`).
 - **502 with `forbidden` in the details** — the impersonated user
   (`IMPERSONATE_USER`) isn't a Super Admin. Confirm via Admin Console →
   Admin roles → Super Admin → Admins.

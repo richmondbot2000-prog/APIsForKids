@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778618951">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778618951">
-<link rel="stylesheet" href="quiet.css?v=1778618951">
-<link rel="stylesheet" href="quiet-extras.css?v=1778618951">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778618951">
+<link rel="stylesheet" href="style.css?v=1778621012">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778621012">
+<link rel="stylesheet" href="quiet.css?v=1778621012">
+<link rel="stylesheet" href="quiet-extras.css?v=1778621012">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778621012">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -290,6 +290,28 @@
     font-style: italic;
     color: var(--ink-500, #6B7794);
     font-size: 0.78rem;
+  }
+
+  /* Suspended rows: greyed but still visible. Mailbox emails get
+     strikethrough since direct delivery no longer works. */
+  .dir-row--suspended {
+    opacity: 0.55;
+    background: transparent;
+  }
+  .dir-row--suspended .dir-name { color: var(--ink-500, #6B7794); }
+  .dir-email--suspended {
+    text-decoration: line-through;
+    text-decoration-color: var(--manuscript-red, #B23A48);
+    text-decoration-thickness: 1.5px;
+  }
+  .dir-forward-chip {
+    display: inline-block;
+    font: 500 11px/1.4 var(--font-mono, "JetBrains Mono", ui-monospace, monospace);
+    color: var(--ink-700, #2C3E66);
+    background: var(--paper-200, #F5ECD4);
+    border: 1px solid var(--brass-300, #E2BF74);
+    padding: 1px 6px;
+    border-radius: 3px;
   }
 
   @media (max-width: 700px) {
@@ -647,7 +669,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778618951" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778621012" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -732,14 +754,30 @@
     fetch("annotations.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
     // Payroll lives behind Cloudflare Access on the workspace Worker — never
     // in the repo. Fails silently on github.io (no Worker route there) and on
-    // first install before PAYROLL_JSON is configured.
+    // first install before PAYROLL_KV is configured.
     fetch("/api/workspace/payroll", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    // Audit log of workspace actions — used to surface the forward target for
+    // suspended accounts. Optional; absence just means we don't display routes.
+    fetch("workspace-actions.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
   ])
-    .then(([staff, activity, annotationsFile, payrollFile]) => {
+    .then(([staff, activity, annotationsFile, payrollFile, workspaceActions]) => {
       annotationsMap = (annotationsFile && annotationsFile.annotations && typeof annotationsFile.annotations === "object")
         ? annotationsFile.annotations
         : {};
       payrollData = payrollFile && (payrollFile.by_email || payrollFile.by_name) ? payrollFile : null;
+      // Build a per-email lookup of the most-recent successful suspend_and_route
+      // action, so the detail card can show where the suspended mailbox forwards.
+      forwardingByEmail = {};
+      for (const a of ((workspaceActions && workspaceActions.actions) || [])) {
+        if (!a.ok) continue;
+        const target = (a.target || "").toLowerCase();
+        if (!target) continue;
+        if (a.action === "suspend-and-route" && a.route_to) {
+          forwardingByEmail[target] = a.route_to;
+        } else if (a.action === "unsuspend") {
+          delete forwardingByEmail[target];
+        }
+      }
       const allWorkspaceUsers = staff.users || [];
       const activityByEmail = {};
       const externalUsers = [];
@@ -761,9 +799,13 @@
         allEntries.push({ type: "external", user: null, activity: e });
       }
 
-      // Sort: active first; within active, tenant priority; within tenant,
-      // writes desc; finally alphabetical. Inactive staff sit at the end.
+      // Sort: suspended accounts to the very bottom (they stay forever, just
+      // greyed). Then active in DB first; within active, tenant priority;
+      // within tenant, writes desc; finally alphabetical.
       allEntries.sort((a, b) => {
+        const aSusp = a.user && a.user.suspended ? 1 : 0;
+        const bSusp = b.user && b.user.suspended ? 1 : 0;
+        if (aSusp !== bSusp) return aSusp - bSusp;
         const aActive = a.activity ? 0 : 1;
         const bActive = b.activity ? 0 : 1;
         if (aActive !== bActive) return aActive - bActive;
@@ -1008,15 +1050,27 @@
       ? `<img class="dir-gws-icon" src="assets/google-workspace-icon.svg?v=1" alt="Google Workspace account active" title="Google Workspace account active">`
       : "";
 
+    // Suspended accounts: grey out the row and strikethrough the email (since
+    // direct delivery no longer works — mail forwards via admin routing).
+    const suspendedClass = u.suspended ? " dir-row--suspended" : "";
+    const emailHtml = u.suspended
+      ? `<span class="dir-email dir-email--suspended" title="Mailbox suspended — direct delivery no longer works">${escapeHtml(u.email)}</span>`
+      : `<span class="dir-email">${escapeHtml(u.email)}</span>`;
+    const forwardTo = u.suspended ? forwardingByEmail[(u.email || "").toLowerCase()] : null;
+    const forwardChip = forwardTo
+      ? `<span class="dir-forward-chip" title="Suspended — mail forwards to ${escapeHtml(forwardTo)}">→ ${escapeHtml(forwardTo)}</span>`
+      : "";
+
     return `
-      <button type="button" class="dir-row" data-key="${escapeHtml(u.email)}" title="View details for ${escapeHtml(u.name || u.email)}">
+      <button type="button" class="dir-row${suspendedClass}" data-key="${escapeHtml(u.email)}" title="View details for ${escapeHtml(u.name || u.email)}">
         ${photo}
         <div class="dir-row-body">
           <div class="dir-row-headline">
             <span class="dir-name">${escapeHtml(u.name || u.email)}</span>
             ${liveGws}
             ${u.title ? `<span class="dir-title">${escapeHtml(u.title)}</span>` : ""}
-            <span class="dir-email">${escapeHtml(u.email)}</span>
+            ${emailHtml}
+            ${forwardChip}
           </div>
           ${rowMetaHtml(a, u.email)}
         </div>
@@ -1061,6 +1115,7 @@
   // Worker behind book.togetherbook.net/api/annotations (see worker/SETUP.md).
   let annotationsMap = {};                              // populated on page load
   let payrollData = null;                               // null until /api/workspace/payroll returns
+  let forwardingByEmail = {};                           // email -> route_to (suspended-and-routed users)
   const ANNOTATIONS_API = "/api/annotations";           // same-origin Worker route
 
   function annotationFor(key) { return annotationsMap[key] || {}; }
@@ -1303,9 +1358,25 @@
     const primaryEmail = (u && u.email) ? u.email.toLowerCase() : "";
     const otherEmails = Array.from(allEmails).filter(e => e !== primaryEmail);
 
+    // For a suspended account, the email no longer accepts direct delivery —
+    // it forwards. Render it strikethrough and tag with the forward target.
+    const isSuspended = !!(u && u.suspended);
+    const forwardTo = isSuspended ? forwardingByEmail[primaryEmail] : null;
+    const emailDisplay = u
+      ? (isSuspended
+          ? `<span class="dir-email--suspended">${escapeHtml(u.email || "—")}</span>${forwardTo ? ` <span class="dir-forward-chip">→ ${escapeHtml(forwardTo)}</span>` : ""}`
+          : escapeHtml(u.email || "—"))
+      : "—";
+    // Sibling emails on a suspended account are also dead-end direct addresses
+    // — strike them through too.
+    const otherEmailHtml = otherEmails.map(e => {
+      const link = `<a href="mailto:${escapeHtml(e)}">${escapeHtml(e)}</a>`;
+      return isSuspended ? `<span class="dir-email--suspended">${link}</span>` : link;
+    }).join("<br>");
+
     const workspaceDl = u ? `
-      <dt>Email</dt><dd>${escapeHtml(u.email || "—")}</dd>
-      ${otherEmails.length ? `<dt>Other emails</dt><dd>${otherEmails.map(e => `<a href="mailto:${escapeHtml(e)}">${escapeHtml(e)}</a>`).join("<br>")}</dd>` : ""}
+      <dt>Email</dt><dd>${emailDisplay}</dd>
+      ${otherEmails.length ? `<dt>Other emails</dt><dd>${otherEmailHtml}</dd>` : ""}
       ${(u.given || u.family) ? `<dt>Full name</dt><dd>${escapeHtml(((u.given || "") + " " + (u.family || "")).trim())}</dd>` : ""}
       ${u.department ? `<dt>Department</dt><dd>${escapeHtml(u.department)}</dd>` : ""}
       ${tenantList.length ? `<dt>Workspace</dt><dd>${tenantList.map(t => escapeHtml(t)).join(", ")}</dd>` : ""}
@@ -1359,14 +1430,21 @@
       ${u ? `
         <div class="dir-modal-section">
           <h3>Manage Workspace account</h3>
-          <div class="dir-manage-actions">
-            ${u.suspended
-              ? `<button type="button" data-action="unsuspend">Unsuspend</button>`
-              : `<button type="button" class="danger" data-action="suspend">Suspend</button>`}
-            <button type="button" class="danger" data-action="delete">Delete…</button>
-          </div>
+          ${u.suspended
+            ? `<div class="dir-manage-actions">
+                 <button type="button" data-action="unsuspend">Unsuspend (turn forwarding off)</button>
+               </div>
+               <p class="dir-modal-saved-hint">${forwardTo ? `Currently forwards to <code>${escapeHtml(forwardTo)}</code>. ` : ""}Unsuspending re-enables direct mailbox delivery and disables the forward.</p>`
+            : `<div class="dir-form-row">
+                 <label for="dirRouteTo">Suspend and forward email to</label>
+                 <input id="dirRouteTo" name="route_to" type="email" placeholder="manager@letme.com" list="dirRouteOptions">
+                 <datalist id="dirRouteOptions">${adminEmailOptions()}</datalist>
+               </div>
+               <div class="dir-manage-actions">
+                 <button type="button" class="danger" data-action="suspend-and-route">Suspend + route</button>
+               </div>
+               <p class="dir-modal-saved-hint">Suspends the Workspace seat (no per-seat fee on Flex) and sets the mailbox to auto-forward to the address above. Logged to <code>workspace-actions.json</code>.</p>`}
           <div class="dir-confirm-slot"></div>
-          <p class="dir-modal-saved-hint">Actions go via the workspace Worker → Google Workspace Admin SDK and are logged to <code>workspace-actions.json</code>.</p>
         </div>` : ""}
 
       <div class="dir-modal-section">
@@ -1416,69 +1494,77 @@
 
     // Unsuspend doesn't need confirmation — it's reversible and non-destructive.
     if (action === "unsuspend") {
-      runAction(entry, action, slot);
+      runAction(entry, action, slot, {});
       return;
     }
 
-    const labels = {
-      suspend: { verb: "Suspend", danger: "Pauses email + Drive access. Billing stops on the Flex plan. Reversible." },
-      delete:  { verb: "Delete",  danger: "Permanently deletes this Workspace account. Recoverable for 20 days, then unrecoverable." },
-    };
-    const meta = labels[action];
-    slot.innerHTML = `
-      <div class="dir-confirm">
-        <div class="dir-confirm-text">
-          <strong>${meta.verb} ${escapeHtml(u.email)}?</strong><br>
-          <span class="dir-modal-saved-hint" style="text-align:left;margin:0;">${escapeHtml(meta.danger)}</span>
-        </div>
-        <div class="dir-confirm-actions">
-          <button type="button" data-cancel>Cancel</button>
-          <button type="button" class="confirm" data-confirm>${meta.verb}</button>
-        </div>
-      </div>`;
-    slot.querySelector("[data-cancel]").addEventListener("click", () => { slot.innerHTML = ""; });
-    slot.querySelector("[data-confirm]").addEventListener("click", () => runAction(entry, action, slot));
+    if (action === "suspend-and-route") {
+      const routeInput = modal.querySelector('input[name="route_to"]');
+      const routeTo = (routeInput && routeInput.value || "").trim();
+      if (!routeTo || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(routeTo)) {
+        slot.innerHTML = `<div class="dir-confirm"><div class="dir-confirm-text"><span class="dir-modal-saved-hint" style="text-align:left;margin:0;color:var(--manuscript-red);">Enter a valid forwarding email above before suspending.</span></div></div>`;
+        return;
+      }
+      slot.innerHTML = `
+        <div class="dir-confirm">
+          <div class="dir-confirm-text">
+            <strong>Suspend ${escapeHtml(u.email)} and forward all mail to ${escapeHtml(routeTo)}?</strong><br>
+            <span class="dir-modal-saved-hint" style="text-align:left;margin:0;">Pauses Workspace access (saves the per-seat fee on Flex). Mail to this address will be auto-forwarded to the target. Reversible via Unsuspend.</span>
+          </div>
+          <div class="dir-confirm-actions">
+            <button type="button" data-cancel>Cancel</button>
+            <button type="button" class="confirm" data-confirm>Suspend + route</button>
+          </div>
+        </div>`;
+      slot.querySelector("[data-cancel]").addEventListener("click", () => { slot.innerHTML = ""; });
+      slot.querySelector("[data-confirm]").addEventListener("click", () => runAction(entry, action, slot, { route_to: routeTo }));
+      return;
+    }
   }
 
-  async function runAction(entry, action, slot) {
+  // Populate the datalist for the Suspend+route input with active Workspace
+  // emails so the user can pick a manager without typing the full address.
+  function adminEmailOptions() {
+    return (allEntries || [])
+      .filter(e => e.type === "staff" && e.user && !e.user.suspended && e.user.email)
+      .map(e => `<option value="${escapeHtml(e.user.email)}">${escapeHtml(e.user.name || e.user.email)}</option>`)
+      .join("");
+  }
+
+  async function runAction(entry, action, slot, extras) {
     const u = entry.user;
     const modal = document.getElementById("dirModal");
-    // Reuse the modal toast for feedback.
     let toast = modal.querySelector("[data-toast]");
     if (!toast) {
-      // Inject a transient toast inside the manage section's slot if Notes hasn't been rendered.
       toast = document.createElement("p");
       toast.className = "dir-modal-toast";
       slot.appendChild(toast);
     } else {
       toast.classList.remove("error");
     }
-    toast.textContent = `${action[0].toUpperCase()}${action.slice(1)}ing ${u.email}…`;
+    const verbLabel = action === "suspend-and-route" ? "Suspending + routing" : (action[0].toUpperCase() + action.slice(1) + "ing");
+    toast.textContent = `${verbLabel} ${u.email}…`;
     modal.querySelectorAll("[data-action], [data-confirm]").forEach(b => b.disabled = true);
 
     try {
-      await workspaceAction(action, { email: u.email });
-      toast.textContent = `${action[0].toUpperCase()}${action.slice(1)} succeeded for ${u.email}.`;
-      // Optimistically update in-memory state so the row reflects reality
-      // before the next refresh-directory.yml run lands a fresh staff.json.
-      if (action === "suspend")   u.suspended = true;
-      if (action === "unsuspend") u.suspended = false;
-      if (action === "delete") {
-        const idx = allEntries.findIndex(e => e === entry);
-        if (idx >= 0) allEntries.splice(idx, 1);
+      await workspaceAction(action, { email: u.email, ...(extras || {}) });
+      toast.textContent = `${u.email} — ${action.replace(/-/g, " ")} succeeded.`;
+      // Optimistic in-memory state update so the row reflects reality before
+      // the next refresh-directory.yml run lands a fresh staff.json.
+      if (action === "suspend-and-route") {
+        u.suspended = true;
+        if (extras && extras.route_to) forwardingByEmail[u.email.toLowerCase()] = extras.route_to;
+      }
+      if (action === "unsuspend") {
+        u.suspended = false;
+        delete forwardingByEmail[(u.email || "").toLowerCase()];
       }
       if (slot) slot.innerHTML = "";
       renderGrid();
-      if (action !== "delete") {
-        // Re-open the modal so the badge + suspend/unsuspend label flip cleanly,
-        // and all listeners are freshly wired.
-        openCard(entryKey(entry));
-      } else {
-        // After delete, the entry no longer exists — close the modal.
-        setTimeout(closeCard, 1200);
-      }
+      // Re-open the modal so the badge + buttons flip cleanly.
+      openCard(entryKey(entry));
     } catch (err) {
-      toast.textContent = `${action[0].toUpperCase()}${action.slice(1)} failed — ${err.message || err}`;
+      toast.textContent = `${verbLabel.replace(/ing$/, "")} failed — ${err.message || err}`;
       toast.classList.add("error");
       modal.querySelectorAll("[data-action], [data-confirm]").forEach(b => b.disabled = false);
     }
