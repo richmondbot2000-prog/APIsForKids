@@ -505,17 +505,19 @@ All three are aggregated by **(Broker, SourceReference1)** — the user's "Sourc
 
 #### 11.5.3 Cost-model derivation (CommissionType enum)
 
-The DB's `Brokers.Campaigns.CommissionType` is an integer enum. Decoded 2026-05-11 from the rate-and-name diagnostic:
+The DB's `Brokers.Campaigns.CommissionType` is an integer enum. **Canonical names from the Partnerships Handbook** (`~/Desktop/wiki/partnerships-handbook.html`):
 
-| Type | Meaning | Cost formula | Notes |
+| ID | Canonical name | Cost formula used by `scan_source_quality.py` | Notes |
 |---|---|---|---|
-| 1 | CPF (cost per funded loan) | `rate × paid_out_count` | Some rates 0.10/0.12 look mis-typed (probably should be type 5); treated literally |
-| 2 | CPL (cost per lead, flat) | `rate × leads_purchased` | Small population (2 campaigns) |
-| 3 | CPC (cost per click, PPC) | excluded from analysis | Bing/Google PPC, Money Lion `$3 cpc` — not a broker lead, no upstream Source |
-| 4 | BID (auction) | `SUM(Leads.BidAmount)` with fallback to `rate × leads_purchased` if bid was never set | The only type that populates `Leads.BidAmount` |
-| 5 | REV (rev-share / EPC) | `rate × SUM(paid-out loan amount)` | Rates like 0.12 = 12% of paid-out loan revenue |
+| 1 | `PerFundedLoan` (CPF) | `rate × paid_out_count` | Paid when a loan is funded. The 0.10/0.12 outliers we saw look like they may have meant percentage-of-loan (i.e. should be type 5), but the literal multiplication is defensible. |
+| 2 | `PerApplication` | `rate × leads_purchased` | Paid per submitted application. Small population in our window (2 campaigns). I called this "CPL" in older code — it's actually per-application, not per-lead. |
+| 3 | `PerClick` (CPC) | **Excluded from analysis** | Click traffic — LendingTree / MoneyLion / Google PPC / Bing PPC. The handbook explicitly notes click campaigns "are excluded from CPF reporting dashboards." Same approach here. |
+| 4 | `PerAcceptedAPILead` | `SUM(Leads.BidAmount)` with fallback to `rate × leads_purchased` | Covers BOTH static-price API campaigns (Example 1 in handbook: fixed $0.80/lead, scorecard-gated) AND price-reject bidding campaigns (Example 2: $10 floor with counteroffer flow). The distinction is the `WithPriceRejectBidding` flag on the campaign, not the commission type. `Leads.BidAmount` is set on the bidding variant. |
+| 5 | `PerFundedLoanPreCheck` | `rate × SUM(paid-out loan amount)` | CPF + Pre-Check API. Per handbook: "we pay X% of the funded loan value." Looser DSIT-10 reclaim logic vs the standard PerFundedLoan. **Also used as a label** for CPF click campaigns where the partner doesn't actually call the Pre-Check API but the campaign is paid per funded loan — done this way to keep them in CPF reporting (Type 3 PerClick is excluded from CPF dashboards). |
 
 For null / unknown types the cell has no cost figure and `cost_per_paid_loan` is omitted.
+
+**The 12% blended CPA target:** Per handbook, "the target is a blended CPA of around 12%. Below this level the programme is profitable after accounting for operational costs, bad debt, and all other origination costs. Above it, we are eroding margin." This is the canonical KPI for the source-quality work; the current page reports `cost_per_paid_loan` in dollars but doesn't explicitly compare against the 12% threshold. See §11.5.9 for proposed improvements.
 
 #### 11.5.4 Ghost rate (worst-quality leaderboard)
 
@@ -566,6 +568,55 @@ Top-level keys in `source-quality.json`:
 - The scanner takes 3-5 minutes typically. Initial implementation timed out at 35min on a 3-way SQL self-join over 75M rows; rewrote as sample-and-match-in-Python (O(N+M) hash lookup instead of O(N×M) join). Don't revert to SQL self-joins.
 - Memory: holds 2-3M purchased leads in RAM with identity indexes. Runner has 7GB, fits comfortably.
 
+#### 11.5.9 Partnership-handbook context for this page
+
+The Brokers page is fundamentally a dashboard companion to the canonical reports at **`reporting.rgcore.com`** — specifically:
+
+- **Spending on Leads** — the most-used report; "shows ROI on all leads bought in a given period, with a trend and end-of-period CPA prediction." Target: ~12% blended CPA.
+- **Affiliate Sub-Source Report (SourceRef1)** — apply rates, CPA, 6-month trend, LastSeen per SR1 per campaign.
+- **Affiliate Sub-Source Report (SourceRef2)** — same at SR2 level for drilling into a problem SR1.
+- **Bad Sub-Affiliates** — flags poor apply-rate sources that need blocking; surfaces the ones the AutoBlock Robot caught and ones it didn't.
+- **Blocked Refs with Accepts** — payouts that occurred AFTER a source was blocked (i.e. our `blocked_to_reconsider` analysis but more direct).
+
+**Hard rules from the handbook the page should reflect:**
+
+- **Bottom of ping tree by design.** We sit at or near the bottom of ping trees. Our accept rate WILL look low vs mainstream lenders — this is structural, not a problem. "What matters is funded loans and revenue per lead sold, not accept rate." The page should not penalise low-accept-rate cells; it should reward high-funded-loan-rate cells.
+- **5-day average time to fund, 10-day window for most conversions.** Currently the page uses a 30-day maturation lag — comfortably longer than the 10-day window. Confirms the lag was the right call.
+- **30-day default dedup window, extendable to 45 days** if a lead progresses through the funnel. Important caveat for the cheaper-clones analysis (see §11.5.10).
+- **AutoBlock thresholds** (run nightly at 04:00 local):
+  - `SourceRef1 alone (no SR2)`: 50+ accepts + ≤10% apply rate + (0 payouts OR CPA >20%)
+  - `SourceRef1 (with SR2 present)`: 150+ accepts + ≤10% apply rate + (0 payouts OR CPA >20%)
+  - `SourceRef2`: 50+ accepts + ≤10% apply rate + (0 payouts OR CPA >20%)
+- **The 10–20% apply-rate manual zone:** "The autoblock only triggers at ≤10% apply rate. Sources with a poor apply rate between 10–20% will not be autoblocked. Use the Bad Sub-Affiliates report regularly to catch these." Our page should highlight cells in this zone explicitly as "manual review needed."
+
+#### 11.5.10 Cheaper-clones / overpay analysis — known caveat
+
+The overpay analysis finds same-identity matches across (Broker, SR1) cells within the analysis window. Per the handbook, **a 30-day dedup window prevents us from buying the same customer twice across any source.** If our cheaper-clones analysis is finding within-30-day duplicates, the implication is one of:
+
+1. Our identity match (SSN OR Phone+DOB OR Email+DOB) is finding **broader matches than their precise dedup** — same person with slightly different lead data across submissions.
+2. **Cross-product dedup doesn't apply** — Default (Type 20) and MedallionBP (Type 24) may dedup separately, allowing the same customer to be purchased once per product within the window.
+3. The dedup was bypassed because the first lead was DECLINED (not accepted) — declines don't set a dedup expiry, so the same customer arriving later via another source IS buyable.
+
+This is the most likely explanation for option 3: most of our cheaper-clones matches are likely cases where one (Broker, SR1) cell sent a lead we declined (price-reject or scorecard fail), then a different cell sent the same person later and we bought them. That IS a legitimate overpay insight — but the framing should be "we bought them where we could have got them cheaper" rather than "we bought them twice." Worth tightening the page copy.
+
+#### 11.5.11 Suggested improvements (TODO list, generated 2026-05-12 after reading the handbook)
+
+In rough priority order:
+
+1. **Add CPA % as a primary metric** alongside `cost_per_paid_loan` dollars. CPA = `total_cost / paid_loan_total`. The handbook uses CPA % as the single most-important KPI ("target ~12% blended"). Currently the page reports dollars per paid loan but never relates that to loan size, so a $1,500 cost-per-paid is undifferentiated between a 30% CPA (on a $5k loan) and a 15% CPA (on a $10k loan).
+2. **Add the 12% CPA threshold as a benchmark line** — colour cells green if CPA <12%, brass if 12–20%, red if >20%. Replaces the current arbitrary $600 cost threshold with the canonical business benchmark.
+3. **Add apply rate prominently** — it's the autoblock trigger. Show per-cell apply rate (`applications / leads_purchased`) with a red flag at ≤10% (autoblock zone) and amber at 10–20% (manual review zone).
+4. **Add an "AutoBlock would catch" badge** to cells matching the SR1 / SR2 autoblock thresholds. Lets you see whether the autoblock is doing its job AND what's slipping through.
+5. **Surface the 10–20% apply-rate "manual review" zone as its own section** — these are cells that need a human decision and never get caught by the robot.
+6. **Add a LastSeen column per cell** — when did this (Broker, SR1) most recently send a lead? Mirrors the `Affiliate Sub-Source Report` LastSeen column. Cells gone quiet for >7d may already be off; cells gone quiet >30d are effectively dormant.
+7. **Add SR2 drill-down underneath each SR1 row** — particularly for the "consider blocking" section. The handbook strongly prefers SR2 surgical blocks over SR1 parent blocks ("affiliates spin up new children when a parent gets blocked"). The page should surface SR2 evidence so the user can see which child within an SR1 parent is the problem.
+8. **Add the 6-month trend per cell** — mirrors the Affiliate Sub-Source Report. A cell trending DOWN in apply rate over 6 months tells a different story to a cell that's always been bad.
+9. **Add a blended-CPA headline KPI** to the page top — the single most-watched number for the partnerships function.
+10. **Tighten the cheaper-clones copy** per §11.5.10 — frame as "we bought these where a declined-then-accepted-elsewhere pattern shows up at a lower price" rather than "we paid twice."
+11. **Add a state filter** — every campaign has a 24-state geo filter and routes leads to Default vs MedallionBP based on state. State-level CPA breakdowns would let us spot states that drag the blend.
+12. **Cross-link to the canonical reports** — small "Open in reporting.rgcore.com" links on each section pointing to the matching report (Spending on Leads / Affiliate Sub-Source / Bad Sub-Affiliates / Blocked Refs with Accepts).
+13. **Surface the AutoBlock Robot's recent activity** — what did it block last night? A simple "AutoBlock Robot's last 7 days" feed on the page would close the loop between the robot's nightly decisions and our human-review work.
+
 ### 11.6 Declines page (`declines.html`)
 
 90-day rolling analysis of two distinct decline pools (powered by `scan_declines.py`):
@@ -607,17 +658,25 @@ Per-loan TUE parameters (`TUEMaxBalance`, `TUEArrearsPosition`, `TUEDaysOld`) ar
 
 ---
 
-## 13. Concept reference: Brokers / Sources / Campaigns terminology
+## 13. Concept reference: Brokers / Sources / Campaigns / SourceRefs terminology
 
-This is the single most error-prone part of the warehouse schema because the DB names don't match the business terminology. **Get this wrong and the source-quality analysis silently lies.** Confirmed with the user 2026-05-11.
+This is the single most error-prone part of the schema because the DB names don't match the business terminology, and the business terminology itself uses "source" and "broker" interchangeably. **Get this wrong and the source-quality analysis silently lies.**
 
-| User term | DB location | What it actually is |
+**Canonical reference:** `~/Desktop/wiki/partnerships-handbook.html` — the Together Loans Partnerships Handbook. Read it for the full picture; key extract below.
+
+### 13.1 Hierarchy from the handbook
+
+| Term | DB location | What it actually is |
 |---|---|---|
-| **Broker** | `Brokers.Sources` (table) → one row per | A company we have a direct contractual relationship with. The affiliate we pay invoices to. ~50-100 distinct rows in the window. Examples: "Lead Economy", "Search ROI, LLC", "Pingyo", "TruePath Leads". The DB table is awkwardly named — "Sources" in the DB ≠ "Source" in the user's terminology, which is the most common source of confusion. |
-| **Source** | `Leads.SourceReference1` (column) → free-text per lead | The upstream sub-broker / affiliate code passed THROUGH a Broker. The Broker resells leads from many Sources. ~78k distinct values in the window, 99.5% fill rate. Same value across different Brokers means different things, so the analysis unit is the tuple **(Broker, SourceReference1)**. SR2 and SR3 also exist on Leads but SR2 is sub-ID (8M distinct values) and SR3 is near-per-lead noise — both ignored. |
-| **Campaign** | `Brokers.Campaigns` (table) → one row per | Our pricing tier with a Broker. Each Broker has many Campaigns at different price points / commission models. Ephemeral — when one is killed, a similar one is typically re-spun under the same Broker. The cost-model (`CommissionType` + `CommissionRate`) lives on the Campaign. Each lead's `Leads.CampaignId` joins to one Campaign. |
+| **Partner / Broker / Source** | `Brokers.Sources` (table) → one row per | A company we have a direct contractual relationship with. The affiliate we pay invoices to. The handbook uses **"sources" and "brokers" interchangeably** for this layer. Examples: "Lead Economy", "Search ROI, LLC", "TFLI", "Monevo", "SuperMoney". |
+| **Campaign** | `Brokers.Campaigns` (table) → one row per | Our pricing tier with a Broker. Each Broker has at least two Campaigns (Default Type 20 + MedallionBP Type 24 are mandatory), plus optional variants (price-reject, scorecard-gated, frequency-filter, click-traffic). Different commission models / price points / quality gates. Each lead's `Leads.CampaignId` joins to one Campaign. The cost model (`CommissionType` + `CommissionRate`) lives on the Campaign. |
+| **SourceRef1** | `Leads.SourceReference1` (column) | The **parent sub-affiliate** code the Broker passes through per lead. ~78k distinct values, 99.5% fill rate. The Broker resells leads from many SourceRef1s — these are sub-affiliates within their network. The Excluded Refs feature lets us block at this level (parent block). |
+| **SourceRef2** | `Leads.SourceReference2` | The **child sub-source** within a SourceRef1. ~8.3M distinct values, 80% fill rate. Used for surgical blocks when a parent SR1 has one bad child. Preferred for blocks over SR1 because affiliates spin up new children when a parent gets blocked. |
+| **SourceRef3** | `Leads.SourceReference3` | Partner's internal lead ID. ~18M distinct (near per-lead), 30% fill rate. **NEVER block on SR3.** Per the handbook: "Used by partners as their own internal lead ID tracking field." |
 
-**What `Brokers.SourceTypeID` is NOT:** I initially mistook this for the Source granularity. It is not. The lookup table `dbo.SourceTypes` only contains 2 values ("Broker", "PPC") — a high-level categorisation of the Broker itself, not the upstream sub-source. Do not use this for the Source-quality rollup.
+**The right analysis unit:** the Excluded Refs admin tool lets you block at SR1 OR SR2. So the **decision unit on this page should ideally support (Broker, SR1, SR2) hierarchy** rather than collapsing to (Broker, SR1) only. Currently we aggregate at (Broker, SR1); a future improvement is to surface SR2 drill-down underneath each SR1 row.
+
+**What `Brokers.SourceTypeID` is NOT:** I initially mistook this for the Source granularity. It is not. The lookup table `dbo.SourceTypes` only contains 2 values ("Broker", "PPC") — a high-level categorisation of the Broker itself, not the sub-affiliate dimension. Do not use this for the Source-quality rollup.
 
 **Join paths used by `scan_source_quality.py`:**
 - `Leads.CampaignId` → `Brokers.Campaigns.CampaignId` (gets commission_type + rate + name)
@@ -933,6 +992,7 @@ A short list of footguns to avoid, kept brief; longer detail in `~/Desktop/wiki/
 - `CLAUDE.md` (this repo) — working-style notes + the nightly-update directive for Claude sessions
 - `CLAUDE_CONTEXT.md` (in the wiki repo) — operational notes for AI-assisted iteration; carries pending work and lessons learned in more conversational form
 - `~/Desktop/wiki/Overview/07_APIsForKids_Site.md` — the wiki-wide spec entry for this site, integrated alongside other Central Services docs. **Keep this in structural sync with SPEC.md.**
+- **`~/Desktop/wiki/partnerships-handbook.html`** — the Together Loans Partnerships Handbook. **Authoritative source** for partner terminology, commission types, AutoBlock thresholds, CPA target, dedup rules, scorecard semantics, and the partnership team's report library. Read this before doing anything substantive on the Brokers page or source-quality analysis.
 - `~/Desktop/wiki/TogetherBOOK_handoff/wiki/README.md` — the original Quiet Edition design handoff package
 - `~/Desktop/wiki/Markdown/*` — service-by-service Tettra exports, useful when adding new platform-aware pages
 - `~/Desktop/wiki/Markdown/*` — service-by-service Tettra exports, useful when adding new platform-aware pages

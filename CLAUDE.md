@@ -37,15 +37,26 @@ The visual treatment is the **Quiet Edition** — cream paper + ink blue + brass
 
 ## 5. The terminology that will trip you up
 
-This is the most error-prone bit of the schema. Get it wrong and the source-quality analysis silently lies. Full detail in SPEC §13. The 30-second version:
+This is the most error-prone bit of the schema. Get it wrong and the source-quality analysis silently lies. Full detail in SPEC §13. **The authoritative source is `~/Desktop/wiki/partnerships-handbook.html`** — read it before touching anything broker-related. The 30-second version:
 
-| User term | Lives in DB at | Roughly |
+| Term | Lives in DB at | Roughly |
 |---|---|---|
-| Broker | `Brokers.Sources` (table) | The affiliate company we have a contract with |
-| Source | `Leads.SourceReference1` (column) | The upstream sub-broker that fed leads INTO that broker — a free-text affiliate code |
-| Campaign | `Brokers.Campaigns` (table) | Our per-pricing-tier agreement WITH that broker. Ephemeral (gets killed + respawned) |
+| Partner / Broker / Source (used interchangeably by the team) | `Brokers.Sources` (table) | The affiliate company we have a contract with — Lead Economy, Search ROI, Monevo, SuperMoney, TFLI, ITMedia etc. |
+| Campaign | `Brokers.Campaigns` (table) | Our per-pricing-tier agreement WITH that partner. Each partner has at least Default (Type 20) + MedallionBP (Type 24) plus optional variants. Ephemeral. |
+| SourceRef1 | `Leads.SourceReference1` (column) | The partner's **parent sub-affiliate** code passed per lead. ~78k distinct values. The partner resells leads from many SR1s. |
+| SourceRef2 | `Leads.SourceReference2` (column) | The **child sub-source** within an SR1 parent. Preferred for surgical blocks. |
+| SourceRef3 | `Leads.SourceReference3` (column) | Partner's internal lead ID. **Never block on this.** |
 
-The DB table named `Brokers.Sources` is what the user calls "Broker". `Brokers.SourceTypeID` is NOT the granular Source dimension — it's a 2-value enum ("Broker"/"PPC"). Use `Leads.SourceReference1` for actual Source rollup. The analysis unit is the tuple **(Broker, SourceReference1)**.
+Analysis unit is currently **(Broker, SourceReference1)** but a future improvement is to surface SR2 drill-down. `Brokers.SourceTypeID` is NOT the granular Source dimension — it's a 2-value enum ("Broker"/"PPC").
+
+**Canonical KPI: blended CPA ~12%.** Below = profitable, above = eroding margin. Per the handbook this is the single most-watched number. The page currently reports `cost_per_paid_loan` in dollars — translating that to CPA % vs the 12% benchmark is one of the open improvements (SPEC §11.5.9).
+
+**Commission types — corrected from the handbook:**
+- 1 = PerFundedLoan (CPF)
+- 2 = PerApplication
+- 3 = PerClick (CPC) — excluded from analysis
+- 4 = PerAcceptedAPILead (covers static-price AND price-reject bidding variants)
+- 5 = PerFundedLoanPreCheck (CPF with Pre-Check, also used as a label for CPF click campaigns)
 
 ## 6. Tooling preferences
 
