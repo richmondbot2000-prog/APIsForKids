@@ -311,64 +311,106 @@ def main() -> None:
     # ─── Part A: weak-accepted (Broker, SourceReference1) ranking ────
     # Aggregation unit is (broker, sr1). Each lead carries both
     # CampaignId (→ broker) and SourceReference1. We aggregate per
-    # (CampaignId, SR1) at the SQL layer so we can apply the
+    # (CampaignId, SR1, SR2) at the SQL layer so we can apply the
     # campaign-specific cost-model formula, then roll up to (broker,
     # SR1) in Python.
+    #
+    # Outcome attribution uses dbo.LeadOutcomes — the canonical per-
+    # lead event log written by Whitebox /UpdateStatus. Each
+    # LeadOutcome row is tagged with the LeadId that was live at the
+    # time of the event, so per-lead aggregation gives correct
+    # attribution even when the same ARef was bought by multiple
+    # brokers across the window. This replaces the prior heuristic
+    # (GROUP BY ARef then MAX(CampaignId)) which mis-attributed ~3%
+    # of paid loans on multi-broker ARefs.
+    #
+    # LeadOutcomeTypes enum (confirmed 2026-05-12):
+    #   1 = Apply1 complete    4 = BRW signed contract
+    #   5 = GT passed checks   6 = GT completed VC
+    #   8 = Paid out
     sr1_sel_l = f"l.[{L_sr1}]" if L_sr1 else "NULL"
     sr2_sel_l = f"l.[{L_sr2}]" if L_sr2 else "NULL"
-    print("# Part A: per-(Campaign, SourceReference1) purchase + paid_out counts", flush=True)
-    loan_sel = f"MAX(CAST(a.[{A_loan}] AS FLOAT))" if A_loan else "NULL"
+    print("# Part A: per-(Campaign, SR1, SR2) funnel counts via LeadOutcomes", flush=True)
+    if not L_leadid:
+        raise RuntimeError("Leads.LeadId column not found — required for the LeadOutcomes attribution path")
     cur.execute(
         f"""
-        WITH purchased AS (
-            SELECT l.[{L_aref}] AS ARef,
-                   MAX(l.[{L_camp}]) AS CampaignId,
-                   MAX({sr1_sel_l}) AS SR1,
-                   MAX({sr2_sel_l}) AS SR2
+        WITH leads_w AS (
+            SELECT l.[{L_leadid}] AS LeadId,
+                   l.[{L_aref}]   AS ARef,
+                   l.[{L_camp}]   AS CampaignId,
+                   {sr1_sel_l}    AS SR1,
+                   {sr2_sel_l}    AS SR2
             FROM dbo.Leads l
             WHERE l.[{L_date}] >= ? AND l.[{L_date}] < ?
               AND l.[{L_lender}] = ?
               AND l.[{L_result}] IN ({",".join(str(x) for x in PURCHASED_RESULT_IDS)})
               AND l.[{L_aref}] IS NOT NULL
-            GROUP BY l.[{L_aref}]
         ),
-        with_status AS (
-            SELECT p.CampaignId,
-                   p.SR1,
-                   p.SR2,
-                   p.ARef,
-                   MAX(CASE WHEN a.[{A_status}] = 5 THEN 1 ELSE 0 END) AS paid,
-                   {loan_sel} AS loan_amount
-            FROM purchased p
-            INNER JOIN dbo.Applications a ON a.[{A_aref}] = p.ARef AND a.[{A_lender}] = ?
-            GROUP BY p.CampaignId, p.SR1, p.SR2, p.ARef
+        outcomes AS (
+            SELECT lo.LeadId,
+                   MAX(CASE WHEN lo.LeadOutcomeTypeID = 1 THEN 1 ELSE 0 END) AS reached_apply1,
+                   MAX(CASE WHEN lo.LeadOutcomeTypeID = 4 THEN 1 ELSE 0 END) AS reached_brw_signed,
+                   MAX(CASE WHEN lo.LeadOutcomeTypeID = 5 THEN 1 ELSE 0 END) AS reached_gt_passed,
+                   MAX(CASE WHEN lo.LeadOutcomeTypeID = 6 THEN 1 ELSE 0 END) AS reached_vc_completed,
+                   MAX(CASE WHEN lo.LeadOutcomeTypeID = 8 THEN 1 ELSE 0 END) AS reached_paid_out
+            FROM dbo.LeadOutcomes lo
+            INNER JOIN leads_w lw ON lw.LeadId = lo.LeadId
+            GROUP BY lo.LeadId
+        ),
+        app_loans AS (
+            SELECT a.[{A_aref}] AS ARef, MAX(CAST(a.[{A_loan}] AS FLOAT)) AS LoanAmount
+            FROM dbo.Applications a
+            WHERE a.[{A_lender}] = ?
+            GROUP BY a.[{A_aref}]
         )
-        SELECT CampaignId, SR1, SR2,
-               COUNT(*)                                        AS apps,
-               SUM(paid)                                       AS paid_out,
-               SUM(CASE WHEN paid = 1 THEN loan_amount END)    AS paid_loan_total
-        FROM with_status
-        GROUP BY CampaignId, SR1, SR2
+        SELECT lw.CampaignId, lw.SR1, lw.SR2,
+               SUM(ISNULL(o.reached_apply1, 0))       AS apply1,
+               SUM(ISNULL(o.reached_brw_signed, 0))   AS brw_signed,
+               SUM(ISNULL(o.reached_gt_passed, 0))    AS gt_passed,
+               SUM(ISNULL(o.reached_vc_completed, 0)) AS vc_completed,
+               SUM(ISNULL(o.reached_paid_out, 0))     AS paid_out,
+               SUM(CASE WHEN o.reached_paid_out = 1 THEN ISNULL(al.LoanAmount, 0) ELSE 0 END) AS paid_loan_total
+        FROM leads_w lw
+        LEFT JOIN outcomes o ON o.LeadId = lw.LeadId
+        LEFT JOIN app_loans al ON al.ARef = lw.ARef
+        GROUP BY lw.CampaignId, lw.SR1, lw.SR2
         """,
         [window_start, window_end, LENDER_ID, LENDER_ID],
     )
     # keyed on (campaign_id, sr1) — aggregated across SR2 for cost-model
     # derivation. Also keep the per-(cid, sr1, sr2) breakdown for the
     # SR2 drill-down on the page.
-    accepted_per_csr1: dict[tuple, list] = {}     # tuple of [apps, paid, loan_total]
-    accepted_per_csr1sr2: dict[tuple, tuple] = {} # (cid, sr1, sr2) -> (apps, paid, loan_total)
-    for cid, sr1, sr2, apps, paid, loan_total in cur.fetchall():
+    # Each slot is {apply1, brw_signed, gt_passed, vc_completed,
+    # paid_out, paid_loan_total} — all canonical from LeadOutcomes.
+    accepted_per_csr1: dict[tuple, dict] = {}
+    accepted_per_csr1sr2: dict[tuple, dict] = {}
+    for cid, sr1, sr2, apply1, brw, gt, vc, paid, loan_total in cur.fetchall():
         cid_int = int(cid) if cid is not None else None
         sr1_norm = (str(sr1).strip() if sr1 is not None else None) or None
         sr2_norm = (str(sr2).strip() if sr2 is not None else None) or None
-        accepted_per_csr1sr2[(cid_int, sr1_norm, sr2_norm)] = (
-            int(apps), int(paid or 0), float(loan_total or 0.0)
-        )
-        slot = accepted_per_csr1.setdefault((cid_int, sr1_norm), [0, 0, 0.0])
-        slot[0] += int(apps)
-        slot[1] += int(paid or 0)
-        slot[2] += float(loan_total or 0.0)
-    print(f"#   (campaign, SR1) cells with purchased apps: {len(accepted_per_csr1):,} ({len(accepted_per_csr1sr2):,} with SR2 detail)", flush=True)
+        cell = {
+            "apply1":          int(apply1 or 0),
+            "brw_signed":      int(brw or 0),
+            "gt_passed":       int(gt or 0),
+            "vc_completed":    int(vc or 0),
+            "paid_out":        int(paid or 0),
+            "paid_loan_total": float(loan_total or 0.0),
+        }
+        accepted_per_csr1sr2[(cid_int, sr1_norm, sr2_norm)] = cell
+        agg = accepted_per_csr1.setdefault((cid_int, sr1_norm), {
+            "apply1":          0,
+            "brw_signed":      0,
+            "gt_passed":       0,
+            "vc_completed":    0,
+            "paid_out":        0,
+            "paid_loan_total": 0.0,
+        })
+        for k in ("apply1", "brw_signed", "gt_passed", "vc_completed", "paid_out"):
+            agg[k] += cell[k]
+        agg["paid_loan_total"] += cell["paid_loan_total"]
+    total_paid = sum(c["paid_out"] for c in accepted_per_csr1sr2.values())
+    print(f"#   (campaign, SR1) cells with outcomes: {len(accepted_per_csr1):,} ({len(accepted_per_csr1sr2):,} with SR2 detail); {total_paid:,} paid_out events attributed", flush=True)
 
     # Per-CAMPAIGN (user's "source") aggregation
     weak_data: dict[int | None, dict] = {}
@@ -382,17 +424,22 @@ def main() -> None:
             "broker_name":     _broker_name(broker_id),
             "commission_type": meta.get("commission_type"),
             "commission_rate": meta.get("commission_rate"),
-            "applications":    0,
+            "apply1":          0,
+            "brw_signed":      0,
+            "gt_passed":       0,
+            "vc_completed":    0,
             "paid_out":        0,
         }
-    # Aggregate accepted apps/paid/loan-amounts per CampaignId (the
-    # campaign-level rollup we still need to apply the cost-model
-    # formula, since CommissionType lives on the Campaign).
-    for (cid, sr1), (apps, paid, loan_total) in accepted_per_csr1.items():
+    # Aggregate per CampaignId (needed because the cost-model formula
+    # is per-Campaign). Sums across SR2.
+    for (cid, sr1), agg in accepted_per_csr1.items():
         slot = weak_data.setdefault(cid, _new_weak_slot(cid))
-        slot["applications"]    += apps
-        slot["paid_out"]        += paid
-        slot["paid_loan_total"]  = slot.get("paid_loan_total", 0.0) + (loan_total or 0.0)
+        slot["apply1"]          += agg["apply1"]
+        slot["brw_signed"]      += agg["brw_signed"]
+        slot["gt_passed"]       += agg["gt_passed"]
+        slot["vc_completed"]    += agg["vc_completed"]
+        slot["paid_out"]        += agg["paid_out"]
+        slot["paid_loan_total"]  = slot.get("paid_loan_total", 0.0) + agg["paid_loan_total"]
 
     # Per-(CampaignId, SR1, SR2) lead count + bid sum + date-range. Used for:
     #   1. Per-campaign cost-model derivation (sum across SR1+SR2)
@@ -568,7 +615,13 @@ def main() -> None:
         leads = cell["leads_purchased"]
         bid_total = cell.get("bid_total")
         last_seen = cell.get("last_seen")
-        apps, paid, paid_loan_total = accepted_per_csr1.get((cid, sr1), (0, 0, 0.0))
+        outcomes_agg = accepted_per_csr1.get((cid, sr1)) or {
+            "apply1": 0, "brw_signed": 0, "gt_passed": 0,
+            "vc_completed": 0, "paid_out": 0, "paid_loan_total": 0.0,
+        }
+        apply1 = outcomes_agg["apply1"]
+        paid = outcomes_agg["paid_out"]
+        paid_loan_total = outcomes_agg["paid_loan_total"]
         cost_cell, model = _cell_cost(cid, leads, paid, bid_total, paid_loan_total)
         key = (broker_id, sr1)
         slot = broker_sr1_raw.setdefault(key, {
@@ -576,7 +629,10 @@ def main() -> None:
             "broker_name":       _broker_name(broker_id),
             "source_ref1":       sr1,
             "leads_purchased":   0,
-            "applications":      0,
+            "apply1":            0,
+            "brw_signed":        0,
+            "gt_passed":         0,
+            "vc_completed":      0,
             "paid_out":          0,
             "paid_loan_total":   0.0,
             "total_cost":        0.0,
@@ -586,7 +642,10 @@ def main() -> None:
             "_sr2_cells":        {},  # sr2 -> aggregate detail
         })
         slot["leads_purchased"]  += leads
-        slot["applications"]     += apps
+        slot["apply1"]           += apply1
+        slot["brw_signed"]       += outcomes_agg["brw_signed"]
+        slot["gt_passed"]        += outcomes_agg["gt_passed"]
+        slot["vc_completed"]     += outcomes_agg["vc_completed"]
         slot["paid_out"]         += paid
         slot["paid_loan_total"]  += paid_loan_total
         if cost_cell is not None:
@@ -626,19 +685,31 @@ def main() -> None:
             continue
         leads2 = cell2["leads_purchased"]
         bid_total2 = cell2.get("bid_total")
-        apps2, paid2, paid_loan_total2 = accepted_per_csr1sr2.get((cid, sr1, sr2), (0, 0, 0.0))
+        outcomes2 = accepted_per_csr1sr2.get((cid, sr1, sr2)) or {
+            "apply1": 0, "brw_signed": 0, "gt_passed": 0,
+            "vc_completed": 0, "paid_out": 0, "paid_loan_total": 0.0,
+        }
+        apply1_2 = outcomes2["apply1"]
+        paid2 = outcomes2["paid_out"]
+        paid_loan_total2 = outcomes2["paid_loan_total"]
         cost_cell2, _model2 = _cell_cost(cid, leads2, paid2, bid_total2, paid_loan_total2)
         sub = slot["_sr2_cells"].setdefault(sr2, {
             "source_ref2":      sr2,
             "leads_purchased":  0,
-            "applications":     0,
+            "apply1":           0,
+            "brw_signed":       0,
+            "gt_passed":        0,
+            "vc_completed":     0,
             "paid_out":         0,
             "paid_loan_total":  0.0,
             "total_cost":       0.0,
             "has_cost":         False,
         })
         sub["leads_purchased"]  += leads2
-        sub["applications"]     += apps2
+        sub["apply1"]           += apply1_2
+        sub["brw_signed"]       += outcomes2["brw_signed"]
+        sub["gt_passed"]        += outcomes2["gt_passed"]
+        sub["vc_completed"]     += outcomes2["vc_completed"]
         sub["paid_out"]         += paid2
         sub["paid_loan_total"]  += paid_loan_total2
         if cost_cell2 is not None:
@@ -679,7 +750,7 @@ def main() -> None:
             if sr2_key is None: continue
             sub_lp = sub["leads_purchased"]
             sub["paid_out_rate"]      = (sub["paid_out"] / sub_lp) if sub_lp else 0
-            sub["apply_rate"]         = (sub["applications"] / sub_lp) if sub_lp else 0
+            sub["apply_rate"]         = (sub["apply1"] / sub_lp) if sub_lp else 0
             sub["cost_per_lead"]      = (sub["total_cost"] / sub_lp) if (sub_lp and sub["has_cost"]) else None
             sub["cost_per_paid_loan"] = (sub["total_cost"] / sub["paid_out"]) if (sub["paid_out"] and sub["has_cost"]) else None
             if not sub["has_cost"]:

@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Brokers</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778576122">
-<link rel="stylesheet" href="quiet.css?v=1778576122">
-<link rel="stylesheet" href="quiet-extras.css?v=1778576122">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778580495">
+<link rel="stylesheet" href="quiet.css?v=1778580495">
+<link rel="stylesheet" href="quiet-extras.css?v=1778580495">
 <style>
   .br-section { max-width: 1280px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .br-section { padding: 2px 0 32px; } }
@@ -662,7 +662,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778576122" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778580495" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -909,7 +909,10 @@
     if (!s) return 0;
     const lp = s.leads_purchased || 0;
     if (!lp) return 0;
-    return (s.applications || 0) / lp;
+    // Canonical apply rate = leads that completed Apply page 1
+    // (LeadOutcomeTypeID = 1) ÷ leads_purchased. Sourced from
+    // dbo.LeadOutcomes via the scanner.
+    return (s.apply1 || 0) / lp;
   }
   // Autoblock thresholds from the handbook (§Quality & Controls):
   //   SR1 alone:                 50+ accepts, ≤10% apply, (0 payouts OR CPA >20%)
