@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778624978">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778624978">
-<link rel="stylesheet" href="quiet.css?v=1778624978">
-<link rel="stylesheet" href="quiet-extras.css?v=1778624978">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778624978">
+<link rel="stylesheet" href="style.css?v=1778627104">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778627104">
+<link rel="stylesheet" href="quiet.css?v=1778627104">
+<link rel="stylesheet" href="quiet-extras.css?v=1778627104">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778627104">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -31,7 +31,57 @@
     color: var(--muted);
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.78rem;
+    margin: 0 0 16px;
+  }
+
+  /* Per-seat billing summary — three cards at the top of the page. The
+     dual-purpose statement of the Directory: track every user record AND
+     surface where the money is going. */
+  .dir-billing-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
     margin: 0 0 28px;
+  }
+  @media (max-width: 700px) {
+    .dir-billing-summary { grid-template-columns: 1fr; }
+  }
+  .dir-billing-card {
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .dir-billing-card--live {
+    border-left: 4px solid #4A9A2E;
+  }
+  .dir-billing-card--suspended {
+    border-left: 4px solid var(--brass-600, #A47829);
+  }
+  .dir-billing-card--saved {
+    border-left: 4px solid var(--ink-700, #2C3E66);
+  }
+  .dir-billing-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .dir-billing-value {
+    font-family: var(--font-display, "Newsreader", Georgia, serif);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .dir-billing-sub {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    font-style: italic;
   }
 
   /* Search + filter bar */
@@ -796,7 +846,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778624978" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778627104" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -822,6 +872,24 @@
       <h1>Directory</h1>
       <p class="lead">Every Workspace account, plus everyone who's written into the Central Services platform in the last 60 days. Sorted by which tenant they work on most.</p>
       <p class="dir-meta" id="dirMeta">Loading…</p>
+
+      <div class="dir-billing-summary" id="dirBillingSummary" hidden>
+        <div class="dir-billing-card dir-billing-card--live">
+          <span class="dir-billing-label">Live Workspace seats</span>
+          <span class="dir-billing-value" id="dirBillingLive">—</span>
+          <span class="dir-billing-sub" id="dirBillingLiveSub"></span>
+        </div>
+        <div class="dir-billing-card dir-billing-card--suspended">
+          <span class="dir-billing-label">Suspended (not billed on Flex)</span>
+          <span class="dir-billing-value" id="dirBillingSuspended">—</span>
+          <span class="dir-billing-sub" id="dirBillingSuspendedSub"></span>
+        </div>
+        <div class="dir-billing-card dir-billing-card--saved">
+          <span class="dir-billing-label">Monthly cost on Flex</span>
+          <span class="dir-billing-value" id="dirBillingCost">—</span>
+          <span class="dir-billing-sub" id="dirBillingSaved"></span>
+        </div>
+      </div>
 
       <div class="dir-controls" id="dirControls" hidden>
         <div class="dir-search-row">
@@ -1004,6 +1072,7 @@
       buildDeptPills(byDept);
       buildTenantPills(byTenant);
       buildWorkspacePills(byWorkspace);
+      renderBillingSummary();
       document.getElementById("dirControls").hidden = allEntries.length === 0;
       renderGrid();
 
@@ -1069,6 +1138,36 @@
         renderGrid();
       });
     });
+  }
+
+  // Per-seat billing summary card. Reads staff.json + workspace-actions.json
+  // to count live vs suspended seats and price the live ones at the configured
+  // per-seat rate. Suspended-on-Flex don't cost — that's the dual-purpose
+  // visibility ("did we actually stop the bill when so-and-so left?").
+  function renderBillingSummary() {
+    const staffEntries = allEntries.filter(e => e.type === "staff" && e.user);
+    if (!staffEntries.length) return;
+    const live = staffEntries.filter(e => !e.user.suspended).length;
+    const suspended = staffEntries.filter(e => e.user.suspended).length;
+    const routed = staffEntries.filter(e => e.user.suspended && forwardingByEmail[(e.user.email || "").toLowerCase()]).length;
+    const monthly = live * SEAT_GBP_PER_MONTH;
+    const saved = suspended * SEAT_GBP_PER_MONTH;
+    const fmtGbp = n => "£" + n.toLocaleString("en-GB");
+
+    document.getElementById("dirBillingLive").textContent = live;
+    document.getElementById("dirBillingLiveSub").textContent =
+      `${fmtGbp(monthly)}/mo @ ${fmtGbp(SEAT_GBP_PER_MONTH)}/seat`;
+    document.getElementById("dirBillingSuspended").textContent = suspended;
+    document.getElementById("dirBillingSuspendedSub").textContent =
+      suspended > 0
+        ? `${routed} of ${suspended} have forwarding set`
+        : `No leavers tracked here yet`;
+    document.getElementById("dirBillingCost").textContent = fmtGbp(monthly);
+    document.getElementById("dirBillingSaved").textContent =
+      saved > 0
+        ? `Avoiding ${fmtGbp(saved)}/mo from suspended accounts`
+        : `Edit SEAT_GBP_PER_MONTH in source if your plan differs`;
+    document.getElementById("dirBillingSummary").hidden = false;
   }
 
   function buildWorkspacePills(byWorkspace) {
@@ -1280,6 +1379,12 @@
   let forwardingByEmail = {};                           // email -> route_to (suspended-and-routed users)
   let allGroups = [];                                   // [{ email, name, description, members:[…], … }]
   let groupsByMemberEmail = {};                         // memberEmail -> [group, …]
+
+  // Per-seat billing assumption — Workspace Business Standard ≈ £11/seat/month.
+  // Change SEAT_GBP_PER_MONTH if you're on a different plan (e.g. 18 for
+  // Business Plus, 23+ for Enterprise). Suspended seats on the Flex plan are
+  // not billed; the summary shows what's actively costing money.
+  const SEAT_GBP_PER_MONTH = 11;
   const ANNOTATIONS_API = "/api/annotations";           // same-origin Worker route
 
   function annotationFor(key) { return annotationsMap[key] || {}; }
