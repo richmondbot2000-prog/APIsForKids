@@ -132,6 +132,7 @@ def main() -> None:
     L_nat = pick(leads_cols, "NationalIdNumber")
     L_leadid = pick(leads_cols, "LeadId", "LeadID")
     L_sr1 = pick(leads_cols, "SourceReference1")
+    L_sr2 = pick(leads_cols, "SourceReference2")
 
     A_aref = pick(apps_cols, "ARef")
     A_lender = pick(apps_cols, "LenderId")
@@ -314,6 +315,7 @@ def main() -> None:
     # campaign-specific cost-model formula, then roll up to (broker,
     # SR1) in Python.
     sr1_sel_l = f"l.[{L_sr1}]" if L_sr1 else "NULL"
+    sr2_sel_l = f"l.[{L_sr2}]" if L_sr2 else "NULL"
     print("# Part A: per-(Campaign, SourceReference1) purchase + paid_out counts", flush=True)
     loan_sel = f"MAX(CAST(a.[{A_loan}] AS FLOAT))" if A_loan else "NULL"
     cur.execute(
@@ -321,7 +323,8 @@ def main() -> None:
         WITH purchased AS (
             SELECT l.[{L_aref}] AS ARef,
                    MAX(l.[{L_camp}]) AS CampaignId,
-                   MAX({sr1_sel_l}) AS SR1
+                   MAX({sr1_sel_l}) AS SR1,
+                   MAX({sr2_sel_l}) AS SR2
             FROM dbo.Leads l
             WHERE l.[{L_date}] >= ? AND l.[{L_date}] < ?
               AND l.[{L_lender}] = ?
@@ -332,31 +335,40 @@ def main() -> None:
         with_status AS (
             SELECT p.CampaignId,
                    p.SR1,
+                   p.SR2,
                    p.ARef,
                    MAX(CASE WHEN a.[{A_status}] = 5 THEN 1 ELSE 0 END) AS paid,
                    {loan_sel} AS loan_amount
             FROM purchased p
             INNER JOIN dbo.Applications a ON a.[{A_aref}] = p.ARef AND a.[{A_lender}] = ?
-            GROUP BY p.CampaignId, p.SR1, p.ARef
+            GROUP BY p.CampaignId, p.SR1, p.SR2, p.ARef
         )
-        SELECT CampaignId, SR1,
+        SELECT CampaignId, SR1, SR2,
                COUNT(*)                                        AS apps,
                SUM(paid)                                       AS paid_out,
                SUM(CASE WHEN paid = 1 THEN loan_amount END)    AS paid_loan_total
         FROM with_status
-        GROUP BY CampaignId, SR1
+        GROUP BY CampaignId, SR1, SR2
         """,
         [window_start, window_end, LENDER_ID, LENDER_ID],
     )
-    # keyed on (campaign_id, sr1)
-    accepted_per_csr1: dict[tuple, tuple] = {}
-    for cid, sr1, apps, paid, loan_total in cur.fetchall():
+    # keyed on (campaign_id, sr1) — aggregated across SR2 for cost-model
+    # derivation. Also keep the per-(cid, sr1, sr2) breakdown for the
+    # SR2 drill-down on the page.
+    accepted_per_csr1: dict[tuple, list] = {}     # tuple of [apps, paid, loan_total]
+    accepted_per_csr1sr2: dict[tuple, tuple] = {} # (cid, sr1, sr2) -> (apps, paid, loan_total)
+    for cid, sr1, sr2, apps, paid, loan_total in cur.fetchall():
         cid_int = int(cid) if cid is not None else None
         sr1_norm = (str(sr1).strip() if sr1 is not None else None) or None
-        accepted_per_csr1[(cid_int, sr1_norm)] = (
+        sr2_norm = (str(sr2).strip() if sr2 is not None else None) or None
+        accepted_per_csr1sr2[(cid_int, sr1_norm, sr2_norm)] = (
             int(apps), int(paid or 0), float(loan_total or 0.0)
         )
-    print(f"#   (campaign, SR1) cells with purchased apps: {len(accepted_per_csr1):,}", flush=True)
+        slot = accepted_per_csr1.setdefault((cid_int, sr1_norm), [0, 0, 0.0])
+        slot[0] += int(apps)
+        slot[1] += int(paid or 0)
+        slot[2] += float(loan_total or 0.0)
+    print(f"#   (campaign, SR1) cells with purchased apps: {len(accepted_per_csr1):,} ({len(accepted_per_csr1sr2):,} with SR2 detail)", flush=True)
 
     # Per-CAMPAIGN (user's "source") aggregation
     weak_data: dict[int | None, dict] = {}
@@ -382,35 +394,53 @@ def main() -> None:
         slot["paid_out"]        += paid
         slot["paid_loan_total"]  = slot.get("paid_loan_total", 0.0) + (loan_total or 0.0)
 
-    # Per-(CampaignId, SR1) lead count + bid sum, for both per-campaign
-    # cost-model derivation and the (broker, sr1) rollup at the end.
+    # Per-(CampaignId, SR1, SR2) lead count + bid sum + date-range. Used for:
+    #   1. Per-campaign cost-model derivation (sum across SR1+SR2)
+    #   2. (Broker, SR1) rollup with SR2 drill-down
+    #   3. LastSeen per cell (MAX(date))
     bid_sql = f", SUM(CAST(l.[{L_bid}] AS FLOAT)) AS bid_total" if L_bid else ", NULL AS bid_total"
     cur.execute(
         f"""
-        SELECT l.[{L_camp}], {sr1_sel_l} AS SR1, COUNT(*) AS purchased{bid_sql}
+        SELECT l.[{L_camp}], {sr1_sel_l} AS SR1, {sr2_sel_l} AS SR2,
+               COUNT(*) AS purchased{bid_sql},
+               MAX(l.[{L_date}]) AS last_seen
         FROM dbo.Leads l
         WHERE l.[{L_date}] >= ? AND l.[{L_date}] < ?
           AND l.[{L_lender}] = ?
           AND l.[{L_result}] IN ({",".join(str(x) for x in PURCHASED_RESULT_IDS)})
-        GROUP BY l.[{L_camp}], {sr1_sel_l}
+        GROUP BY l.[{L_camp}], {sr1_sel_l}, {sr2_sel_l}
         """,
         [window_start, window_end, LENDER_ID],
     )
-    # Holds per-(cid, sr1) lead counts + bid totals — used for the
-    # (broker, sr1) rollup at the end.
+    # Holds per-(cid, sr1) aggregates AND per-(cid, sr1, sr2) breakdown
+    # used for the (broker, sr1) rollup with SR2 drill-down at the end.
     purchased_per_csr1: dict[tuple, dict] = {}
-    for cid, sr1, n, bid_total in cur.fetchall():
+    purchased_per_csr1sr2: dict[tuple, dict] = {}  # (cid, sr1, sr2) -> details
+    for cid, sr1, sr2, n, bid_total, last_seen in cur.fetchall():
         cid_int = int(cid) if cid is not None else None
         sr1_norm = (str(sr1).strip() if sr1 is not None else None) or None
-        purchased_per_csr1[(cid_int, sr1_norm)] = {
+        sr2_norm = (str(sr2).strip() if sr2 is not None else None) or None
+        purchased_per_csr1sr2[(cid_int, sr1_norm, sr2_norm)] = {
             "leads_purchased": int(n),
             "bid_total":       float(bid_total) if bid_total is not None else None,
+            "last_seen":       last_seen,
         }
+        # Sum into per-(cid, sr1)
+        cell = purchased_per_csr1.setdefault((cid_int, sr1_norm), {
+            "leads_purchased": 0,
+            "bid_total":       None,
+            "last_seen":       None,
+        })
+        cell["leads_purchased"] += int(n)
+        if bid_total is not None:
+            cell["bid_total"] = (cell["bid_total"] or 0.0) + float(bid_total)
+        if last_seen is not None and (cell["last_seen"] is None or last_seen > cell["last_seen"]):
+            cell["last_seen"] = last_seen
         slot = weak_data.setdefault(cid_int, _new_weak_slot(cid_int))
         slot["leads_purchased"] = slot.get("leads_purchased", 0) + int(n)
         if bid_total is not None:
             slot["bid_total"] = slot.get("bid_total", 0.0) + float(bid_total)
-    print(f"#   (campaign, SR1) cells with purchased leads: {len(purchased_per_csr1):,}", flush=True)
+    print(f"#   (campaign, SR1) cells with purchased leads: {len(purchased_per_csr1):,} ({len(purchased_per_csr1sr2):,} with SR2 detail)", flush=True)
 
     # Compute paid_out_rate + cost metrics per campaign and stats across
     # the qualifying cohort.
@@ -507,6 +537,9 @@ def main() -> None:
         return (None, "unknown")
 
     # Build per-(broker, sr1) totals by walking every (cid, sr1) cell.
+    # Also build SR2 breakdown by walking every (cid, sr1, sr2) cell so
+    # the page can drill into which child SR2 within an SR1 is the
+    # problem (preferred surgical-block unit per the handbook).
     broker_sr1_raw: dict[tuple, dict] = {}
     for (cid, sr1), cell in purchased_per_csr1.items():
         if cid is None: continue
@@ -517,6 +550,7 @@ def main() -> None:
         broker_id = campaign_to_source.get(cid)
         leads = cell["leads_purchased"]
         bid_total = cell.get("bid_total")
+        last_seen = cell.get("last_seen")
         apps, paid, paid_loan_total = accepted_per_csr1.get((cid, sr1), (0, 0, 0.0))
         cost_cell, model = _cell_cost(cid, leads, paid, bid_total, paid_loan_total)
         key = (broker_id, sr1)
@@ -530,7 +564,9 @@ def main() -> None:
             "paid_loan_total":   0.0,
             "total_cost":        0.0,
             "has_cost":          False,
+            "last_seen":         None,
             "_campaigns":        {},
+            "_sr2_cells":        {},  # sr2 -> aggregate detail
         })
         slot["leads_purchased"]  += leads
         slot["applications"]     += apps
@@ -539,6 +575,8 @@ def main() -> None:
         if cost_cell is not None:
             slot["total_cost"] += cost_cell
             slot["has_cost"]   = True
+        if last_seen is not None and (slot["last_seen"] is None or last_seen > slot["last_seen"]):
+            slot["last_seen"] = last_seen
         camp = slot["_campaigns"].setdefault(cid, {
             "campaign_id":    cid,
             "campaign_name":  _source_name(cid),
@@ -555,6 +593,40 @@ def main() -> None:
         if cost_cell is not None:
             camp["total_cost"] += cost_cell
             camp["has_cost"]   = True
+
+    # Walk every (cid, sr1, sr2) cell and apportion to the parent
+    # (broker, sr1) slot's SR2 breakdown.
+    for (cid, sr1, sr2), cell2 in purchased_per_csr1sr2.items():
+        if cid is None or sr1 is None: continue
+        meta = campaign_meta.get(cid)
+        if not meta: continue
+        if str(meta.get("commission_type")) == CPC_COMMISSION_TYPE:
+            continue
+        broker_id = campaign_to_source.get(cid)
+        key = (broker_id, sr1)
+        slot = broker_sr1_raw.get(key)
+        if slot is None:
+            continue
+        leads2 = cell2["leads_purchased"]
+        bid_total2 = cell2.get("bid_total")
+        apps2, paid2, paid_loan_total2 = accepted_per_csr1sr2.get((cid, sr1, sr2), (0, 0, 0.0))
+        cost_cell2, _model2 = _cell_cost(cid, leads2, paid2, bid_total2, paid_loan_total2)
+        sub = slot["_sr2_cells"].setdefault(sr2, {
+            "source_ref2":      sr2,
+            "leads_purchased":  0,
+            "applications":     0,
+            "paid_out":         0,
+            "paid_loan_total":  0.0,
+            "total_cost":       0.0,
+            "has_cost":         False,
+        })
+        sub["leads_purchased"]  += leads2
+        sub["applications"]     += apps2
+        sub["paid_out"]         += paid2
+        sub["paid_loan_total"]  += paid_loan_total2
+        if cost_cell2 is not None:
+            sub["total_cost"] += cost_cell2
+            sub["has_cost"]   = True
 
     # Derive cell-level rates + filter on MIN_VOLUME at the (broker, sr1)
     # level. Drop cells where source_ref1 is missing — those rows are
@@ -580,6 +652,29 @@ def main() -> None:
             slot["cost_per_paid_loan"] = None
         # Materialize campaign breakdown as a sorted list (by leads desc)
         slot["campaigns"] = sorted(slot.pop("_campaigns").values(), key=lambda c: -(c.get("leads_purchased") or 0))
+        # Materialize SR2 breakdown — drop SR2=None (unsourced child
+        # rows are noise at this level), derive per-SR2 rates, sort by
+        # leads desc, cap at top 8 (covers the 99th percentile of cell
+        # complexity; rest get summed into a residual row by the page).
+        sr2_cells_raw = slot.pop("_sr2_cells", {})
+        sr2_list = []
+        for sr2_key, sub in sr2_cells_raw.items():
+            if sr2_key is None: continue
+            sub_lp = sub["leads_purchased"]
+            sub["paid_out_rate"]      = (sub["paid_out"] / sub_lp) if sub_lp else 0
+            sub["apply_rate"]         = (sub["applications"] / sub_lp) if sub_lp else 0
+            sub["cost_per_lead"]      = (sub["total_cost"] / sub_lp) if (sub_lp and sub["has_cost"]) else None
+            sub["cost_per_paid_loan"] = (sub["total_cost"] / sub["paid_out"]) if (sub["paid_out"] and sub["has_cost"]) else None
+            if not sub["has_cost"]:
+                sub["total_cost"] = None
+            sr2_list.append(sub)
+        sr2_list.sort(key=lambda s: -(s.get("leads_purchased") or 0))
+        slot["sr2_breakdown"]       = sr2_list
+        slot["sr2_distinct_count"]  = len(sr2_list)
+        # Convert last_seen to ISO string
+        if slot.get("last_seen") is not None:
+            ls = slot["last_seen"]
+            slot["last_seen"] = ls.isoformat() if hasattr(ls, "isoformat") else str(ls)
         bs_qualifying.append(slot)
     bs_qualifying.sort(key=lambda s: -(s.get("cost_per_paid_loan") or 0))
     print(
