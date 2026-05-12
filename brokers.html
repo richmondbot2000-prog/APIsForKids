@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Brokers</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778568921">
-<link rel="stylesheet" href="quiet.css?v=1778568921">
-<link rel="stylesheet" href="quiet-extras.css?v=1778568921">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778570143">
+<link rel="stylesheet" href="quiet.css?v=1778570143">
+<link rel="stylesheet" href="quiet-extras.css?v=1778570143">
 <style>
   .br-section { max-width: 1280px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .br-section { padding: 2px 0 32px; } }
@@ -361,6 +361,22 @@
   }
   .br-rec-flag.below-q1     { background: rgba(190,60,50,0.12); color: var(--red-500); }
   .br-rec-flag.below-median { background: rgba(180,145,80,0.12); color: var(--brass-600); }
+  /* CPA + apply-rate badges per the partnerships handbook. */
+  .br-rec-flag.cpa-on-plan  { background: rgba(120,160,100,0.16); color: var(--sage-700, var(--sage-500)); }
+  .br-rec-flag.cpa-watch    { background: rgba(180,145,80,0.18); color: var(--brass-600); }
+  .br-rec-flag.cpa-cut      { background: rgba(190,60,50,0.16); color: var(--red-500); }
+  .br-rec-flag.autoblock    { background: rgba(190,60,50,0.20); color: var(--red-500); border: 1px solid rgba(190,60,50,0.4); }
+  .br-rec-flag.manual-zone  { background: rgba(180,145,80,0.20); color: var(--brass-600); border: 1px solid rgba(180,145,80,0.4); }
+  .br-rec-flag.apply-zone-red    { background: rgba(190,60,50,0.16); color: var(--red-500); }
+  .br-rec-flag.apply-zone-amber  { background: rgba(180,145,80,0.16); color: var(--brass-600); }
+  .br-rec-reporting-link {
+    display: inline-block;
+    font: italic 400 11px/1.3 var(--font-display);
+    color: var(--brass-600);
+    text-decoration: none;
+    margin-left: 8px;
+  }
+  .br-rec-reporting-link:hover { text-decoration: underline; }
   .br-rec-destinations {
     font: italic 400 11px/1.4 var(--font-display);
     color: var(--ink-500);
@@ -501,7 +517,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778568921" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778570143" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -560,19 +576,21 @@
     <!-- ── Source-quality block intro + freshness ────────────────── -->
     <div id="brSqIntro" hidden style="margin: 24px 0 8px;">
       <h2 class="br-canvas-title">Source-quality analysis</h2>
-      <p class="br-canvas-sub">All four sections below are derived from <code>source-quality.json</code> — a daily heavy-join analysis that aggregates leads by <strong>(Broker, SourceReference1)</strong> cell over a <strong>60-day window ending 30 days ago</strong> (the 30-day lag gives paid-out outcomes time to settle). For each section: what it tells you, and what action it implies.</p>
+      <p class="br-canvas-sub">All sections below are derived from <code>source-quality.json</code> — a daily heavy-join analysis that aggregates leads by <strong>(Broker, SourceReference1)</strong> cell over a <strong>60-day window ending 30 days ago</strong> (the 30-day lag gives paid-out outcomes time to settle). The canonical KPI from the <em>Partnerships Handbook</em> is <strong>blended CPA</strong> (cost / paid-loan revenue) — target ≤12% to remain profitable. Cells are coloured against that target: <span style="color: var(--sage-700, var(--sage-500));">≤12% on plan</span> · <span style="color: var(--brass-600);">12–20% watch</span> · <span style="color: var(--red-500);">&gt;20% cut</span>.</p>
       <div class="br-recommend-meta" id="brSqFreshness"></div>
+      <!-- Headline KPI band: blended CPA across all qualifying cells -->
+      <div id="brSqHeadline" class="br-kpis" style="margin: 16px 0 12px;"></div>
       <div style="margin: 12px 0 0; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
         <span style="font: 500 10px/1 var(--font-body); text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-500);">Filter to broker</span>
         <input id="brSqBrokerFilter" type="search" placeholder="e.g. Lead Economy"
           style="background: var(--paper-50); border: 1px solid var(--paper-300); color: var(--ink-900); padding: 5px 9px; font: 400 13px/1.3 var(--font-display); width: 240px;" />
-        <span style="font: italic 400 11px/1.3 var(--font-display); color: var(--ink-500);">substring match — applies across all four sections below</span>
+        <span style="font: italic 400 11px/1.3 var(--font-display); color: var(--ink-500);">substring match — applies across all sections below</span>
       </div>
     </div>
 
     <!-- ── Best-value (Broker, Source) cells — positive mirror ────── -->
     <div class="br-canvas-wrap" id="brBestWrap" hidden style="margin-bottom: 24px;">
-      <h2 class="br-canvas-title">Best value Sources — <em>buy more here</em></h2>
+      <h2 class="br-canvas-title">Best value Sources — <em>buy more here</em><a class="br-rec-reporting-link" href="https://reporting.rgcore.com" target="_blank" rel="noopener">Open Spending on Leads report →</a></h2>
       <p class="br-canvas-sub">The mirror of "Sources to consider blocking." (Broker, Source) cells with the <strong>lowest cost per paid loan</strong> — the most efficient places we're already spending. Same volume gate (<span id="brSqMinVolBest">200</span>+ purchased leads), same 60-day matured window. If we want to grow originations at the current efficiency, these are the cells to lean into first.</p>
       <div class="br-recommend-meta" id="brBestMeta"></div>
       <div id="brBestList"></div>
@@ -581,23 +599,31 @@
     <!-- ── Source-quality recommendations (block / unblock) ────────── -->
     <div class="br-recommend-grid" id="brRecommendGrid" hidden>
       <div class="br-canvas-wrap">
-        <h2 class="br-canvas-title">Sources to consider <em>blocking</em></h2>
+        <h2 class="br-canvas-title">Sources to consider <em>blocking</em><a class="br-rec-reporting-link" href="https://reporting.rgcore.com" target="_blank" rel="noopener">Affiliate Sub-Source report →</a></h2>
         <p class="br-canvas-sub">Aggregated by <strong>(Broker, Source)</strong> — each row is a Broker + their `SourceReference1` value (the upstream sub-source code passed on each lead). Cells whose effective <strong>cost per paid loan</strong> exceeds <strong>$600</strong> surface as candidates to throttle. Volume-gated to <span id="brSqMinVol">200</span>+ purchased leads; cells with no recorded cost (rev-share / CPF with no billed loans yet) are excluded. Window: 60 days ending 30 days ago for outcome maturation. Campaigns active within each cell are listed underneath as detail.</p>
         <div class="br-recommend-meta" id="brWeakMeta"></div>
         <div id="brWeakList"></div>
       </div>
       <div class="br-canvas-wrap">
-        <h2 class="br-canvas-title">Blocked Sources to consider <em>re-enabling</em></h2>
+        <h2 class="br-canvas-title">Blocked Sources to consider <em>re-enabling</em><a class="br-rec-reporting-link" href="https://reporting.rgcore.com" target="_blank" rel="noopener">Blocked Refs with Accepts →</a></h2>
         <p class="br-canvas-sub">(Broker, Source) cells where we currently reject leads (LeadResultTypeId = -1 — <em>Source excluded</em>). We identity-match each rejected lead against subsequent purchases via a <strong>different (Broker, Source) cell</strong> — by SSN, Phone+DOB, or Email+DOB — counting only matches landing <strong>strictly after the rejection</strong> and within <strong>30 days</strong>. High bounceback-paid counts mean blocking this cell is forfeiting funded loans we'd otherwise have written.</p>
         <div class="br-recommend-meta" id="brBlockedMeta"></div>
         <div id="brBlockedList"></div>
       </div>
     </div>
 
+    <!-- ── Manual-review zone (10-20% apply rate — AutoBlock misses these) ── -->
+    <div class="br-canvas-wrap" id="brManualWrap" hidden style="margin-bottom: 24px;">
+      <h2 class="br-canvas-title">Manual review zone — <em>10–20% apply rate</em></h2>
+      <p class="br-canvas-sub">Per the Partnerships Handbook, the nightly <strong>AutoBlock Robot</strong> only fires at ≤10% apply rate. Cells with apply rates between <strong>10% and 20%</strong> are still underperforming but slip through the robot's net — they need a human decision. This is the population the <em>Bad Sub-Affiliates</em> report on <code>reporting.rgcore.com</code> is designed to flag. Same volume gate (50+ accepts) as the autoblock thresholds. <a class="br-rec-reporting-link" href="https://reporting.rgcore.com" target="_blank" rel="noopener">Open Bad Sub-Affiliates report →</a></p>
+      <div class="br-recommend-meta" id="brManualMeta"></div>
+      <div id="brManualList"></div>
+    </div>
+
     <!-- ── Cheaper-clones (overpay) section ────────────────────────── -->
     <div class="br-canvas-wrap" id="brCheaperWrap" hidden style="margin-bottom: 24px;">
-      <h2 class="br-canvas-title">Sources where <em>we overpay</em></h2>
-      <p class="br-canvas-sub">Aggregated by <strong>(Broker, Source)</strong>. For every purchased lead bought at an upfront per-lead price (CPL or auction-bid models), we identity-match the same person against later purchases in the window. When a cheaper version of the same person reappears via a <strong>different (Broker, Source) cell</strong>, the first buy was an overpay — we could have waited. Ranked by total overspend.</p>
+      <h2 class="br-canvas-title">Sources where we <em>paid for a previously-declined customer</em></h2>
+      <p class="br-canvas-sub">Aggregated by <strong>(Broker, Source)</strong>. For every purchased lead bought at an upfront per-lead price, we identity-match the same person against later purchases via a different (Broker, Source) cell. Since the 30-day dedup window blocks same-customer re-purchases, the matches here are almost always cases where one cell sent a lead we declined (price-reject / scorecard fail) and a different cell sent the same person later at a lower price. Ranked by total overspend.</p>
       <div class="br-recommend-meta" id="brCheaperMeta"></div>
       <div id="brCheaperList"></div>
     </div>
@@ -686,6 +712,77 @@
   // without re-fetching.
   let _SQ = null;
 
+  // ─── Source-quality helper functions ───────────────────────────────
+  // CPA = total_cost / paid_loan_total. Per the Partnerships Handbook
+  // the canonical KPI is blended CPA, target ≤12%. Cells are coloured
+  // against that target by `_cpaFlagHtml`.
+  function _cpaPct(s) {
+    if (!s) return null;
+    const cost = s.total_cost;
+    // paid_loan_total isn't on every row (Best/Weak yes; Blocked/Cheaper no
+    // because they're keyed differently). We use the cohort average loan
+    // amount as a fallback so the row's CPA is approximate but present.
+    let revenue = s.paid_loan_total;
+    if ((revenue == null || revenue === 0) && s.paid_out && window.COHORT_AVG_LOAN) {
+      revenue = s.paid_out * window.COHORT_AVG_LOAN;
+    }
+    if (!cost || !revenue) return null;
+    return cost / revenue;
+  }
+  function _applyRate(s) {
+    if (!s) return 0;
+    const lp = s.leads_purchased || 0;
+    if (!lp) return 0;
+    return (s.applications || 0) / lp;
+  }
+  // Autoblock thresholds from the handbook (§Quality & Controls):
+  //   SR1 alone:                 50+ accepts, ≤10% apply, (0 payouts OR CPA >20%)
+  //   SR1 with SR2 children:    150+ accepts, ≤10% apply, (0 payouts OR CPA >20%)
+  //   SR2 alone:                 50+ accepts, ≤10% apply, (0 payouts OR CPA >20%)
+  // We aggregate at SR1 level and don't know whether children exist; default
+  // to the 50-threshold (the more permissive of the two SR1 variants).
+  function _autoblockMatch(s) {
+    if (!s) return false;
+    const accepts = s.leads_purchased || 0;
+    if (accepts < 50) return false;
+    if (_applyRate(s) > 0.10) return false;
+    if ((s.paid_out || 0) === 0) return true;
+    const cpa = _cpaPct(s);
+    if (cpa != null && cpa > 0.20) return true;
+    return false;
+  }
+  // The 10-20% apply-rate "manual review" zone — autoblock misses these.
+  function _manualReviewMatch(s) {
+    if (!s) return false;
+    const accepts = s.leads_purchased || 0;
+    if (accepts < 50) return false;
+    const ar = _applyRate(s);
+    return ar > 0.10 && ar <= 0.20;
+  }
+  function _cpaFlagHtml(s) {
+    const cpa = _cpaPct(s);
+    if (cpa == null) return '';
+    let cls = 'cpa-on-plan';
+    let label = `${(cpa * 100).toFixed(1)}% CPA`;
+    if (cpa > 0.20) cls = 'cpa-cut';
+    else if (cpa > 0.12) cls = 'cpa-watch';
+    return ` <span class="br-rec-flag ${cls}">${label}</span>`;
+  }
+  function _applyFlagHtml(s) {
+    const ar = _applyRate(s);
+    const accepts = s.leads_purchased || 0;
+    const arPct = `${(ar * 100).toFixed(1)}% apply`;
+    if (accepts < 50) return ` <span class="br-rec-flag" style="background:rgba(107,119,148,0.10); color: var(--ink-500);">${arPct}</span>`;
+    if (ar <= 0.10) return ` <span class="br-rec-flag apply-zone-red">${arPct} · autoblock zone</span>`;
+    if (ar <= 0.20) return ` <span class="br-rec-flag apply-zone-amber">${arPct} · manual zone</span>`;
+    return ` <span class="br-rec-flag" style="background:rgba(120,160,100,0.12); color: var(--sage-700, var(--sage-500));">${arPct}</span>`;
+  }
+  function _autoblockBadgeHtml(s) {
+    return _autoblockMatch(s)
+      ? ' <span class="br-rec-flag autoblock">would autoblock</span>'
+      : '';
+  }
+
   function renderRecommendations(sq) {
     _SQ = sq;
     // Wire the filter once; subsequent calls re-render via _renderSqSections().
@@ -739,8 +836,47 @@
 
     const COST_PER_PAID_THRESHOLD = 600;
 
-    // ── Best value Sources — buy more here ─────────────────────────
+    // ── Headline KPI band: blended CPA + apply + count ─────────────
     const weakAll = (sq.weak_accepted && sq.weak_accepted.by_broker_source) || [];
+    const cohort = filterTerm ? weakAll.filter(matchesFilter) : weakAll;
+    const totalCost = cohort.reduce((a, s) => a + (s.total_cost || 0), 0);
+    const totalRevenue = cohort.reduce((a, s) => a + (s.paid_loan_total || 0), 0);
+    const totalLeads = cohort.reduce((a, s) => a + (s.leads_purchased || 0), 0);
+    const totalApps = cohort.reduce((a, s) => a + (s.applications || 0), 0);
+    const totalPaidOut = cohort.reduce((a, s) => a + (s.paid_out || 0), 0);
+    const cohortCpa = totalRevenue ? (totalCost / totalRevenue) : null;
+    const cohortApply = totalLeads ? (totalApps / totalLeads) : null;
+    const headlineEl = document.getElementById("brSqHeadline");
+    if (headlineEl) {
+      const cpaText = cohortCpa != null ? `${(cohortCpa * 100).toFixed(1)}%` : "—";
+      const cpaColor = cohortCpa == null ? "var(--ink-500)"
+        : (cohortCpa <= 0.12 ? "var(--sage-700, var(--sage-500))"
+        : (cohortCpa <= 0.20 ? "var(--brass-600)" : "var(--red-500)"));
+      const applyText = cohortApply != null ? `${(cohortApply * 100).toFixed(1)}%` : "—";
+      headlineEl.innerHTML = `
+        <div class="br-kpi">
+          <div class="br-kpi-label">Blended CPA${filterTerm ? ' (filtered)' : ''}</div>
+          <div class="br-kpi-value" style="color: ${cpaColor};">${cpaText}</div>
+          <div class="br-kpi-sub">target ≤ 12%${cohortCpa != null && cohortCpa > 0.12 ? ' · over budget' : ''}</div>
+        </div>
+        <div class="br-kpi">
+          <div class="br-kpi-label">Blended apply rate</div>
+          <div class="br-kpi-value">${applyText}</div>
+          <div class="br-kpi-sub">${formatNumber(totalApps)} of ${formatBig(totalLeads)} bought leads</div>
+        </div>
+        <div class="br-kpi">
+          <div class="br-kpi-label">Paid loans</div>
+          <div class="br-kpi-value">${formatNumber(totalPaidOut)}</div>
+          <div class="br-kpi-sub">$${formatBig(totalRevenue).replace('$','')} originated</div>
+        </div>
+        <div class="br-kpi">
+          <div class="br-kpi-label">Spend</div>
+          <div class="br-kpi-value">$${formatBig(totalCost).replace('$','')}</div>
+          <div class="br-kpi-sub">${cohort.length} (Broker, Source) cells</div>
+        </div>`;
+    }
+
+    // ── Best value Sources — buy more here ─────────────────────────
     const bestSources = weakAll
       .filter(s => (s.cost_per_paid_loan || 0) > 0 && (s.paid_out || 0) > 0)
       .filter(matchesFilter)
@@ -787,6 +923,24 @@
       ? unblock.map(renderBlockedBsRow).join("")
       : '<div class="br-rec-empty">No blocked (Broker, Source) cells met the volume threshold.</div>';
 
+    // ── Manual review zone — 10-20% apply rate cells autoblock misses ──
+    const manualCells = weakAll
+      .filter(matchesFilter)
+      .filter(_manualReviewMatch)
+      .sort((a, b) => (a.paid_out_rate || 0) - (b.paid_out_rate || 0))   // worst paid-out rate first
+      .slice(0, 20);
+    const manualWrap = document.getElementById("brManualWrap");
+    if (manualCells.length) {
+      manualWrap.hidden = false;
+      const totalManualLeads = manualCells.reduce((a, s) => a + (s.leads_purchased || 0), 0);
+      const totalManualPaid = manualCells.reduce((a, s) => a + (s.paid_out || 0), 0);
+      document.getElementById("brManualMeta").textContent =
+        `${manualCells.length} cells in the 10–20% apply-rate zone · ${totalManualLeads.toLocaleString()} purchased leads · ${totalManualPaid.toLocaleString()} paid loans · ${weakAll.filter(matchesFilter).filter(_autoblockMatch).length} additional cells already match the autoblock criteria (shown in their respective sections with a badge)`;
+      document.getElementById("brManualList").innerHTML = manualCells.map(renderManualBsRow).join("");
+    } else {
+      manualWrap.hidden = true;
+    }
+
     // ── Sources where we overpay ──
     const cc = sq.cheaper_clones || {};
     const cheaperBs = (cc.by_broker_source) || [];
@@ -822,12 +976,29 @@
     return `
       <div class="br-rec-row is-good">
         <div class="br-rec-name">
-          ${_bsTitle(s)}
+          ${_bsTitle(s)}${_cpaFlagHtml(s)}${_applyFlagHtml(s)}
           <div class="br-rec-broker">${(s.campaigns || []).length} active campaign${(s.campaigns||[]).length === 1 ? "" : "s"}${totalSpent ? ` · ${totalSpent} spent` : ""}</div>
         </div>
         <div class="br-rec-metric">${cpp}<div class="br-rec-metric-sub">cost / paid loan</div></div>
         <div class="br-rec-metric">${cpl}<div class="br-rec-metric-sub">cost / lead</div></div>
         <div class="br-rec-sub">${pct(s.paid_out_rate, 3)} paid · ${formatNumber(s.paid_out || 0)}/${formatNumber(s.leads_purchased || 0)} purchased</div>
+      </div>`;
+  }
+
+  function renderManualBsRow(s) {
+    const cpp = s.cost_per_paid_loan != null
+      ? `$${formatNumber(Math.round(s.cost_per_paid_loan))}`
+      : "—";
+    const cpl = s.cost_per_lead != null ? `$${s.cost_per_lead.toFixed(2)}` : "—";
+    return `
+      <div class="br-rec-row">
+        <div class="br-rec-name">
+          ${_bsTitle(s)}${_cpaFlagHtml(s)}${_applyFlagHtml(s)}
+          <div class="br-rec-broker">${(s.campaigns || []).length} active campaign${(s.campaigns||[]).length === 1 ? "" : "s"}</div>
+        </div>
+        <div class="br-rec-metric">${cpp}<div class="br-rec-metric-sub">cost / paid loan</div></div>
+        <div class="br-rec-metric">${cpl}<div class="br-rec-metric-sub">cost / lead</div></div>
+        <div class="br-rec-sub">${pct(s.paid_out_rate, 3)} paid · ${formatNumber(s.paid_out || 0)}/${formatNumber(s.leads_purchased || 0)} purchased — apply rate 10–20% means autoblock will not catch this; review manually</div>
       </div>`;
   }
 
@@ -852,7 +1023,7 @@
     return `
       <div class="br-rec-row is-bad">
         <div class="br-rec-name">
-          ${_bsTitle(s)}
+          ${_bsTitle(s)}${_cpaFlagHtml(s)}${_applyFlagHtml(s)}${_autoblockBadgeHtml(s)}
           <div class="br-rec-broker">${(s.campaigns || []).length} active campaign${(s.campaigns||[]).length === 1 ? "" : "s"}${totalSpent ? ` · ${totalSpent} spent` : ""}</div>
         </div>
         <div class="br-rec-metric">${cpp}<div class="br-rec-metric-sub">cost / paid loan</div></div>
