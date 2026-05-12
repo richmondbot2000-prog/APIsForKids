@@ -76,7 +76,7 @@ The site is a flat set of HTML files. **No router, no SPA, no build step.** Each
 | Page | URL | What it shows | Data file(s) |
 |---|---|---|---|
 | **Home — About our systems** | `/index.html` | Long-scroll storybook in 7 chapters: hero · 8 helpers · 12 robots · 6 screens · 6 outside askers · loan story · 6 ground rules · 15 commandments | inline (no JSON) |
-| **Yesterday's payouts** | `/yesterday.html` | Two Leaflet maps of US borrowers paid out yesterday + per-state breakdown tables | `yesterday-payouts.json` |
+| **Yesterday's payouts** | `/yesterday.html` | Three Leaflet maps of US borrowers paid out yesterday (clustered pins · per-state totals · per-state averages) + per-state breakdown tables | `yesterday-payouts.json` |
 | **Brandwatch** | `/brandwatch.html` | Public mentions across 10 sources (Trustpilot, BBB, Reddit, Bluesky, Lemmy, Hacker News, CourtListener, Google News, CFPB, YouTube) | `brandwatch.json` |
 | **1stContact** | `/1stcontact.html` | First inbound email per US borrower / GT after payout, 3-month window, redacted PII; word cloud at top | `first-contact.json` |
 | **Directory** | `/directory.html` | All 61 letme.* Workspace users + 140 warehouse-only operators who write into the platform but aren't in Workspace; sorted by primary tenant (transform → rgroup-cluster → other → inactive); filterable by tenant + department | `staff.json` + `staff-activity.json` |
@@ -459,7 +459,7 @@ Renders one chart and one table from `topups.json`.
 
 ### 11.4 Yesterday page (`yesterday.html`)
 
-Two Leaflet maps wrapped with `position: relative; z-index: 0` so Leaflet's internal pane z-indexes (200–800) stay clamped and don't escape over the topbar / mobile drawer. Per-state breakdown tables below.
+Three Leaflet maps wrapped with `position: relative; z-index: 0` so Leaflet's internal pane z-indexes (200–800) stay clamped and don't escape over the topbar / mobile drawer. The first map drops a clustered pin per borrower; the second labels each state's centroid with the **total** paid out yesterday; the third (added 2026-05-12) labels each state's centroid with the **average loan amount** for yesterday's paid-out loans (popup shows the loan count + total so the mean is anchored to its denominator). Per-state breakdown tables below.
 
 ### 11.5 Brokers page + Source-quality analysis (`brokers.html`)
 
