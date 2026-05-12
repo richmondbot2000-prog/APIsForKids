@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-05-12T22:42:27Z",
+  "totals": {
+    "groups": 0,
+    "members": 0
+  },
+  "tenants": [
+    "letme.co.uk",
+    "rgroup.co.uk"
+  ],
+  "fetch_errors": [
+    "tenant letme.co.uk: ('unauthorized_client: Client is unauthorized to retrieve access tokens using this method, or client not authorized for any of the scopes requested.', {'error': 'unauthorized_client', 'error_description': 'Client is unauthorized to retrieve access tokens using this method, or client not authorized for any of the scopes requested.'})",
+    "tenant rgroup.co.uk: ('unauthorized_client: Client is unauthorized to retrieve access tokens using this method, or client not authorized for any of the scopes requested.', {'error': 'unauthorized_client', 'error_description': 'Client is unauthorized to retrieve access tokens using this method, or client not authorized for any of the scopes requested.'})"
+  ],
+  "groups": []
+}
