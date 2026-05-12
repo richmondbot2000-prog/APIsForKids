@@ -716,11 +716,16 @@
     fetch("staff.json", { cache: "no-store" }).then(r => r.ok ? r.json() : Promise.reject("staff.json HTTP " + r.status)),
     fetch("staff-activity.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch("annotations.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    // Payroll lives behind Cloudflare Access on the workspace Worker — never
+    // in the repo. Fails silently on github.io (no Worker route there) and on
+    // first install before PAYROLL_JSON is configured.
+    fetch("/api/workspace/payroll", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
   ])
-    .then(([staff, activity, annotationsFile]) => {
+    .then(([staff, activity, annotationsFile, payrollFile]) => {
       annotationsMap = (annotationsFile && annotationsFile.annotations && typeof annotationsFile.annotations === "object")
         ? annotationsFile.annotations
         : {};
+      payrollData = payrollFile && (payrollFile.by_email || payrollFile.by_name) ? payrollFile : null;
       const allWorkspaceUsers = staff.users || [];
       const activityByEmail = {};
       const externalUsers = [];
@@ -1041,11 +1046,36 @@
   // annotations.json at the repo root and committed by the Cloudflare
   // Worker behind book.togetherbook.net/api/annotations (see worker/SETUP.md).
   let annotationsMap = {};                              // populated on page load
+  let payrollData = null;                               // null until /api/workspace/payroll returns
   const ANNOTATIONS_API = "/api/annotations";           // same-origin Worker route
 
   function annotationFor(key) { return annotationsMap[key] || {}; }
   function entryKey(entry) {
     return entry.type === "staff" ? (entry.user.email || "") : (entry.activity.username || "");
+  }
+
+  // Match a directory entry against a payroll record. Email is the strongest
+  // key (only LetMe rows carry it); fall back to lowercase "first last".
+  function payrollFor(entry) {
+    if (!payrollData) return null;
+    const u = entry.user;
+    const a = entry.activity;
+    const email = ((u && u.email) || (a && a.username) || "").toLowerCase();
+    if (email && payrollData.by_email && payrollData.by_email[email]) {
+      return payrollData.by_email[email];
+    }
+    if (u) {
+      const candidates = new Set();
+      if (u.given && u.family) candidates.add(`${u.given} ${u.family}`.toLowerCase());
+      if (u.name) {
+        const parts = u.name.trim().toLowerCase().split(/\s+/);
+        if (parts.length >= 2) candidates.add(`${parts[0]} ${parts[parts.length - 1]}`);
+      }
+      for (const k of candidates) {
+        if (payrollData.by_name && payrollData.by_name[k]) return payrollData.by_name[k];
+      }
+    }
+    return null;
   }
 
   // POST to the Worker. On success we both replace the local in-memory cache
@@ -1124,6 +1154,36 @@
     document.getElementById("dirModal").innerHTML = "";
   }
 
+  function payrollSectionHtml(entry) {
+    const p = payrollFor(entry);
+    if (!p) return "";
+    const fmtUkDate = s => {
+      if (!s) return "—";
+      const d = new Date(s);
+      if (isNaN(d.getTime())) return s;
+      return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+    };
+    const row = (k, v) => v ? `<dt>${k}</dt><dd>${escapeHtml(v)}</dd>` : "";
+    const rowRaw = (k, html) => html ? `<dt>${k}</dt><dd>${html}</dd>` : "";
+    const ageBits = [];
+    if (p.dob) ageBits.push(fmtUkDate(p.dob));
+    if (p.age != null) ageBits.push(`(${p.age})`);
+    return `
+      <div class="dir-modal-section">
+        <h3>Payroll</h3>
+        <dl class="dir-detail-grid">
+          ${row("Employer", p.employer)}
+          ${row("Employee #", p.employee_number)}
+          ${rowRaw("Start date", p.start_date ? escapeHtml(fmtUkDate(p.start_date)) : "")}
+          ${row("Date of birth", ageBits.join(" "))}
+          ${p.mobile ? `<dt>Mobile</dt><dd><a href="tel:${escapeHtml(p.mobile.replace(/\s+/g, ""))}">${escapeHtml(p.mobile)}</a></dd>` : ""}
+          ${row("Address", p.address)}
+          ${p.termination_date ? `<dt>Terminated</dt><dd>${escapeHtml(fmtUkDate(p.termination_date))}</dd>` : ""}
+        </dl>
+      </div>
+    `;
+  }
+
   function renderModalBody(entry) {
     const u = entry.user;
     const a = entry.activity;
@@ -1200,6 +1260,8 @@
         <h3>Workspace</h3>
         <dl class="dir-detail-grid">${workspaceDl}</dl>
       </div>
+
+      ${payrollSectionHtml(entry)}
 
       ${a ? `
         <div class="dir-modal-section">

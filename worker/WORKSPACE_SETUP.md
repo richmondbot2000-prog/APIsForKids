@@ -52,6 +52,7 @@ Worker page → **Settings** → **Variables and Secrets** → **+ Add** (one pe
 | Secret   | `GITHUB_TOKEN`                | The same `github_pat_…` value as the annotations Worker (or a new one)|
 | Variable | `IMPERSONATE_USER`            | `james.benamor@letme.co.uk`                                           |
 | Variable | `ADMIN_EMAILS`                | `james.benamor@letme.com` (comma-separated if you add more later)     |
+| Secret   | `PAYROLL_JSON`                | Output of `python3 scripts/scan_payroll.py` (see §Payroll below) — optional, only needed for the "Payroll" section in the detail card |
 
 (`IMPERSONATE_USER` and `ADMIN_EMAILS` are non-secret — they're fine as plain
 variables. You can also paste them as Secrets if you'd prefer.)
@@ -101,6 +102,28 @@ If the action fails:
 - **502 with `forbidden` in the details** — the impersonated user
   (`IMPERSONATE_USER`) isn't a Super Admin. Confirm via Admin Console →
   Admin roles → Super Admin → Admins.
+
+## Payroll data
+
+The detail card's "Payroll" section is fed by GET `book.togetherbook.net/api/workspace/payroll`, which returns the `PAYROLL_JSON` Worker secret behind Cloudflare Access. The data is **never committed to the repo** and **never served via github.io** — it's only reachable through the CF Access-gated route on book.togetherbook.net.
+
+To populate or refresh it:
+
+```bash
+# Process the two CSVs in ~/Desktop/wiki/Payroll into a single JSON blob:
+python3 ~/Desktop/APIsForKids/scripts/scan_payroll.py | pbcopy
+```
+
+Then in the Cloudflare dashboard → this Worker → **Settings → Variables and Secrets** → edit the existing `PAYROLL_JSON` secret (or add it the first time) → paste, **Save**, **Redeploy**.
+
+The CSVs are:
+
+- `LetMe_Property_Management_Limited_-_Employee_Contact_Details.xlsx - Employee Contact Details.csv` (LetMe Property staff; has email column for direct matching to staff.json)
+- `For James EmployeeDetails-20260512 (1).xlsx - Export.csv` (Together Loans / R Group staff; no email — matched by lowercase first+last name)
+
+The script outputs a `{ by_email, by_name, counts }` object. The Directory page tries email first, then name fallback.
+
+Refresh cadence: whenever HR sends updated CSVs. Drop the new files into `~/Desktop/wiki/Payroll/` (replacing the old ones if the filenames stay the same — adjust `LETME_FILE` / `TLRG_FILE` constants in the script if not) and re-run the command.
 
 ## Notes
 

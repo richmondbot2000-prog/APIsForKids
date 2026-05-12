@@ -38,6 +38,28 @@ export default {
     if (req.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: cors(req) });
     }
+
+    // GET /api/workspace/payroll — returns the payroll JSON stored in the
+    // PAYROLL_JSON secret. Behind Cloudflare Access only; the github.io
+    // public URL never hits this route, so the PII never leaks via Pages.
+    if (req.method === "GET") {
+      const url = new URL(req.url);
+      if (url.pathname.replace(/\/$/, "").endsWith("/payroll")) {
+        if (!req.headers.get("Cf-Access-Jwt-Assertion")) {
+          return json({ error: "not authenticated via Cloudflare Access" }, 401, req);
+        }
+        if (!env.PAYROLL_JSON) {
+          return json({ error: "PAYROLL_JSON secret not configured yet" }, 503, req);
+        }
+        try {
+          return json(JSON.parse(env.PAYROLL_JSON), 200, req);
+        } catch (e) {
+          return json({ error: "PAYROLL_JSON is not valid JSON: " + e.message }, 500, req);
+        }
+      }
+      return json({ error: "unknown GET endpoint" }, 404, req);
+    }
+
     if (req.method !== "POST") {
       return json({ error: "method not allowed" }, 405, req);
     }
@@ -250,7 +272,7 @@ function cors(req) {
   const origin = req.headers.get("Origin") || "*";
   return {
     "Access-Control-Allow-Origin": origin,
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Cf-Access-Jwt-Assertion",
     "Vary": "Origin",
   };
