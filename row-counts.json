@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-11T10:49:34.621761Z",
-  "snapshot_date": "2026-05-11",
+  "updated_at": "2026-05-12T08:15:27.440781Z",
+  "snapshot_date": "2026-05-12",
   "source": "GitHub Actions weekly scan against Fabric warehouse",
-  "duration_seconds": 248.300229,
+  "duration_seconds": 250.129033,
   "totals": {
     "tables": 68,
-    "rows": 1966565994,
+    "rows": 1967640617,
     "tables_total_scanned": 184
   },
   "skipped_databases": [
@@ -23,196 +23,196 @@
       "database": "ReportingApplications",
       "schema": "dbo",
       "table": "leads",
-      "rows": 394642703,
+      "rows": 396510358,
       "columns": 57
     },
     {
       "database": "ReportingCommunications",
       "schema": "dbo",
       "table": "Messages",
-      "rows": 249570026,
+      "rows": 249851875,
       "columns": 26
     },
     {
       "database": "ReportingLoanbook",
       "schema": "dbo",
       "table": "Loan_History",
-      "rows": 197069397,
+      "rows": 197231708,
       "columns": 24
     },
     {
       "database": "ReportingApplications",
       "schema": "dbo",
       "table": "ApplicationHistories",
-      "rows": 106043807,
+      "rows": 105404997,
       "columns": 27
     },
     {
       "database": "ReportingCentralCrm",
       "schema": "dbo",
       "table": "GeneratedMessages",
-      "rows": 97471404,
+      "rows": 97509269,
       "columns": 8
     },
     {
       "database": "ReportingTracking",
       "schema": "dbo",
       "table": "WebVisits",
-      "rows": 92336374,
+      "rows": 92657672,
       "columns": 16
     },
     {
       "database": "ReportingApplications",
       "schema": "dbo",
       "table": "Tasks",
-      "rows": 89576561,
+      "rows": 88852047,
       "columns": 9
     },
     {
       "database": "ReportingBrokers",
       "schema": "dbo",
       "table": "LeadScorecardScores",
-      "rows": 85033947,
+      "rows": 85394860,
       "columns": 19
     },
     {
       "database": "ReportingApplications",
       "schema": "dbo",
       "table": "EventObjects",
-      "rows": 80984983,
+      "rows": 81077385,
       "columns": 2
     },
     {
       "database": "ReportingApplications",
       "schema": "dbo",
       "table": "Events",
-      "rows": 79573593,
+      "rows": 79663577,
       "columns": 9
     },
     {
       "database": "ReportingApplications",
       "schema": "dbo",
       "table": "LeadOutcomes",
-      "rows": 46540542,
+      "rows": 46615235,
       "columns": 5
     },
     {
       "database": "ReportingCommunications",
       "schema": "dbo",
       "table": "Attachments",
-      "rows": 45579015,
+      "rows": 45631399,
       "columns": 5
     },
     {
       "database": "ReportingPayments",
       "schema": "dbo",
       "table": "Events",
-      "rows": 36368760,
+      "rows": 36402165,
       "columns": 16
     },
     {
       "database": "ReportingPayments",
       "schema": "dbo",
       "table": "EventObjects",
-      "rows": 34572438,
+      "rows": 34605843,
       "columns": 2
     },
     {
       "database": "ReportingCommunications",
       "schema": "dbo",
       "table": "ShortUrls",
-      "rows": 33973661,
+      "rows": 34088569,
       "columns": 10
     },
     {
       "database": "ReportingApplications",
       "schema": "dbo",
       "table": "Addresses",
-      "rows": 33655523,
+      "rows": 33368508,
       "columns": 8
     },
     {
       "database": "ReportingApplications",
       "schema": "dbo",
       "table": "Telephones",
-      "rows": 28121870,
+      "rows": 27887633,
       "columns": 5
     },
     {
       "database": "ReportingCreditbuilder",
       "schema": "dbo",
       "table": "Events",
-      "rows": 25197282,
+      "rows": 25203219,
       "columns": 8
     },
     {
       "database": "ReportingApplications",
       "schema": "dbo",
       "table": "Emails",
-      "rows": 21942723,
+      "rows": 21756656,
       "columns": 5
     },
     {
       "database": "ReportingApplications",
       "schema": "dbo",
       "table": "GovernmentIdentities",
-      "rows": 17201753,
+      "rows": 17046643,
       "columns": 4
     },
     {
       "database": "ReportingApplications",
       "schema": "dbo",
       "table": "Customers",
-      "rows": 16971522,
+      "rows": 16816860,
       "columns": 21
     },
     {
       "database": "ReportingLoanbook",
       "schema": "dbo",
       "table": "Events",
-      "rows": 16633476,
+      "rows": 16648223,
       "columns": 9
     },
     {
       "database": "ReportingApplications",
       "schema": "dbo",
       "table": "Applications",
-      "rows": 13816031,
+      "rows": 13674004,
       "columns": 31
     },
     {
       "database": "ReportingApplications",
       "schema": "dbo",
       "table": "ESignatures",
-      "rows": 13576958,
+      "rows": 13517273,
       "columns": 21
     },
     {
       "database": "ReportingLookup",
       "schema": "dbo",
       "table": "Lookups",
-      "rows": 12547086,
+      "rows": 12568230,
       "columns": 10
     },
     {
       "database": "ReportingCreditbuilder",
       "schema": "dbo",
       "table": "Transactions",
-      "rows": 12372362,
+      "rows": 12377782,
       "columns": 11
     },
     {
       "database": "ReportingLoanbook",
       "schema": "dbo",
       "table": "Transactions",
-      "rows": 11763409,
+      "rows": 11770762,
       "columns": 13
     },
     {
       "database": "ReportingApplications",
       "schema": "dbo",
       "table": "WebBehaviours",
-      "rows": 9568423,
+      "rows": 9646459,
       "columns": 9
     },
     {
@@ -226,35 +226,35 @@
       "database": "ReportingPayments",
       "schema": "dbo",
       "table": "Payments",
-      "rows": 8474729,
+      "rows": 8488401,
       "columns": 26
     },
     {
       "database": "ReportingApplications",
       "schema": "dbo",
       "table": "Flags",
-      "rows": 8224348,
+      "rows": 8009233,
       "columns": 11
     },
     {
       "database": "ReportingLoanbook",
       "schema": "dbo",
       "table": "Payment_Schedule",
-      "rows": 7733481,
+      "rows": 7739922,
       "columns": 7
     },
     {
       "database": "ReportingCentralCrm",
       "schema": "dbo",
       "table": "RobotResponses",
-      "rows": 5295535,
+      "rows": 5301911,
       "columns": 13
     },
     {
       "database": "ReportingCentralCrm",
       "schema": "dbo",
       "table": "TriggeredMessages",
-      "rows": 5291183,
+      "rows": 5297557,
       "columns": 10
     },
     {
@@ -282,84 +282,84 @@
       "database": "ReportingLoanbook",
       "schema": "dbo",
       "table": "AppLoginSuccesses",
-      "rows": 2026560,
+      "rows": 2032017,
       "columns": 8
     },
     {
       "database": "ReportingLoanbook",
       "schema": "dbo",
       "table": "Allocate",
-      "rows": 1548837,
+      "rows": 1551395,
       "columns": 5
     },
     {
       "database": "ReportingApplications",
       "schema": "dbo",
       "table": "Audit",
-      "rows": 983290,
+      "rows": 1094605,
       "columns": 9
     },
     {
       "database": "ReportingLoanbook",
       "schema": "dbo",
       "table": "CustomFlags",
-      "rows": 856987,
+      "rows": 857482,
       "columns": 22
     },
     {
       "database": "ReportingCentralCrm",
       "schema": "dbo",
       "table": "SentCampaigns",
-      "rows": 720506,
+      "rows": 723211,
       "columns": 7
     },
     {
       "database": "ReportingCommunications",
       "schema": "dbo",
       "table": "ShortUrlClicks",
-      "rows": 558635,
+      "rows": 610090,
       "columns": 4
     },
     {
       "database": "ReportingLoanbook",
       "schema": "dbo",
       "table": "Telephones",
-      "rows": 376553,
+      "rows": 377008,
       "columns": 5
     },
     {
       "database": "ReportingLookup",
       "schema": "dbo",
       "table": "EmailLookups",
-      "rows": 352467,
+      "rows": 358408,
       "columns": 9
     },
     {
       "database": "ReportingLoanbook",
       "schema": "dbo",
       "table": "GovernmentIdentities",
-      "rows": 349003,
+      "rows": 349416,
       "columns": 4
     },
     {
       "database": "ReportingLoanbook",
       "schema": "dbo",
       "table": "Emails",
-      "rows": 343472,
+      "rows": 343920,
       "columns": 5
     },
     {
       "database": "ReportingLoanbook",
       "schema": "dbo",
       "table": "Customer",
-      "rows": 309350,
+      "rows": 309760,
       "columns": 17
     },
     {
       "database": "ReportingApplications",
       "schema": "dbo",
       "table": "VerbalContracts",
-      "rows": 246646,
+      "rows": 247194,
       "columns": 14
     },
     {
@@ -373,35 +373,35 @@
       "database": "ReportingPayments",
       "schema": "dbo",
       "table": "Audit",
-      "rows": 191249,
+      "rows": 191251,
       "columns": 10
     },
     {
       "database": "ReportingLoanbook",
       "schema": "dbo",
       "table": "LoanAtInception",
-      "rows": 154753,
+      "rows": 154958,
       "columns": 37
     },
     {
       "database": "ReportingLoanbook",
       "schema": "dbo",
       "table": "Loan",
-      "rows": 154753,
+      "rows": 154958,
       "columns": 40
     },
     {
       "database": "ReportingCentralCrm",
       "schema": "dbo",
       "table": "PaymentFactoryRuns",
-      "rows": 109878,
+      "rows": 109916,
       "columns": 8
     },
     {
       "database": "ReportingLoanbook",
       "schema": "dbo",
       "table": "PaymentScheduleChanges",
-      "rows": 73645,
+      "rows": 73735,
       "columns": 5
     },
     {
@@ -422,22 +422,22 @@
       "database": "ReportingLoanbook",
       "schema": "dbo",
       "table": "DefaultHistory",
-      "rows": 51617,
+      "rows": 51710,
       "columns": 6
-    },
-    {
-      "database": "ReportingLoanbook",
-      "schema": "dbo",
-      "table": "Audit",
-      "rows": 38499,
-      "columns": 9
     },
     {
       "database": "ReportingPayments",
       "schema": "dbo",
       "table": "PaymentPermissions",
-      "rows": 38389,
+      "rows": 38825,
       "columns": 7
+    },
+    {
+      "database": "ReportingLoanbook",
+      "schema": "dbo",
+      "table": "Audit",
+      "rows": 38504,
+      "columns": 9
     },
     {
       "database": "ReportingCentralCrm",
@@ -471,14 +471,14 @@
       "database": "ReportingBrokers",
       "schema": "dbo",
       "table": "ExcludedRefs",
-      "rows": 3730,
+      "rows": 3746,
       "columns": 9
     },
     {
       "database": "ReportingLookup",
       "schema": "dbo",
       "table": "Carriers",
-      "rows": 2642,
+      "rows": 2645,
       "columns": 5
     },
     {
