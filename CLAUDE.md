@@ -14,6 +14,7 @@ They use the site (`book.togetherbook.net`) as an operational dashboard and as a
 
 - **Be terse.** One sentence per update is almost always enough. End-of-turn summaries should be one or two sentences max.
 - **Ship to live immediately.** This repo's `main` branch deploys via GitHub Pages — every commit goes live within 30-60 seconds. The user expects you to commit + push your changes within the same turn, not stage them for later review.
+- **Overnight work is welcome.** When the user says "I'm going to bed" or "do work while I'm gone", default to ambitious — multiple substantive commits over the night, each with a clear commit message they can scan in the morning. Don't wait for permission, don't write status files; let commit history be the log. Avoid scanner changes that could break the daily 07:05 source-quality refresh without being verified — UI/copy/docs changes are safer overnight.
 - **Don't over-ask.** Before asking a clarifying question, spend up to a minute on read-only investigation (grep, file reads). A specific question after research beats a vague one upfront. When you do ask, AskUserQuestion with concrete options beats prose.
 - **They correct bluntly when wrong.** Take it on the chin and adjust. Don't apologise or rehash — just incorporate the correction and continue.
 - **Avoid emojis** in code, comments, commits, page copy, or anywhere on the site unless explicitly requested.
