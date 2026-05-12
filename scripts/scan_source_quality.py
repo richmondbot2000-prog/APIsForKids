@@ -453,11 +453,18 @@ def main() -> None:
         Return (total_cost, model_label) based on the campaign's
         CommissionType. None means we have no defensible cost figure.
 
-          1 = CPF   → rate × paid_out (cost per funded loan)
-          2 = CPL   → rate × leads_purchased (flat per-lead price)
-          4 = BID   → sum of Leads.BidAmount; fall back to
-                       rate × leads_purchased if bid was never set
-          5 = REV   → rate × sum(paid-out loan amount) (revenue share)
+          1 = PerFundedLoan (CPF)        → rate × paid_out (cost per
+                                           funded loan)
+            └ EXCEPT when rate < 1: warehouse data quality issue —
+              these entries are percentage rev-share values
+              (10–12%) mis-categorised as flat-dollar CPF. Treat
+              as rev-share: rate × paid-out loan amount.
+          2 = PerApplication             → rate × leads_purchased
+          4 = PerAcceptedAPILead         → sum of Leads.BidAmount;
+                                           fall back to rate × leads
+                                           when bid wasn't recorded
+          5 = PerFundedLoanPreCheck      → rate × sum(paid-out loan
+                                           amount) (revenue share)
         Anything else (incl. None) → no cost.
         """
         ct = str(slot.get("commission_type"))
@@ -467,6 +474,12 @@ def main() -> None:
         bid_total = slot.get("bid_total")
         paid_loan_total = slot.get("paid_loan_total") or 0.0
         if ct == "1":
+            # Heuristic: sub-dollar CPF rate cannot be a real flat $
+            # per funded loan (no broker accepts $0.12 per funded loan).
+            # These are percentage rev-share values entered against the
+            # wrong CommissionType in the warehouse. Treat as rev-share.
+            if 0 < rate < 1:
+                return (rate * paid_loan_total, "cpf_rev_share_heuristic")
             return (rate * paid, "cpf")
         if ct == "2":
             return (rate * purchased, "cpl")
@@ -525,6 +538,10 @@ def main() -> None:
         ct = str(meta.get("commission_type"))
         rate = meta.get("commission_rate") or 0
         if ct == "1":
+            # Sub-dollar CPF rates are mis-categorised percentage
+            # rev-share entries. See _campaign_cost docstring above.
+            if 0 < rate < 1:
+                return (rate * paid_loan_total, "cpf_rev_share_heuristic")
             return (rate * paid, "cpf")
         if ct == "2":
             return (rate * leads, "cpl")
