@@ -1,0 +1,48 @@
+name: Probe lead attribution
+
+# One-off diagnostic. Sizes the multi-broker-ARef attribution bug and
+# searches INFORMATION_SCHEMA for the 'backing tables' Kelly Black
+# mentioned. Trigger manually only.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Microsoft ODBC Driver 18
+        run: |
+          set -euo pipefail
+          source /etc/os-release
+          curl -fsSL "https://packages.microsoft.com/config/ubuntu/${VERSION_ID}/packages-microsoft-prod.deb" -o /tmp/packages-microsoft-prod.deb
+          sudo dpkg -i /tmp/packages-microsoft-prod.deb
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python deps
+        run: pip install --quiet pyodbc==5.*
+
+      - name: Probe
+        env:
+          FABRIC_SQL_ENDPOINT:  d76gbn5gtayeppltcrsxsvkluq-ruqkpz7fkwpelmnjh4kbg2lqpi.datawarehouse.fabric.microsoft.com
+          FABRIC_TENANT_ID:     b760fc1f-98a6-4730-bd73-146579554ba4
+          FABRIC_CLIENT_ID:     b8fb2709-6e42-4a1e-91e6-8a3807a9884d
+          FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
+          SQ_WINDOW_DAYS:       '60'
+          SQ_MATURATION_DAYS:   '30'
+          SQ_LENDER_ID:         '6'
+        run: python scripts/probe_lead_attribution.py
