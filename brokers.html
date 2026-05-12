@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Brokers</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778572275">
-<link rel="stylesheet" href="quiet.css?v=1778572275">
-<link rel="stylesheet" href="quiet-extras.css?v=1778572275">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778573167">
+<link rel="stylesheet" href="quiet.css?v=1778573167">
+<link rel="stylesheet" href="quiet-extras.css?v=1778573167">
 <style>
   .br-section { max-width: 1280px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .br-section { padding: 2px 0 32px; } }
@@ -522,15 +522,61 @@
     text-align: center;
   }
 
-  /* ── Top-10 leaderboards (side-by-side) ──────────────────────────── */
+  /* ── Top-10 leaderboards (three side-by-side) ───────────────────── */
   .br-leaderboard-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 16px;
     margin: 0 0 22px;
   }
-  @media (max-width: 980px) {
+  @media (max-width: 1200px) {
+    .br-leaderboard-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 800px) {
     .br-leaderboard-grid { grid-template-columns: 1fr; }
+  }
+  .br-leaderboard-toggle-row {
+    text-align: center;
+    margin-top: 10px;
+  }
+  /* Cost-per-loan row: simpler than the funnel-bar leaderboards. */
+  .br-cost-row {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 8px;
+    align-items: baseline;
+    padding: 4px 0;
+    border-bottom: 1px dashed var(--divider);
+    font: 400 12px/1.3 var(--font-display);
+  }
+  .br-cost-row:last-child { border-bottom: none; }
+  .br-cost-row-name {
+    font: italic 500 13px/1.25 var(--font-display);
+    color: var(--ink-900);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .br-cost-row-bar {
+    position: relative;
+    height: 14px;
+    background: var(--paper-100);
+    border: 1px solid var(--paper-300);
+    margin-top: 2px;
+  }
+  .br-cost-row-bar-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--brass-500);
+    opacity: 0.7;
+  }
+  .br-cost-row-cost {
+    font: 600 14px/1 var(--font-mono);
+    color: var(--ink-900);
+    text-align: right;
+  }
+  .br-cost-row-sub {
+    font: 400 10px/1.3 var(--font-display);
+    color: var(--ink-500);
+    text-align: right;
   }
   .br-leaderboard-wrap {
     position: relative;
@@ -613,7 +659,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778572275" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778573167" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -656,11 +702,25 @@
         <h2 class="br-canvas-title">Top 10 by lead volume</h2>
         <p class="br-canvas-sub">Bar width = leads presented (full width = #1). The coloured strip inside scales each broker's downstream stages against the same lead-volume axis.</p>
         <div id="brLeaderboard"></div>
+        <div class="br-leaderboard-toggle-row">
+          <button id="brLeaderboardToggle" class="br-pill" type="button" hidden>Show all sources</button>
+        </div>
       </div>
       <div class="br-leaderboard-wrap">
         <h2 class="br-canvas-title">Top 10 by paid-out loans</h2>
         <p class="br-canvas-sub">Same brokers re-ranked by how many of their leads actually became funded loans. Different list — the volume leader rarely is the conversion leader.</p>
         <div id="brLeaderboardPaid"></div>
+        <div class="br-leaderboard-toggle-row">
+          <button id="brLeaderboardPaidToggle" class="br-pill" type="button" hidden>Show all sources</button>
+        </div>
+      </div>
+      <div class="br-leaderboard-wrap">
+        <h2 class="br-canvas-title">Top 10 by cost per loan</h2>
+        <p class="br-canvas-sub">Brokers ranked by <strong>cost per paid loan</strong> — total spend (lead-price × leads bought, summed per broker from <code>source-quality.json</code>) divided by paid loans. Cheapest at top. PPC and Organic excluded since we don't track a per-lead cost for those channels. Bar width is proportional to cost in the visible set.</p>
+        <div id="brLeaderboardCost"></div>
+        <div class="br-leaderboard-toggle-row">
+          <button id="brLeaderboardCostToggle" class="br-pill" type="button" hidden>Show all sources</button>
+        </div>
       </div>
       <div class="br-leaderboard-wrap" style="grid-column: 1 / -1;">
         <h2 class="br-canvas-title">Outcome distribution — <em>where every broker's leads end up</em></h2>
@@ -798,6 +858,19 @@
     const totalPaid = (d.totals && d.totals.paid_out) || 0;
     const totalFunded = (d.totals && d.totals.paid_out_loan_total) || 0;
     window.COHORT_AVG_LOAN = totalPaid ? (totalFunded / totalPaid) : 0;
+    // Per-broker total_cost rollup from source-quality.json so the
+    // cost-per-loan leaderboard has lead-price data.
+    window.BROKER_COST_BY_ID = {};
+    if (sq && sq.weak_accepted && sq.weak_accepted.by_broker_source) {
+      for (const cell of sq.weak_accepted.by_broker_source) {
+        const bid = cell.broker_id;
+        if (bid == null || !cell.total_cost) continue;
+        const slot = window.BROKER_COST_BY_ID[bid] || { total_cost: 0, paid_out: 0 };
+        slot.total_cost += cell.total_cost || 0;
+        slot.paid_out   += cell.paid_out   || 0;
+        window.BROKER_COST_BY_ID[bid] = slot;
+      }
+    }
     render();
     renderRefresh(d);
     renderMeta(d);
@@ -1319,23 +1392,114 @@
   function renderLeaderboard(d) {
     const sources = d.sources || [];
     if (!sources.length) return;
-    // Volume-ranked top 10
-    const byVol = sources.slice(0, 10);
-    document.getElementById("brLeaderboard").innerHTML = renderLeaderRows(byVol, "leads_presented", byVol[0].leads_presented || 1);
-    // Paid-out-ranked top 10 (only brokers with paid_out > 0)
-    const byPaid = [...sources]
+
+    // ── Top by lead volume ──
+    const byVolAll = [...sources].sort((a, b) => (b.leads_presented || 0) - (a.leads_presented || 0));
+    _wireLeaderboardToggle({
+      hostId:   "brLeaderboard",
+      toggleId: "brLeaderboardToggle",
+      rows:     byVolAll,
+      render:   (rows) => renderLeaderRows(rows, "leads_presented", byVolAll[0]?.leads_presented || 1),
+    });
+
+    // ── Top by paid-out loans ──
+    const byPaidAll = [...sources]
       .filter(r => (r.paid_out || 0) > 0)
-      .sort((a, b) => (b.paid_out || 0) - (a.paid_out || 0))
-      .slice(0, 10);
-    document.getElementById("brLeaderboardPaid").innerHTML =
-      byPaid.length
-        ? renderLeaderRows(byPaid, "paid_out", byPaid[0].paid_out || 1)
-        : '<p style="color: var(--ink-500); font-style: italic;">No paid-out loans in this window.</p>';
+      .sort((a, b) => (b.paid_out || 0) - (a.paid_out || 0));
+    _wireLeaderboardToggle({
+      hostId:   "brLeaderboardPaid",
+      toggleId: "brLeaderboardPaidToggle",
+      rows:     byPaidAll,
+      render:   (rows) => renderLeaderRows(rows, "paid_out", byPaidAll[0]?.paid_out || 1),
+      emptyMsg: '<p style="color: var(--ink-500); font-style: italic;">No paid-out loans in this window.</p>',
+    });
+
+    // ── Top by cost per paid loan (cheapest first) ──
+    const costMap = window.BROKER_COST_BY_ID || {};
+    const byCostAll = sources
+      .map(r => {
+        const c = costMap[r.source_id];
+        // Require >$50 total spend + >=1 paid loan to keep edge-case
+        // / test brokers (e.g. PROFFILIANT with $0.40 total spend) out
+        // of the leaderboard.
+        if (!c || !c.paid_out || !c.total_cost || c.total_cost < 50) return null;
+        return Object.assign({}, r, {
+          _total_cost:       c.total_cost,
+          _paid_out_costed:  c.paid_out,
+          _cost_per_paid:    c.total_cost / c.paid_out,
+        });
+      })
+      .filter(Boolean)
+      .sort((a, b) => (a._cost_per_paid || 0) - (b._cost_per_paid || 0));
+    _wireLeaderboardToggle({
+      hostId:   "brLeaderboardCost",
+      toggleId: "brLeaderboardCostToggle",
+      rows:     byCostAll,
+      render:   (rows) => renderCostLeaderRows(rows),
+      emptyMsg: '<p style="color: var(--ink-500); font-style: italic;">No cost-per-loan data — source-quality.json may not be loaded yet.</p>',
+    });
 
     // Outcome distribution — all active brokers (including Organic /
-    // direct / Unknown source). No volume gate by default; the chart
-    // visualises the share, so any source with >0 leads is comparable.
+    // direct / Unknown source). No volume gate; visualises share.
     renderOutcomeDistribution(sources);
+  }
+
+  // Wires a top-10 leaderboard with a "Show all sources" toggle.
+  // Falls back to a placeholder if rows[] is empty.
+  function _wireLeaderboardToggle({ hostId, toggleId, rows, render, emptyMsg }) {
+    const host = document.getElementById(hostId);
+    const toggle = document.getElementById(toggleId);
+    if (!host) return;
+    if (!rows.length) {
+      host.innerHTML = emptyMsg || '<p style="color: var(--ink-500); font-style: italic;">No data.</p>';
+      if (toggle) toggle.hidden = true;
+      return;
+    }
+    let showAll = false;
+    const draw = () => {
+      const visible = showAll ? rows : rows.slice(0, 10);
+      host.innerHTML = render(visible);
+      if (toggle) {
+        toggle.hidden = rows.length <= 10;
+        toggle.textContent = showAll
+          ? `Show top 10 only`
+          : `Show all ${rows.length} sources`;
+      }
+    };
+    draw();
+    if (toggle && !toggle.__wired) {
+      toggle.__wired = true;
+      toggle.addEventListener("click", () => {
+        showAll = !showAll;
+        draw();
+      });
+    }
+  }
+
+  // Render rows for the cost-per-loan leaderboard. Bar width = cost
+  // relative to the max in the visible set so the visible spread is
+  // legible regardless of overall scale.
+  function renderCostLeaderRows(rows) {
+    if (!rows.length) return '';
+    const maxCost = rows.reduce((m, r) => Math.max(m, r._cost_per_paid || 0), 0) || 1;
+    return rows.map(r => {
+      const cost = r._cost_per_paid || 0;
+      const widthPct = (cost / maxCost) * 100;
+      const totalCost = r._total_cost || 0;
+      return `
+        <div class="br-cost-row" title="${escapeHtml(r.friendly_name || ("Source " + r.source_id))}">
+          <div>
+            <div class="br-cost-row-name">${escapeHtml(r.friendly_name || ("Source " + r.source_id))}</div>
+            <div class="br-cost-row-bar">
+              <div class="br-cost-row-bar-fill" style="width: ${widthPct.toFixed(3)}%;"></div>
+            </div>
+          </div>
+          <div>
+            <div class="br-cost-row-cost">$${formatNumber(Math.round(cost))}</div>
+            <div class="br-cost-row-sub">${formatNumber(r._paid_out_costed || 0)} paid · ${formatMoneyBig(totalCost)} spent</div>
+          </div>
+        </div>`;
+    }).join("");
   }
 
   // ─── Outcome-distribution stacked-bar chart ───────────────────────
