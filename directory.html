@@ -101,100 +101,85 @@
   }
   .dir-pill.active .dir-pill-count { color: var(--accent-ink); }
 
-  /* Grid */
-  .dir-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 14px;
-  }
-  .dir-card {
-    background: linear-gradient(160deg, var(--bg-soft) 0%, var(--bg-soft-2) 100%);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px 16px;
-    text-align: center;
-    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
-    text-decoration: none;
-    color: inherit;
+  /* List */
+  .dir-list {
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 6px;
   }
-  .dir-card:hover {
+  .dir-row {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .dir-row:hover {
     border-color: var(--accent);
-    box-shadow: var(--shadow-glow-cyan, 0 0 18px rgba(0, 212, 255, 0.18));
-    transform: translateY(-1px);
+    background: var(--bg-soft-2);
     text-decoration: none;
   }
   .dir-photo {
-    width: 96px; height: 96px;
+    width: 44px; height: 44px;
     border-radius: 50%;
     object-fit: cover;
     background: linear-gradient(135deg, #2a3470 0%, #4a5aaa 100%);
-    border: 1.5px solid rgba(0, 212, 255, 0.35);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
-    margin-bottom: 6px;
+    border: 1px solid rgba(0, 212, 255, 0.3);
   }
-  /* Initials fallback when there's no photo */
   .dir-photo-placeholder {
-    width: 96px; height: 96px;
+    width: 44px; height: 44px;
     border-radius: 50%;
     background: linear-gradient(135deg, #2a3470 0%, #4a5aaa 100%);
-    border: 1.5px solid rgba(0, 212, 255, 0.35);
+    border: 1px solid rgba(0, 212, 255, 0.3);
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: var(--font-display);
-    font-size: 1.6rem;
+    font-size: 0.85rem;
     font-weight: 700;
     color: var(--ink);
-    margin-bottom: 6px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  }
+  .dir-row-body { min-width: 0; }
+  .dir-row-headline {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
   }
   .dir-name {
     font-weight: 700;
-    font-size: 1rem;
-    line-height: 1.25;
+    font-size: 0.98rem;
     color: var(--ink);
   }
   .dir-title {
-    font-size: 0.84rem;
+    font-size: 0.82rem;
     color: var(--ink-soft);
-    line-height: 1.35;
-  }
-  .dir-department {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.66rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--accent-ink);
-    background: rgba(0, 212, 255, 0.08);
-    border: 1px solid rgba(0, 212, 255, 0.3);
-    padding: 2px 8px;
-    border-radius: 4px;
-    margin-top: 4px;
   }
   .dir-email {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     color: var(--muted);
     word-break: break-all;
-    margin-top: 2px;
   }
-
-  .dir-activity {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px dashed var(--divider, rgba(0,0,0,0.12));
-    display: flex; flex-direction: column; gap: 4px;
+  .dir-row-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    align-items: center;
+    margin-top: 4px;
     font-family: var(--font-display, "Newsreader", Georgia, serif);
     font-size: 12px;
     line-height: 1.4;
   }
   .dir-last { color: var(--ink-700, #2C3E66); }
   .dir-last b { font-weight: 500; color: var(--ink-900, #11192E); font-style: italic; }
-  .dir-tenants { display: flex; flex-wrap: wrap; gap: 4px; }
+  .dir-tenants { display: inline-flex; flex-wrap: wrap; gap: 4px; }
   .dir-tenant {
     display: inline-block;
     font: 500 10px/1.4 var(--font-mono, "JetBrains Mono", ui-monospace, monospace);
@@ -209,39 +194,62 @@
   .dir-warehouse {
     color: var(--ink-600, #4A5878);
     font-style: italic;
-    font-size: 12px;
   }
   .dir-warehouse em {
     color: var(--ink-900, #11192E);
     font-style: italic;
     font-weight: 500;
   }
-  /* Workspace-tenant chip on each staff card. Only rendered when there's
-     more than one tenant in staff.json (multi-tenant deployments). */
+  .dir-row-aside {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .dir-department {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-ink);
+    background: rgba(0, 212, 255, 0.08);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  /* Workspace-tenant chip. Only rendered when there's more than one tenant
+     in staff.json (multi-tenant deployments). */
   .dir-workspace-chip {
     display: inline-block;
     font: 500 10px/1.4 var(--font-mono, "JetBrains Mono", ui-monospace, monospace);
     color: var(--sage-700, #5A7041);
     background: rgba(116, 145, 90, 0.10);
     border: 1px solid rgba(116, 145, 90, 0.30);
-    padding: 1px 6px;
+    padding: 2px 6px;
     border-radius: 3px;
-    margin: 2px 0 4px;
     letter-spacing: 0.02em;
   }
 
-  .dir-card--external {
-    opacity: 0.92;
-  }
-  .dir-card--external .dir-photo-placeholder {
+  .dir-row--external { opacity: 0.92; }
+  .dir-row--external .dir-photo-placeholder {
     background: var(--paper-200, #F5ECD4);
     color: var(--brass-600, #A47829);
-    border: 1.5px dashed var(--brass-300, #E2BF74);
+    border: 1px dashed var(--brass-300, #E2BF74);
   }
-  .dir-card--external .dir-title {
+  .dir-row--external .dir-title {
     font-style: italic;
     color: var(--ink-500, #6B7794);
     font-size: 0.78rem;
+  }
+
+  @media (max-width: 700px) {
+    .dir-row { grid-template-columns: 44px minmax(0, 1fr); }
+    .dir-row-aside {
+      grid-column: 1 / -1;
+      justify-content: flex-start;
+    }
   }
 
   .dir-empty {
@@ -316,7 +324,7 @@
         </div>
       </div>
 
-      <div class="dir-grid" id="dirGrid"></div>
+      <div class="dir-list" id="dirGrid"></div>
 
       <div class="dir-empty" id="dirEmpty" hidden>
         Directory hasn't been populated yet. Once IT delivers the Workspace
@@ -561,12 +569,11 @@
       ? new Date(a.last_active_utc).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
       : null;
     const tenants = (a.tenants || []).map(t => `<span class="dir-tenant">${escapeHtml(t)}</span>`).join("");
-    return `
-      <div class="dir-activity">
-        ${lastDate ? `<div class="dir-last">last seen <b>${escapeHtml(lastDate)}</b></div>` : ""}
-        ${tenants ? `<div class="dir-tenants">${tenants}</div>` : ""}
-        ${a.top_warehouse ? `<div class="dir-warehouse">mostly <em>${escapeHtml(a.top_warehouse)}</em></div>` : ""}
-      </div>`;
+    const parts = [];
+    if (lastDate) parts.push(`<span class="dir-last">last seen <b>${escapeHtml(lastDate)}</b></span>`);
+    if (tenants) parts.push(`<span class="dir-tenants">${tenants}</span>`);
+    if (a.top_warehouse) parts.push(`<span class="dir-warehouse">mostly <em>${escapeHtml(a.top_warehouse)}</em></span>`);
+    return parts.length ? `<div class="dir-row-meta">${parts.join("")}</div>` : "";
   }
 
   function prettyName(localPart) {
@@ -596,18 +603,24 @@
     const tenantList = u.tenants || (u.tenant ? [u.tenant] : []);
     const showWorkspaceChip = !document.getElementById("dirWorkspaceRow").hidden && tenantList.length;
     const workspaceChip = showWorkspaceChip
-      ? `<div class="dir-workspace-chip" title="Google Workspace tenant">${tenantList.map(t => escapeHtml(t)).join(" + ")}</div>`
+      ? `<span class="dir-workspace-chip" title="Google Workspace tenant">${tenantList.map(t => escapeHtml(t)).join(" + ")}</span>`
+      : "";
+    const departmentChip = u.department
+      ? `<span class="dir-department">${escapeHtml(u.department)}</span>`
       : "";
 
     return `
-      <a class="dir-card" href="mailto:${escapeHtml(u.email)}" title="Email ${escapeHtml(u.name || u.email)}">
+      <a class="dir-row" href="mailto:${escapeHtml(u.email)}" title="Email ${escapeHtml(u.name || u.email)}">
         ${photo}
-        <div class="dir-name">${escapeHtml(u.name || u.email)}</div>
-        ${u.title ? `<div class="dir-title">${escapeHtml(u.title)}</div>` : ""}
-        ${u.department ? `<div class="dir-department">${escapeHtml(u.department)}</div>` : ""}
-        ${workspaceChip}
-        <div class="dir-email">${escapeHtml(u.email)}</div>
-        ${activityHtml(a)}
+        <div class="dir-row-body">
+          <div class="dir-row-headline">
+            <span class="dir-name">${escapeHtml(u.name || u.email)}</span>
+            ${u.title ? `<span class="dir-title">${escapeHtml(u.title)}</span>` : ""}
+            <span class="dir-email">${escapeHtml(u.email)}</span>
+          </div>
+          ${activityHtml(a)}
+        </div>
+        <div class="dir-row-aside">${departmentChip}${workspaceChip}</div>
       </a>
     `;
   }
@@ -620,12 +633,17 @@
     const initials = ((local.charAt(0) || "?") + (local.split(/[._-]/)[1]?.charAt(0) || "")).toUpperCase();
 
     return `
-      <a class="dir-card dir-card--external" href="mailto:${escapeHtml(username)}" title="Active in DB only — ${escapeHtml(username)}">
+      <a class="dir-row dir-row--external" href="mailto:${escapeHtml(username)}" title="Active in DB only — ${escapeHtml(username)}">
         <div class="dir-photo-placeholder">${escapeHtml(initials)}</div>
-        <div class="dir-name">${escapeHtml(display)}</div>
-        <div class="dir-title">no Workspace account</div>
-        <div class="dir-email">${escapeHtml(username)}</div>
-        ${activityHtml(a)}
+        <div class="dir-row-body">
+          <div class="dir-row-headline">
+            <span class="dir-name">${escapeHtml(display)}</span>
+            <span class="dir-title">no Workspace account</span>
+            <span class="dir-email">${escapeHtml(username)}</span>
+          </div>
+          ${activityHtml(a)}
+        </div>
+        <div class="dir-row-aside"></div>
       </a>
     `;
   }
