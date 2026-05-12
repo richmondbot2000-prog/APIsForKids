@@ -292,6 +292,8 @@ The full schema lives in `database.md` (rendered in the live site under `/databa
 - **`LoanbookId` is alphanumeric** (`010100AQUA`), don't `int()` it.
 - **`Lenders.Name` doesn't exist** — hard-map `LenderId → label` in code.
 - **`Loanbook.Customer.GtRef` doesn't exist** — `GtRef` is only on `Messages`.
+- **Lead outcomes ≠ Applications.Status snapshots.** `dbo.LeadOutcomes` (in `ReportingApplications`) is the canonical per-lead event log of funnel progression — every milestone a lead reaches generates one row tagged with the `LeadId` that was live at the moment. `Applications.ApplicationStatusTypeId` reflects current state only and is updated by `/UpdateStatus`. For attribution-sensitive analytics (which broker drove which paid loan when multiple brokers sold the same customer), use `LeadOutcomes` per `LeadId`, not `Applications.Status` per `ARef`. See §11.5.8b for the canonical query pattern.
+- **`Leads.ExpiryDateUtc`** holds the dedup expiry per lead — how long that broker can "claim" the lead. Important if you ever need to reconstruct attribution semantics manually (typically not needed since `LeadOutcomes.LeadId` already records which lead was live at outcome time).
 
 ---
 
@@ -567,6 +569,80 @@ Top-level keys in `source-quality.json`:
 
 - The scanner takes 3-5 minutes typically. Initial implementation timed out at 35min on a 3-way SQL self-join over 75M rows; rewrote as sample-and-match-in-Python (O(N+M) hash lookup instead of O(N×M) join). Don't revert to SQL self-joins.
 - Memory: holds 2-3M purchased leads in RAM with identity indexes. Runner has 7GB, fits comfortably.
+
+#### 11.5.8b LeadOutcomes-based canonical attribution (added 2026-05-12)
+
+Confirmed with Kelly Black (Together Loans CEO) that **`Leads.LeadResultTypeId` is set at point of purchase but `dbo.LeadOutcomes` is the canonical lead-progress log.** Whitebox's `/UpdateStatus` writes one row per outcome event tagged with the specific `LeadId` that was live at the time. We refactored Part A of `scan_source_quality.py` accordingly:
+
+**Old (broken):** grouped leads by ARef then took `MAX(CampaignId)` to pick a broker per ARef. Arbitrary attribution when the same ARef was sold by multiple brokers. Probe `probe_lead_attribution.py` measured this: **21% of ARefs in the 60d window were bought by 2+ brokers; ~3% of paid loans had ambiguous attribution.**
+
+**New (canonical):** JOIN per-LeadId on `dbo.LeadOutcomes` and pivot the type column to derive cell-level funnel counts directly. No more MAX heuristic.
+
+The new Part A query uses three CTEs:
+
+```sql
+WITH leads_w AS (
+    SELECT l.LeadId, l.ARef, l.CampaignId, SR1_expr AS SR1, SR2_expr AS SR2
+    FROM dbo.Leads l
+    WHERE l.DateReceivedUtc >= @window_start AND l.DateReceivedUtc < @window_end
+      AND l.LenderId = @lender AND l.LeadResultTypeId IN (1, 30)
+),
+outcomes AS (
+    SELECT lo.LeadId,
+           MAX(CASE WHEN lo.LeadOutcomeTypeID = 1 THEN 1 ELSE 0 END) AS reached_apply1,
+           MAX(CASE WHEN lo.LeadOutcomeTypeID = 4 THEN 1 ELSE 0 END) AS reached_brw_signed,
+           MAX(CASE WHEN lo.LeadOutcomeTypeID = 5 THEN 1 ELSE 0 END) AS reached_gt_passed,
+           MAX(CASE WHEN lo.LeadOutcomeTypeID = 6 THEN 1 ELSE 0 END) AS reached_vc_completed,
+           MAX(CASE WHEN lo.LeadOutcomeTypeID = 8 THEN 1 ELSE 0 END) AS reached_paid_out
+    FROM dbo.LeadOutcomes lo
+    INNER JOIN leads_w lw ON lw.LeadId = lo.LeadId
+    GROUP BY lo.LeadId
+),
+app_loans AS (
+    SELECT a.ARef, MAX(CAST(a.LoanAmount AS FLOAT)) AS LoanAmount
+    FROM dbo.Applications a WHERE a.LenderId = @lender
+    GROUP BY a.ARef
+)
+SELECT lw.CampaignId, lw.SR1, lw.SR2,
+       SUM(ISNULL(o.reached_apply1, 0))       AS apply1,
+       SUM(ISNULL(o.reached_brw_signed, 0))   AS brw_signed,
+       SUM(ISNULL(o.reached_gt_passed, 0))    AS gt_passed,
+       SUM(ISNULL(o.reached_vc_completed, 0)) AS vc_completed,
+       SUM(ISNULL(o.reached_paid_out, 0))     AS paid_out,
+       SUM(CASE WHEN o.reached_paid_out = 1 THEN ISNULL(al.LoanAmount, 0) ELSE 0 END) AS paid_loan_total
+FROM leads_w lw
+LEFT JOIN outcomes o ON o.LeadId = lw.LeadId
+LEFT JOIN app_loans al ON al.ARef = lw.ARef
+GROUP BY lw.CampaignId, lw.SR1, lw.SR2
+```
+
+**`LeadOutcomeTypes` enum (confirmed 2026-05-12 via `probe_lead_outcomes.py`):**
+
+| ID | Description | Maps to our funnel as |
+|---|---|---|
+| 1 | Apply1 complete | `apply1` (denominator for canonical apply rate) |
+| 2 | Budget plan complete | not currently surfaced |
+| 3 | Payment details complete | not currently surfaced |
+| 4 | BRW signed contract | `brw_signed` |
+| 5 | GT passed checks | `gt_passed` |
+| 6 | GT completed VC | `vc_completed` |
+| 7 | Signed up to CB | not surfaced |
+| 8 | **Paid out** | `paid_out` — the only outcome that earns |
+| 9 | GT Added | not surfaced |
+| 10 | GT Signed Contract | not surfaced |
+
+**Output shape change** (2026-05-12): each `weak_accepted.by_broker_source[]` cell, each campaign in the drill-down, and each `sr2_breakdown[]` sub-cell now carry `apply1`, `brw_signed`, `gt_passed`, `vc_completed`, `paid_out` (counts) plus `paid_loan_total` (sum). The old `applications` field (which was effectively == `leads_purchased` and produced a meaningless ~100% apply rate) is removed. **`brokers.html`'s `_applyRate(s)` now reads `s.apply1`** for the canonical apply-rate signal.
+
+**Verified 2026-05-12 first run after refactor:** 3,900 paid_out events attributed across 961 qualifying cells; matches the canonical 3,912 from the LeadOutcomes probe minus the 12 in Type 3 (PPC) campaigns excluded by design. Blended apply rate dropped from ~100% (broken pre-refactor) to **29.6%** (canonical post-refactor). Top "consider blocking" cells shifted: Search ROI / 550309 ($10,728/paid pre-refactor) dropped out of the top 5; Round Sky / 3565 ($4,959, 32% apply) took #1, characterised by the new "engaged but unfunded" signal.
+
+#### 11.5.8c One-off diagnostic scripts
+
+Two probe scripts + workflows live in the repo for re-runs if needed:
+
+- `scripts/probe_lead_attribution.py` + `.github/workflows/probe-lead-attribution.yml` — sizes the multi-broker-ARef attribution gap and searches `INFORMATION_SCHEMA` for backing-table candidates. Manual trigger only.
+- `scripts/probe_lead_outcomes.py` + `.github/workflows/probe-lead-outcomes.yml` — dumps the `dbo.LeadOutcomes` + `dbo.LeadOutcomeTypes` schemas, samples rows, and searches `INFORMATION_SCHEMA.VIEWS` across all 7 reporting DBs. Manual trigger only.
+
+Run via `gh workflow run probe-X.yml --ref main`. Useful for any future re-investigation of attribution semantics or for finding new outcome types if the enum expands.
 
 #### 11.5.9 Partnership-handbook context for this page
 

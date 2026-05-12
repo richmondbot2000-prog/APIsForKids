@@ -52,11 +52,16 @@ Analysis unit is currently **(Broker, SourceReference1)** but a future improveme
 **Canonical KPI: blended CPA ~12%.** Below = profitable, above = eroding margin. Per the handbook this is the single most-watched number. The page currently reports `cost_per_paid_loan` in dollars — translating that to CPA % vs the 12% benchmark is one of the open improvements (SPEC §11.5.9).
 
 **Commission types — corrected from the handbook:**
-- 1 = PerFundedLoan (CPF)
+- 1 = PerFundedLoan (CPF) — *if* `rate < 1`, the scanner reinterprets as % rev-share (mis-typed data; see SPEC §11.5.3)
 - 2 = PerApplication
 - 3 = PerClick (CPC) — excluded from analysis
 - 4 = PerAcceptedAPILead (covers static-price AND price-reject bidding variants)
 - 5 = PerFundedLoanPreCheck (CPF with Pre-Check, also used as a label for CPF click campaigns)
+
+**Lead Outcomes (the canonical attribution path)** — confirmed with Kelly Black 2026-05-12:
+- `ReportingApplications.dbo.LeadOutcomes` is the per-lead event log. Each row is `(LeadId, LeadOutcomeTypeID, DateTimeUtc)`. Whitebox `/UpdateStatus` writes one row per milestone, tagged with the `LeadId` that was live at the time — so per-`LeadId` aggregation gives correct attribution even when an ARef was sold by multiple brokers. The funnel enum is in `dbo.LeadOutcomeTypes` (10 values; key ones: 1=Apply1 complete, 4=BRW signed, 5=GT passed, 6=GT VC, 8=**Paid out**).
+- `scan_source_quality.py` Part A uses this canonical path; `scan_brokers.py` still uses Tasks-derived stage counts (separate consideration, not yet refactored).
+- For any attribution-sensitive analytics, **don't group by ARef then MAX(CampaignId)** — that's the old broken heuristic and arbitrarily picks a broker when the customer was sold by multiple. JOIN LeadOutcomes per LeadId instead.
 
 ## 6. Tooling preferences
 
