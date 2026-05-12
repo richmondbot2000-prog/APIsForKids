@@ -510,7 +510,7 @@ Per-action authorisation chain:
 3. The Worker checks the CF-Access-Authenticated-User-Email is in the `ADMIN_EMAILS` env var (comma-separated, currently `james.benamor@letme.com`). Failure: 403.
 4. **Two Google access tokens are minted** per action via service-account JWT + DWD:
    - **Admin token** — impersonates `IMPERSONATE_USER` (`james.benamor@letme.co.uk`, a Super Admin), scope `admin.directory.user + apps.licensing`. Used for the suspend/unsuspend/create endpoints.
-   - **Mailbox token** — impersonates the **target user**, scope `gmail.settings.basic`. Used for the forwarding setup. This is why Suspend+route needs `gmail.settings.basic` added to the DWD config in `admin.google.com` (Step 3 of `worker/WORKSPACE_SETUP.md`).
+   - **Mailbox token** — impersonates the **target user**, scope `gmail.settings.sharing`. Used for the forwarding setup. This is why Suspend+route needs `gmail.settings.sharing` added to the DWD config in `admin.google.com` (Step 3 of `worker/WORKSPACE_SETUP.md`).
 5. Failure: 502 with the Google error message.
 
 **Audit log:** every action appends an entry to `workspace-actions.json` in the repo via the GitHub Contents API. The Worker holds a fine-grained PAT (`GITHUB_TOKEN` secret) with `Contents: read+write` on `richmondbot2000-prog/togetherbook`. The audit file is FIFO-trimmed to 2000 entries; older history persists in git via the commit log (commit message is `Workspace: <action> <email> by <actor>`). The page reads `workspace-actions.json` to surface forwarding targets on suspended rows; if it ever disappears, the UI degrades by hiding the `→ chip` but actions still work.
@@ -568,7 +568,7 @@ Reasonable expectation: ~60 records, ~28-30 KB minified. The 5.1 KB Worker Secre
 |---|---|---|
 | Payroll section missing on everyone | `PAYROLL_KV` empty / not bound; endpoint returns 503 | Re-run scanner → paste into KV → check `book.togetherbook.net/api/workspace/payroll` in browser returns JSON |
 | Payroll section missing on one specific person | No match — they aren't in either CSV, OR their Workspace name is too different from payroll's legal name (no alias covers the gap) | Check unmatched list with the Python diagnostic in `scripts/scan_payroll.py`; if it's worth fixing, either rename them in Workspace, add a nickname to the `NICKNAMES` map, or accept that one record won't match |
-| "Suspend + route" returns 502 | Most likely: `gmail.settings.basic` scope not added in DWD | `admin.google.com → Security → Access and data control → API controls → Manage Domain-Wide Delegation` — edit the existing Client ID, add scope `https://www.googleapis.com/auth/gmail.settings.basic` |
+| "Suspend + route" returns 502 | Most likely: `gmail.settings.sharing` scope not added in DWD | `admin.google.com → Security → Access and data control → API controls → Manage Domain-Wide Delegation` — edit the existing Client ID, add scope `https://www.googleapis.com/auth/gmail.settings.sharing` |
 | "Suspend + route" returns 401/403 | CF Access session expired, or `ADMIN_EMAILS` doesn't include the actor | Re-auth via book.togetherbook.net; or edit `ADMIN_EMAILS` env var on `apifk-workspace-worker2` and redeploy |
 | Forwarding chip ("→ X") missing on a suspended row | `workspace-actions.json` doesn't have a successful `suspend-and-route` for that email | Look at the file in repo; if the suspend happened outside this UI (e.g. via Admin Console directly) there's no record. Future-proof: have the suspender always use the page. |
 | Whole page blank / 404 | GitHub Pages CNAME `book.togetherbook.net` lost its HTTPS cert (state goes `bad_authz`) | `gh api repos/richmondbot2000-prog/togetherbook/pages` to check `https_certificate.state`. If bad, in repo Settings → Pages, uncheck and re-check "Enforce HTTPS" to retry ACME. |
@@ -584,7 +584,7 @@ If the Workers / KV / DWD ever need to be re-created:
    - `https://www.googleapis.com/auth/admin.directory.user.readonly`
    - `https://www.googleapis.com/auth/admin.directory.group.readonly` (added by accident, harmless, kept)
    - `https://www.googleapis.com/auth/apps.licensing`
-   - `https://www.googleapis.com/auth/gmail.settings.basic`
+   - `https://www.googleapis.com/auth/gmail.settings.sharing`
 3. **GitHub PATs** (one-time): fine-grained on the user `richmondbot2000-prog`, `Contents: read+write` on `togetherbook` only. Same token is reused by both Workers as `GITHUB_TOKEN` secret.
 4. **Cloudflare Workers** (two of them):
    - `apifk-workspace-worker2` — route `book.togetherbook.net/api/workspace/*`. Bindings: `GOOGLE_SERVICE_ACCOUNT_JSON`, `GITHUB_TOKEN`, `IMPERSONATE_USER` (`james.benamor@letme.co.uk`), `ADMIN_EMAILS` (`james.benamor@letme.com`), KV binding `PAYROLL_KV` → `apifk-payroll` namespace. Code: `worker/workspace-worker.js`.

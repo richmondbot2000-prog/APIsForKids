@@ -38,7 +38,7 @@ const ADMIN_SCOPES = [
 // Gmail settings scope — needed for forwardingAddresses + autoForwarding.
 // The Worker impersonates the *target user* (not the admin) for these calls
 // because mailbox-settings APIs run as the mailbox owner under DWD.
-const GMAIL_SCOPES = "https://www.googleapis.com/auth/gmail.settings.basic";
+const GMAIL_SCOPES = "https://www.googleapis.com/auth/gmail.settings.sharing";
 
 export default {
   async fetch(req, env) {

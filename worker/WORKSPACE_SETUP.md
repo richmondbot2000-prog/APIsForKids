@@ -98,10 +98,10 @@ If the action fails:
   malformed, or DWD scopes aren't authorised. Re-check the
   `domain-wide-delegation` page; the scopes should include
   `admin.directory.user`, `apps.licensing`, and
-  `gmail.settings.basic` (the last one is needed for the Suspend + route
+  `gmail.settings.sharing` (the last one is needed for the Suspend + route
   email-forwarding action — add it via Admin Console → Security → Access
   and data control → API controls → Domain-wide delegation → edit the
-  Client ID → add scope `https://www.googleapis.com/auth/gmail.settings.basic`).
+  Client ID → add scope `https://www.googleapis.com/auth/gmail.settings.sharing`).
 - **502 with `forbidden` in the details** — the impersonated user
   (`IMPERSONATE_USER`) isn't a Super Admin. Confirm via Admin Console →
   Admin roles → Super Admin → Admins.
