@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778621948">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778621948">
-<link rel="stylesheet" href="quiet.css?v=1778621948">
-<link rel="stylesheet" href="quiet-extras.css?v=1778621948">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778621948">
+<link rel="stylesheet" href="style.css?v=1778622074">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778622074">
+<link rel="stylesheet" href="quiet.css?v=1778622074">
+<link rel="stylesheet" href="quiet-extras.css?v=1778622074">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778622074">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -490,6 +490,25 @@
     border-color: var(--manuscript-red, #B23A48);
     box-shadow: 0 0 0 2px rgba(178, 58, 72, 0.25);
   }
+  .dir-modal-banner {
+    margin: 0 0 16px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    font: 600 0.95rem 'Inter', sans-serif;
+    border-left: 4px solid;
+    transition: opacity 0.4s;
+  }
+  .dir-modal-banner--success {
+    background: #E6F1E0;
+    color: #2D5C1F;
+    border-left-color: #4A9A2E;
+  }
+  .dir-modal-banner--error {
+    background: #FBE3E5;
+    color: #7A1F2A;
+    border-left-color: var(--manuscript-red, #B23A48);
+  }
+  .dir-modal-banner--fade { opacity: 0; }
   .dir-modal-actions {
     display: flex;
     gap: 8px;
@@ -673,7 +692,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778621948" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778622074" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1506,8 +1525,6 @@
       const routeInput = modal.querySelector('input[name="route_to"]');
       const routeTo = (routeInput && routeInput.value || "").trim();
       if (!routeTo || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(routeTo)) {
-        // Highlight the input and focus it — the prior approach put the error
-        // far below in the confirm-slot, which read like a separate field.
         if (routeInput) {
           routeInput.classList.add("dir-input-invalid");
           routeInput.focus();
@@ -1516,19 +1533,10 @@
         slot.innerHTML = "";
         return;
       }
-      slot.innerHTML = `
-        <div class="dir-confirm">
-          <div class="dir-confirm-text">
-            <strong>Suspend ${escapeHtml(u.email)} and forward all mail to ${escapeHtml(routeTo)}?</strong><br>
-            <span class="dir-modal-saved-hint" style="text-align:left;margin:0;">Pauses Workspace access (saves the per-seat fee on Flex). Mail to this address will be auto-forwarded to the target. Reversible via Unsuspend.</span>
-          </div>
-          <div class="dir-confirm-actions">
-            <button type="button" data-cancel>Cancel</button>
-            <button type="button" class="confirm" data-confirm>Suspend + route</button>
-          </div>
-        </div>`;
-      slot.querySelector("[data-cancel]").addEventListener("click", () => { slot.innerHTML = ""; });
-      slot.querySelector("[data-confirm]").addEventListener("click", () => runAction(entry, action, slot, { route_to: routeTo }));
+      // No inline confirmation step — typing the forwarding address IS the
+      // confirmation. One button, one click. The modal re-renders into the
+      // suspended state after success, which is the natural "it worked" signal.
+      runAction(entry, action, slot, { route_to: routeTo });
       return;
     }
   }
@@ -1559,9 +1567,7 @@
 
     try {
       await workspaceAction(action, { email: u.email, ...(extras || {}) });
-      toast.textContent = `${u.email} — ${action.replace(/-/g, " ")} succeeded.`;
-      // Optimistic in-memory state update so the row reflects reality before
-      // the next refresh-directory.yml run lands a fresh staff.json.
+      // Optimistic in-memory state update.
       if (action === "suspend-and-route") {
         u.suspended = true;
         if (extras && extras.route_to) forwardingByEmail[u.email.toLowerCase()] = extras.route_to;
@@ -1572,13 +1578,34 @@
       }
       if (slot) slot.innerHTML = "";
       renderGrid();
-      // Re-open the modal so the badge + buttons flip cleanly.
+      // Re-render the modal into its post-action state and pin a prominent
+      // success banner at the top so the user sees clearly what just happened.
       openCard(entryKey(entry));
+      const successText = action === "suspend-and-route"
+        ? `Suspended — mail to ${u.email} now forwards to ${extras && extras.route_to ? extras.route_to : "the address you set"}.`
+        : action === "unsuspend"
+          ? `Unsuspended — ${u.email} is active again, forwarding turned off.`
+          : `${u.email} — ${action.replace(/-/g, " ")} succeeded.`;
+      showModalBanner(successText, "success");
     } catch (err) {
-      toast.textContent = `${verbLabel.replace(/ing$/, "")} failed — ${err.message || err}`;
-      toast.classList.add("error");
+      showModalBanner(`${verbLabel.replace(/ing$/, "")} failed — ${err.message || err}`, "error");
       modal.querySelectorAll("[data-action], [data-confirm]").forEach(b => b.disabled = false);
     }
+  }
+
+  // Pin a banner at the top of the open modal. Auto-dismisses after 8s.
+  function showModalBanner(text, kind) {
+    const modal = document.getElementById("dirModal");
+    if (!modal) return;
+    const existing = modal.querySelector(".dir-modal-banner");
+    if (existing) existing.remove();
+    const div = document.createElement("div");
+    div.className = `dir-modal-banner dir-modal-banner--${kind || "info"}`;
+    div.textContent = text;
+    modal.insertBefore(div, modal.firstChild);
+    modal.scrollTop = 0;
+    setTimeout(() => div.classList.add("dir-modal-banner--fade"), 6000);
+    setTimeout(() => { if (div.parentNode) div.remove(); }, 8000);
   }
 
   /* ----- Create-user modal ----- */
