@@ -144,8 +144,8 @@ BRANDS = [
 ]
 
 USER_AGENT = (
-    "APIsForKids-brandwatch/1.0 "
-    "(+https://richmondbot2000-prog.github.io/APIsForKids/; contact: "
+    "TogetherBook-brandwatch/1.0 "
+    "(+https://book.togetherbook.net/; contact: "
     "richmondbot2000@gmail.com)"
 )
 

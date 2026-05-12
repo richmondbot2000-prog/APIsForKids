@@ -115,7 +115,7 @@ jobs:
               "<th style='padding:6px 10px'>Date</th><th style='padding:6px 10px'>Mention</th>"
               "</tr></thead><tbody>" + "".join(rows) + "</tbody></table>"
               "<p style='color:#888;font-size:12px;margin-top:24px'>"
-              "Sent automatically by APIsForKids/refresh-brandwatch."
+              "Sent automatically by TogetherBook/refresh-brandwatch."
               "</p>"
           )
           print(body)
@@ -132,7 +132,7 @@ jobs:
           secure: true
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-          from: APIsForKids Brandwatch <${{ secrets.SMTP_USERNAME }}>
+          from: TogetherBook Brandwatch <${{ secrets.SMTP_USERNAME }}>
           to: james.benamor@rgroup.co.uk, compliance@togetherloans.com
           subject: ${{ steps.body.outputs.subject }}
           html_body: file:///tmp/email_body.html

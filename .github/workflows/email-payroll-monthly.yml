@@ -18,7 +18,7 @@ jobs:
           secure: true
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-          from: APIsForKids Directory <${{ secrets.SMTP_USERNAME }}>
+          from: TogetherBook Directory <${{ secrets.SMTP_USERNAME }}>
           to: Payroll@letme.com
           cc: james.benamor@rgroup.co.uk
           subject: Monthly payroll spreadsheet request — Togetherbook Directory
