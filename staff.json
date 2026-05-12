@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated_at": "2026-05-12T08:09:23.530418Z",
+  "updated_at": "2026-05-12T21:59:45.087483Z",
   "snapshot_date": "2026-05-12",
   "domain": "letme.co.uk",
   "tenants": [
@@ -41,6 +41,9 @@
   "users": [
     {
       "email": "azure@letme.com",
+      "aliases": [
+        "azure@letme.co.uk"
+      ],
       "name": "Azure Account",
       "given": "Azure",
       "family": "Account",
@@ -56,6 +59,7 @@
     },
     {
       "email": "leticia.alexandre@letme.com",
+      "aliases": [],
       "name": "Leticia Alexandre",
       "given": "Leticia",
       "family": "Alexandre",
@@ -71,6 +75,12 @@
     },
     {
       "email": "autobots@rapida.bg",
+      "aliases": [
+        "rapida.payout@rapida.bg",
+        "rapida.payout@mail.rapida.bg",
+        "rapida.collections@rapida.bg",
+        "rapida.collections@mail.rapida.bg"
+      ],
       "name": "Bulgaria Autobots",
       "given": "Bulgaria",
       "family": "Autobots",
@@ -86,6 +96,15 @@
     },
     {
       "email": "autobots@clearloans.com.au",
+      "aliases": [
+        "cash.payments@clearloans.com.au",
+        "communications.collector@clearloans.com.au",
+        "collections@clearloans.com.au",
+        "noreply@clearloans.com.au",
+        "automessaging@clearloans.com.au",
+        "help@letme.co.uk",
+        "makeacomplaint@letme.co.uk"
+      ],
       "name": "Clearloans Autobots",
       "given": "Clearloans",
       "family": "Autobots",
@@ -101,6 +120,7 @@
     },
     {
       "email": "lmautomessagingarchive@letme.com",
+      "aliases": [],
       "name": "Lending Mate Automessaging Archive",
       "given": "Lending Mate",
       "family": "Automessaging Archive",
@@ -116,6 +136,9 @@
     },
     {
       "email": "kyle.barrett@letme.com",
+      "aliases": [
+        "kyle.barret@letme.com"
+      ],
       "name": "Kyle Barrett",
       "given": "Kyle",
       "family": "Barrett",
@@ -131,6 +154,7 @@
     },
     {
       "email": "daniel.bartlett@letme.com",
+      "aliases": [],
       "name": "Daniel Bartlett",
       "given": "Daniel",
       "family": "Bartlett",
@@ -146,6 +170,13 @@
     },
     {
       "email": "james.benamor@letme.com",
+      "aliases": [
+        "james.benamor@letme.co.uk",
+        "james.b@letme.com",
+        "james.benamor@memini.co.uk",
+        "paul.benamor@letme.co.uk",
+        "paul.benamor@letme.com"
+      ],
       "name": "James Benamor",
       "given": "James",
       "family": "Benamor",
@@ -161,6 +192,7 @@
     },
     {
       "email": "lucas.benamor@letme.co.uk",
+      "aliases": [],
       "name": "Lucas Benamor",
       "given": "Lucas",
       "family": "Benamor",
@@ -176,6 +208,9 @@
     },
     {
       "email": "tarek.benamor@letme.com",
+      "aliases": [
+        "tarek.benamor@letme.co.uk"
+      ],
       "name": "Tarek Benamor",
       "given": "Tarek",
       "family": "Benamor",
@@ -190,22 +225,12 @@
       ]
     },
     {
-      "email": "zara.benamor@letme.com",
-      "name": "Zara Benamor",
-      "given": "Zara",
-      "family": "Benamor",
-      "title": "",
-      "department": "",
-      "photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjUbqFgqRfXPlHglsTjGqMUztmtAY-p1Mum81O16lkADE2PQrNtx=s96-c",
-      "suspended": false,
-      "admin": false,
-      "tenant": "letme.co.uk",
-      "tenants": [
-        "letme.co.uk"
-      ]
-    },
-    {
       "email": "dan.bennett@clearloans.com.au",
+      "aliases": [
+        "dan.bennett@alerts.clearloans.com.au",
+        "dan.bennett@letme.co.uk",
+        "dan.bennett@letme.com"
+      ],
       "name": "Dan Bennett",
       "given": "Dan",
       "family": "Bennett",
@@ -221,6 +246,12 @@
     },
     {
       "email": "kelly.black@letme.com",
+      "aliases": [
+        "kelly.black@letme.co.uk",
+        "liam.keighley@letme.co.uk",
+        "alexandra.wellings@letme.co.uk",
+        "alexandra.wellings@letme.com"
+      ],
       "name": "Kelly Black",
       "given": "Kelly",
       "family": "Black",
@@ -236,6 +267,7 @@
     },
     {
       "email": "noreply@togetherbook.net",
+      "aliases": [],
       "name": "Richmond Bot",
       "given": "Richmond",
       "family": "Bot",
@@ -251,6 +283,9 @@
     },
     {
       "email": "david.byatt@letme.com",
+      "aliases": [
+        "david.byatt@letme.co.uk"
+      ],
       "name": "David Byatt",
       "given": "David",
       "family": "Byatt",
@@ -266,6 +301,7 @@
     },
     {
       "email": "joshua.carless@letme.co.uk",
+      "aliases": [],
       "name": "Joshua Carless",
       "given": "Joshua",
       "family": "Carless",
@@ -281,6 +317,9 @@
     },
     {
       "email": "laura.chadbourne@letme.co.uk",
+      "aliases": [
+        "laura.chadbourne@letme.com"
+      ],
       "name": "Laura Chadbourne",
       "given": "Laura",
       "family": "Chadbourne",
@@ -296,6 +335,11 @@
     },
     {
       "email": "amber.cole@letme.com",
+      "aliases": [
+        "amber.cole@letme.co.uk",
+        "femi.omotoso@letme.com",
+        "femi.omotoso@letme.co.uk"
+      ],
       "name": "Amber Cole",
       "given": "Amber",
       "family": "Cole",
@@ -311,6 +355,7 @@
     },
     {
       "email": "joshua.cole@letme.com",
+      "aliases": [],
       "name": "Joshua Cole",
       "given": "Joshua",
       "family": "Cole",
@@ -326,6 +371,9 @@
     },
     {
       "email": "clementia.dsouza@letme.com",
+      "aliases": [
+        "clementia.dsouza@letme.co.uk"
+      ],
       "name": "Clementia Dsouza",
       "given": "Clementia",
       "family": "Dsouza",
@@ -341,6 +389,7 @@
     },
     {
       "email": "max.dynowski@letme.co.uk",
+      "aliases": [],
       "name": "Max Dynowski",
       "given": "Max",
       "family": "Dynowski",
@@ -356,6 +405,10 @@
     },
     {
       "email": "raveeha.ejaz@letme.com",
+      "aliases": [
+        "raveeha@letme.com",
+        "raveeha.ejaz@letme.co.uk"
+      ],
       "name": "Raveeha Ejaz",
       "given": "Raveeha",
       "family": "Ejaz",
@@ -371,6 +424,7 @@
     },
     {
       "email": "candidate.email@letme.co.uk",
+      "aliases": [],
       "name": "Candidate Email",
       "given": "Candidate",
       "family": "Email",
@@ -386,6 +440,22 @@
     },
     {
       "email": "historic@letme.co.uk",
+      "aliases": [
+        "shelby.barefoot@letme.co.uk",
+        "adrianna.przybylska@letme.com",
+        "adrianna.przybylska@rapidamoney.pl",
+        "sam.lissen@letme.com",
+        "sam.lissen@letme.co.uk",
+        "patryk.brandeburski@letme.co.uk",
+        "patryk.brandeburski@letme.com",
+        "patryk.brandeburski@rapidamoney.bg",
+        "patryk.brandeburski@rapidamoney.pl",
+        "irena.lipinska@letme.co.uk",
+        "irena.lipinska@mail.rapidamoney.pl",
+        "irena.lipinska@letme.com",
+        "elliott.santana@letme.co.uk",
+        "elliott.santana@letme.com"
+      ],
       "name": "Historic Emails",
       "given": "Historic",
       "family": "Emails",
@@ -401,6 +471,9 @@
     },
     {
       "email": "joseph.foard@letme.com",
+      "aliases": [
+        "joseph.foard@letme.co.uk"
+      ],
       "name": "Joseph Foard",
       "given": "Joseph",
       "family": "Foard",
@@ -416,6 +489,15 @@
     },
     {
       "email": "julian.foster@letme.co.uk",
+      "aliases": [
+        "julian@letme.co.uk",
+        "andrew.allen@letme.com",
+        "andrew.allen@letme.co.uk",
+        "sian.burton@letme.co.uk",
+        "sian.burton@letme.com",
+        "properties@letme.co.uk",
+        "properties@letme.com"
+      ],
       "name": "Julian Foster",
       "given": "Julian",
       "family": "Foster",
@@ -431,6 +513,10 @@
     },
     {
       "email": "ben.gardner@letme.com",
+      "aliases": [
+        "ben.gardner@letme.co.uk",
+        "richmondgroup@letme.com"
+      ],
       "name": "Ben Gardner",
       "given": "Ben",
       "family": "Gardner",
@@ -446,6 +532,7 @@
     },
     {
       "email": "brogan.hackley@letme.com",
+      "aliases": [],
       "name": "Brogan Hackley",
       "given": "Brogan",
       "family": "Hackley",
@@ -461,6 +548,9 @@
     },
     {
       "email": "edward.heaney@letme.com",
+      "aliases": [
+        "edward.heaney@letme.co.uk"
+      ],
       "name": "Edward Heaney",
       "given": "Edward",
       "family": "Heaney",
@@ -476,6 +566,9 @@
     },
     {
       "email": "victor.igbaifua@letme.com",
+      "aliases": [
+        "victor.igbaifua@letme.co.uk"
+      ],
       "name": "Victor Igbaifua",
       "given": "Victor",
       "family": "Igbaifua",
@@ -491,6 +584,7 @@
     },
     {
       "email": "katarzyna.jiddou@letme.com",
+      "aliases": [],
       "name": "Katarzyna Jiddou",
       "given": "Katarzyna",
       "family": "Jiddou",
@@ -506,6 +600,9 @@
     },
     {
       "email": "kamran.kamaei@letme.com",
+      "aliases": [
+        "kamran.kamaei@letme.co.uk"
+      ],
       "name": "Kamran Kamaei",
       "given": "Kamran",
       "family": "Kamaei",
@@ -521,6 +618,23 @@
     },
     {
       "email": "dorota.kazmierczyk@letme.com",
+      "aliases": [
+        "dorota.kazmierczyk@rapidamoney.pl",
+        "dorota.kazmierczyk@mail.rapidamoney.pl",
+        "ugoda@rapidamoney.pl",
+        "wniosek@rapidamoney.pl",
+        "adrianna.gostol@letme.com",
+        "adrianna.gostol@mail.rapidamoney.pl",
+        "adrianna.gostol@rapidamoney.pl",
+        "radoslaw.wojnarski@letme.com",
+        "radoslaw.wojnarski@rapidamoney.pl",
+        "modesta.przybylek@rapidamoney.pl",
+        "kamen.totev@letme.co.uk",
+        "kamen.totev@rapidamoney.pl",
+        "elzbieta.olender@letme.com",
+        "elzbieta.olender@mail.rapidamoney.pl",
+        "elzbieta.olender@rapidamoney.pl"
+      ],
       "name": "Dorota Kazmierczyk",
       "given": "Dorota",
       "family": "Kazmierczyk",
@@ -536,6 +650,11 @@
     },
     {
       "email": "morgan.smith@letme.com",
+      "aliases": [
+        "morgan.smith@letme.co.uk",
+        "jade.reynolds@letme.com",
+        "jade.reynolds@letme.co.uk"
+      ],
       "name": "Morgan Kennedy-Smith",
       "given": "Morgan",
       "family": "Kennedy-Smith",
@@ -551,6 +670,9 @@
     },
     {
       "email": "igor.kravcov@letme.com",
+      "aliases": [
+        "igor.kravcov@letme.co.uk"
+      ],
       "name": "Igor Kravcov",
       "given": "Igor",
       "family": "Kravcov",
@@ -566,6 +688,7 @@
     },
     {
       "email": "finance@letme.com",
+      "aliases": [],
       "name": "Finance Letme",
       "given": "Finance",
       "family": "Letme",
@@ -581,6 +704,7 @@
     },
     {
       "email": "customer.letters@letme.co.uk",
+      "aliases": [],
       "name": "customer letters",
       "given": "customer",
       "family": "letters",
@@ -596,6 +720,9 @@
     },
     {
       "email": "cyrus.leung@letme.com",
+      "aliases": [
+        "cyrus.leung@letme.co.uk"
+      ],
       "name": "Cyrus Leung",
       "given": "Cyrus",
       "family": "Leung",
@@ -611,6 +738,9 @@
     },
     {
       "email": "cherry.liu@letme.com",
+      "aliases": [
+        "cherry.liu@letme.co.uk"
+      ],
       "name": "Cherry Liu",
       "given": "Cherry",
       "family": "Liu",
@@ -626,6 +756,9 @@
     },
     {
       "email": "mourad.malki@clearloans.com.au",
+      "aliases": [
+        "mourad.malki@mail.clearloans.com.au"
+      ],
       "name": "Mourad Malki",
       "given": "Mourad",
       "family": "Malki",
@@ -641,6 +774,11 @@
     },
     {
       "email": "mourad.malki@letme.com",
+      "aliases": [
+        "mourad.malki@letme.co.uk",
+        "mourad.malki@rapidamoney.pl",
+        "mourad.malki@mail.rapidamoney.pl"
+      ],
       "name": "Mourad Malki",
       "given": "Mourad",
       "family": "Malki",
@@ -656,6 +794,7 @@
     },
     {
       "email": "office@letme.com",
+      "aliases": [],
       "name": "Letme Office",
       "given": "Letme",
       "family": "Office",
@@ -671,6 +810,9 @@
     },
     {
       "email": "phil.oneill@letme.co.uk",
+      "aliases": [
+        "phil.oniell@letme.co.uk"
+      ],
       "name": "phil oneill",
       "given": "phil",
       "family": "oneill",
@@ -686,6 +828,7 @@
     },
     {
       "email": "skanpoczta@rapidamoney.pl",
+      "aliases": [],
       "name": "Rapida Poat-Scanning",
       "given": "Rapida",
       "family": "Poat-Scanning",
@@ -701,6 +844,7 @@
     },
     {
       "email": "printer@letme.co.uk",
+      "aliases": [],
       "name": "Office Printer",
       "given": "Office",
       "family": "Printer",
@@ -716,6 +860,7 @@
     },
     {
       "email": "mark.prior@letme.co.uk",
+      "aliases": [],
       "name": "Mark Prior",
       "given": "Mark",
       "family": "Prior",
@@ -731,6 +876,9 @@
     },
     {
       "email": "mike.pursey@letme.com",
+      "aliases": [
+        "mike.pursey@letme.co.uk"
+      ],
       "name": "Mike Pursey",
       "given": "Mike",
       "family": "Pursey",
@@ -746,6 +894,12 @@
     },
     {
       "email": "autobots@rapidamoney.pl",
+      "aliases": [
+        "customers.letters.generator@rapidamoney.pl",
+        "rapida.windykacja@rapidamoney.pl",
+        "contracts@rapidamoney.pl",
+        "communications.collector@rapidamoney.pl"
+      ],
       "name": "autobots Rapida",
       "given": "autobots",
       "family": "Rapida",
@@ -761,6 +915,7 @@
     },
     {
       "email": "reservation@letme.com",
+      "aliases": [],
       "name": "Letme Reservations",
       "given": "Letme",
       "family": "Reservations",
@@ -775,7 +930,26 @@
       ]
     },
     {
+      "email": "george.roche@letme.co.uk",
+      "aliases": [
+        "george.roche@letme.com"
+      ],
+      "name": "George Roche",
+      "given": "George",
+      "family": "Roche",
+      "title": "",
+      "department": "",
+      "photo_url": "",
+      "suspended": false,
+      "admin": false,
+      "tenant": "letme.co.uk",
+      "tenants": [
+        "letme.co.uk"
+      ]
+    },
+    {
       "email": "dan.sanders@letme.com",
+      "aliases": [],
       "name": "Dan Sanders",
       "given": "Dan",
       "family": "Sanders",
@@ -791,6 +965,7 @@
     },
     {
       "email": "nikolay.savov@rapida.bg",
+      "aliases": [],
       "name": "Nikolay Savov",
       "given": "Nikolay",
       "family": "Savov",
@@ -806,6 +981,9 @@
     },
     {
       "email": "tomasz.schwertner@letme.com",
+      "aliases": [
+        "tomasz.schwertner@rapidamoney.pl"
+      ],
       "name": "Tomasz Schwertner",
       "given": "Tomasz",
       "family": "Schwertner",
@@ -821,6 +999,9 @@
     },
     {
       "email": "tom.slaughter@letme.com",
+      "aliases": [
+        "tom.slaughter@letme.co.uk"
+      ],
       "name": "Tom Slaughter",
       "given": "Tom",
       "family": "Slaughter",
@@ -836,6 +1017,7 @@
     },
     {
       "email": "jamie.stevens@letme.com",
+      "aliases": [],
       "name": "Jamie Stevens",
       "given": "Jamie",
       "family": "Stevens",
@@ -851,6 +1033,9 @@
     },
     {
       "email": "lucian.teodoroiu@letme.co.uk",
+      "aliases": [
+        "lucian.teodoroiu@letme.com"
+      ],
       "name": "Lucian Teodoroiu",
       "given": "Lucian",
       "family": "Teodoroiu",
@@ -866,6 +1051,9 @@
     },
     {
       "email": "adnan.turken@letme.co.uk",
+      "aliases": [
+        "adnan.turken@letme.com"
+      ],
       "name": "Adnan Türken",
       "given": "Adnan",
       "family": "Türken",
@@ -881,6 +1069,9 @@
     },
     {
       "email": "sophia.ugwunne@letme.com",
+      "aliases": [
+        "sophia.ugwunne@letme.co.uk"
+      ],
       "name": "Sophia Ugwunne",
       "given": "Sophia",
       "family": "Ugwunne",
@@ -896,6 +1087,9 @@
     },
     {
       "email": "esther.uwadione@letme.com",
+      "aliases": [
+        "esther.uwadione@letme.co.uk"
+      ],
       "name": "Esther Uwadione",
       "given": "Esther",
       "family": "Uwadione",
@@ -911,6 +1105,9 @@
     },
     {
       "email": "james.webster@letme.co.uk",
+      "aliases": [
+        "james.webster@letme.com"
+      ],
       "name": "James Webster",
       "given": "James",
       "family": "Webster",
@@ -926,6 +1123,9 @@
     },
     {
       "email": "matthew.wood@letme.co.uk",
+      "aliases": [
+        "matthew.wood@letme.com"
+      ],
       "name": "matthew wood",
       "given": "matthew",
       "family": "wood",
@@ -941,6 +1141,7 @@
     },
     {
       "email": "natasha.wright@letme.co.uk",
+      "aliases": [],
       "name": "Natasha Wright",
       "given": "Natasha",
       "family": "Wright",
@@ -956,6 +1157,7 @@
     },
     {
       "email": "ekrem.yurtman@letme.com",
+      "aliases": [],
       "name": "Ekrem Yurtman",
       "given": "Ekrem",
       "family": "Yurtman",
