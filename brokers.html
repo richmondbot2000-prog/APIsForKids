@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Brokers</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778539287">
-<link rel="stylesheet" href="quiet.css?v=1778539287">
-<link rel="stylesheet" href="quiet-extras.css?v=1778539287">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778568710">
+<link rel="stylesheet" href="quiet.css?v=1778568710">
+<link rel="stylesheet" href="quiet-extras.css?v=1778568710">
 <style>
   .br-section { max-width: 1280px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .br-section { padding: 2px 0 32px; } }
@@ -501,7 +501,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778539287" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778568710" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -562,6 +562,12 @@
       <h2 class="br-canvas-title">Source-quality analysis</h2>
       <p class="br-canvas-sub">All four sections below are derived from <code>source-quality.json</code> — a daily heavy-join analysis that aggregates leads by <strong>(Broker, SourceReference1)</strong> cell over a <strong>60-day window ending 30 days ago</strong> (the 30-day lag gives paid-out outcomes time to settle). For each section: what it tells you, and what action it implies.</p>
       <div class="br-recommend-meta" id="brSqFreshness"></div>
+      <div style="margin: 12px 0 0; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+        <span style="font: 500 10px/1 var(--font-body); text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-500);">Filter to broker</span>
+        <input id="brSqBrokerFilter" type="search" placeholder="e.g. Lead Economy"
+          style="background: var(--paper-50); border: 1px solid var(--paper-300); color: var(--ink-900); padding: 5px 9px; font: 400 13px/1.3 var(--font-display); width: 240px;" />
+        <span style="font: italic 400 11px/1.3 var(--font-display); color: var(--ink-500);">substring match — applies across all four sections below</span>
+      </div>
     </div>
 
     <!-- ── Best-value (Broker, Source) cells — positive mirror ────── -->
@@ -676,13 +682,38 @@
     document.getElementById("brMeta").textContent = "brokers.json not loaded — " + err;
   });
 
+  // Cached source-quality data so the broker filter can re-render
+  // without re-fetching.
+  let _SQ = null;
+
   function renderRecommendations(sq) {
+    _SQ = sq;
+    // Wire the filter once; subsequent calls re-render via _renderSqSections().
+    const filterEl = document.getElementById("brSqBrokerFilter");
+    if (filterEl && !filterEl.__wired) {
+      filterEl.__wired = true;
+      filterEl.addEventListener("input", () => _renderSqSections());
+    }
+    _renderSqSections();
+  }
+
+  function _renderSqSections() {
+    const sq = _SQ;
     const grid = document.getElementById("brRecommendGrid");
     if (!sq) { grid.hidden = true; return; }
     grid.hidden = false;
     document.getElementById("brSqMinVol").textContent = (sq.min_volume_for_ranking || 200).toLocaleString();
     const bestVolEl = document.getElementById("brSqMinVolBest");
     if (bestVolEl) bestVolEl.textContent = (sq.min_volume_for_ranking || 200).toLocaleString();
+
+    // Broker filter — applies to all four sections below.
+    const filterEl = document.getElementById("brSqBrokerFilter");
+    const filterTerm = ((filterEl && filterEl.value) || "").trim().toLowerCase();
+    const matchesFilter = (row) => {
+      if (!filterTerm) return true;
+      const bn = (row.broker_name || "").toLowerCase();
+      return bn.includes(filterTerm);
+    };
 
     // Source-quality intro + freshness indicator
     const intro = document.getElementById("brSqIntro");
@@ -703,6 +734,7 @@
     const weakAll = (sq.weak_accepted && sq.weak_accepted.by_broker_source) || [];
     const bestSources = weakAll
       .filter(s => (s.cost_per_paid_loan || 0) > 0 && (s.paid_out || 0) > 0)
+      .filter(matchesFilter)
       .sort((a, b) => (a.cost_per_paid_loan || 0) - (b.cost_per_paid_loan || 0))
       .slice(0, 15);
     const bestWrap = document.getElementById("brBestWrap");
@@ -723,6 +755,7 @@
     const weakBs = (sq.weak_accepted && sq.weak_accepted.by_broker_source) || [];
     const blockSources = weakBs
       .filter(s => (s.cost_per_paid_loan || 0) >= COST_PER_PAID_THRESHOLD)
+      .filter(matchesFilter)
       .sort((a, b) => (b.cost_per_paid_loan || 0) - (a.cost_per_paid_loan || 0))
       .slice(0, 15);
     document.getElementById("brWeakMeta").textContent =
@@ -732,7 +765,8 @@
       : '<div class="br-rec-empty">No (Broker, Source) cells clear the $600/paid-loan threshold.</div>';
 
     // ── Blocked Sources to consider re-enabling — (Broker, SR1) only, no campaign drill ──
-    const blocked = sq.blocked_to_reconsider || [];
+    const blockedAll = sq.blocked_to_reconsider || [];
+    const blocked = blockedAll.filter(matchesFilter);
     const unblock = blocked.slice(0, 15);
     const totalExcluded = blocked.reduce((a, b) => a + (b.excluded_count || 0), 0);
     const totalBouncePaid = blocked.reduce((a, b) => a + (b.bounceback_paid || 0), 0);
@@ -749,6 +783,7 @@
     const cheaperBs = (cc.by_broker_source) || [];
     const cheaperRows = cheaperBs
       .filter(s => (s.total_savings_if_waited || 0) > 0)
+      .filter(matchesFilter)
       .sort((a, b) => (b.total_savings_if_waited || 0) - (a.total_savings_if_waited || 0))
       .slice(0, 15);
     const ccWrap = document.getElementById("brCheaperWrap");
