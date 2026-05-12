@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "updated_at": "2026-05-12T21:59:45.087483Z",
+  "updated_at": "2026-05-12T22:07:14.424788Z",
   "snapshot_date": "2026-05-12",
   "domain": "letme.co.uk",
   "tenants": [
@@ -42,7 +42,11 @@
     {
       "email": "azure@letme.com",
       "aliases": [
-        "azure@letme.co.uk"
+        "azure@grenwich-clearloans.com",
+        "azure@letme.co.uk",
+        "azure@mail.amigohome.co.uk",
+        "azure@mail.letme.co.uk",
+        "azure@rgroup.co.uk"
       ],
       "name": "Azure Account",
       "given": "Azure",
@@ -76,10 +80,10 @@
     {
       "email": "autobots@rapida.bg",
       "aliases": [
-        "rapida.payout@rapida.bg",
-        "rapida.payout@mail.rapida.bg",
+        "rapida.collections@mail.rapida.bg",
         "rapida.collections@rapida.bg",
-        "rapida.collections@mail.rapida.bg"
+        "rapida.payout@mail.rapida.bg",
+        "rapida.payout@rapida.bg"
       ],
       "name": "Bulgaria Autobots",
       "given": "Bulgaria",
@@ -97,13 +101,21 @@
     {
       "email": "autobots@clearloans.com.au",
       "aliases": [
-        "cash.payments@clearloans.com.au",
-        "communications.collector@clearloans.com.au",
-        "collections@clearloans.com.au",
-        "noreply@clearloans.com.au",
         "automessaging@clearloans.com.au",
+        "cash.payments@clearloans.com.au",
+        "collections@clearloans.com.au",
+        "communications.collector@clearloans.com.au",
+        "help@grenwich-clearloans.com",
         "help@letme.co.uk",
-        "makeacomplaint@letme.co.uk"
+        "help@mail.amigohome.co.uk",
+        "help@mail.letme.co.uk",
+        "help@rgroup.co.uk",
+        "makeacomplaint@grenwich-clearloans.com",
+        "makeacomplaint@letme.co.uk",
+        "makeacomplaint@mail.amigohome.co.uk",
+        "makeacomplaint@mail.letme.co.uk",
+        "makeacomplaint@rgroup.co.uk",
+        "noreply@clearloans.com.au"
       ],
       "name": "Clearloans Autobots",
       "given": "Clearloans",
@@ -171,11 +183,19 @@
     {
       "email": "james.benamor@letme.com",
       "aliases": [
-        "james.benamor@letme.co.uk",
         "james.b@letme.com",
+        "james.benamor@grenwich-clearloans.com",
+        "james.benamor@letme.co.uk",
+        "james.benamor@mail.amigohome.co.uk",
+        "james.benamor@mail.letme.co.uk",
         "james.benamor@memini.co.uk",
+        "james.benamor@rgroup.co.uk",
+        "paul.benamor@grenwich-clearloans.com",
         "paul.benamor@letme.co.uk",
-        "paul.benamor@letme.com"
+        "paul.benamor@letme.com",
+        "paul.benamor@mail.amigohome.co.uk",
+        "paul.benamor@mail.letme.co.uk",
+        "paul.benamor@rgroup.co.uk"
       ],
       "name": "James Benamor",
       "given": "James",
@@ -192,7 +212,12 @@
     },
     {
       "email": "lucas.benamor@letme.co.uk",
-      "aliases": [],
+      "aliases": [
+        "lucas.benamor@grenwich-clearloans.com",
+        "lucas.benamor@mail.amigohome.co.uk",
+        "lucas.benamor@mail.letme.co.uk",
+        "lucas.benamor@rgroup.co.uk"
+      ],
       "name": "Lucas Benamor",
       "given": "Lucas",
       "family": "Benamor",
@@ -209,7 +234,11 @@
     {
       "email": "tarek.benamor@letme.com",
       "aliases": [
-        "tarek.benamor@letme.co.uk"
+        "tarek.benamor@grenwich-clearloans.com",
+        "tarek.benamor@letme.co.uk",
+        "tarek.benamor@mail.amigohome.co.uk",
+        "tarek.benamor@mail.letme.co.uk",
+        "tarek.benamor@rgroup.co.uk"
       ],
       "name": "Tarek Benamor",
       "given": "Tarek",
@@ -228,8 +257,12 @@
       "email": "dan.bennett@clearloans.com.au",
       "aliases": [
         "dan.bennett@alerts.clearloans.com.au",
+        "dan.bennett@grenwich-clearloans.com",
         "dan.bennett@letme.co.uk",
-        "dan.bennett@letme.com"
+        "dan.bennett@letme.com",
+        "dan.bennett@mail.amigohome.co.uk",
+        "dan.bennett@mail.letme.co.uk",
+        "dan.bennett@rgroup.co.uk"
       ],
       "name": "Dan Bennett",
       "given": "Dan",
@@ -247,10 +280,22 @@
     {
       "email": "kelly.black@letme.com",
       "aliases": [
-        "kelly.black@letme.co.uk",
-        "liam.keighley@letme.co.uk",
+        "alexandra.wellings@grenwich-clearloans.com",
         "alexandra.wellings@letme.co.uk",
-        "alexandra.wellings@letme.com"
+        "alexandra.wellings@letme.com",
+        "alexandra.wellings@mail.amigohome.co.uk",
+        "alexandra.wellings@mail.letme.co.uk",
+        "alexandra.wellings@rgroup.co.uk",
+        "kelly.black@grenwich-clearloans.com",
+        "kelly.black@letme.co.uk",
+        "kelly.black@mail.amigohome.co.uk",
+        "kelly.black@mail.letme.co.uk",
+        "kelly.black@rgroup.co.uk",
+        "liam.keighley@grenwich-clearloans.com",
+        "liam.keighley@letme.co.uk",
+        "liam.keighley@mail.amigohome.co.uk",
+        "liam.keighley@mail.letme.co.uk",
+        "liam.keighley@rgroup.co.uk"
       ],
       "name": "Kelly Black",
       "given": "Kelly",
@@ -284,7 +329,11 @@
     {
       "email": "david.byatt@letme.com",
       "aliases": [
-        "david.byatt@letme.co.uk"
+        "david.byatt@grenwich-clearloans.com",
+        "david.byatt@letme.co.uk",
+        "david.byatt@mail.amigohome.co.uk",
+        "david.byatt@mail.letme.co.uk",
+        "david.byatt@rgroup.co.uk"
       ],
       "name": "David Byatt",
       "given": "David",
@@ -301,7 +350,12 @@
     },
     {
       "email": "joshua.carless@letme.co.uk",
-      "aliases": [],
+      "aliases": [
+        "joshua.carless@grenwich-clearloans.com",
+        "joshua.carless@mail.amigohome.co.uk",
+        "joshua.carless@mail.letme.co.uk",
+        "joshua.carless@rgroup.co.uk"
+      ],
       "name": "Joshua Carless",
       "given": "Joshua",
       "family": "Carless",
@@ -318,7 +372,11 @@
     {
       "email": "laura.chadbourne@letme.co.uk",
       "aliases": [
-        "laura.chadbourne@letme.com"
+        "laura.chadbourne@grenwich-clearloans.com",
+        "laura.chadbourne@letme.com",
+        "laura.chadbourne@mail.amigohome.co.uk",
+        "laura.chadbourne@mail.letme.co.uk",
+        "laura.chadbourne@rgroup.co.uk"
       ],
       "name": "Laura Chadbourne",
       "given": "Laura",
@@ -336,9 +394,17 @@
     {
       "email": "amber.cole@letme.com",
       "aliases": [
+        "amber.cole@grenwich-clearloans.com",
         "amber.cole@letme.co.uk",
+        "amber.cole@mail.amigohome.co.uk",
+        "amber.cole@mail.letme.co.uk",
+        "amber.cole@rgroup.co.uk",
+        "femi.omotoso@grenwich-clearloans.com",
+        "femi.omotoso@letme.co.uk",
         "femi.omotoso@letme.com",
-        "femi.omotoso@letme.co.uk"
+        "femi.omotoso@mail.amigohome.co.uk",
+        "femi.omotoso@mail.letme.co.uk",
+        "femi.omotoso@rgroup.co.uk"
       ],
       "name": "Amber Cole",
       "given": "Amber",
@@ -372,7 +438,11 @@
     {
       "email": "clementia.dsouza@letme.com",
       "aliases": [
-        "clementia.dsouza@letme.co.uk"
+        "clementia.dsouza@grenwich-clearloans.com",
+        "clementia.dsouza@letme.co.uk",
+        "clementia.dsouza@mail.amigohome.co.uk",
+        "clementia.dsouza@mail.letme.co.uk",
+        "clementia.dsouza@rgroup.co.uk"
       ],
       "name": "Clementia Dsouza",
       "given": "Clementia",
@@ -389,7 +459,12 @@
     },
     {
       "email": "max.dynowski@letme.co.uk",
-      "aliases": [],
+      "aliases": [
+        "max.dynowski@grenwich-clearloans.com",
+        "max.dynowski@mail.amigohome.co.uk",
+        "max.dynowski@mail.letme.co.uk",
+        "max.dynowski@rgroup.co.uk"
+      ],
       "name": "Max Dynowski",
       "given": "Max",
       "family": "Dynowski",
@@ -406,8 +481,12 @@
     {
       "email": "raveeha.ejaz@letme.com",
       "aliases": [
-        "raveeha@letme.com",
-        "raveeha.ejaz@letme.co.uk"
+        "raveeha.ejaz@grenwich-clearloans.com",
+        "raveeha.ejaz@letme.co.uk",
+        "raveeha.ejaz@mail.amigohome.co.uk",
+        "raveeha.ejaz@mail.letme.co.uk",
+        "raveeha.ejaz@rgroup.co.uk",
+        "raveeha@letme.com"
       ],
       "name": "Raveeha Ejaz",
       "given": "Raveeha",
@@ -424,7 +503,12 @@
     },
     {
       "email": "candidate.email@letme.co.uk",
-      "aliases": [],
+      "aliases": [
+        "candidate.email@grenwich-clearloans.com",
+        "candidate.email@mail.amigohome.co.uk",
+        "candidate.email@mail.letme.co.uk",
+        "candidate.email@rgroup.co.uk"
+      ],
       "name": "Candidate Email",
       "given": "Candidate",
       "family": "Email",
@@ -441,20 +525,44 @@
     {
       "email": "historic@letme.co.uk",
       "aliases": [
-        "shelby.barefoot@letme.co.uk",
         "adrianna.przybylska@letme.com",
         "adrianna.przybylska@rapidamoney.pl",
-        "sam.lissen@letme.com",
-        "sam.lissen@letme.co.uk",
+        "elliott.santana@grenwich-clearloans.com",
+        "elliott.santana@letme.co.uk",
+        "elliott.santana@letme.com",
+        "elliott.santana@mail.amigohome.co.uk",
+        "elliott.santana@mail.letme.co.uk",
+        "elliott.santana@rgroup.co.uk",
+        "historic@grenwich-clearloans.com",
+        "historic@mail.amigohome.co.uk",
+        "historic@mail.letme.co.uk",
+        "historic@rgroup.co.uk",
+        "irena.lipinska@grenwich-clearloans.com",
+        "irena.lipinska@letme.co.uk",
+        "irena.lipinska@letme.com",
+        "irena.lipinska@mail.amigohome.co.uk",
+        "irena.lipinska@mail.letme.co.uk",
+        "irena.lipinska@mail.rapidamoney.pl",
+        "irena.lipinska@rgroup.co.uk",
+        "patryk.brandeburski@grenwich-clearloans.com",
         "patryk.brandeburski@letme.co.uk",
         "patryk.brandeburski@letme.com",
+        "patryk.brandeburski@mail.amigohome.co.uk",
+        "patryk.brandeburski@mail.letme.co.uk",
         "patryk.brandeburski@rapidamoney.bg",
         "patryk.brandeburski@rapidamoney.pl",
-        "irena.lipinska@letme.co.uk",
-        "irena.lipinska@mail.rapidamoney.pl",
-        "irena.lipinska@letme.com",
-        "elliott.santana@letme.co.uk",
-        "elliott.santana@letme.com"
+        "patryk.brandeburski@rgroup.co.uk",
+        "sam.lissen@grenwich-clearloans.com",
+        "sam.lissen@letme.co.uk",
+        "sam.lissen@letme.com",
+        "sam.lissen@mail.amigohome.co.uk",
+        "sam.lissen@mail.letme.co.uk",
+        "sam.lissen@rgroup.co.uk",
+        "shelby.barefoot@grenwich-clearloans.com",
+        "shelby.barefoot@letme.co.uk",
+        "shelby.barefoot@mail.amigohome.co.uk",
+        "shelby.barefoot@mail.letme.co.uk",
+        "shelby.barefoot@rgroup.co.uk"
       ],
       "name": "Historic Emails",
       "given": "Historic",
@@ -472,7 +580,11 @@
     {
       "email": "joseph.foard@letme.com",
       "aliases": [
-        "joseph.foard@letme.co.uk"
+        "joseph.foard@grenwich-clearloans.com",
+        "joseph.foard@letme.co.uk",
+        "joseph.foard@mail.amigohome.co.uk",
+        "joseph.foard@mail.letme.co.uk",
+        "joseph.foard@rgroup.co.uk"
       ],
       "name": "Joseph Foard",
       "given": "Joseph",
@@ -490,13 +602,33 @@
     {
       "email": "julian.foster@letme.co.uk",
       "aliases": [
-        "julian@letme.co.uk",
-        "andrew.allen@letme.com",
+        "andrew.allen@grenwich-clearloans.com",
         "andrew.allen@letme.co.uk",
+        "andrew.allen@letme.com",
+        "andrew.allen@mail.amigohome.co.uk",
+        "andrew.allen@mail.letme.co.uk",
+        "andrew.allen@rgroup.co.uk",
+        "julian.foster@grenwich-clearloans.com",
+        "julian.foster@mail.amigohome.co.uk",
+        "julian.foster@mail.letme.co.uk",
+        "julian.foster@rgroup.co.uk",
+        "julian@grenwich-clearloans.com",
+        "julian@letme.co.uk",
+        "julian@mail.amigohome.co.uk",
+        "julian@mail.letme.co.uk",
+        "julian@rgroup.co.uk",
+        "properties@grenwich-clearloans.com",
+        "properties@letme.co.uk",
+        "properties@letme.com",
+        "properties@mail.amigohome.co.uk",
+        "properties@mail.letme.co.uk",
+        "properties@rgroup.co.uk",
+        "sian.burton@grenwich-clearloans.com",
         "sian.burton@letme.co.uk",
         "sian.burton@letme.com",
-        "properties@letme.co.uk",
-        "properties@letme.com"
+        "sian.burton@mail.amigohome.co.uk",
+        "sian.burton@mail.letme.co.uk",
+        "sian.burton@rgroup.co.uk"
       ],
       "name": "Julian Foster",
       "given": "Julian",
@@ -514,7 +646,11 @@
     {
       "email": "ben.gardner@letme.com",
       "aliases": [
+        "ben.gardner@grenwich-clearloans.com",
         "ben.gardner@letme.co.uk",
+        "ben.gardner@mail.amigohome.co.uk",
+        "ben.gardner@mail.letme.co.uk",
+        "ben.gardner@rgroup.co.uk",
         "richmondgroup@letme.com"
       ],
       "name": "Ben Gardner",
@@ -549,7 +685,11 @@
     {
       "email": "edward.heaney@letme.com",
       "aliases": [
-        "edward.heaney@letme.co.uk"
+        "edward.heaney@grenwich-clearloans.com",
+        "edward.heaney@letme.co.uk",
+        "edward.heaney@mail.amigohome.co.uk",
+        "edward.heaney@mail.letme.co.uk",
+        "edward.heaney@rgroup.co.uk"
       ],
       "name": "Edward Heaney",
       "given": "Edward",
@@ -567,7 +707,11 @@
     {
       "email": "victor.igbaifua@letme.com",
       "aliases": [
-        "victor.igbaifua@letme.co.uk"
+        "victor.igbaifua@grenwich-clearloans.com",
+        "victor.igbaifua@letme.co.uk",
+        "victor.igbaifua@mail.amigohome.co.uk",
+        "victor.igbaifua@mail.letme.co.uk",
+        "victor.igbaifua@rgroup.co.uk"
       ],
       "name": "Victor Igbaifua",
       "given": "Victor",
@@ -601,7 +745,11 @@
     {
       "email": "kamran.kamaei@letme.com",
       "aliases": [
-        "kamran.kamaei@letme.co.uk"
+        "kamran.kamaei@grenwich-clearloans.com",
+        "kamran.kamaei@letme.co.uk",
+        "kamran.kamaei@mail.amigohome.co.uk",
+        "kamran.kamaei@mail.letme.co.uk",
+        "kamran.kamaei@rgroup.co.uk"
       ],
       "name": "Kamran Kamaei",
       "given": "Kamran",
@@ -619,21 +767,25 @@
     {
       "email": "dorota.kazmierczyk@letme.com",
       "aliases": [
-        "dorota.kazmierczyk@rapidamoney.pl",
-        "dorota.kazmierczyk@mail.rapidamoney.pl",
-        "ugoda@rapidamoney.pl",
-        "wniosek@rapidamoney.pl",
         "adrianna.gostol@letme.com",
         "adrianna.gostol@mail.rapidamoney.pl",
         "adrianna.gostol@rapidamoney.pl",
-        "radoslaw.wojnarski@letme.com",
-        "radoslaw.wojnarski@rapidamoney.pl",
-        "modesta.przybylek@rapidamoney.pl",
-        "kamen.totev@letme.co.uk",
-        "kamen.totev@rapidamoney.pl",
+        "dorota.kazmierczyk@mail.rapidamoney.pl",
+        "dorota.kazmierczyk@rapidamoney.pl",
         "elzbieta.olender@letme.com",
         "elzbieta.olender@mail.rapidamoney.pl",
-        "elzbieta.olender@rapidamoney.pl"
+        "elzbieta.olender@rapidamoney.pl",
+        "kamen.totev@grenwich-clearloans.com",
+        "kamen.totev@letme.co.uk",
+        "kamen.totev@mail.amigohome.co.uk",
+        "kamen.totev@mail.letme.co.uk",
+        "kamen.totev@rapidamoney.pl",
+        "kamen.totev@rgroup.co.uk",
+        "modesta.przybylek@rapidamoney.pl",
+        "radoslaw.wojnarski@letme.com",
+        "radoslaw.wojnarski@rapidamoney.pl",
+        "ugoda@rapidamoney.pl",
+        "wniosek@rapidamoney.pl"
       ],
       "name": "Dorota Kazmierczyk",
       "given": "Dorota",
@@ -651,9 +803,17 @@
     {
       "email": "morgan.smith@letme.com",
       "aliases": [
-        "morgan.smith@letme.co.uk",
+        "jade.reynolds@grenwich-clearloans.com",
+        "jade.reynolds@letme.co.uk",
         "jade.reynolds@letme.com",
-        "jade.reynolds@letme.co.uk"
+        "jade.reynolds@mail.amigohome.co.uk",
+        "jade.reynolds@mail.letme.co.uk",
+        "jade.reynolds@rgroup.co.uk",
+        "morgan.smith@grenwich-clearloans.com",
+        "morgan.smith@letme.co.uk",
+        "morgan.smith@mail.amigohome.co.uk",
+        "morgan.smith@mail.letme.co.uk",
+        "morgan.smith@rgroup.co.uk"
       ],
       "name": "Morgan Kennedy-Smith",
       "given": "Morgan",
@@ -671,7 +831,11 @@
     {
       "email": "igor.kravcov@letme.com",
       "aliases": [
-        "igor.kravcov@letme.co.uk"
+        "igor.kravcov@grenwich-clearloans.com",
+        "igor.kravcov@letme.co.uk",
+        "igor.kravcov@mail.amigohome.co.uk",
+        "igor.kravcov@mail.letme.co.uk",
+        "igor.kravcov@rgroup.co.uk"
       ],
       "name": "Igor Kravcov",
       "given": "Igor",
@@ -704,7 +868,12 @@
     },
     {
       "email": "customer.letters@letme.co.uk",
-      "aliases": [],
+      "aliases": [
+        "customer.letters@grenwich-clearloans.com",
+        "customer.letters@mail.amigohome.co.uk",
+        "customer.letters@mail.letme.co.uk",
+        "customer.letters@rgroup.co.uk"
+      ],
       "name": "customer letters",
       "given": "customer",
       "family": "letters",
@@ -721,7 +890,11 @@
     {
       "email": "cyrus.leung@letme.com",
       "aliases": [
-        "cyrus.leung@letme.co.uk"
+        "cyrus.leung@grenwich-clearloans.com",
+        "cyrus.leung@letme.co.uk",
+        "cyrus.leung@mail.amigohome.co.uk",
+        "cyrus.leung@mail.letme.co.uk",
+        "cyrus.leung@rgroup.co.uk"
       ],
       "name": "Cyrus Leung",
       "given": "Cyrus",
@@ -739,7 +912,11 @@
     {
       "email": "cherry.liu@letme.com",
       "aliases": [
-        "cherry.liu@letme.co.uk"
+        "cherry.liu@grenwich-clearloans.com",
+        "cherry.liu@letme.co.uk",
+        "cherry.liu@mail.amigohome.co.uk",
+        "cherry.liu@mail.letme.co.uk",
+        "cherry.liu@rgroup.co.uk"
       ],
       "name": "Cherry Liu",
       "given": "Cherry",
@@ -775,9 +952,13 @@
     {
       "email": "mourad.malki@letme.com",
       "aliases": [
+        "mourad.malki@grenwich-clearloans.com",
         "mourad.malki@letme.co.uk",
+        "mourad.malki@mail.amigohome.co.uk",
+        "mourad.malki@mail.letme.co.uk",
+        "mourad.malki@mail.rapidamoney.pl",
         "mourad.malki@rapidamoney.pl",
-        "mourad.malki@mail.rapidamoney.pl"
+        "mourad.malki@rgroup.co.uk"
       ],
       "name": "Mourad Malki",
       "given": "Mourad",
@@ -811,7 +992,15 @@
     {
       "email": "phil.oneill@letme.co.uk",
       "aliases": [
-        "phil.oniell@letme.co.uk"
+        "phil.oneill@grenwich-clearloans.com",
+        "phil.oneill@mail.amigohome.co.uk",
+        "phil.oneill@mail.letme.co.uk",
+        "phil.oneill@rgroup.co.uk",
+        "phil.oniell@grenwich-clearloans.com",
+        "phil.oniell@letme.co.uk",
+        "phil.oniell@mail.amigohome.co.uk",
+        "phil.oniell@mail.letme.co.uk",
+        "phil.oniell@rgroup.co.uk"
       ],
       "name": "phil oneill",
       "given": "phil",
@@ -844,7 +1033,12 @@
     },
     {
       "email": "printer@letme.co.uk",
-      "aliases": [],
+      "aliases": [
+        "printer@grenwich-clearloans.com",
+        "printer@mail.amigohome.co.uk",
+        "printer@mail.letme.co.uk",
+        "printer@rgroup.co.uk"
+      ],
       "name": "Office Printer",
       "given": "Office",
       "family": "Printer",
@@ -860,7 +1054,12 @@
     },
     {
       "email": "mark.prior@letme.co.uk",
-      "aliases": [],
+      "aliases": [
+        "mark.prior@grenwich-clearloans.com",
+        "mark.prior@mail.amigohome.co.uk",
+        "mark.prior@mail.letme.co.uk",
+        "mark.prior@rgroup.co.uk"
+      ],
       "name": "Mark Prior",
       "given": "Mark",
       "family": "Prior",
@@ -877,7 +1076,11 @@
     {
       "email": "mike.pursey@letme.com",
       "aliases": [
-        "mike.pursey@letme.co.uk"
+        "mike.pursey@grenwich-clearloans.com",
+        "mike.pursey@letme.co.uk",
+        "mike.pursey@mail.amigohome.co.uk",
+        "mike.pursey@mail.letme.co.uk",
+        "mike.pursey@rgroup.co.uk"
       ],
       "name": "Mike Pursey",
       "given": "Mike",
@@ -895,10 +1098,10 @@
     {
       "email": "autobots@rapidamoney.pl",
       "aliases": [
-        "customers.letters.generator@rapidamoney.pl",
-        "rapida.windykacja@rapidamoney.pl",
+        "communications.collector@rapidamoney.pl",
         "contracts@rapidamoney.pl",
-        "communications.collector@rapidamoney.pl"
+        "customers.letters.generator@rapidamoney.pl",
+        "rapida.windykacja@rapidamoney.pl"
       ],
       "name": "autobots Rapida",
       "given": "autobots",
@@ -932,7 +1135,11 @@
     {
       "email": "george.roche@letme.co.uk",
       "aliases": [
-        "george.roche@letme.com"
+        "george.roche@grenwich-clearloans.com",
+        "george.roche@letme.com",
+        "george.roche@mail.amigohome.co.uk",
+        "george.roche@mail.letme.co.uk",
+        "george.roche@rgroup.co.uk"
       ],
       "name": "George Roche",
       "given": "George",
@@ -1000,7 +1207,11 @@
     {
       "email": "tom.slaughter@letme.com",
       "aliases": [
-        "tom.slaughter@letme.co.uk"
+        "tom.slaughter@grenwich-clearloans.com",
+        "tom.slaughter@letme.co.uk",
+        "tom.slaughter@mail.amigohome.co.uk",
+        "tom.slaughter@mail.letme.co.uk",
+        "tom.slaughter@rgroup.co.uk"
       ],
       "name": "Tom Slaughter",
       "given": "Tom",
@@ -1034,7 +1245,11 @@
     {
       "email": "lucian.teodoroiu@letme.co.uk",
       "aliases": [
-        "lucian.teodoroiu@letme.com"
+        "lucian.teodoroiu@grenwich-clearloans.com",
+        "lucian.teodoroiu@letme.com",
+        "lucian.teodoroiu@mail.amigohome.co.uk",
+        "lucian.teodoroiu@mail.letme.co.uk",
+        "lucian.teodoroiu@rgroup.co.uk"
       ],
       "name": "Lucian Teodoroiu",
       "given": "Lucian",
@@ -1052,7 +1267,11 @@
     {
       "email": "adnan.turken@letme.co.uk",
       "aliases": [
-        "adnan.turken@letme.com"
+        "adnan.turken@grenwich-clearloans.com",
+        "adnan.turken@letme.com",
+        "adnan.turken@mail.amigohome.co.uk",
+        "adnan.turken@mail.letme.co.uk",
+        "adnan.turken@rgroup.co.uk"
       ],
       "name": "Adnan Türken",
       "given": "Adnan",
@@ -1070,7 +1289,11 @@
     {
       "email": "sophia.ugwunne@letme.com",
       "aliases": [
-        "sophia.ugwunne@letme.co.uk"
+        "sophia.ugwunne@grenwich-clearloans.com",
+        "sophia.ugwunne@letme.co.uk",
+        "sophia.ugwunne@mail.amigohome.co.uk",
+        "sophia.ugwunne@mail.letme.co.uk",
+        "sophia.ugwunne@rgroup.co.uk"
       ],
       "name": "Sophia Ugwunne",
       "given": "Sophia",
@@ -1088,7 +1311,11 @@
     {
       "email": "esther.uwadione@letme.com",
       "aliases": [
-        "esther.uwadione@letme.co.uk"
+        "esther.uwadione@grenwich-clearloans.com",
+        "esther.uwadione@letme.co.uk",
+        "esther.uwadione@mail.amigohome.co.uk",
+        "esther.uwadione@mail.letme.co.uk",
+        "esther.uwadione@rgroup.co.uk"
       ],
       "name": "Esther Uwadione",
       "given": "Esther",
@@ -1106,7 +1333,11 @@
     {
       "email": "james.webster@letme.co.uk",
       "aliases": [
-        "james.webster@letme.com"
+        "james.webster@grenwich-clearloans.com",
+        "james.webster@letme.com",
+        "james.webster@mail.amigohome.co.uk",
+        "james.webster@mail.letme.co.uk",
+        "james.webster@rgroup.co.uk"
       ],
       "name": "James Webster",
       "given": "James",
@@ -1124,7 +1355,11 @@
     {
       "email": "matthew.wood@letme.co.uk",
       "aliases": [
-        "matthew.wood@letme.com"
+        "matthew.wood@grenwich-clearloans.com",
+        "matthew.wood@letme.com",
+        "matthew.wood@mail.amigohome.co.uk",
+        "matthew.wood@mail.letme.co.uk",
+        "matthew.wood@rgroup.co.uk"
       ],
       "name": "matthew wood",
       "given": "matthew",
@@ -1141,7 +1376,12 @@
     },
     {
       "email": "natasha.wright@letme.co.uk",
-      "aliases": [],
+      "aliases": [
+        "natasha.wright@grenwich-clearloans.com",
+        "natasha.wright@mail.amigohome.co.uk",
+        "natasha.wright@mail.letme.co.uk",
+        "natasha.wright@rgroup.co.uk"
+      ],
       "name": "Natasha Wright",
       "given": "Natasha",
       "family": "Wright",
