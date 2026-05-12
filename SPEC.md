@@ -433,7 +433,8 @@ A second, equally important purpose: **per-seat billing visibility for leavers**
 | Warehouse activity (per user, 60d) | `staff-activity.json` (repo) | `scan_staff_activity.py` | hourly :15 via `refresh-staff-activity.yml` | Page still renders Workspace rows without activity meta. |
 | Annotations (notes) | `annotations.json` (repo) | `apifk-annotations-worker` writes on Save | on-demand (every Save) | Read fails silently → form starts empty; payroll-fallback still pre-fills. |
 | Payroll | `PAYROLL_KV` namespace, key `current` (Cloudflare Workers KV, **NOT** in repo) | manual: user runs `scripts/scan_payroll.py` against the two CSVs in `~/Desktop/wiki/Payroll/` and pastes the JSON into KV | manual — every time HR sends a refreshed CSV (typically monthly; **monthly reminder emails go out automatically** via `.github/workflows/email-payroll-monthly.yml` to `Payroll@letme.com` on the 1st of each month) | Endpoint returns 503; page just doesn't render the Payroll section. |
-| Workspace audit log (suspend / route / create) | `workspace-actions.json` (repo) | `apifk-workspace-worker` appends per action | on-demand | Page renders without the "→ forwards to X" chip. |
+| Workspace audit log (suspend / route / create / group ops) | `workspace-actions.json` (repo) | `apifk-workspace-worker` appends per action | on-demand | Page renders without the "→ forwards to X" chip. |
+| Groups (Workspace group emails + members) | `groups.json` (repo) | `scan_groups.py` | hourly :20 via `refresh-groups.yml` | Groups section just stays empty until the file lands. |
 
 Both `staff.json` and `staff-activity.json` are committed to the repo (no PII). `PAYROLL_KV` is **deliberately off-repo** because the CSVs contain DOBs, home addresses, and mobile numbers — only reachable via the Cloudflare-Access-gated endpoint `book.togetherbook.net/api/workspace/payroll`. The `github.io` public mirror cannot fetch it (no Worker route there) so the Payroll section is invisible there.
 
@@ -515,6 +516,53 @@ Per-action authorisation chain:
 
 **Audit log:** every action appends an entry to `workspace-actions.json` in the repo via the GitHub Contents API. The Worker holds a fine-grained PAT (`GITHUB_TOKEN` secret) with `Contents: read+write` on `richmondbot2000-prog/togetherbook`. The audit file is FIFO-trimmed to 2000 entries; older history persists in git via the commit log (commit message is `Workspace: <action> <email> by <actor>`). The page reads `workspace-actions.json` to surface forwarding targets on suspended rows; if it ever disappears, the UI degrades by hiding the `→ chip` but actions still work.
 
+#### 11.1.7b Group management (free, doesn't consume seats)
+
+The Directory page also manages **Google Groups** — email addresses like `finance@rgroup.co.uk` that deliver to a list of members rather than to a single mailbox. Groups are free in Google Workspace (no per-seat fee, no member limit), so they're the right tool for shared inboxes, distribution lists, and the "forward to a team after a leaver" pattern.
+
+**Data:** `groups.json` at the repo root, refreshed hourly :20 by `refresh-groups.yml` calling `scripts/scan_groups.py`. Schema:
+```jsonc
+{
+  "schema_version": 1,
+  "updated_at": "<ISO>",
+  "totals": { "groups": N, "members": N },
+  "tenants": ["letme.co.uk", ...],
+  "groups": [
+    {
+      "email": "finance@rgroup.co.uk",
+      "name": "Finance",
+      "description": "...",
+      "tenant": "letme.co.uk",
+      "aliases": [],
+      "member_count": 7,
+      "members": [
+        { "email": "...", "role": "MEMBER|MANAGER|OWNER", "type": "USER|GROUP|EXTERNAL", "status": "ACTIVE|SUSPENDED|..." }
+      ]
+    }
+  ]
+}
+```
+
+**Required DWD scopes** (read-only for the scanner, full read+write for the Worker):
+- `admin.directory.group.readonly` + `admin.directory.group.member.readonly` (scanner)
+- `admin.directory.group` + `admin.directory.group.member` (Worker)
+
+**Worker endpoints** (all POST, same Cloudflare Access + `ADMIN_EMAILS` gating as the user actions, all logged to `workspace-actions.json`):
+- `/api/workspace/group-create` `{ email, name, description? }`
+- `/api/workspace/group-delete` `{ email }`
+- `/api/workspace/group-member-add` `{ group_email, member_email, role? }` (default role `MEMBER`)
+- `/api/workspace/group-member-remove` `{ group_email, member_email }`
+
+**Page integration:**
+- A "Groups" section below the people list (`#dirGroupsSection`), rendering one row per group with name + email + member count.
+- Each row opens a group modal (`renderGroupModalBody`) showing all members (each with a Remove button), an "Add member" form with a `<datalist>` autocomplete over active Workspace emails, and a Delete group button in a Danger zone.
+- The "+ New group" button creates an empty group via `/api/workspace/group-create`.
+- On every user's modal, a "Groups" section lists the brass chips for every group they're a member of (matched by primary email **and** any alias via `groupsForUser()`). Clicking a chip opens the group modal in place. The user modal itself never edits groups — that's the group modal's job, per the design rule "edit groups via the group's own card, not via the member's card."
+
+**Member-validation rule:** the page's "Add member" datalist only includes active (non-suspended) Workspace emails from `staff.json`, so the user is guided away from typing free-text external emails. The Worker doesn't enforce this server-side though — the Admin SDK will happily accept any address — so the UI is the only guardrail today. If we want to lock it down server-side, add a check in `doGroupMemberAdd`.
+
+**Group deletion is permanent.** Members aren't affected (they keep their accounts), but the address dies and any mail aliases pointing at it stop working. Same blast radius as a Workspace user delete, hence the confirmation strip in the Danger zone of the group modal.
+
 #### 11.1.8 Annotations persistence (Notes form)
 
 - **Storage:** `annotations.json` at the repo root. Shape `{ schema_version, updated_at, annotations: { "<email-or-username>": { phone, start_date } } }`.
@@ -582,7 +630,10 @@ If the Workers / KV / DWD ever need to be re-created:
 2. **DWD scopes** authorised in `admin.google.com` against the service account's numeric Client ID:
    - `https://www.googleapis.com/auth/admin.directory.user`
    - `https://www.googleapis.com/auth/admin.directory.user.readonly`
-   - `https://www.googleapis.com/auth/admin.directory.group.readonly` (added by accident, harmless, kept)
+   - `https://www.googleapis.com/auth/admin.directory.group` (full write — for the Groups CRUD endpoints)
+   - `https://www.googleapis.com/auth/admin.directory.group.member`
+   - `https://www.googleapis.com/auth/admin.directory.group.readonly` (for the read-only scanner)
+   - `https://www.googleapis.com/auth/admin.directory.group.member.readonly`
    - `https://www.googleapis.com/auth/apps.licensing`
    - `https://www.googleapis.com/auth/gmail.settings.sharing`
 3. **GitHub PATs** (one-time): fine-grained on the user `richmondbot2000-prog`, `Contents: read+write` on `togetherbook` only. Same token is reused by both Workers as `GITHUB_TOKEN` secret.
