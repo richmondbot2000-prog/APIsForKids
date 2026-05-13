@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778674057">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778674057">
-<link rel="stylesheet" href="quiet.css?v=1778674057">
-<link rel="stylesheet" href="quiet-extras.css?v=1778674057">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778674057">
+<link rel="stylesheet" href="style.css?v=1778675465">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778675465">
+<link rel="stylesheet" href="quiet.css?v=1778675465">
+<link rel="stylesheet" href="quiet-extras.css?v=1778675465">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778675465">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -953,7 +953,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778674057" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778675465" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -3004,9 +3004,12 @@
   }
 
   function renderGroupRow(g) {
-    const initials = (g.name || g.email).split(/[\s@.\-_]+/).filter(Boolean).slice(0, 2).map(t => t.charAt(0).toUpperCase()).join("") || "G";
+    // Identify groups by EMAIL — the address is what matters operationally.
+    // The Workspace 'name' field is descriptive admin metadata and not
+    // useful when scanning a list of forwarding-only / distribution-list groups.
+    const local = (g.email || "").split("@")[0] || "G";
+    const initials = local.split(/[._-]+/).filter(Boolean).slice(0, 2).map(t => t.charAt(0).toUpperCase()).join("") || "G";
     const isEx = isExEmployeeGroup(g);
-    const desc = !isEx && g.description ? `<span class="dir-title">${escapeHtml(g.description)}</span>` : "";
     const exChip = isEx
       ? `<span class="dir-ex-chip" title="This group was created by converting a Workspace user. Mail to this address forwards to the listed member(s) at £0/month.">ex-employee</span>`
       : "";
@@ -3015,13 +3018,11 @@
         <div class="dir-photo-placeholder">${escapeHtml(initials)}</div>
         <div class="dir-row-body">
           <div class="dir-row-headline">
-            <span class="dir-name">${escapeHtml(g.name || g.email)}</span>
+            <span class="dir-name" style="font-family:'JetBrains Mono',monospace;font-weight:500;">${escapeHtml(g.email)}</span>
             ${exChip}
-            ${desc}
-            <span class="dir-email">${escapeHtml(g.email)}</span>
           </div>
           <div class="dir-row-meta">
-            <span class="dir-last">${g.member_count || 0} member${g.member_count === 1 ? "" : "s"} ${isEx && g.members && g.members.length ? `· forwarding to <em>${escapeHtml(g.members.map(m => m.email).join(", "))}</em>` : ""}</span>
+            <span class="dir-last">${g.member_count || 0} member${g.member_count === 1 ? "" : "s"}${isEx && g.members && g.members.length ? ` · forwarding to <em>${escapeHtml(g.members.map(m => m.email).join(", "))}</em>` : ""}</span>
           </div>
         </div>
         <div class="dir-row-aside"></div>
@@ -3080,10 +3081,10 @@
     return `
       <button class="dir-modal-close" type="button" data-close aria-label="Close">×</button>
       <div class="dir-modal-head">
-        <div class="dir-photo-placeholder" style="width:64px;height:64px;font-size:1.1rem;">${escapeHtml((g.name || g.email).split(/[\s@.\-_]+/).filter(Boolean).slice(0, 2).map(t => t.charAt(0).toUpperCase()).join("") || "G")}</div>
+        <div class="dir-photo-placeholder" style="width:64px;height:64px;font-size:1.1rem;">${escapeHtml(((g.email || "").split("@")[0] || "G").split(/[._-]+/).filter(Boolean).slice(0, 2).map(t => t.charAt(0).toUpperCase()).join("") || "G")}</div>
         <div>
-          <h2 class="dir-modal-name" id="dirModalName">${escapeHtml(g.name || g.email)}</h2>
-          <p class="dir-modal-title">${escapeHtml(g.description || "Workspace group · " + g.email)}</p>
+          <h2 class="dir-modal-name" id="dirModalName" style="font-family:'JetBrains Mono',monospace;font-size:1.4rem;">${escapeHtml(g.email)}</h2>
+          ${g.description ? `<p class="dir-modal-title">${escapeHtml(g.description)}</p>` : ""}
         </div>
       </div>
 
