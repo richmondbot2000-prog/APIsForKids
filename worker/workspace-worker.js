@@ -38,7 +38,7 @@ const BRANCH = "main";
 //   3. Cannot be suspended, password-reset, or have their admin flag changed
 //      by anyone but themselves
 // This is the "you can't lock yourself out of your own system" safety latch.
-const OWNER_EMAIL = "james.benamor@letme.co.uk";
+const OWNER_EMAIL = "james.benamor@letme.com";
 const OWNER_PROTECTED_ACTIONS = new Set([
   "suspend-and-route",
   "suspend-no-forward",
