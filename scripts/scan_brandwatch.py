@@ -275,14 +275,20 @@ def _http_get_proxied(url: str, *, tier: str = "premium", **kwargs) -> requests.
     # ScraperAPI takes 20–60 s for these depending on tier and target.
     kwargs.setdefault("timeout", 90)
 
+    # ScraperAPI's own infrastructure (not the target site) occasionally
+    # returns transient 500s. Retry up to 4 attempts with exponential backoff
+    # (5s, 15s, 30s) so a single bad minute doesn't wipe an hourly snapshot.
+    # Total worst case ≈ 50s per failing request — well inside the 10-min
+    # workflow timeout even with multiple pages.
+    backoffs = [5, 15, 30]
     last: requests.Response | None = None
-    for attempt in (1, 2):
+    import time as _t
+    for attempt in range(1, 5):
         last = _http_get(base, **kwargs)
         if last.status_code < 500:
             return last
-        if attempt == 1:
-            import time as _t
-            _t.sleep(2)
+        if attempt < 4:
+            _t.sleep(backoffs[attempt - 1])
     return last  # type: ignore[return-value]
 
 

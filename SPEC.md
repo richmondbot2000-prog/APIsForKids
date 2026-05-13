@@ -135,6 +135,7 @@ All refresh workflows live in `.github/workflows/refresh-*.yml`. They share a co
 | `refresh-yesterday-payouts.yml` | hourly :00 | `yesterday-payouts.json` | Fabric warehouse | `FABRIC_*` secrets |
 | `refresh-row-counts.yml` | hourly :00 | `row-counts.json` | Fabric warehouse | `FABRIC_*` secrets |
 | `refresh-brandwatch.yml` | hourly :00 | `brandwatch.json` | Trustpilot, BBB, Reddit, Bluesky, Lemmy, HN, CourtListener, Google News, CFPB, YouTube | `SCRAPERAPI_KEY`, `YOUTUBE_API_KEY` |
+| `retry-trustpilot.yml` | manual only | `brandwatch.json` (merge) | Trustpilot only, via ScraperAPI | `SCRAPERAPI_KEY`. Use when the morning brandwatch run logged `source_status.trustpilot.ok=false` — bypasses the same-day guard because it only touches the TP fields, not the snapshot as a whole. |
 | `refresh-1st-contact.yml` | hourly :00 | `first-contact.json` | Fabric warehouse | `FABRIC_*` secrets |
 | `refresh-directory.yml` | hourly :00 | `staff.json` | Google Workspace Admin SDK | `WORKSPACE_SERVICE_ACCOUNT_JSON`, `WORKSPACE_DELEGATE_USER` |
 | `refresh-staff-activity.yml` | hourly :15 | `staff-activity.json` | Fabric warehouse | `FABRIC_*` secrets |

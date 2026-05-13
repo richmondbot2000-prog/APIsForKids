@@ -1,0 +1,58 @@
+name: Retry Trustpilot
+
+# Manual-only: re-fetches Trustpilot reviews and merges them into the
+# existing brandwatch.json. Use this when the morning brandwatch run logged
+# a Trustpilot failure (transient ScraperAPI 500 etc.) — bypasses the
+# same-day guard because it only touches Trustpilot fields, not the snapshot
+# as a whole.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-brandwatch          # share the lock with the main workflow
+  cancel-in-progress: false
+
+jobs:
+  retry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: pip install --quiet 'requests>=2.31'
+
+      - name: Retry Trustpilot fetch
+        env:
+          SCRAPERAPI_KEY: ${{ secrets.SCRAPERAPI_KEY }}
+        run: python scripts/retry_trustpilot.py
+
+      - name: Commit if brandwatch.json changed
+        run: |
+          set -euo pipefail
+          git add brandwatch.json
+          if git diff --cached --quiet -- brandwatch.json; then
+            echo "no changes — nothing to commit"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TP=$(python -c "import json; print(json.load(open('brandwatch.json'))['totals']['by_source']['trustpilot'])")
+          N=$(python -c "import json; print(json.load(open('brandwatch.json'))['totals']['all'])")
+          git commit -m "Retry Trustpilot: ${TP} TP reviews / ${N} total mentions"
+          for attempt in 1 2 3; do
+            if git push; then break; fi
+            if [ "$attempt" -eq 3 ]; then echo "::error::Push failed"; exit 1; fi
+            git fetch origin main && git rebase origin/main
+          done
