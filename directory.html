@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778664620">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778664620">
-<link rel="stylesheet" href="quiet.css?v=1778664620">
-<link rel="stylesheet" href="quiet-extras.css?v=1778664620">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778664620">
+<link rel="stylesheet" href="style.css?v=1778665023">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778665023">
+<link rel="stylesheet" href="quiet.css?v=1778665023">
+<link rel="stylesheet" href="quiet-extras.css?v=1778665023">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778665023">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -606,6 +606,43 @@
     border-left-color: var(--manuscript-red, #B23A48);
   }
   .dir-modal-banner--fade { opacity: 0; }
+  .dir-payroll-link-row {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+  }
+  .dir-link-btn {
+    background: transparent;
+    border: none;
+    color: var(--accent-ink);
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    font: inherit;
+  }
+  .dir-link-btn:hover { text-decoration: none; }
+  .dir-link-list {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .dir-link-list li { padding: 0; border-bottom: 1px solid var(--border); }
+  .dir-link-list li:last-child { border-bottom: none; }
+  .dir-link-pick {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font: inherit;
+    color: var(--ink);
+  }
+  .dir-link-pick:hover { background: var(--bg-soft-2); }
   .dir-audit-list {
     margin: 0;
     padding: 0;
@@ -917,7 +954,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778664620" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778665023" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1711,6 +1748,28 @@
       }
     };
 
+    // (0) Manual link in annotations always wins. Handles Sophia/Chidinma type
+    // mismatches where the legal name (payroll) differs from the chosen name
+    // (Workspace) and no auto-match would ever find it.
+    const key = entryKey(entry);
+    const ann = annotationFor(key);
+    if (ann && ann.payroll_match) {
+      const wanted = ann.payroll_match;
+      const wantedId = `${wanted.employer || ""}|${wanted.employee_number || ""}|${wanted.first_name || ""}|${wanted.last_name || ""}`;
+      const allLists = [
+        ...Object.values(payrollData.by_email || {}),
+        ...Object.values(payrollData.by_name || {}),
+      ];
+      for (const lst of allLists) {
+        for (const r of (lst || [])) {
+          if (`${r.employer}|${r.employee_number}|${r.first_name}|${r.last_name}` === wantedId) {
+            pushAll([r]);
+            return out;   // manual match short-circuits everything else
+          }
+        }
+      }
+    }
+
     const email = ((u && u.email) || (a && a.username) || "").toLowerCase();
     if (email && payrollData.by_email) pushAll(payrollData.by_email[email]);
 
@@ -1747,11 +1806,17 @@
 
   // POST to the Worker. On success we both replace the local in-memory cache
   // with the canonical state echoed back AND re-render the row list.
-  async function saveAnnotationRemote(key, phone, start_date) {
+  async function saveAnnotationRemote(key, phone, start_date, opts) {
+    const payload = { key, phone, start_date };
+    // Only send payroll_match when the caller explicitly wants to change it
+    // (set or unset). Phone/start saves shouldn't accidentally clobber a link.
+    if (opts && Object.prototype.hasOwnProperty.call(opts, "payroll_match")) {
+      payload.payroll_match = opts.payroll_match;
+    }
     const res = await fetch(ANNOTATIONS_API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ key, phone, start_date }),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) {
       let detail = "";
@@ -1792,6 +1857,11 @@
     modal.querySelectorAll("[data-open-group]").forEach(chip => {
       chip.addEventListener("click", () => openGroupCard(chip.dataset.openGroup));
     });
+    // Payroll-link affordances.
+    const relinkBtn = modal.querySelector("[data-relink]");
+    if (relinkBtn) relinkBtn.addEventListener("click", () => openPayrollLinkPicker(entry));
+    const unlinkBtn = modal.querySelector("[data-unlink]");
+    if (unlinkBtn) unlinkBtn.addEventListener("click", () => savePayrollLink(entry, null));
 
     const saveBtn = modal.querySelector("[data-save]");
     if (saveBtn) {
@@ -1864,7 +1934,31 @@
 
   function payrollSectionHtml(entry) {
     const all = payrollAllFor(entry);
-    if (!all.length) return "";
+    const u = entry.user;
+    const ann = annotationFor(entryKey(entry));
+    const isManualLink = !!(ann && ann.payroll_match);
+    // Only show the link-affordance when we have payroll data loaded and the
+    // entry is a Workspace staff member (external users have no Workspace ID
+    // to attach an annotation to).
+    const linkAffordance = (payrollData && u) ? `
+        <div class="dir-payroll-link-row">
+          ${isManualLink
+            ? `<span class="dir-modal-saved-hint" style="margin:0;text-align:left;">Manually linked. <button type="button" class="dir-link-btn" data-relink>Change…</button> <button type="button" class="dir-link-btn" data-unlink>Unlink</button></span>`
+            : (all.length
+                ? `<span class="dir-modal-saved-hint" style="margin:0;text-align:left;">Auto-matched. Wrong person? <button type="button" class="dir-link-btn" data-relink>Pick a different record…</button></span>`
+                : `<span class="dir-modal-saved-hint" style="margin:0;text-align:left;">No payroll match. <button type="button" class="dir-link-btn" data-relink>Link a payroll record…</button></span>`)}
+        </div>` : "";
+
+    if (!all.length) {
+      // No record matched, but we still want the affordance to be visible
+      // so the user can manually link one.
+      return payrollData && u ? `
+        <div class="dir-modal-section">
+          <h3>Payroll</h3>
+          ${linkAffordance}
+        </div>` : "";
+    }
+
     const fmtUkDate = s => {
       if (!s) return "—";
       const d = new Date(s);
@@ -1886,6 +1980,7 @@
         <dl class="dir-detail-grid">
           ${row("Employer", p.employer)}
           ${row("Employee #", p.employee_number)}
+          <dt>Payroll name</dt><dd>${escapeHtml(`${p.first_name || ""} ${p.last_name || ""}`.trim())}</dd>
           ${rowRaw("Start date", p.start_date ? escapeHtml(fmtUkDate(p.start_date)) : "")}
           ${row("Date of birth", ageBits.join(" "))}
           ${p.email ? `<dt>Payroll email</dt><dd><a href="mailto:${escapeHtml(p.email)}">${escapeHtml(p.email)}</a></dd>` : ""}
@@ -1898,8 +1993,9 @@
 
     return `
       <div class="dir-modal-section">
-        <h3>Payroll${all.length > 1 ? ` <span class="dir-modal-count">${all.length} records</span>` : ""}</h3>
+        <h3>Payroll${all.length > 1 ? ` <span class="dir-modal-count">${all.length} records</span>` : ""}${isManualLink ? ` <span class="dir-modal-count" style="color:var(--brass-600);">manually linked</span>` : ""}</h3>
         ${all.map((p, i) => recordBlock(p, i === 0)).join("")}
+        ${linkAffordance}
       </div>
     `;
   }
@@ -2408,6 +2504,102 @@
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
+  }
+
+  // Open the payroll-record picker for an entry. Shows every payroll record
+  // (with a search box) and lets the user pick one to manually link. The
+  // chosen record is saved as { employer, employee_number, first_name,
+  // last_name } in the entry's annotation under `payroll_match`.
+  function openPayrollLinkPicker(entry) {
+    if (!payrollData) return;
+    // Collect unique records — same id-tuple may appear under both by_email
+    // and several by_name keys.
+    const all = [];
+    const seen = new Set();
+    for (const lst of [...Object.values(payrollData.by_email || {}), ...Object.values(payrollData.by_name || {})]) {
+      for (const r of (lst || [])) {
+        const id = `${r.employer}|${r.employee_number}|${r.first_name}|${r.last_name}`;
+        if (seen.has(id)) continue;
+        seen.add(id);
+        all.push(r);
+      }
+    }
+    all.sort((a, b) => `${a.last_name} ${a.first_name}`.localeCompare(`${b.last_name} ${b.first_name}`));
+
+    const modal = document.getElementById("dirModal");
+    const u = entry.user;
+    const title = u ? (u.name || u.email) : entry.activity?.username || "";
+    modal.innerHTML = `
+      <button class="dir-modal-close" type="button" data-close aria-label="Close">×</button>
+      <div class="dir-modal-head">
+        <div>
+          <h2 class="dir-modal-name">Link payroll record</h2>
+          <p class="dir-modal-title">Pick the right payroll record for ${escapeHtml(title)}.</p>
+        </div>
+      </div>
+      <div class="dir-modal-section">
+        <div class="dir-form-row">
+          <label for="dirLinkSearch">Search</label>
+          <input id="dirLinkSearch" type="search" placeholder="Filter by name, employer, employee #, email…" autocomplete="off">
+        </div>
+        <ul class="dir-link-list" id="dirLinkList"></ul>
+      </div>`;
+    const backdrop = document.getElementById("dirModalBackdrop");
+    backdrop.classList.add("open");
+    backdrop.setAttribute("aria-hidden", "false");
+    document.body.classList.add("dir-modal-open");
+    modal.querySelector("[data-close]").addEventListener("click", () => openCard(entryKey(entry)));
+
+    const listEl = modal.querySelector("#dirLinkList");
+    const render = (term) => {
+      const t = (term || "").toLowerCase().trim();
+      const items = t
+        ? all.filter(r => {
+            const hay = [r.first_name, r.last_name, r.email, r.employer, r.employee_number, r.address, r.mobile].filter(Boolean).join(" ").toLowerCase();
+            return hay.includes(t) || hay.replace(/\s+/g, "").includes(t.replace(/\s+/g, ""));
+          })
+        : all;
+      listEl.innerHTML = items.map(r => {
+        const id = `${r.employer}|${r.employee_number}|${r.first_name}|${r.last_name}`;
+        const sub = [r.employer, r.employee_number ? `#${r.employee_number}` : "", r.start_date ? `start ${r.start_date}` : "", r.email].filter(Boolean).join(" · ");
+        return `<li><button type="button" class="dir-link-pick" data-id="${escapeHtml(id)}"><strong>${escapeHtml(r.first_name)} ${escapeHtml(r.last_name)}</strong><br><span class="dir-modal-saved-hint" style="text-align:left;margin:0;">${escapeHtml(sub)}</span></button></li>`;
+      }).join("") || `<li class="dir-modal-saved-hint" style="text-align:left;margin:0;padding:8px 0;">No records match.</li>`;
+      listEl.querySelectorAll("[data-id]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.dataset.id;
+          const rec = all.find(r => `${r.employer}|${r.employee_number}|${r.first_name}|${r.last_name}` === id);
+          if (!rec) return;
+          savePayrollLink(entry, {
+            employer: rec.employer,
+            employee_number: rec.employee_number,
+            first_name: rec.first_name,
+            last_name: rec.last_name,
+          });
+        });
+      });
+    };
+    render("");
+    modal.querySelector("#dirLinkSearch").addEventListener("input", e => render(e.target.value));
+    modal.querySelector("#dirLinkSearch").focus();
+  }
+
+  // Persist a payroll_match annotation (null to unlink) and re-open the user
+  // card so the Payroll section reflects the change.
+  async function savePayrollLink(entry, match) {
+    const key = entryKey(entry);
+    try {
+      await saveAnnotationRemote(
+        key,
+        (annotationFor(key).phone || ""),
+        (annotationFor(key).start_date || ""),
+        { payroll_match: match },
+      );
+      openCard(key);
+      showModalBanner(match ? `Linked to ${match.first_name} ${match.last_name} (payroll).` : `Unlinked payroll record.`, "success");
+    } catch (err) {
+      openCard(key);
+      showModalBanner(`Link failed — ${err.message || err}`, "error");
+    }
   }
 
   // Pin a banner at the top of the open modal. Auto-dismisses after 8s.

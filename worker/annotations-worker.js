@@ -39,7 +39,7 @@ export default {
     let body;
     try { body = await req.json(); }
     catch { return json({ error: "invalid JSON body" }, 400, req); }
-    const { key, phone, start_date } = body || {};
+    const { key, phone, start_date, payroll_match } = body || {};
     if (!key || typeof key !== "string") {
       return json({ error: "missing 'key' (email or username)" }, 400, req);
     }
@@ -75,12 +75,26 @@ export default {
 
     const cleanPhone = (phone || "").trim();
     const cleanStart = (start_date || "").trim();
-    if (!cleanPhone && !cleanStart) {
+    // payroll_match is either an object {employee_number, first_name, last_name, employer}
+    // or null (explicit unlink). Treat any non-object as "not set", so the
+    // existing phone+start_date-only callers don't accidentally clobber a link.
+    const hasMatchKey = Object.prototype.hasOwnProperty.call(body || {}, "payroll_match");
+    const cleanMatch = (payroll_match && typeof payroll_match === "object") ? payroll_match : null;
+    const existing = (annotations[key] && typeof annotations[key] === "object") ? annotations[key] : {};
+    const next = {};
+    if (cleanPhone) next.phone = cleanPhone;
+    if (cleanStart) next.start_date = cleanStart;
+    // Preserve an existing payroll_match unless the caller explicitly set the
+    // field (to either a new value or null).
+    if (hasMatchKey) {
+      if (cleanMatch) next.payroll_match = cleanMatch;
+    } else if (existing.payroll_match) {
+      next.payroll_match = existing.payroll_match;
+    }
+    if (Object.keys(next).length === 0) {
       delete annotations[key];
     } else {
-      annotations[key] = {};
-      if (cleanPhone) annotations[key].phone = cleanPhone;
-      if (cleanStart) annotations[key].start_date = cleanStart;
+      annotations[key] = next;
     }
 
     const out = {
@@ -89,7 +103,14 @@ export default {
       annotations,
     };
     const newContent = b64Encode(JSON.stringify(out, null, 2) + "\n");
-    const commitMsg = `Directory note: ${cleanPhone || cleanStart ? "set" : "clear"} ${key}`;
+    const action = !annotations[key]
+      ? "clear"
+      : hasMatchKey && cleanMatch
+        ? "link payroll"
+        : hasMatchKey && !cleanMatch
+          ? "unlink payroll"
+          : "set";
+    const commitMsg = `Directory note: ${action} ${key}`;
 
     const putRes = await fetch(
       `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE_PATH}`,
