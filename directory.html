@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778685953">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778685953">
-<link rel="stylesheet" href="quiet.css?v=1778685953">
-<link rel="stylesheet" href="quiet-extras.css?v=1778685953">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778685953">
+<link rel="stylesheet" href="style.css?v=1778686775">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778686775">
+<link rel="stylesheet" href="quiet.css?v=1778686775">
+<link rel="stylesheet" href="quiet-extras.css?v=1778686775">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778686775">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -989,7 +989,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778685953" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778686775" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1541,41 +1541,11 @@
               return `${e.user.name || e.user.email} <code>${e.user.email}</code> — in: ${gs.map(g => escapeHtml(g.email)).join(", ")}`;
             }));
         } else if (kind === "active-no-payroll") {
-          // Open a merge-picker per row so the user can link a payroll record
-          // directly from the dialog. Headline of the dialog is the action.
-          openActiveNoPayrollMerger(activeNoPayroll);
+          showHealthDialog("Active users without a payroll record",
+            activeNoPayroll.map(e => `${e.user.name || e.user.email} <code>${e.user.email}</code>`));
         } else if (kind === "unclaimed-payroll") {
           showHealthDialog("Payroll records without a Workspace match", unclaimed.map(p => `${p.first_name} ${p.last_name} · ${p.employer || ""} ${p.email ? `(${p.email})` : ""}`));
         }
-      });
-    });
-  }
-
-  // Bulk-merge view: lists every active Workspace user with no payroll match,
-  // each line has a 'Link payroll…' button that opens the per-user picker.
-  function openActiveNoPayrollMerger(entries) {
-    const modal = document.getElementById("dirModal");
-    const rows = entries.map(e => `
-      <li>
-        <span class="dir-group-member-email"><strong>${escapeHtml(e.user.name || e.user.email)}</strong> <span class="dir-modal-saved-hint" style="display:inline;margin:0;padding:0;">${escapeHtml(e.user.email)}</span></span>
-        <button type="button" data-link-entry="${escapeHtml(e.user.email)}">Link payroll…</button>
-      </li>`).join("");
-    modal.innerHTML = `
-      <button class="dir-modal-close" type="button" data-close aria-label="Close">×</button>
-      <div class="dir-modal-head"><div><h2 class="dir-modal-name">Workspace users without a payroll match</h2><p class="dir-modal-title">${entries.length} user${entries.length === 1 ? "" : "s"}. Click <strong>Link payroll…</strong> to manually match one to a payroll record.</p></div></div>
-      <div class="dir-modal-section">
-        <ul class="dir-group-member-list">${rows || `<li class="dir-modal-saved-hint" style="text-align:left;margin:0;padding:8px 0;">All active Workspace users have a payroll match.</li>`}</ul>
-      </div>`;
-    const backdrop = document.getElementById("dirModalBackdrop");
-    backdrop.classList.add("open");
-    backdrop.setAttribute("aria-hidden", "false");
-    document.body.classList.add("dir-modal-open");
-    modal.querySelector("[data-close]").addEventListener("click", closeCard);
-    modal.querySelectorAll("[data-link-entry]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const email = btn.dataset.linkEntry;
-        const entry = allEntries.find(e => e.type === "staff" && e.user && (e.user.email || "").toLowerCase() === email.toLowerCase());
-        if (entry) openPayrollLinkPicker(entry);
       });
     });
   }
@@ -1896,28 +1866,6 @@
       }
     };
 
-    // (0) Manual link in annotations always wins. Handles Sophia/Chidinma type
-    // mismatches where the legal name (payroll) differs from the chosen name
-    // (Workspace) and no auto-match would ever find it.
-    const key = entryKey(entry);
-    const ann = annotationFor(key);
-    if (ann && ann.payroll_match) {
-      const wanted = ann.payroll_match;
-      const wantedId = `${wanted.employer || ""}|${wanted.employee_number || ""}|${wanted.first_name || ""}|${wanted.last_name || ""}`;
-      const allLists = [
-        ...Object.values(payrollData.by_email || {}),
-        ...Object.values(payrollData.by_name || {}),
-      ];
-      for (const lst of allLists) {
-        for (const r of (lst || [])) {
-          if (`${r.employer}|${r.employee_number}|${r.first_name}|${r.last_name}` === wantedId) {
-            pushAll([r]);
-            return out;   // manual match short-circuits everything else
-          }
-        }
-      }
-    }
-
     const email = ((u && u.email) || (a && a.username) || "").toLowerCase();
     if (email && payrollData.by_email) pushAll(payrollData.by_email[email]);
 
@@ -2010,11 +1958,6 @@
     modal.querySelectorAll("[data-open-group]").forEach(chip => {
       chip.addEventListener("click", () => openGroupCard(chip.dataset.openGroup));
     });
-    // Payroll-link affordances.
-    const relinkBtn = modal.querySelector("[data-relink]");
-    if (relinkBtn) relinkBtn.addEventListener("click", () => openPayrollLinkPicker(entry));
-    const unlinkBtn = modal.querySelector("[data-unlink]");
-    if (unlinkBtn) unlinkBtn.addEventListener("click", () => savePayrollLink(entry, null));
 
     // For active users, check the live autoForwarding state via the Gmail
     // API and swap the Manage section into 'Live + forwarding active' mode
@@ -2032,6 +1975,25 @@
     if (phoneInput) phoneInput.dataset.initialValue = phoneInput.value;
     if (addressInput) addressInput.dataset.initialValue = addressInput.value;
     modal.dataset.notesKey = key;
+
+    // Reveal the input box below the value when the user clicks [Edit].
+    modal.querySelectorAll("[data-edit-toggle]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const field = btn.dataset.editToggle;
+        const wrap = modal.querySelector(`[data-edit-input-wrap="${field}"]`);
+        if (!wrap) return;
+        const willShow = wrap.hidden;
+        wrap.hidden = !willShow;
+        btn.textContent = willShow ? "Cancel" : "Edit";
+        if (willShow) {
+          const inp = wrap.querySelector("input, textarea");
+          if (inp) {
+            inp.focus();
+            if (typeof inp.select === "function") inp.select();
+          }
+        }
+      });
+    });
   }
 
   // Auto-save Notes (phone + address) if the values changed. Fire-and-forget;
@@ -2104,30 +2066,7 @@
 
   function payrollSectionHtml(entry) {
     const all = payrollAllFor(entry);
-    const u = entry.user;
-    const ann = annotationFor(entryKey(entry));
-    const isManualLink = !!(ann && ann.payroll_match);
-    // Only show the link-affordance when we have payroll data loaded and the
-    // entry is a Workspace staff member (external users have no Workspace ID
-    // to attach an annotation to).
-    const linkAffordance = (payrollData && u) ? `
-        <div class="dir-payroll-link-row">
-          ${isManualLink
-            ? `<span class="dir-modal-saved-hint" style="margin:0;text-align:left;">Manually linked. <button type="button" class="dir-link-btn" data-relink>Change…</button> <button type="button" class="dir-link-btn" data-unlink>Unlink</button></span>`
-            : (all.length
-                ? `<span class="dir-modal-saved-hint" style="margin:0;text-align:left;">Auto-matched. Wrong person? <button type="button" class="dir-link-btn" data-relink>Pick a different record…</button></span>`
-                : `<span class="dir-modal-saved-hint" style="margin:0;text-align:left;">No payroll match. <button type="button" class="dir-link-btn" data-relink>Link a payroll record…</button></span>`)}
-        </div>` : "";
-
-    if (!all.length) {
-      // No record matched, but we still want the affordance to be visible
-      // so the user can manually link one.
-      return payrollData && u ? `
-        <div class="dir-modal-section">
-          <h3>Payroll</h3>
-          ${linkAffordance}
-        </div>` : "";
-    }
+    if (!all.length) return "";
 
     const fmtUkDate = s => {
       if (!s) return "—";
@@ -2163,9 +2102,8 @@
 
     return `
       <div class="dir-modal-section">
-        <h3>Payroll${all.length > 1 ? ` <span class="dir-modal-count">${all.length} records</span>` : ""}${isManualLink ? ` <span class="dir-modal-count" style="color:var(--brass-600);">manually linked</span>` : ""}</h3>
+        <h3>Payroll${all.length > 1 ? ` <span class="dir-modal-count">${all.length} records</span>` : ""}</h3>
         ${all.map((p, i) => recordBlock(p, i === 0)).join("")}
-        ${linkAffordance}
       </div>
     `;
   }
@@ -2310,6 +2248,38 @@
         <dl class="dir-detail-grid">${workspaceDl}</dl>
       </div>
 
+      ${u ? (() => {
+        const ann = annotationFor(entryKey(entry));
+        const p = payrollFor(entry);
+        const phoneVal = ann.phone || (p && p.mobile) || "";
+        const addrVal = ann.address || (p && p.address) || "";
+        const phoneSrc = ann.phone ? "" : (phoneVal ? ` <span class="dir-modal-saved-hint" style="display:inline;margin:0;padding:0;">(from payroll)</span>` : "");
+        const addrSrc = ann.address ? "" : (addrVal ? ` <span class="dir-modal-saved-hint" style="display:inline;margin:0;padding:0;">(from payroll)</span>` : "");
+        return `
+        <div class="dir-modal-section">
+          <h3>Contact</h3>
+          <dl class="dir-detail-grid">
+            <dt>Phone</dt>
+            <dd>
+              <span>${escapeHtml(phoneVal) || "—"}</span>${phoneSrc}
+              <button type="button" class="dir-link-btn" data-edit-toggle="phone" style="margin-left:8px;">Edit</button>
+              <div data-edit-input-wrap="phone" hidden style="margin-top:6px;">
+                <input id="dirPhone" name="phone" type="tel" value="${escapeHtml(ann.phone || "")}" placeholder="${escapeHtml(phoneVal || "+44 7…")}">
+              </div>
+            </dd>
+            <dt>Address</dt>
+            <dd>
+              <span style="white-space:pre-line;">${escapeHtml(addrVal) || "—"}</span>${addrSrc}
+              <button type="button" class="dir-link-btn" data-edit-toggle="address" style="margin-left:8px;">Edit</button>
+              <div data-edit-input-wrap="address" hidden style="margin-top:6px;">
+                <textarea id="dirAddress" name="address" rows="2" placeholder="${escapeHtml(addrVal || "Home address")}">${escapeHtml(ann.address || "")}</textarea>
+              </div>
+            </dd>
+          </dl>
+          <p class="dir-modal-saved-hint">Any edits save to <code>annotations.json</code> automatically when you close this card.</p>
+        </div>`;
+      })() : ""}
+
       ${isSuspended ? auditHistoryHtml(u) : ""}
 
       ${u && groupsForUser(u).length ? `
@@ -2355,7 +2325,7 @@
                  <datalist id="dirRouteOptions">${adminEmailOptions()}</datalist>
                </div>
                <div class="dir-manage-actions">
-                 <button type="button" class="danger" data-action="convert-and-forward">Convert to group + start forwarding</button>
+                 <button type="button" class="danger" data-action="convert-and-forward">Suspend account and start forwarding (takes 21 days)</button>
                  <button type="button" data-action="unsuspend">Move back to live (£11/mo)</button>
                </div>
                <p class="dir-modal-saved-hint"><strong>Convert to group</strong> deletes the user immediately and creates a forwarding-only Group at this address after Google's 20-day address-reuse lockout. ~20 more days of bounced mail, then mail forwards to the target forever. £0/month. <br><strong>Move back to live</strong> resumes the £11/mo seat — use only if you want the account active again.</p>`
@@ -2366,7 +2336,7 @@
                    <datalist id="dirRouteOptions">${adminEmailOptions()}</datalist>
                  </div>
                  <div class="dir-manage-actions">
-                   <button type="button" class="danger" data-action="convert-and-forward">Convert to group + start forwarding</button>
+                   <button type="button" class="danger" data-action="convert-and-forward">Suspend account and start forwarding (takes 21 days)</button>
                    <button type="button" data-action="suspend-no-forward">Suspend without forwarding</button>
                  </div>
                  <p class="dir-modal-saved-hint"><strong>Convert to group</strong> deletes the Workspace user and re-creates the email address as a forwarding-only Group with the target as a member. Free forever (no seat fee), and mail reliably flows. Requires one manual step in admin.google.com (delete with 'Make email available immediately' ticked) — the next button will walk you through it. <br><strong>Suspend without forwarding</strong> just stops the seat fee; mail to this address will bounce.</p>
@@ -2384,18 +2354,6 @@
           <div class="dir-confirm-slot" data-pw-slot></div>
         </div>` : ""}
 
-      <div class="dir-modal-section">
-        <h3>Notes</h3>
-        <div class="dir-form-row">
-          <label for="dirPhone">Phone</label>
-          <input id="dirPhone" name="phone" type="tel" value="${escapeHtml(ann.phone || (payrollFor(entry)?.mobile) || "")}" placeholder="+44 7…">
-        </div>
-        <div class="dir-form-row">
-          <label for="dirAddress">Address</label>
-          <textarea id="dirAddress" name="address" rows="2" placeholder="${escapeHtml((payrollFor(entry)?.address) || "Home address")}">${escapeHtml(ann.address || "")}</textarea>
-        </div>
-        <p class="dir-modal-saved-hint">Changes are saved to <code>annotations.json</code> automatically when you close this card.</p>
-      </div>
     `;
   }
 
@@ -3035,101 +2993,6 @@
     setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
   }
 
-  // Open the payroll-record picker for an entry. Shows every payroll record
-  // (with a search box) and lets the user pick one to manually link. The
-  // chosen record is saved as { employer, employee_number, first_name,
-  // last_name } in the entry's annotation under `payroll_match`.
-  function openPayrollLinkPicker(entry) {
-    if (!payrollData) return;
-    // Collect unique records — same id-tuple may appear under both by_email
-    // and several by_name keys.
-    const all = [];
-    const seen = new Set();
-    for (const lst of [...Object.values(payrollData.by_email || {}), ...Object.values(payrollData.by_name || {})]) {
-      for (const r of (lst || [])) {
-        const id = `${r.employer}|${r.employee_number}|${r.first_name}|${r.last_name}`;
-        if (seen.has(id)) continue;
-        seen.add(id);
-        all.push(r);
-      }
-    }
-    all.sort((a, b) => `${a.last_name} ${a.first_name}`.localeCompare(`${b.last_name} ${b.first_name}`));
-
-    const modal = document.getElementById("dirModal");
-    const u = entry.user;
-    const title = u ? (u.name || u.email) : entry.activity?.username || "";
-    modal.innerHTML = `
-      <button class="dir-modal-close" type="button" data-close aria-label="Close">×</button>
-      <div class="dir-modal-head">
-        <div>
-          <h2 class="dir-modal-name">Link payroll record</h2>
-          <p class="dir-modal-title">Pick the right payroll record for ${escapeHtml(title)}.</p>
-        </div>
-      </div>
-      <div class="dir-modal-section">
-        <div class="dir-form-row">
-          <label for="dirLinkSearch">Search</label>
-          <input id="dirLinkSearch" type="search" placeholder="Filter by name, employer, employee #, email…" autocomplete="off">
-        </div>
-        <ul class="dir-link-list" id="dirLinkList"></ul>
-      </div>`;
-    const backdrop = document.getElementById("dirModalBackdrop");
-    backdrop.classList.add("open");
-    backdrop.setAttribute("aria-hidden", "false");
-    document.body.classList.add("dir-modal-open");
-    modal.querySelector("[data-close]").addEventListener("click", () => openCard(entryKey(entry)));
-
-    const listEl = modal.querySelector("#dirLinkList");
-    const render = (term) => {
-      const t = (term || "").toLowerCase().trim();
-      const items = t
-        ? all.filter(r => {
-            const hay = [r.first_name, r.last_name, r.email, r.employer, r.employee_number, r.address, r.mobile].filter(Boolean).join(" ").toLowerCase();
-            return hay.includes(t) || hay.replace(/\s+/g, "").includes(t.replace(/\s+/g, ""));
-          })
-        : all;
-      listEl.innerHTML = items.map(r => {
-        const id = `${r.employer}|${r.employee_number}|${r.first_name}|${r.last_name}`;
-        const sub = [r.employer, r.employee_number ? `#${r.employee_number}` : "", r.start_date ? `start ${r.start_date}` : "", r.email].filter(Boolean).join(" · ");
-        return `<li><button type="button" class="dir-link-pick" data-id="${escapeHtml(id)}"><strong>${escapeHtml(r.first_name)} ${escapeHtml(r.last_name)}</strong><br><span class="dir-modal-saved-hint" style="text-align:left;margin:0;">${escapeHtml(sub)}</span></button></li>`;
-      }).join("") || `<li class="dir-modal-saved-hint" style="text-align:left;margin:0;padding:8px 0;">No records match.</li>`;
-      listEl.querySelectorAll("[data-id]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const id = btn.dataset.id;
-          const rec = all.find(r => `${r.employer}|${r.employee_number}|${r.first_name}|${r.last_name}` === id);
-          if (!rec) return;
-          savePayrollLink(entry, {
-            employer: rec.employer,
-            employee_number: rec.employee_number,
-            first_name: rec.first_name,
-            last_name: rec.last_name,
-          });
-        });
-      });
-    };
-    render("");
-    modal.querySelector("#dirLinkSearch").addEventListener("input", e => render(e.target.value));
-    modal.querySelector("#dirLinkSearch").focus();
-  }
-
-  // Persist a payroll_match annotation (null to unlink) and re-open the user
-  // card so the Payroll section reflects the change.
-  async function savePayrollLink(entry, match) {
-    const key = entryKey(entry);
-    try {
-      await saveAnnotationRemote(
-        key,
-        (annotationFor(key).phone || ""),
-        (annotationFor(key).start_date || ""),
-        { payroll_match: match },
-      );
-      openCard(key);
-      showModalBanner(match ? `Linked to ${match.first_name} ${match.last_name} (payroll).` : `Unlinked payroll record.`, "success");
-    } catch (err) {
-      openCard(key);
-      showModalBanner(`Link failed — ${err.message || err}`, "error");
-    }
-  }
 
   // Recover deleted seats by calling /api/workspace/recover with the user's
   // immutable id (the email may have been recycled). Best-effort: each seat
