@@ -492,6 +492,13 @@ Two design decisions worth flagging:
 - **Health panel** (`#dirHealthPanel`): a red-bordered card flagging data-quality issues — (a) suspended Workspace accounts with no recorded forwarding target (mail going nowhere), (b) active users with no matched payroll record (HR gap), (c) payroll records with no Workspace match (leaver-on-the-books or contractor). Each row has a one-click action ("Show them" filters to that subset or opens a list dialog). When everything is clean, the panel turns green with a single tick.
 - **Billing summary** (`#dirBillingSummary`): three cards — live seats × `SEAT_GBP_PER_MONTH` (default £11, edit the JS constant for Business Plus / Enterprise), suspended count with "N of M have forwarding set", and total monthly cost with "Avoiding £X/mo from suspended accounts". Implements the "per-seat-billing visibility" half of the page's stated dual purpose.
 
+The health panel checks four things; when all are zero, the panel turns green with a single tick:
+1. Suspended accounts with no recorded forwarding target (mail going nowhere).
+2. Suspended accounts still in 1+ groups (group-distributed mail still reaches them; defeats the leaver suspension's hygiene purpose).
+3. Active Workspace users with no matched payroll record (HR gap?).
+4. Payroll records with no matched Workspace user (leaver-on-the-books or contractor).
+Plus a stale-payroll warning when `payrollData.updated_at` is over 40 days old — HR refreshes monthly, so 40+ days means the 1st-of-month cron reminder wasn't acted on.
+
 **Filter rows** (below the search input):
 
 - **Status** (`#dirStatusRow`): All / Active / Suspended. The Suspended pill is the one-click route to leaver review.
@@ -520,6 +527,10 @@ The detail card's "Manage Workspace account" section drives Cloudflare Worker `a
 - **POST `/api/workspace/unsuspend`** `{ email }` — sets `suspended: false`, then best-effort disables `autoForwarding`.
 - **POST `/api/workspace/create`** `{ given_name, family_name, email, password, org_unit_path? }` — creates a new Workspace user with `changePasswordAtNextLogin: true`.
 - **No Delete endpoint.** Deleting permanently removes the seat and its mailbox from the audit history; we never want that. Suspended-with-routing is the leaver workflow.
+
+**On the active user's card** (when they're in 1+ groups):
+- The standard "Suspend + route" button (suspends + sets forwarding).
+- A second **"Suspend + route + remove from N groups"** button that runs the full leaver workflow in one click: suspend+route, then loop `group-member-remove` across every membership. Confirmation strip lists every group that'll be touched. Best-effort: a failed group-remove doesn't roll back the suspension. Banner summarises wins + failures.
 
 **On the suspended user's card:**
 - **"Unsuspend"** button — reverses the suspend + disables forwarding.
