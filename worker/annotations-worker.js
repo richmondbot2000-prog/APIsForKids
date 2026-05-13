@@ -39,7 +39,7 @@ export default {
     let body;
     try { body = await req.json(); }
     catch { return json({ error: "invalid JSON body" }, 400, req); }
-    const { key, phone, start_date, payroll_match } = body || {};
+    const { key, phone, start_date, address, payroll_match } = body || {};
     if (!key || typeof key !== "string") {
       return json({ error: "missing 'key' (email or username)" }, 400, req);
     }
@@ -73,24 +73,30 @@ export default {
       ? current.annotations
       : {};
 
-    const cleanPhone = (phone || "").trim();
-    const cleanStart = (start_date || "").trim();
-    // payroll_match is either an object {employee_number, first_name, last_name, employer}
-    // or null (explicit unlink). Treat any non-object as "not set", so the
-    // existing phone+start_date-only callers don't accidentally clobber a link.
-    const hasMatchKey = Object.prototype.hasOwnProperty.call(body || {}, "payroll_match");
-    const cleanMatch = (payroll_match && typeof payroll_match === "object") ? payroll_match : null;
+    // Field-by-field preservation: if the caller didn't include a field in the
+    // payload at all, we keep the existing value. If they sent an empty
+    // string, we clear it. If they sent a value, we set it. This lets clients
+    // do partial updates without clobbering fields they don't touch.
+    const has = (k) => Object.prototype.hasOwnProperty.call(body || {}, k);
     const existing = (annotations[key] && typeof annotations[key] === "object") ? annotations[key] : {};
-    const next = {};
-    if (cleanPhone) next.phone = cleanPhone;
-    if (cleanStart) next.start_date = cleanStart;
-    // Preserve an existing payroll_match unless the caller explicitly set the
-    // field (to either a new value or null).
-    if (hasMatchKey) {
-      if (cleanMatch) next.payroll_match = cleanMatch;
-    } else if (existing.payroll_match) {
-      next.payroll_match = existing.payroll_match;
+    const next = { ...existing };
+
+    const setScalar = (k, val) => {
+      if (!has(k)) return;
+      const t = (val || "").trim();
+      if (t) next[k] = t; else delete next[k];
+    };
+    setScalar("phone", phone);
+    setScalar("start_date", start_date);
+    setScalar("address", address);
+
+    // payroll_match is an object (not a string) — handle separately.
+    if (has("payroll_match")) {
+      const m = (payroll_match && typeof payroll_match === "object") ? payroll_match : null;
+      if (m) next.payroll_match = m;
+      else delete next.payroll_match;
     }
+
     if (Object.keys(next).length === 0) {
       delete annotations[key];
     } else {
@@ -105,9 +111,9 @@ export default {
     const newContent = b64Encode(JSON.stringify(out, null, 2) + "\n");
     const action = !annotations[key]
       ? "clear"
-      : hasMatchKey && cleanMatch
+      : has("payroll_match") && payroll_match
         ? "link payroll"
-        : hasMatchKey && !cleanMatch
+        : has("payroll_match") && !payroll_match
           ? "unlink payroll"
           : "set";
     const commitMsg = `Directory note: ${action} ${key}`;

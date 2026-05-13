@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778667224">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778667224">
-<link rel="stylesheet" href="quiet.css?v=1778667224">
-<link rel="stylesheet" href="quiet-extras.css?v=1778667224">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778667224">
+<link rel="stylesheet" href="style.css?v=1778667479">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778667479">
+<link rel="stylesheet" href="quiet.css?v=1778667479">
+<link rel="stylesheet" href="quiet-extras.css?v=1778667479">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778667479">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -943,7 +943,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778667224" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778667479" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1821,9 +1821,13 @@
   // POST to the Worker. On success we both replace the local in-memory cache
   // with the canonical state echoed back AND re-render the row list.
   async function saveAnnotationRemote(key, phone, start_date, opts) {
-    const payload = { key, phone, start_date };
-    // Only send payroll_match when the caller explicitly wants to change it
-    // (set or unset). Phone/start saves shouldn't accidentally clobber a link.
+    // Only include each field if the caller explicitly passed it. The Worker
+    // preserves existing fields it doesn't see in the payload, so partial
+    // updates work and unrelated fields aren't clobbered.
+    const payload = { key };
+    if (phone !== undefined) payload.phone = phone;
+    if (start_date !== undefined && start_date !== "") payload.start_date = start_date;
+    if (opts && Object.prototype.hasOwnProperty.call(opts, "address")) payload.address = opts.address;
     if (opts && Object.prototype.hasOwnProperty.call(opts, "payroll_match")) {
       payload.payroll_match = opts.payroll_match;
     }
@@ -1881,14 +1885,14 @@
     if (saveBtn) {
       saveBtn.addEventListener("click", async () => {
         const phone = (modal.querySelector('input[name="phone"]').value || "").trim();
-        const start = (modal.querySelector('input[name="start_date"]').value || "").trim();
+        const address = (modal.querySelector('textarea[name="address"]').value || "").trim();
         const toast = modal.querySelector("[data-toast]");
         saveBtn.disabled = true;
         if (toast) { toast.textContent = "Saving…"; toast.classList.remove("error"); }
         try {
-          await saveAnnotationRemote(key, phone, start);
+          await saveAnnotationRemote(key, phone, "", { address });
           if (toast) toast.textContent = "Saved to the team directory.";
-          renderGrid();   // refresh rows so the new note shows inline
+          renderGrid();
         } catch (err) {
           if (toast) {
             toast.textContent = "Save failed — " + (err.message || err);
@@ -2219,8 +2223,8 @@
           <input id="dirPhone" name="phone" type="tel" value="${escapeHtml(ann.phone || (payrollFor(entry)?.mobile) || "")}" placeholder="+44 7…">
         </div>
         <div class="dir-form-row">
-          <label for="dirStart">Start date</label>
-          <input id="dirStart" name="start_date" type="date" value="${escapeHtml(ann.start_date || (payrollFor(entry)?.start_date) || "")}">
+          <label for="dirAddress">Address</label>
+          <textarea id="dirAddress" name="address" rows="2" placeholder="${escapeHtml((payrollFor(entry)?.address) || "Home address")}">${escapeHtml(ann.address || "")}</textarea>
         </div>
         <div class="dir-modal-actions">
           ${mailto ? `<a class="dir-modal-btn" href="mailto:${escapeHtml(mailto)}" title="${mailtoIsForward ? `Goes to the forwarded target ${escapeHtml(mailto)} — original mailbox is suspended` : `mailto: ${escapeHtml(mailto)}`}">Email${mailtoIsForward ? " (via forward)" : ""}</a>` : ""}
