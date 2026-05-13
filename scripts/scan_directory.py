@@ -69,13 +69,9 @@ def build_service(key_info: dict, delegate: str):
     return build('admin', 'directory_v1', credentials=creds, cache_discovery=False)
 
 
-def fetch_users(service) -> list[dict]:
-    """Page through users.list — Workspace caps at 500/page, we follow nextPageToken.
-
-    Uses `customer='my_customer'` rather than `domain=` so we get every active
-    user across all the tenant's domains. The admin console's user-count is
-    across the whole customer.
-    """
+def _fetch_users_one(service, show_deleted: bool) -> list[dict]:
+    """One paged users.list call. Pass show_deleted=True to fetch the 20-day
+    deleted window; False to fetch active+suspended."""
     out: list[dict] = []
     page_token: str | None = None
     while True:
@@ -85,7 +81,7 @@ def fetch_users(service) -> list[dict]:
             'orderBy': 'email',
             'projection': 'full',
             'viewType': 'admin_view',
-            'showDeleted': 'true',   # include recently-deleted (20-day window) so leavers don't fall off the page
+            'showDeleted': 'true' if show_deleted else 'false',
         }
         if page_token:
             kwargs['pageToken'] = page_token
@@ -95,6 +91,22 @@ def fetch_users(service) -> list[dict]:
         if not page_token:
             break
     return out
+
+
+def fetch_users(service) -> list[dict]:
+    """Returns active + suspended + recently-deleted Workspace users.
+
+    Google's API needs two calls: showDeleted=false returns active+suspended,
+    showDeleted=true returns ONLY the 20-day deleted window. We union them
+    so the Directory page can render every state with one staff.json.
+    """
+    live = _fetch_users_one(service, show_deleted=False)
+    try:
+        deleted = _fetch_users_one(service, show_deleted=True)
+    except Exception as e:
+        print(f"# WARNING: deleted-users fetch failed (non-fatal): {e}", flush=True)
+        deleted = []
+    return live + deleted
 
 
 def normalize(u: dict, tenant: str) -> dict:
