@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778666865">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778666865">
-<link rel="stylesheet" href="quiet.css?v=1778666865">
-<link rel="stylesheet" href="quiet-extras.css?v=1778666865">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778666865">
+<link rel="stylesheet" href="style.css?v=1778667224">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778667224">
+<link rel="stylesheet" href="quiet.css?v=1778667224">
+<link rel="stylesheet" href="quiet-extras.css?v=1778667224">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778667224">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -438,7 +438,9 @@
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 100;
+    /* Above the topbar (z-index 1000 from quiet-extras.css) so the modal's
+       title + close button aren't hidden under it on scroll. */
+    z-index: 2000;
     padding: 16px;
   }
   .dir-modal-backdrop.open { display: flex; }
@@ -941,7 +943,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778666865" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778667224" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -2181,11 +2183,18 @@
             : u.suspended
             ? (() => {
                 const memberOf = groupsForUser(u);
-                return `<div class="dir-manage-actions">
+                const noForward = !forwardTo;
+                return `${noForward ? `<div class="dir-form-row">
+                 <label for="dirAddFwdTo">Forward mail to</label>
+                 <input id="dirAddFwdTo" name="add_fwd_to" type="email" placeholder="Type a colleague's email" list="dirRouteOptions" autocomplete="off">
+                 <datalist id="dirRouteOptions">${adminEmailOptions()}</datalist>
+               </div>` : ""}
+               <div class="dir-manage-actions">
+                 ${noForward ? `<button type="button" data-action="add-forwarding">Add forwarding</button>` : ""}
                  <button type="button" data-action="unsuspend">Unsuspend (turn forwarding off)</button>
                  ${memberOf.length ? `<button type="button" class="danger" data-action="purge-groups">Remove from ${memberOf.length} group${memberOf.length === 1 ? "" : "s"}</button>` : ""}
                </div>
-               <p class="dir-modal-saved-hint">${forwardTo ? `Currently forwards to <code>${escapeHtml(forwardTo)}</code>. ` : ""}Unsuspending re-enables direct mailbox delivery and disables the forward.${memberOf.length ? ` Leavers should typically be removed from all groups too — ${memberOf.length} membership${memberOf.length === 1 ? "" : "s"} still active.` : ""}</p>`;
+               <p class="dir-modal-saved-hint">${forwardTo ? `Currently forwards to <code>${escapeHtml(forwardTo)}</code>. ` : `<strong style="color:var(--manuscript-red);">No forwarding configured — mail to this address is going nowhere.</strong> Type a colleague's email above and click <strong>Add forwarding</strong>. The account is briefly unsuspended (~2s) to set the rule, then re-suspended. `}Unsuspending re-enables direct mailbox delivery and disables the forward.${memberOf.length ? ` Leavers should typically be removed from all groups too — ${memberOf.length} membership${memberOf.length === 1 ? "" : "s"} still active.` : ""}</p>`;
               })()
             : (() => {
                 const memberOf = groupsForUser(u);
@@ -2273,6 +2282,22 @@
         </div>`;
       slot.querySelector("[data-cancel]").addEventListener("click", () => { slot.innerHTML = ""; });
       slot.querySelector("[data-confirm]").addEventListener("click", () => runRecover(entry, deletedSeats, slot));
+      return;
+    }
+
+    if (action === "add-forwarding") {
+      const input = modal.querySelector('input[name="add_fwd_to"]');
+      const routeTo = (input && input.value || "").trim();
+      if (!routeTo || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(routeTo)) {
+        if (input) {
+          input.classList.add("dir-input-invalid");
+          input.focus();
+          input.addEventListener("input", () => input.classList.remove("dir-input-invalid"), { once: true });
+        }
+        return;
+      }
+      // No confirm step — the typed-in email IS the confirmation.
+      runAction(entry, "add-forwarding", slot, { route_to: routeTo });
       return;
     }
 

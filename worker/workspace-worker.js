@@ -111,6 +111,7 @@ export default {
     try {
       switch (action) {
         case "suspend-and-route":    result = await doSuspendAndRoute(env, adminToken, body); break;
+        case "add-forwarding":       result = await doAddForwarding(env, adminToken, body); break;
         case "unsuspend":            result = await doUnsuspend(env, adminToken, body); break;
         case "recover":              result = await doRecover(adminToken, body); break;
         case "create":               result = await doCreate(adminToken, body); break;
@@ -178,6 +179,46 @@ async function doSuspendAndRoute(env, adminToken, body) {
   const susRes = await adminApi(adminToken, "PUT", `users/${encodeURIComponent(body.email)}`, { suspended: true });
   if (!susRes.ok) return { ok: false, error: "suspendUser: " + susRes.error };
 
+  return { ok: true, data: { suspended: true, forwarded_to: body.route_to } };
+}
+
+// Add forwarding to an already-suspended user. Google blocks impersonating
+// suspended users for Gmail API calls, so we unsuspend → set forwarding →
+// re-suspend. The unsuspend window is ~2 seconds. If the Gmail step fails
+// we still re-suspend so the user ends up where they started.
+async function doAddForwarding(env, adminToken, body) {
+  if (!body.email) return { ok: false, error: "missing email" };
+  if (!body.route_to) return { ok: false, error: "missing route_to" };
+
+  // Step 1: unsuspend
+  const u1 = await adminApi(adminToken, "PUT", `users/${encodeURIComponent(body.email)}`, { suspended: false });
+  if (!u1.ok) return { ok: false, error: "unsuspend (step 1): " + u1.error };
+
+  let forwardErr = null;
+  try {
+    const mailboxToken = await getGoogleAccessToken(env, body.email, GMAIL_SCOPES);
+    const addRes = await gmailApi(mailboxToken, body.email, "POST", "settings/forwardingAddresses",
+      { forwardingEmail: body.route_to });
+    if (!addRes.ok && addRes.status !== 409) {
+      forwardErr = "addForwardingAddress: " + addRes.error;
+    } else {
+      const fwdRes = await gmailApi(mailboxToken, body.email, "PUT", "settings/autoForwarding", {
+        enabled: true,
+        emailAddress: body.route_to,
+        disposition: "leaveInInbox",
+      });
+      if (!fwdRes.ok) forwardErr = "setAutoForwarding: " + fwdRes.error;
+    }
+  } catch (e) {
+    forwardErr = "gmail step: " + (e.message || e);
+  }
+
+  // Step 3: re-suspend (always, even if forwarding failed)
+  const u2 = await adminApi(adminToken, "PUT", `users/${encodeURIComponent(body.email)}`, { suspended: true });
+  if (!u2.ok && !forwardErr) {
+    return { ok: false, error: "re-suspend (step 3): " + u2.error + ". User is currently UNSUSPENDED — investigate." };
+  }
+  if (forwardErr) return { ok: false, error: forwardErr };
   return { ok: true, data: { suspended: true, forwarded_to: body.route_to } };
 }
 
