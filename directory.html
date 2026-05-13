@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778668322">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778668322">
-<link rel="stylesheet" href="quiet.css?v=1778668322">
-<link rel="stylesheet" href="quiet-extras.css?v=1778668322">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778668322">
+<link rel="stylesheet" href="style.css?v=1778669851">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778669851">
+<link rel="stylesheet" href="quiet.css?v=1778669851">
+<link rel="stylesheet" href="quiet-extras.css?v=1778669851">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778669851">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -698,6 +698,16 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.7rem;
   }
+  .dir-ex-chip {
+    display: inline-block;
+    font: 500 11px/1.4 var(--font-mono, "JetBrains Mono", ui-monospace, monospace);
+    color: var(--brass-600, #A47829);
+    background: var(--paper-200, #F5ECD4);
+    border: 1px solid var(--brass-300, #E2BF74);
+    padding: 1px 6px;
+    border-radius: 3px;
+    text-transform: lowercase;
+  }
   .dir-row--group .dir-title { font-style: italic; color: var(--ink-500, #6B7794); }
 
   .dir-modal-section .dir-group-link {
@@ -943,7 +953,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778668322" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778669851" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -2199,8 +2209,9 @@
                  ${noForward ? `<button type="button" data-action="add-forwarding">Add forwarding</button>` : ""}
                  <button type="button" data-action="unsuspend">Unsuspend (turn forwarding off)</button>
                  ${memberOf.length ? `<button type="button" class="danger" data-action="purge-groups">Remove from ${memberOf.length} group${memberOf.length === 1 ? "" : "s"}</button>` : ""}
+                 <button type="button" class="danger" data-action="convert-to-group">Convert to group (free, mailbox lost)</button>
                </div>
-               <p class="dir-modal-saved-hint">${forwardTo ? `Currently forwards to <code>${escapeHtml(forwardTo)}</code>. ` : `<strong style="color:var(--manuscript-red);">No forwarding configured — mail to this address is going nowhere.</strong> Type a colleague's email above and click <strong>Add forwarding</strong>. The account is briefly unsuspended (~2s) to set the rule, then re-suspended. `}Unsuspending re-enables direct mailbox delivery and disables the forward.${memberOf.length ? ` Leavers should typically be removed from all groups too — ${memberOf.length} membership${memberOf.length === 1 ? "" : "s"} still active.` : ""}</p>`;
+               <p class="dir-modal-saved-hint">${forwardTo ? `Currently forwards to <code>${escapeHtml(forwardTo)}</code>. ` : `<strong style="color:var(--manuscript-red);">No forwarding configured — mail to this address is going nowhere.</strong> Type a colleague's email above and click <strong>Add forwarding</strong>. The account is briefly unsuspended (~2s) to set the rule, then re-suspended. `}Unsuspending re-enables direct mailbox delivery and disables the forward.${memberOf.length ? ` Leavers should typically be removed from all groups too — ${memberOf.length} membership${memberOf.length === 1 ? "" : "s"} still active.` : ""}<br><br><strong>Convert to group</strong> deletes the user (mailbox lost, 25-day Vault retention) and re-creates the email address as a forwarding-only Group. Free forever, no Workspace seat. Use when you don't need the leaver's old mailbox.</p>`;
               })()
             : (() => {
                 const memberOf = groupsForUser(u);
@@ -2210,10 +2221,11 @@
                  <datalist id="dirRouteOptions">${adminEmailOptions()}</datalist>
                </div>
                <div class="dir-manage-actions">
+                 <button type="button" data-action="reset-password">Reset password…</button>
                  <button type="button" class="danger" data-action="suspend-and-route">Suspend + route</button>
                  ${memberOf.length ? `<button type="button" class="danger" data-action="leaver-full">Suspend + route + remove from ${memberOf.length} group${memberOf.length === 1 ? "" : "s"}</button>` : ""}
                </div>
-               <p class="dir-modal-saved-hint">Suspends the Workspace seat (no per-seat fee on Flex) and sets the mailbox to auto-forward to the address above. Logged to <code>workspace-actions.json</code>.${memberOf.length ? ` The 'Suspend + route + remove' button also revokes the ${memberOf.length} group membership${memberOf.length === 1 ? "" : "s"} this person has — the full leaver workflow in one click.` : ""}</p>`;
+               <p class="dir-modal-saved-hint">Reset password generates a one-shot password the user must change on next sign-in — useful for lockouts. Suspend+route suspends the Workspace seat (no per-seat fee on Flex) and sets the mailbox to auto-forward to the address above. Logged to <code>workspace-actions.json</code>.${memberOf.length ? ` The 'Suspend + route + remove' button also revokes the ${memberOf.length} group membership${memberOf.length === 1 ? "" : "s"} this person has — the full leaver workflow in one click.` : ""}</p>`;
               })()}
           <div class="dir-confirm-slot"></div>
         </div>` : ""}
@@ -2304,6 +2316,73 @@
       }
       // No confirm step — the typed-in email IS the confirmation.
       runAction(entry, "add-forwarding", slot, { route_to: routeTo });
+      return;
+    }
+
+    if (action === "convert-to-group") {
+      // Prompt for forward target inline. Default to the existing forward if any.
+      const existingForward = forwardingByEmail[(u.email || "").toLowerCase()] || "";
+      slot.innerHTML = `
+        <div class="dir-confirm">
+          <div class="dir-confirm-text">
+            <strong>Convert ${escapeHtml(u.email)} to a forwarding group?</strong><br>
+            <span class="dir-modal-saved-hint" style="text-align:left;margin:0;">This will (1) delete the Workspace user (mailbox kept in Vault for 25 days then unrecoverable), (2) create a Group at <code>${escapeHtml(u.email)}</code>, and (3) add the forward target as a member. Costs £0/month forever.</span>
+            <div class="dir-form-row" style="margin-top:10px;">
+              <label for="dirConvFwdTo">Forward mail to</label>
+              <input id="dirConvFwdTo" name="conv_fwd_to" type="email" value="${escapeHtml(existingForward)}" placeholder="Type a colleague's email" list="dirRouteOptions" autocomplete="off">
+              <datalist id="dirRouteOptions">${adminEmailOptions()}</datalist>
+            </div>
+          </div>
+          <div class="dir-confirm-actions">
+            <button type="button" data-cancel>Cancel</button>
+            <button type="button" class="confirm" data-confirm>Convert to group</button>
+          </div>
+        </div>`;
+      slot.querySelector("[data-cancel]").addEventListener("click", () => { slot.innerHTML = ""; });
+      slot.querySelector("[data-confirm]").addEventListener("click", () => {
+        const input = slot.querySelector('input[name="conv_fwd_to"]');
+        const fwdTo = (input.value || "").trim();
+        if (!fwdTo || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(fwdTo)) {
+          input.classList.add("dir-input-invalid");
+          input.focus();
+          return;
+        }
+        runConvertToGroup(entry, u, fwdTo, slot);
+      });
+      return;
+    }
+
+    if (action === "reset-password") {
+      const newPassword = generatePassword();
+      slot.innerHTML = `
+        <div class="dir-confirm">
+          <div class="dir-confirm-text">
+            <strong>Reset password for ${escapeHtml(u.email)}?</strong><br>
+            <span class="dir-modal-saved-hint" style="text-align:left;margin:0;">New password (write down or copy now — won't be shown again):</span>
+            <div class="dir-form-row" style="margin-top:10px;">
+              <label for="dirResetPw">New password</label>
+              <input id="dirResetPw" type="text" value="${escapeHtml(newPassword)}" readonly>
+              <button type="button" data-copy-pw style="background:transparent;border:1px solid var(--border);color:var(--ink-soft);padding:6px 12px;border-radius:6px;cursor:pointer;">Copy</button>
+              <button type="button" data-regen-pw style="background:transparent;border:1px solid var(--border);color:var(--ink-soft);padding:6px 12px;border-radius:6px;cursor:pointer;">Regenerate</button>
+            </div>
+            <span class="dir-modal-saved-hint" style="text-align:left;margin:8px 0 0;">User will be forced to change this on next sign-in.</span>
+          </div>
+          <div class="dir-confirm-actions">
+            <button type="button" data-cancel>Cancel</button>
+            <button type="button" class="confirm" data-confirm>Set this password</button>
+          </div>
+        </div>`;
+      const pwInput = slot.querySelector("#dirResetPw");
+      slot.querySelector("[data-cancel]").addEventListener("click", () => { slot.innerHTML = ""; });
+      slot.querySelector("[data-copy-pw]").addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(pwInput.value); pwInput.style.borderColor = "#4A9A2E"; } catch (e) {}
+      });
+      slot.querySelector("[data-regen-pw]").addEventListener("click", () => {
+        pwInput.value = generatePassword();
+      });
+      slot.querySelector("[data-confirm]").addEventListener("click", () => {
+        runResetPassword(entry, u, pwInput.value, slot);
+      });
       return;
     }
 
@@ -2493,6 +2572,58 @@
       showModalBanner(`Leaver workflow complete: ${u.email} suspended, mail forwards to ${routeTo}, removed from ${removed} group${removed === 1 ? "" : "s"}.`, "success");
     } else {
       showModalBanner(`Leaver workflow partial: suspended OK, mail forwards to ${routeTo}. Removed from ${removed} group${removed === 1 ? "" : "s"}; ${failures.length} group removal${failures.length === 1 ? "" : "s"} failed: ${failures.join("; ")}`, "error");
+    }
+  }
+
+  // Convert a user into a Group at the same address. Worker does the heavy
+  // lifting (delete user → create group → add member); we just update
+  // in-memory state so the row + Groups section reflect the change instantly.
+  async function runConvertToGroup(entry, u, forwardTo, slot) {
+    const modal = document.getElementById("dirModal");
+    modal.querySelectorAll("[data-action], [data-confirm]").forEach(b => b.disabled = true);
+    showModalBanner(`Converting ${u.email} to a forwarding group…`, "info");
+    try {
+      await workspaceAction("convert-to-group", { email: u.email, forward_to: forwardTo });
+      // Optimistic state: remove the staff entry, add a Group entry.
+      const idx = allEntries.findIndex(e => e === entry);
+      if (idx >= 0) allEntries.splice(idx, 1);
+      allGroups.push({
+        email: u.email,
+        name: (u.name || u.email.split("@")[0]) + " (ex-employee)",
+        description: `Forwarding-only group at ${u.email}. Converted from Workspace user.`,
+        tenant: "",
+        aliases: [],
+        member_count: 1,
+        members: [{ email: forwardTo, role: "MEMBER", type: "USER", status: "ACTIVE" }],
+        _converted: true,
+      });
+      buildGroupMembershipIndex();
+      renderGroupsSection();
+      renderBillingSummary();
+      renderStatusPills();
+      renderHealth();
+      renderGrid();
+      // No card to re-open (user is gone). Close the modal.
+      showModalBanner(`${u.email} is now a Group forwarding to ${forwardTo}. £0/month.`, "success");
+      setTimeout(closeCard, 1800);
+    } catch (err) {
+      showModalBanner(`Convert failed — ${err.message || err}`, "error");
+      modal.querySelectorAll("[data-action], [data-confirm]").forEach(b => b.disabled = false);
+    }
+  }
+
+  // Reset a user's password to one we generate client-side (so the page can
+  // show it once + copy). Worker sets it with changePasswordAtNextLogin=true.
+  async function runResetPassword(entry, u, newPassword, slot) {
+    const modal = document.getElementById("dirModal");
+    modal.querySelectorAll("[data-action], [data-confirm]").forEach(b => b.disabled = true);
+    try {
+      await workspaceAction("reset-password", { email: u.email, password: newPassword });
+      if (slot) slot.innerHTML = `<p class="dir-modal-saved-hint" style="text-align:left;margin:0;background:#E6F1E0;padding:10px 14px;border-radius:6px;border-left:4px solid #4A9A2E;color:#2D5C1F;"><strong>Done.</strong> The new password is <code>${escapeHtml(newPassword)}</code>. Share it with ${escapeHtml(u.name || u.email)} via your usual handover channel. They'll be forced to change it on next sign-in.</p>`;
+      showModalBanner(`Password reset for ${u.email}.`, "success");
+    } catch (err) {
+      showModalBanner(`Reset failed — ${err.message || err}`, "error");
+      modal.querySelectorAll("[data-action], [data-confirm]").forEach(b => b.disabled = false);
     }
   }
 
@@ -2789,20 +2920,34 @@
       : `<div class="dir-empty" style="margin-top:8px;">No groups match "<strong>${escapeHtml(term)}</strong>".</div>`;
   }
 
+  // True for groups that look like they came from convert-to-group — used to
+  // render an 'ex-employee' chip. Heuristic: description starts with the
+  // marker text we set at creation, OR the in-memory _converted flag is true.
+  function isExEmployeeGroup(g) {
+    if (g._converted) return true;
+    const d = (g.description || "").trim();
+    return d.startsWith("Forwarding-only group at ") && d.includes("converted on ");
+  }
+
   function renderGroupRow(g) {
     const initials = (g.name || g.email).split(/[\s@.\-_]+/).filter(Boolean).slice(0, 2).map(t => t.charAt(0).toUpperCase()).join("") || "G";
-    const desc = g.description ? `<span class="dir-title">${escapeHtml(g.description)}</span>` : "";
+    const isEx = isExEmployeeGroup(g);
+    const desc = !isEx && g.description ? `<span class="dir-title">${escapeHtml(g.description)}</span>` : "";
+    const exChip = isEx
+      ? `<span class="dir-ex-chip" title="This group was created by converting a Workspace user. Mail to this address forwards to the listed member(s) at £0/month.">ex-employee</span>`
+      : "";
     return `
       <button type="button" class="dir-row dir-row--group" data-group="${escapeHtml(g.email)}" title="View group ${escapeHtml(g.email)}">
         <div class="dir-photo-placeholder">${escapeHtml(initials)}</div>
         <div class="dir-row-body">
           <div class="dir-row-headline">
             <span class="dir-name">${escapeHtml(g.name || g.email)}</span>
+            ${exChip}
             ${desc}
             <span class="dir-email">${escapeHtml(g.email)}</span>
           </div>
           <div class="dir-row-meta">
-            <span class="dir-last">${g.member_count || 0} member${g.member_count === 1 ? "" : "s"}</span>
+            <span class="dir-last">${g.member_count || 0} member${g.member_count === 1 ? "" : "s"} ${isEx && g.members && g.members.length ? `· forwarding to <em>${escapeHtml(g.members.map(m => m.email).join(", "))}</em>` : ""}</span>
           </div>
         </div>
         <div class="dir-row-aside"></div>

@@ -114,6 +114,8 @@ export default {
         case "add-forwarding":       result = await doAddForwarding(env, adminToken, body); break;
         case "unsuspend":            result = await doUnsuspend(env, adminToken, body); break;
         case "recover":              result = await doRecover(adminToken, body); break;
+        case "reset-password":       result = await doResetPassword(adminToken, body); break;
+        case "convert-to-group":     result = await doConvertToGroup(adminToken, body); break;
         case "create":               result = await doCreate(adminToken, body); break;
         case "group-create":         result = await doGroupCreate(adminToken, body); break;
         case "group-delete":         result = await doGroupDelete(adminToken, body); break;
@@ -243,6 +245,60 @@ async function doRecover(token, body) {
   return adminApi(token, "POST", `users/${encodeURIComponent(body.user_id)}/undelete`, {
     orgUnitPath: body.org_unit_path || "/",
   });
+}
+
+// Reset a user's password. Caller supplies the new password (so the page can
+// show + copy it once); we don't generate one on the server. Forces password
+// change on next sign-in so the new password is just for the handover.
+async function doResetPassword(token, body) {
+  if (!body.email) return { ok: false, error: "missing email" };
+  if (!body.password) return { ok: false, error: "missing password" };
+  return adminApi(token, "PUT", `users/${encodeURIComponent(body.email)}`, {
+    password: body.password,
+    changePasswordAtNextLogin: true,
+  });
+}
+
+// Convert a Workspace user into a Group at the same address. Used as the
+// 'leaver, no longer paying for a seat, mail still goes somewhere' workflow.
+// Steps: (1) delete the user, (2) create a Group at the same email, (3) add
+// the forward target as a member. Mailbox is preserved in Vault for 25 days
+// then unrecoverable. Cost after conversion: £0/month forever.
+async function doConvertToGroup(token, body) {
+  if (!body.email) return { ok: false, error: "missing email" };
+  if (!body.forward_to) return { ok: false, error: "missing forward_to" };
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(body.forward_to)) {
+    return { ok: false, error: "forward_to is not a valid email" };
+  }
+  // 1. Delete the user. Once deleted, the address is freed and the next
+  //    24 hours window the address may still resolve to the deleted user —
+  //    but Group creation usually succeeds immediately.
+  const del = await adminApi(token, "DELETE", `users/${encodeURIComponent(body.email)}`);
+  if (!del.ok) return { ok: false, error: "delete user: " + del.error };
+
+  // 2. Create the Group at the freed address.
+  const groupName = body.name || (body.email.split("@")[0].replace(/[._-]+/g, " ") + " (ex-employee)");
+  const groupDescription = body.description ||
+    `Forwarding-only group at ${body.email}. The Workspace account was converted on ${new Date().toISOString().slice(0, 10)} to keep the email address working without paying for a seat.`;
+  const grp = await adminApi(token, "POST", "groups", {
+    email: body.email,
+    name: groupName,
+    description: groupDescription,
+  });
+  if (!grp.ok) {
+    return { ok: false, error: "create group (user already deleted — restore from admin.google.com → Recently deleted within 20 days): " + grp.error };
+  }
+
+  // 3. Add the forward target as a member. Failure here leaves the group
+  //    intact but empty — the admin can add members manually if needed.
+  const mem = await adminApi(token, "POST", `groups/${encodeURIComponent(body.email)}/members`, {
+    email: body.forward_to,
+    role: "MEMBER",
+  });
+  if (!mem.ok) {
+    return { ok: false, error: "create group succeeded but member add failed: " + mem.error };
+  }
+  return { ok: true, data: { converted: true, group_email: body.email, member: body.forward_to } };
 }
 
 async function doCreate(token, body) {
