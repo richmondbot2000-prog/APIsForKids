@@ -1,29 +1,25 @@
 {
-  "snapshot_at": "2026-05-12T08:14:31.688142+00:00",
-  "snapshot_date": "2026-05-12",
+  "snapshot_at": "2026-05-13T08:18:21.666398+00:00",
+  "snapshot_date": "2026-05-13",
   "lender_id": 6,
   "lender_label": "Transform Credit (LenderId 6, USA)",
   "window_days": 90,
-  "window_start": "2026-02-11",
-  "window_end": "2026-05-12",
+  "window_start": "2026-02-12",
+  "window_end": "2026-05-13",
   "leads": {
-    "presented": 115544853,
-    "purchased": 4421946,
-    "rejected": 111122907,
+    "presented": 116290315,
+    "purchased": 4443537,
+    "rejected": 111846778,
     "results": [
       {
         "result_type_id": 2,
         "label": "Already claimed",
-        "count": 46929599,
-        "share": 0.406159147564972,
+        "count": 47133087,
+        "share": 0.4053053515247594,
         "daily": [
           {
-            "date": "2026-02-11",
-            "count": 388505
-          },
-          {
             "date": "2026-02-12",
-            "count": 511477
+            "count": 391128
           },
           {
             "date": "2026-02-13",
@@ -379,23 +375,23 @@
           },
           {
             "date": "2026-05-12",
-            "count": 122442
+            "count": 706810
+          },
+          {
+            "date": "2026-05-13",
+            "count": 127974
           }
         ]
       },
       {
         "result_type_id": -1,
         "label": "Source excluded",
-        "count": 32382913,
-        "share": 0.2802627045620111,
+        "count": 32675363,
+        "share": 0.2809809484134599,
         "daily": [
           {
-            "date": "2026-02-11",
-            "count": 235139
-          },
-          {
             "date": "2026-02-12",
-            "count": 296064
+            "count": 222441
           },
           {
             "date": "2026-02-13",
@@ -751,23 +747,23 @@
           },
           {
             "date": "2026-05-12",
-            "count": 118868
+            "count": 606800
+          },
+          {
+            "date": "2026-05-13",
+            "count": 113280
           }
         ]
       },
       {
         "result_type_id": 21,
         "label": "Rejected with counteroffer",
-        "count": 15618034,
-        "share": 0.13516858254170785,
+        "count": 15764258,
+        "share": 0.1355595089754465,
         "daily": [
           {
-            "date": "2026-02-11",
-            "count": 106634
-          },
-          {
             "date": "2026-02-12",
-            "count": 135089
+            "count": 105765
           },
           {
             "date": "2026-02-13",
@@ -1123,23 +1119,23 @@
           },
           {
             "date": "2026-05-12",
-            "count": 49236
+            "count": 281272
+          },
+          {
+            "date": "2026-05-13",
+            "count": 50146
           }
         ]
       },
       {
         "result_type_id": 4,
         "label": "Throttled",
-        "count": 5898821,
-        "share": 0.05105221779112913,
+        "count": 5888502,
+        "share": 0.05063622022177857,
         "daily": [
           {
-            "date": "2026-02-11",
-            "count": 48713
-          },
-          {
             "date": "2026-02-12",
-            "count": 69555
+            "count": 46660
           },
           {
             "date": "2026-02-13",
@@ -1487,23 +1483,23 @@
           },
           {
             "date": "2026-05-12",
-            "count": 20770
+            "count": 61154
+          },
+          {
+            "date": "2026-05-13",
+            "count": 20905
           }
         ]
       },
       {
         "result_type_id": 20,
         "label": "Rejected for lead score",
-        "count": 4488233,
-        "share": 0.03884407555566322,
+        "count": 4558514,
+        "share": 0.039199429462376124,
         "daily": [
           {
-            "date": "2026-02-11",
-            "count": 7295
-          },
-          {
             "date": "2026-02-12",
-            "count": 8932
+            "count": 7352
           },
           {
             "date": "2026-02-13",
@@ -1859,23 +1855,23 @@
           },
           {
             "date": "2026-05-12",
-            "count": 13982
+            "count": 79094
+          },
+          {
+            "date": "2026-05-13",
+            "count": 14044
           }
         ]
       },
       {
         "result_type_id": 3,
         "label": "Duplicate",
-        "count": 3654377,
-        "share": 0.031627345616165176,
+        "count": 3666525,
+        "share": 0.03152906585557017,
         "daily": [
           {
-            "date": "2026-02-11",
-            "count": 25997
-          },
-          {
             "date": "2026-02-12",
-            "count": 34227
+            "count": 25267
           },
           {
             "date": "2026-02-13",
@@ -2231,23 +2227,23 @@
           },
           {
             "date": "2026-05-12",
-            "count": 8753
+            "count": 47007
+          },
+          {
+            "date": "2026-05-13",
+            "count": 8851
           }
         ]
       },
       {
         "result_type_id": 18,
         "label": "Seen too frequently",
-        "count": 799669,
-        "share": 0.006920853497472536,
+        "count": 809013,
+        "share": 0.00695683901105608,
         "daily": [
           {
-            "date": "2026-02-11",
-            "count": 3551
-          },
-          {
             "date": "2026-02-12",
-            "count": 4181
+            "count": 3307
           },
           {
             "date": "2026-02-13",
@@ -2603,23 +2599,23 @@
           },
           {
             "date": "2026-05-12",
-            "count": 2826
+            "count": 13952
+          },
+          {
+            "date": "2026-05-13",
+            "count": 2643
           }
         ]
       },
       {
         "result_type_id": 16,
         "label": "Blacklisted",
-        "count": 695531,
-        "share": 0.006019575791922121,
+        "count": 698186,
+        "share": 0.006003818976670585,
         "daily": [
           {
-            "date": "2026-02-11",
-            "count": 6200
-          },
-          {
             "date": "2026-02-12",
-            "count": 8216
+            "count": 6010
           },
           {
             "date": "2026-02-13",
@@ -2975,23 +2971,23 @@
           },
           {
             "date": "2026-05-12",
-            "count": 2642
+            "count": 11209
+          },
+          {
+            "date": "2026-05-13",
+            "count": 2494
           }
         ]
       },
       {
         "result_type_id": 26,
         "label": "Invalid pay type",
-        "count": 366678,
-        "share": 0.003173468921198939,
+        "count": 368754,
+        "share": 0.003170977737913944,
         "daily": [
           {
-            "date": "2026-02-11",
-            "count": 2180
-          },
-          {
             "date": "2026-02-12",
-            "count": 3312
+            "count": 2508
           },
           {
             "date": "2026-02-13",
@@ -3347,23 +3343,23 @@
           },
           {
             "date": "2026-05-12",
-            "count": 755
+            "count": 4932
+          },
+          {
+            "date": "2026-05-13",
+            "count": 883
           }
         ]
       },
       {
         "result_type_id": 22,
         "label": "Counteroffer rejected",
-        "count": 191068,
-        "share": 0.0016536262329227248,
+        "count": 191177,
+        "share": 0.001643963213961541,
         "daily": [
           {
-            "date": "2026-02-11",
-            "count": 1868
-          },
-          {
             "date": "2026-02-12",
-            "count": 2410
+            "count": 1691
           },
           {
             "date": "2026-02-13",
@@ -3719,23 +3715,23 @@
           },
           {
             "date": "2026-05-12",
-            "count": 510
+            "count": 2661
+          },
+          {
+            "date": "2026-05-13",
+            "count": 545
           }
         ]
       },
       {
         "result_type_id": 12,
         "label": "No valid product",
-        "count": 96751,
-        "share": 0.0008373458227516201,
+        "count": 92172,
+        "share": 0.0007926025482001661,
         "daily": [
           {
-            "date": "2026-02-11",
-            "count": 4645
-          },
-          {
             "date": "2026-02-12",
-            "count": 7740
+            "count": 7251
           },
           {
             "date": "2026-02-13",
@@ -4091,23 +4087,23 @@
           },
           {
             "date": "2026-05-12",
-            "count": 96
+            "count": 535
+          },
+          {
+            "date": "2026-05-13",
+            "count": 116
           }
         ]
       },
       {
         "result_type_id": 15,
         "label": "Invalid state",
-        "count": 1224,
-        "share": 1.0593288824384068e-05,
+        "count": 1218,
+        "share": 1.0473787090524262e-05,
         "daily": [
           {
-            "date": "2026-02-11",
-            "count": 8
-          },
-          {
             "date": "2026-02-12",
-            "count": 13
+            "count": 11
           },
           {
             "date": "2026-02-13",
@@ -4460,6 +4456,10 @@
           {
             "date": "2026-05-11",
             "count": 1
+          },
+          {
+            "date": "2026-05-12",
+            "count": 4
           }
         ]
       },
@@ -4467,7 +4467,7 @@
         "result_type_id": 5,
         "label": "Invalid campaign",
         "count": 8,
-        "share": 6.92371818587194e-08,
+        "share": 6.879334706419877e-08,
         "daily": [
           {
             "date": "2026-03-05",
@@ -4495,7 +4495,7 @@
         "result_type_id": 27,
         "label": "Invalid bank account type",
         "count": 1,
-        "share": 8.654647732339925e-09,
+        "share": 8.599168383024846e-09,
         "daily": [
           {
             "date": "2026-03-05",
@@ -4506,60 +4506,60 @@
     ]
   },
   "flag_declines": {
-    "total": 408317,
+    "total": 410603,
     "types": [
       {
         "flag_type_id": 2,
         "label": "Decline",
-        "total": 196411,
+        "total": 198016,
         "top_reasons": [
           {
             "reason": "GT Declined, Credit score too low - C < 600",
-            "count": 92610
+            "count": 93524
           },
           {
             "reason": "GT Declined, Failed Phone Verification",
-            "count": 44967
+            "count": 45187
           },
           {
             "reason": "GT Declined, Thin file - PaymentLength < 20",
-            "count": 18844
+            "count": 19051
           },
           {
             "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
-            "count": 7969
+            "count": 8028
           },
           {
             "reason": "GT Declined, Bad combination All",
-            "count": 7795
+            "count": 7865
           },
           {
             "reason": "GT Declined, Guarantor scorecard fail",
-            "count": 4393
+            "count": 4408
           },
           {
             "reason": "GT Declined, No credit file found",
-            "count": 4033
+            "count": 4047
           },
           {
             "reason": "GT Declined, Credit score too low - C < 650",
-            "count": 3325
+            "count": 3332
           },
           {
             "reason": "GT Declined, Tradeline misbehaviour",
-            "count": 3029
+            "count": 3068
           },
           {
             "reason": "BW Declined, Whitebox not run - ARef is on a live loan",
-            "count": 2640
+            "count": 2642
           },
           {
             "reason": "GT Declined, Bankrupt",
-            "count": 1010
+            "count": 1021
           },
           {
             "reason": "BW Declined, Borrower state location not accepted",
-            "count": 428
+            "count": 439
           },
           {
             "reason": "BW Declined, DoNotLend",
@@ -4567,53 +4567,49 @@
           },
           {
             "reason": "GT Declined, Borrower and Guarantor shared finance",
-            "count": 359
+            "count": 360
           },
           {
             "reason": "GT Declined, Reason GT Declined, Guarantor scorecard fail - Homeownership",
-            "count": 341
+            "count": 346
           },
           {
             "reason": "GT Declined, Thin file - TotalLinesConsidered < 3",
-            "count": 326
+            "count": 330
           },
           {
             "reason": "GT Declined, Thin file - PaymentLength < 40",
-            "count": 255
-          },
-          {
-            "reason": "GT Declined, Existing customer Aref = 0602350405043529240307 = DNL",
-            "count": 244
+            "count": 261
           },
           {
             "reason": "BW Declined, Borrower Hard credit file rules",
-            "count": 243
+            "count": 249
+          },
+          {
+            "reason": "GT Declined, Existing customer Aref = 0602350405043529240307 = DNL",
+            "count": 245
           },
           {
             "reason": "GT Declined, Bad mortgage",
-            "count": 123
+            "count": 121
           }
         ],
         "daily": [
           {
-            "date": "2026-02-11",
-            "count": 1304
-          },
-          {
             "date": "2026-02-12",
-            "count": 1998
+            "count": 1455
           },
           {
             "date": "2026-02-13",
-            "count": 2153
+            "count": 2152
           },
           {
             "date": "2026-02-14",
-            "count": 1708
+            "count": 1707
           },
           {
             "date": "2026-02-15",
-            "count": 1574
+            "count": 1573
           },
           {
             "date": "2026-02-16",
@@ -4621,55 +4617,55 @@
           },
           {
             "date": "2026-02-17",
-            "count": 2184
+            "count": 2181
           },
           {
             "date": "2026-02-18",
-            "count": 2384
+            "count": 2381
           },
           {
             "date": "2026-02-19",
-            "count": 2268
+            "count": 2265
           },
           {
             "date": "2026-02-20",
-            "count": 2133
+            "count": 2131
           },
           {
             "date": "2026-02-21",
-            "count": 1737
+            "count": 1736
           },
           {
             "date": "2026-02-22",
-            "count": 1489
+            "count": 1488
           },
           {
             "date": "2026-02-23",
-            "count": 1904
+            "count": 1903
           },
           {
             "date": "2026-02-24",
-            "count": 1976
+            "count": 1972
           },
           {
             "date": "2026-02-25",
-            "count": 1741
+            "count": 1739
           },
           {
             "date": "2026-02-26",
-            "count": 1676
+            "count": 1674
           },
           {
             "date": "2026-02-27",
-            "count": 1773
+            "count": 1772
           },
           {
             "date": "2026-02-28",
-            "count": 1522
+            "count": 1521
           },
           {
             "date": "2026-03-01",
-            "count": 1302
+            "count": 1297
           },
           {
             "date": "2026-03-02",
@@ -4677,27 +4673,27 @@
           },
           {
             "date": "2026-03-03",
-            "count": 1976
+            "count": 1973
           },
           {
             "date": "2026-03-04",
-            "count": 1935
+            "count": 1932
           },
           {
             "date": "2026-03-05",
-            "count": 2005
+            "count": 2003
           },
           {
             "date": "2026-03-06",
-            "count": 1808
+            "count": 1806
           },
           {
             "date": "2026-03-07",
-            "count": 1505
+            "count": 1504
           },
           {
             "date": "2026-03-08",
-            "count": 1409
+            "count": 1407
           },
           {
             "date": "2026-03-09",
@@ -4705,35 +4701,35 @@
           },
           {
             "date": "2026-03-10",
-            "count": 1933
+            "count": 1928
           },
           {
             "date": "2026-03-11",
-            "count": 1866
+            "count": 1862
           },
           {
             "date": "2026-03-12",
-            "count": 1870
+            "count": 1867
           },
           {
             "date": "2026-03-13",
-            "count": 1811
+            "count": 1810
           },
           {
             "date": "2026-03-14",
-            "count": 1485
+            "count": 1482
           },
           {
             "date": "2026-03-15",
-            "count": 1304
+            "count": 1303
           },
           {
             "date": "2026-03-16",
-            "count": 1857
+            "count": 1854
           },
           {
             "date": "2026-03-17",
-            "count": 2046
+            "count": 2042
           },
           {
             "date": "2026-03-18",
@@ -4745,111 +4741,111 @@
           },
           {
             "date": "2026-03-20",
-            "count": 1970
+            "count": 1969
           },
           {
             "date": "2026-03-21",
-            "count": 1606
+            "count": 1604
           },
           {
             "date": "2026-03-22",
-            "count": 1461
+            "count": 1459
           },
           {
             "date": "2026-03-23",
-            "count": 2173
+            "count": 2171
           },
           {
             "date": "2026-03-24",
-            "count": 2137
+            "count": 2135
           },
           {
             "date": "2026-03-25",
-            "count": 2127
+            "count": 2125
           },
           {
             "date": "2026-03-26",
-            "count": 2158
+            "count": 2152
           },
           {
             "date": "2026-03-27",
-            "count": 2179
+            "count": 2176
           },
           {
             "date": "2026-03-28",
-            "count": 1811
+            "count": 1810
           },
           {
             "date": "2026-03-29",
-            "count": 1557
+            "count": 1553
           },
           {
             "date": "2026-03-30",
-            "count": 2203
+            "count": 2196
           },
           {
             "date": "2026-03-31",
-            "count": 2305
+            "count": 2302
           },
           {
             "date": "2026-04-01",
-            "count": 2208
+            "count": 2204
           },
           {
             "date": "2026-04-02",
-            "count": 2297
+            "count": 2292
           },
           {
             "date": "2026-04-03",
-            "count": 2219
+            "count": 2216
           },
           {
             "date": "2026-04-04",
-            "count": 1801
+            "count": 1797
           },
           {
             "date": "2026-04-05",
-            "count": 1456
+            "count": 1453
           },
           {
             "date": "2026-04-06",
-            "count": 2255
+            "count": 2250
           },
           {
             "date": "2026-04-07",
-            "count": 2411
+            "count": 2407
           },
           {
             "date": "2026-04-08",
-            "count": 2419
+            "count": 2412
           },
           {
             "date": "2026-04-09",
-            "count": 2528
+            "count": 2526
           },
           {
             "date": "2026-04-10",
-            "count": 2376
+            "count": 2371
           },
           {
             "date": "2026-04-11",
-            "count": 1945
+            "count": 1940
           },
           {
             "date": "2026-04-12",
-            "count": 1828
+            "count": 1827
           },
           {
             "date": "2026-04-13",
-            "count": 2487
+            "count": 2485
           },
           {
             "date": "2026-04-14",
-            "count": 2430
+            "count": 2427
           },
           {
             "date": "2026-04-15",
-            "count": 2367
+            "count": 2363
           },
           {
             "date": "2026-04-16",
@@ -4857,35 +4853,35 @@
           },
           {
             "date": "2026-04-17",
-            "count": 2410
+            "count": 2407
           },
           {
             "date": "2026-04-18",
-            "count": 1858
+            "count": 1857
           },
           {
             "date": "2026-04-19",
-            "count": 1645
+            "count": 1644
           },
           {
             "date": "2026-04-20",
-            "count": 2546
+            "count": 2545
           },
           {
             "date": "2026-04-21",
-            "count": 2608
+            "count": 2607
           },
           {
             "date": "2026-04-22",
-            "count": 2602
+            "count": 2599
           },
           {
             "date": "2026-04-23",
-            "count": 2526
+            "count": 2524
           },
           {
             "date": "2026-04-24",
-            "count": 2509
+            "count": 2506
           },
           {
             "date": "2026-04-25",
@@ -4893,102 +4889,102 @@
           },
           {
             "date": "2026-04-26",
-            "count": 1804
+            "count": 1803
           },
           {
             "date": "2026-04-27",
-            "count": 2671
+            "count": 2668
           },
           {
             "date": "2026-04-28",
-            "count": 2648
+            "count": 2645
           },
           {
             "date": "2026-04-29",
-            "count": 2811
+            "count": 2808
           },
           {
             "date": "2026-04-30",
-            "count": 3392
+            "count": 3391
           },
           {
             "date": "2026-05-01",
-            "count": 3555
+            "count": 3554
           },
           {
             "date": "2026-05-02",
-            "count": 2790
+            "count": 2786
           },
           {
             "date": "2026-05-03",
-            "count": 2654
+            "count": 2651
           },
           {
             "date": "2026-05-04",
-            "count": 3702
+            "count": 3696
           },
           {
             "date": "2026-05-05",
-            "count": 3548
+            "count": 3534
           },
           {
             "date": "2026-05-06",
-            "count": 3402
+            "count": 3396
           },
           {
             "date": "2026-05-07",
-            "count": 3334
+            "count": 3313
           },
           {
             "date": "2026-05-08",
-            "count": 3302
+            "count": 3282
           },
           {
             "date": "2026-05-09",
-            "count": 2887
+            "count": 2871
           },
           {
             "date": "2026-05-10",
-            "count": 2351
+            "count": 2325
           },
           {
             "date": "2026-05-11",
-            "count": 3529
+            "count": 3496
           },
           {
             "date": "2026-05-12",
-            "count": 796
+            "count": 3742
+          },
+          {
+            "date": "2026-05-13",
+            "count": 843
           }
         ],
         "by_client": [
           {
             "client": "Whitebox",
-            "count": 196302
+            "count": 197905
           },
           {
             "client": "TogetherLoansCRM",
-            "count": 109
+            "count": 111
           }
         ]
       },
       {
         "flag_type_id": 3,
         "label": "DNL",
-        "total": 2193,
+        "total": 2203,
         "top_reasons": [
           {
             "reason": "(no reason given)",
-            "count": 2193
+            "count": 2203
           }
         ],
         "daily": [
           {
-            "date": "2026-02-11",
-            "count": 12
-          },
-          {
             "date": "2026-02-12",
-            "count": 32
+            "count": 24
           },
           {
             "date": "2026-02-13",
@@ -5344,32 +5340,36 @@
           },
           {
             "date": "2026-05-12",
+            "count": 30
+          },
+          {
+            "date": "2026-05-13",
             "count": 7
           }
         ],
         "by_client": [
           {
             "client": "Whitebox",
-            "count": 2105
+            "count": 2118
           },
           {
             "client": "TogetherLoansCRM",
-            "count": 88
+            "count": 85
           }
         ]
       },
       {
         "flag_type_id": 4,
         "label": "Cancelled",
-        "total": 206177,
+        "total": 206839,
         "top_reasons": [
           {
             "reason": "(no reason given)",
-            "count": 206059
+            "count": 206724
           },
           {
             "reason": "Cancelled",
-            "count": 117
+            "count": 114
           },
           {
             "reason": "Non-Consent to record VVC",
@@ -5378,300 +5378,296 @@
         ],
         "daily": [
           {
-            "date": "2026-02-11",
-            "count": 1748
-          },
-          {
             "date": "2026-02-12",
-            "count": 2041
+            "count": 1589
           },
           {
             "date": "2026-02-13",
-            "count": 2231
+            "count": 2225
           },
           {
             "date": "2026-02-14",
-            "count": 1800
+            "count": 1794
           },
           {
             "date": "2026-02-15",
-            "count": 1491
+            "count": 1489
           },
           {
             "date": "2026-02-16",
-            "count": 2093
+            "count": 2085
           },
           {
             "date": "2026-02-17",
-            "count": 2050
+            "count": 2046
           },
           {
             "date": "2026-02-18",
-            "count": 2350
+            "count": 2336
           },
           {
             "date": "2026-02-19",
-            "count": 2290
+            "count": 2284
           },
           {
             "date": "2026-02-20",
-            "count": 2257
+            "count": 2250
           },
           {
             "date": "2026-02-21",
-            "count": 1905
+            "count": 1897
           },
           {
             "date": "2026-02-22",
-            "count": 1626
+            "count": 1621
           },
           {
             "date": "2026-02-23",
-            "count": 1993
-          },
-          {
-            "date": "2026-02-24",
-            "count": 2093
-          },
-          {
-            "date": "2026-02-25",
-            "count": 2090
-          },
-          {
-            "date": "2026-02-26",
             "count": 1985
           },
           {
-            "date": "2026-02-27",
-            "count": 1846
-          },
-          {
-            "date": "2026-02-28",
-            "count": 1450
-          },
-          {
-            "date": "2026-03-01",
-            "count": 1367
-          },
-          {
-            "date": "2026-03-02",
-            "count": 1844
-          },
-          {
-            "date": "2026-03-03",
-            "count": 1995
-          },
-          {
-            "date": "2026-03-04",
-            "count": 2102
-          },
-          {
-            "date": "2026-03-05",
-            "count": 2009
-          },
-          {
-            "date": "2026-03-06",
-            "count": 1900
-          },
-          {
-            "date": "2026-03-07",
-            "count": 1540
-          },
-          {
-            "date": "2026-03-08",
-            "count": 1446
-          },
-          {
-            "date": "2026-03-09",
-            "count": 1906
-          },
-          {
-            "date": "2026-03-10",
-            "count": 1952
-          },
-          {
-            "date": "2026-03-11",
-            "count": 1906
-          },
-          {
-            "date": "2026-03-12",
-            "count": 2026
-          },
-          {
-            "date": "2026-03-13",
-            "count": 1907
-          },
-          {
-            "date": "2026-03-14",
-            "count": 1524
-          },
-          {
-            "date": "2026-03-15",
-            "count": 1450
-          },
-          {
-            "date": "2026-03-16",
-            "count": 1945
-          },
-          {
-            "date": "2026-03-17",
-            "count": 2006
-          },
-          {
-            "date": "2026-03-18",
+            "date": "2026-02-24",
             "count": 2089
           },
           {
+            "date": "2026-02-25",
+            "count": 2087
+          },
+          {
+            "date": "2026-02-26",
+            "count": 1976
+          },
+          {
+            "date": "2026-02-27",
+            "count": 1838
+          },
+          {
+            "date": "2026-02-28",
+            "count": 1446
+          },
+          {
+            "date": "2026-03-01",
+            "count": 1360
+          },
+          {
+            "date": "2026-03-02",
+            "count": 1838
+          },
+          {
+            "date": "2026-03-03",
+            "count": 1990
+          },
+          {
+            "date": "2026-03-04",
+            "count": 2097
+          },
+          {
+            "date": "2026-03-05",
+            "count": 2001
+          },
+          {
+            "date": "2026-03-06",
+            "count": 1897
+          },
+          {
+            "date": "2026-03-07",
+            "count": 1536
+          },
+          {
+            "date": "2026-03-08",
+            "count": 1444
+          },
+          {
+            "date": "2026-03-09",
+            "count": 1899
+          },
+          {
+            "date": "2026-03-10",
+            "count": 1944
+          },
+          {
+            "date": "2026-03-11",
+            "count": 1899
+          },
+          {
+            "date": "2026-03-12",
+            "count": 2022
+          },
+          {
+            "date": "2026-03-13",
+            "count": 1899
+          },
+          {
+            "date": "2026-03-14",
+            "count": 1516
+          },
+          {
+            "date": "2026-03-15",
+            "count": 1446
+          },
+          {
+            "date": "2026-03-16",
+            "count": 1938
+          },
+          {
+            "date": "2026-03-17",
+            "count": 1996
+          },
+          {
+            "date": "2026-03-18",
+            "count": 2082
+          },
+          {
             "date": "2026-03-19",
-            "count": 1881
+            "count": 1875
           },
           {
             "date": "2026-03-20",
-            "count": 2019
+            "count": 2010
           },
           {
             "date": "2026-03-21",
-            "count": 1706
+            "count": 1699
           },
           {
             "date": "2026-03-22",
-            "count": 1492
+            "count": 1485
           },
           {
             "date": "2026-03-23",
-            "count": 1978
+            "count": 1972
           },
           {
             "date": "2026-03-24",
-            "count": 2337
+            "count": 2327
           },
           {
             "date": "2026-03-25",
-            "count": 2315
+            "count": 2307
           },
           {
             "date": "2026-03-26",
-            "count": 2206
+            "count": 2197
           },
           {
             "date": "2026-03-27",
-            "count": 2306
+            "count": 2292
           },
           {
             "date": "2026-03-28",
-            "count": 1927
+            "count": 1916
           },
           {
             "date": "2026-03-29",
-            "count": 1735
+            "count": 1728
           },
           {
             "date": "2026-03-30",
-            "count": 2281
+            "count": 2268
           },
           {
             "date": "2026-03-31",
-            "count": 2407
+            "count": 2388
           },
           {
             "date": "2026-04-01",
-            "count": 2510
+            "count": 2493
           },
           {
             "date": "2026-04-02",
-            "count": 2485
+            "count": 2476
           },
           {
             "date": "2026-04-03",
-            "count": 2437
+            "count": 2427
           },
           {
             "date": "2026-04-04",
-            "count": 2000
+            "count": 1991
           },
           {
             "date": "2026-04-05",
-            "count": 1669
+            "count": 1659
           },
           {
             "date": "2026-04-06",
-            "count": 2266
+            "count": 2253
           },
           {
             "date": "2026-04-07",
-            "count": 2647
+            "count": 2626
           },
           {
             "date": "2026-04-08",
-            "count": 2630
+            "count": 2619
           },
           {
             "date": "2026-04-09",
-            "count": 2708
+            "count": 2674
           },
           {
             "date": "2026-04-10",
-            "count": 2871
+            "count": 2832
           },
           {
             "date": "2026-04-11",
-            "count": 2302
+            "count": 2269
           },
           {
             "date": "2026-04-12",
-            "count": 2107
+            "count": 2084
           },
           {
             "date": "2026-04-13",
-            "count": 2594
+            "count": 2581
           },
           {
             "date": "2026-04-14",
-            "count": 2820
+            "count": 2801
           },
           {
             "date": "2026-04-15",
-            "count": 2903
+            "count": 2890
           },
           {
             "date": "2026-04-16",
-            "count": 2740
+            "count": 2725
           },
           {
             "date": "2026-04-17",
-            "count": 2857
+            "count": 2854
           },
           {
             "date": "2026-04-18",
-            "count": 2210
+            "count": 2203
           },
           {
             "date": "2026-04-19",
-            "count": 2036
+            "count": 2027
           },
           {
             "date": "2026-04-20",
-            "count": 2766
+            "count": 2763
           },
           {
             "date": "2026-04-21",
-            "count": 2879
+            "count": 2873
           },
           {
             "date": "2026-04-22",
-            "count": 3143
+            "count": 3139
           },
           {
             "date": "2026-04-23",
-            "count": 2925
+            "count": 2921
           },
           {
             "date": "2026-04-24",
-            "count": 2804
+            "count": 2800
           },
           {
             "date": "2026-04-25",
-            "count": 2291
+            "count": 2288
           },
           {
             "date": "2026-04-26",
@@ -5679,100 +5675,104 @@
           },
           {
             "date": "2026-04-27",
-            "count": 2929
+            "count": 2926
           },
           {
             "date": "2026-04-28",
-            "count": 3120
+            "count": 3115
           },
           {
             "date": "2026-04-29",
-            "count": 3377
+            "count": 3370
           },
           {
             "date": "2026-04-30",
-            "count": 3335
+            "count": 3331
           },
           {
             "date": "2026-05-01",
-            "count": 2644
+            "count": 2640
           },
           {
             "date": "2026-05-02",
-            "count": 2915
+            "count": 2910
           },
           {
             "date": "2026-05-03",
-            "count": 2940
+            "count": 2938
           },
           {
             "date": "2026-05-04",
-            "count": 3651
+            "count": 3642
           },
           {
             "date": "2026-05-05",
-            "count": 3617
+            "count": 3598
           },
           {
             "date": "2026-05-06",
-            "count": 3695
+            "count": 3670
           },
           {
             "date": "2026-05-07",
-            "count": 2254
+            "count": 2242
           },
           {
             "date": "2026-05-08",
-            "count": 1854
+            "count": 1839
           },
           {
             "date": "2026-05-09",
-            "count": 3204
+            "count": 3183
           },
           {
             "date": "2026-05-10",
-            "count": 2407
+            "count": 2386
           },
           {
             "date": "2026-05-11",
-            "count": 3190
+            "count": 3155
           },
           {
             "date": "2026-05-12",
-            "count": 430
+            "count": 3726
+          },
+          {
+            "date": "2026-05-13",
+            "count": 423
           }
         ],
         "by_client": [
           {
             "client": "RobotResponder",
-            "count": 201893
+            "count": 202535
           },
           {
             "client": "TogetherLoansCRM",
-            "count": 4284
+            "count": 4304
           }
         ]
       },
       {
         "flag_type_id": 6,
         "label": "FraudRisk",
-        "total": 3536,
+        "total": 3545,
         "top_reasons": [
           {
             "reason": "Suspicious activity on linked account",
-            "count": 2105
+            "count": 2118
           },
           {
             "reason": "(no reason given)",
-            "count": 530
+            "count": 528
           },
           {
             "reason": "No knowledge of application",
-            "count": 424
+            "count": 422
           },
           {
             "reason": "Failed CF questions",
-            "count": 82
+            "count": 84
           },
           {
             "reason": "Credit Bureau Notification",
@@ -5784,7 +5784,7 @@
           },
           {
             "reason": "Voices sound the same",
-            "count": 17
+            "count": 16
           },
           {
             "reason": "Potential Scam linked to 0613340010052315230219 + 0605200922021001073402",
@@ -5800,7 +5800,7 @@
           },
           {
             "reason": "Data Protection",
-            "count": 5
+            "count": 6
           },
           {
             "reason": "Fraudulent Documents",
@@ -5841,12 +5841,8 @@
         ],
         "daily": [
           {
-            "date": "2026-02-11",
-            "count": 22
-          },
-          {
             "date": "2026-02-12",
-            "count": 49
+            "count": 38
           },
           {
             "date": "2026-02-13",
@@ -6202,13 +6198,17 @@
           },
           {
             "date": "2026-05-12",
-            "count": 12
+            "count": 46
+          },
+          {
+            "date": "2026-05-13",
+            "count": 8
           }
         ],
         "by_client": [
           {
             "client": "Whitebox",
-            "count": 2255
+            "count": 2267
           },
           {
             "client": "TogetherLoansCRM",
@@ -6216,7 +6216,7 @@
           },
           {
             "client": "RobotResponder",
-            "count": 136
+            "count": 133
           }
         ]
       }
@@ -6224,82 +6224,82 @@
     "top_decliners": [
       {
         "username": "togetherloans",
-        "count": 200662
+        "count": 202290
       },
       {
         "username": "jack.bassilious@transformcredit.com",
-        "count": 189809
+        "count": 190322
       },
       {
         "username": "james.webster@transformcredit.com",
-        "count": 12221
+        "count": 12347
       },
       {
         "username": "bushra.tabassum@transformcredit.com",
-        "count": 600
+        "count": 604
       },
       {
         "username": "ceera.gillette@transformcredit.com",
-        "count": 593
+        "count": 603
       },
       {
         "username": "aldrine.sejour@togetherloans.com",
-        "count": 442
+        "count": 456
       },
       {
         "username": "sophie.james@transformcredit.com",
-        "count": 408
+        "count": 401
       },
       {
         "username": "eden.oxley@transformcredit.com",
-        "count": 336
+        "count": 334
       },
       {
         "username": "kevin.lam@togetherloans.com",
-        "count": 277
+        "count": 267
       },
       {
         "username": "laurine.beaubrun@togetherloans.com",
-        "count": 250
+        "count": 266
       },
       {
         "username": "joseph.shabazz@transformcredit.com",
-        "count": 227
-      },
-      {
-        "username": "john.christie@transformcredit.com",
-        "count": 210
+        "count": 236
       },
       {
         "username": "jaimi.struble@togetherloans.com",
+        "count": 210
+      },
+      {
+        "username": "john.christie@transformcredit.com",
         "count": 209
       },
       {
         "username": "johnathon.ausborn@togetherloans.com",
-        "count": 199
+        "count": 205
       },
       {
         "username": "courtnie.raine@transformcredit.com",
-        "count": 167
+        "count": 172
       },
       {
         "username": "annette.rodriguez@togetherloans.com",
-        "count": 166
+        "count": 170
       },
       {
         "username": "lori.hagaman@transformcredit.com",
-        "count": 163
+        "count": 161
       },
       {
         "username": "adedayo.adebowale@togetherloans.com",
-        "count": 139
+        "count": 140
       },
       {
         "username": "jennifer.taylor@transformcredit.com",
-        "count": 128
+        "count": 125
       },
       {
-        "username": "rebekah.dewaard@transformcredit.com",
+        "username": "kalyn.lacey@togetherloans.com",
         "count": 112
       }
     ]
