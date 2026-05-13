@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778655169">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778655169">
-<link rel="stylesheet" href="quiet.css?v=1778655169">
-<link rel="stylesheet" href="quiet-extras.css?v=1778655169">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778655169">
+<link rel="stylesheet" href="style.css?v=1778660953">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778660953">
+<link rel="stylesheet" href="quiet.css?v=1778660953">
+<link rel="stylesheet" href="quiet-extras.css?v=1778660953">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778660953">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -560,6 +560,31 @@
     border-left-color: var(--manuscript-red, #B23A48);
   }
   .dir-modal-banner--fade { opacity: 0; }
+  .dir-audit-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.85rem;
+  }
+  .dir-audit-list li {
+    padding: 4px 8px;
+    background: var(--bg-soft-2);
+    border-radius: 4px;
+    color: var(--ink);
+  }
+  .dir-audit-ts {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .dir-audit-actor {
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 0.8rem;
+  }
 
   /* Groups section (below the people list). */
   .dir-groups-section {
@@ -846,7 +871,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778655169" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778660953" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -980,13 +1005,16 @@
         ? annotationsFile.annotations
         : {};
       payrollData = payrollFile && (payrollFile.by_email || payrollFile.by_name) ? payrollFile : null;
-      // Build a per-email lookup of the most-recent successful suspend_and_route
-      // action, so the detail card can show where the suspended mailbox forwards.
+      // Build per-email indexes from the audit log:
+      //   - forwardingByEmail: target -> current forward address (or undefined if unsuspended)
+      //   - auditByEmail: target -> chronological list of every successful action
       forwardingByEmail = {};
+      auditByEmail = {};
       for (const a of ((workspaceActions && workspaceActions.actions) || [])) {
-        if (!a.ok) continue;
         const target = (a.target || "").toLowerCase();
         if (!target) continue;
+        (auditByEmail[target] ||= []).push(a);
+        if (!a.ok) continue;
         if (a.action === "suspend-and-route" && a.route_to) {
           forwardingByEmail[target] = a.route_to;
         } else if (a.action === "unsuspend") {
@@ -1414,6 +1442,7 @@
   let annotationsMap = {};                              // populated on page load
   let payrollData = null;                               // null until /api/workspace/payroll returns
   let forwardingByEmail = {};                           // email -> route_to (suspended-and-routed users)
+  let auditByEmail = {};                                // email -> chronological [{ts, actor, action, ok, route_to?, member_email?, ...}]
   let allGroups = [];                                   // [{ email, name, description, members:[…], … }]
   let groupsByMemberEmail = {};                         // memberEmail -> [group, …]
 
@@ -1562,6 +1591,43 @@
     backdrop.setAttribute("aria-hidden", "true");
     document.body.classList.remove("dir-modal-open");
     document.getElementById("dirModal").innerHTML = "";
+  }
+
+  // Render a chronological audit-history block for a suspended user.
+  // Shows the last suspend-and-route event (when, by whom, where it forwards)
+  // and links to the audit JSON in the repo for the full story.
+  function auditHistoryHtml(u) {
+    if (!u || !u.email) return "";
+    const events = (auditByEmail[u.email.toLowerCase()] || [])
+      .filter(e => e.ok && (e.action === "suspend-and-route" || e.action === "unsuspend"))
+      .sort((a, b) => (a.ts || "").localeCompare(b.ts || ""));
+    if (!events.length) {
+      // Suspended but no audit record — suspension happened outside this UI
+      // (e.g. someone used Admin Console directly). Flag it as a gap.
+      return `
+        <div class="dir-modal-section">
+          <h3>Suspended <span class="dir-modal-count">no audit record</span></h3>
+          <p class="dir-modal-saved-hint" style="text-align:left;margin:0;">This account is suspended but no <code>suspend-and-route</code> action is logged here. The suspension likely happened in admin.google.com directly. There's no recorded forward target — mail to this address may be going nowhere.</p>
+        </div>`;
+    }
+    const fmtTs = ts => {
+      try {
+        const d = new Date(ts);
+        return d.toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+      } catch (e) { return ts; }
+    };
+    const last = events[events.length - 1];
+    const rows = events.map(e => {
+      const verb = e.action === "suspend-and-route" ? "Suspended + routed" : "Unsuspended";
+      const detail = e.route_to ? ` → <code>${escapeHtml(e.route_to)}</code>` : "";
+      return `<li><span class="dir-audit-ts">${escapeHtml(fmtTs(e.ts))}</span> · ${verb}${detail} <span class="dir-audit-actor">by ${escapeHtml(e.actor || "unknown")}</span></li>`;
+    }).join("");
+    return `
+      <div class="dir-modal-section">
+        <h3>Audit history</h3>
+        <ul class="dir-audit-list">${rows}</ul>
+        <p class="dir-modal-saved-hint" style="text-align:left;margin:8px 0 0;">Most recent: ${escapeHtml(last.action === "suspend-and-route" ? "currently suspended" : "currently active")}. Full log: <code>workspace-actions.json</code>.</p>
+      </div>`;
   }
 
   function payrollSectionHtml(entry) {
@@ -1734,6 +1800,8 @@
         <h3>Workspace</h3>
         <dl class="dir-detail-grid">${workspaceDl}</dl>
       </div>
+
+      ${isSuspended ? auditHistoryHtml(u) : ""}
 
       ${u && groupsForUser(u).length ? `
         <div class="dir-modal-section">
