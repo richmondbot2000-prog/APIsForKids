@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-13T20:36:37.687Z",
+  "updated_at": "2026-05-13T20:37:02.997Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -228,6 +228,15 @@
     },
     {
       "ts": "2026-05-13T20:36:37.687Z",
+      "actor": "james.benamor@letme.com",
+      "action": "group-member-remove",
+      "target": "alert@togetherloans.com",
+      "ok": false,
+      "member_email": "james.benamor@rgroup.co.uk",
+      "error": "Not Authorized to access this resource/api"
+    },
+    {
+      "ts": "2026-05-13T20:37:02.997Z",
       "actor": "james.benamor@letme.com",
       "action": "group-member-remove",
       "target": "alert@togetherloans.com",
