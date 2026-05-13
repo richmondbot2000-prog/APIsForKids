@@ -147,6 +147,7 @@ export default {
         case "group-member-remove":  result = await doGroupMemberRemove(adminToken, body); break;
         case "user-alias-remove":    result = await doUserAliasRemove(adminToken, body); break;
         case "alias-to-group":       result = await doAliasToGroup(adminToken, body); break;
+        case "rename-user":          result = await doRenameUser(adminToken, body); break;
         default:
           return json({ error: `unknown action: ${action}` }, 404, req);
       }
@@ -507,6 +508,18 @@ async function doUserAliasRemove(token, body) {
     "DELETE",
     `users/${encodeURIComponent(body.user_email)}/aliases/${encodeURIComponent(body.alias)}`,
   );
+}
+
+// Change a user's primary email. The rename is instant; Google auto-creates
+// a nonEditableAlias at the old address that routes mail to the same mailbox
+// for ~21 days, then expires. The page surfaces a countdown while that's
+// active. Returns the updated user resource on success.
+async function doRenameUser(token, body) {
+  if (!body.current_email) return { ok: false, error: "missing current_email" };
+  if (!body.new_email) return { ok: false, error: "missing new_email" };
+  return adminApi(token, "PATCH", `users/${encodeURIComponent(body.current_email)}`, {
+    primaryEmail: body.new_email,
+  });
 }
 
 // One-shot helper: remove an alias from a user, then create a Group at that

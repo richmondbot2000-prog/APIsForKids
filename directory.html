@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778698378">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778698378">
-<link rel="stylesheet" href="quiet.css?v=1778698378">
-<link rel="stylesheet" href="quiet-extras.css?v=1778698378">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778698378">
+<link rel="stylesheet" href="style.css?v=1778700375">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778700375">
+<link rel="stylesheet" href="quiet.css?v=1778700375">
+<link rel="stylesheet" href="quiet-extras.css?v=1778700375">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778700375">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -1065,7 +1065,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778698378" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778700375" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1993,6 +1993,9 @@
     if (opts && Object.prototype.hasOwnProperty.call(opts, "payroll_match")) {
       payload.payroll_match = opts.payroll_match;
     }
+    if (opts && Object.prototype.hasOwnProperty.call(opts, "rename_decay")) {
+      payload.rename_decay = opts.rename_decay;
+    }
     const res = await fetch(ANNOTATIONS_API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -2041,6 +2044,11 @@
     const aliasPanelLink = modal.querySelector("[data-open-alias-panel]");
     if (aliasPanelLink) {
       aliasPanelLink.addEventListener("click", () => openAliasPanel(entry));
+    }
+    // "Rename primary" link next to Email.
+    const renamePanelLink = modal.querySelector("[data-open-rename-panel]");
+    if (renamePanelLink) {
+      renamePanelLink.addEventListener("click", () => openRenamePanel(entry));
     }
 
     // For active users, check the live autoForwarding state via the Gmail
@@ -2297,8 +2305,28 @@
           : "")
       : "";
 
+    // Compute rename-decay countdown if an in-flight rename has been logged
+    // on this user (set when the page-driven rename ran). 21-day window from
+    // renamed_at; auto-fades when the count reaches zero.
+    const ann = u ? annotationFor(entryKey(entry)) : null;
+    const decay = (ann && ann.rename_decay && typeof ann.rename_decay === "object") ? ann.rename_decay : null;
+    let renameDecayLine = "";
+    if (decay && decay.renamed_at && decay.old_address) {
+      const ms = Date.now() - new Date(decay.renamed_at).getTime();
+      const daysGone = Math.floor(ms / 86400000);
+      const daysLeft = 21 - daysGone;
+      if (daysLeft > 0) {
+        renameDecayLine = `<p class="dir-modal-saved-hint" style="text-align:left;margin:6px 0 0;color:var(--manuscript-red);"><strong>Rename in flight.</strong> Mail to <code>${escapeHtml(decay.old_address)}</code> still routes here for ${daysLeft} more day${daysLeft === 1 ? "" : "s"}, then stops.</p>`;
+      }
+    }
+
+    const canOfferRename = !!(u && !u.suspended && !u.deletion_time);
+    const renameLink = canOfferRename
+      ? ` <button type="button" class="dir-link-btn" data-open-rename-panel="1" style="margin-left:8px;font-size:0.78rem;">Rename primary</button>`
+      : "";
+
     const workspaceDl = u ? `
-      <dt>Email</dt><dd>${emailDisplay}</dd>
+      <dt>Email</dt><dd>${emailDisplay}${renameLink}</dd>
       ${otherEmails.length ? `<dt>Other emails</dt><dd>${otherEmailsCell}</dd>` : ""}
       ${(u.given || u.family) ? `<dt>Full name</dt><dd>${escapeHtml(((u.given || "") + " " + (u.family || "")).trim())}</dd>` : ""}
       ${u.department ? `<dt>Department</dt><dd>${escapeHtml(u.department)}</dd>` : ""}
@@ -2332,6 +2360,7 @@
         <div>
           <h2 class="dir-modal-name" id="dirModalName">${escapeHtml(display)}</h2>
           <p class="dir-modal-title">${escapeHtml(subtitle)}</p>
+          ${renameDecayLine}
           ${liveGwsWordmark}
           ${suspendedBadge}
         </div>
@@ -2341,6 +2370,7 @@
         <h3>Workspace</h3>
         <dl class="dir-detail-grid">${workspaceDl}</dl>
         <div class="dir-alias-panel-slot"></div>
+        <div class="dir-rename-panel-slot"></div>
       </div>
 
       ${u ? (() => {
@@ -3212,6 +3242,130 @@
       convertBtn.textContent = "CONVERT TO GROUP";
       closeBtn.disabled = false;
       showModalBanner(`Conversion failed: ${err.message || err}`, "error");
+    }
+  }
+
+  // "Rename primary" panel — choose a new primary email for this user. They
+  // can either promote an existing editable alias or type a brand-new address.
+  // Google's rename is instant; mail to the old address keeps routing here
+  // for ~21 days via an auto-alias, then stops. The countdown shown under
+  // the user's name comes from the rename_decay annotation we set on commit.
+  function openRenamePanel(entry) {
+    const modal = document.getElementById("dirModal");
+    const slot = modal.querySelector(".dir-rename-panel-slot");
+    if (!slot) return;
+    const u = entry.user;
+    const editable = (u && Array.isArray(u.aliases_editable))
+      ? u.aliases_editable.filter(a => a && a.toLowerCase() !== (u.email || "").toLowerCase())
+      : [];
+    const aliasOptions = editable.map(a => `
+      <li>
+        <label>
+          <input type="radio" name="renamePick" value="${escapeHtml(a)}" data-rename-radio data-rename-source="alias">
+          <span>${escapeHtml(a)}</span>
+        </label>
+      </li>
+    `).join("");
+    slot.innerHTML = `
+      <div class="dir-alias-panel">
+        <button type="button" class="dir-alias-panel-close" data-rename-close aria-label="Close">×</button>
+        <h4>Rename primary email</h4>
+        <p>
+          Pick a new primary address for <strong>${escapeHtml(u.email)}</strong>. The change is immediate. Mail to the old address keeps reaching this mailbox for ~21 days via an auto-alias, then stops. The user's mailbox, Drive, and group memberships are preserved.
+        </p>
+        ${aliasOptions ? `
+          <p style="margin:0 0 4px;font-weight:600;color:var(--ink);">Promote an existing alias:</p>
+          <ul class="dir-alias-panel-list">${aliasOptions}</ul>
+        ` : ""}
+        <p style="margin:0 0 4px;font-weight:600;color:var(--ink);">…or use a brand new address:</p>
+        <label style="display:flex;gap:8px;align-items:center;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:0.86rem;">
+          <input type="radio" name="renamePick" value="__new__" data-rename-radio data-rename-source="new">
+          <input type="email" placeholder="new.address@letme.co.uk" data-rename-new-input style="flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:5px;font:inherit;">
+        </label>
+        <div class="dir-alias-panel-actions" style="margin-top:12px;">
+          <button type="button" data-rename-commit disabled>RENAME</button>
+        </div>
+      </div>`;
+    const panel = slot.querySelector(".dir-alias-panel");
+    const closeBtn = panel.querySelector("[data-rename-close]");
+    const commitBtn = panel.querySelector("[data-rename-commit]");
+    const newInput = panel.querySelector("[data-rename-new-input]");
+    const validEmail = s => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s || "");
+    function refreshEnable() {
+      const picked = panel.querySelector("[data-rename-radio]:checked");
+      if (!picked) { commitBtn.disabled = true; return; }
+      if (picked.dataset.renameSource === "new") {
+        commitBtn.disabled = !validEmail((newInput.value || "").trim());
+      } else {
+        commitBtn.disabled = false;
+      }
+    }
+    panel.querySelectorAll("[data-rename-radio]").forEach(r => r.addEventListener("change", refreshEnable));
+    newInput.addEventListener("input", () => {
+      // Typing in the new-address field auto-selects its radio.
+      const r = panel.querySelector('[data-rename-radio][data-rename-source="new"]');
+      if (r) r.checked = true;
+      refreshEnable();
+    });
+    closeBtn.addEventListener("click", () => { slot.innerHTML = ""; });
+    commitBtn.addEventListener("click", () => {
+      const picked = panel.querySelector("[data-rename-radio]:checked");
+      if (!picked) return;
+      const newEmail = picked.dataset.renameSource === "new"
+        ? (newInput.value || "").trim()
+        : picked.value;
+      if (!validEmail(newEmail)) return;
+      if (newEmail.toLowerCase() === (u.email || "").toLowerCase()) {
+        showModalBanner("New address is the same as the current primary.", "error");
+        return;
+      }
+      runRenameUser(entry, newEmail, panel);
+    });
+  }
+
+  // Execute the rename: PATCH primaryEmail via Worker, then write a
+  // rename_decay annotation keyed off the NEW primary so the countdown
+  // survives the staff.json refresh. Patch local state for instant feedback.
+  async function runRenameUser(entry, newEmail, panel) {
+    const u = entry.user;
+    const oldEmail = u.email;
+    const commitBtn = panel.querySelector("[data-rename-commit]");
+    const closeBtn = panel.querySelector("[data-rename-close]");
+    commitBtn.disabled = true;
+    commitBtn.textContent = "Renaming…";
+    closeBtn.disabled = true;
+    try {
+      await workspaceAction("rename-user", { current_email: oldEmail, new_email: newEmail });
+      const renamedAt = new Date().toISOString();
+      // Annotation lives under the NEW email so it follows the user after
+      // the next refresh-directory run swaps the primary in staff.json.
+      try {
+        await saveAnnotationRemote(newEmail, undefined, undefined, {
+          rename_decay: { old_address: oldEmail, renamed_at: renamedAt },
+        });
+      } catch (e) { console.warn("rename_decay annotation save failed", e); }
+      // Patch local state so the change shows immediately.
+      u.email = newEmail;
+      const lcOld = oldEmail.toLowerCase();
+      const lcNew = newEmail.toLowerCase();
+      // Old address auto-becomes a nonEditableAlias on Google's side. Mirror
+      // that in u.aliases so the picker reflects reality until staff.json
+      // refreshes. If newEmail was an editable alias, drop it from that list.
+      u.aliases = Array.from(new Set([...(u.aliases || []).filter(a => a.toLowerCase() !== lcNew), oldEmail])).sort();
+      u.aliases_editable = (u.aliases_editable || []).filter(a => a.toLowerCase() !== lcNew);
+      // Refresh local annotations cache so the countdown line renders next openCard.
+      const annKey = entryKey(entry);
+      const cur = (annotationsMap[annKey] && typeof annotationsMap[annKey] === "object") ? annotationsMap[annKey] : {};
+      annotationsMap[annKey] = { ...cur, rename_decay: { old_address: oldEmail, renamed_at: renamedAt } };
+      panel.parentElement.innerHTML = "";
+      renderGrid();
+      openCard(entryKey(entry));
+      showModalBanner(`Primary email renamed: ${oldEmail} → ${newEmail}. Mail to the old address routes here for ~21 more days.`, "success");
+    } catch (err) {
+      commitBtn.disabled = false;
+      commitBtn.textContent = "RENAME";
+      closeBtn.disabled = false;
+      showModalBanner(`Rename failed: ${err.message || err}`, "error");
     }
   }
 
