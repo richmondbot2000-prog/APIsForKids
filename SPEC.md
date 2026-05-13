@@ -23,8 +23,7 @@ _The source-of-truth document for `togetherbook.net` / `richmondbot2000-prog/tog
    - 11.3 [Brandwatch page](#113-brandwatch-page-brandwatchhtml)
    - 11.4 [Yesterday page](#114-yesterday-page-yesterdayhtml)
    - 11.5 [Brokers page + Source-quality analysis](#115-brokers-page--source-quality-analysis-brokershtml)
-   - 11.6 [Declines page](#116-declines-page-declineshtml)
-   - 11.7 [Pipeline page](#117-pipeline-page-pipelinehtml)
+   - 11.6 [Pipeline page](#116-pipeline-page-pipelinehtml)
 12. [Concept reference: Top-Up Eligibility (TUE)](#12-concept-reference-top-up-eligibility-tue)
 13. [Concept reference: Brokers / Sources / Campaigns terminology](#13-concept-reference-brokers--sources--campaigns-terminology)
 14. [Brandwatch email notifications](#14-brandwatch-email-notifications)
@@ -83,13 +82,12 @@ The site is a flat set of HTML files. **No router, no SPA, no build step.** Each
 | **TopUps** | `/topups.html` | 24-month chart of distinct Transform Credit (LenderId 6) live loans split Primary / Top-Up, with a TUE-eligible-count line overlay; "last refreshed" badge | `topups.json` |
 | **Pipeline** | `/pipeline.html` | March-cohort application-pipeline analysis with two d3-sankey diagrams (Lead funnel + Application progression), per-stage drop-off table, and click-to-expand sampled customer timelines per dead-end endpoint. All PII masked server-side. | `pipeline.json` + `pipeline-samples.json` |
 | **Brokers** | `/brokers.html` | Per-Broker funnel scorecard PLUS three Source-quality analysis sections — (a) Sources to consider blocking, (b) Blocked Sources to consider re-enabling, (c) Sources where we overpay. KPI band, two top-10 leaderboards (volume + paid), worst-quality leaderboard (ghost rate), sortable table with inline mini-funnel. Click row to expand stage-by-stage detail + top rejection reasons. | `brokers.json` + `source-quality.json` |
-| **Declines** | `/declines.html` | 90-day decline-reasons analysis. Lead rejections by `LeadResultTypeId` + application-stage declines from `Flags` (Decline / DNL / Cancelled / FraudRisk). Per flag-type cards with top reasons, daily trend SVG, and ClientType breakdown. | `declines.json` |
 | **Schema** | `/database.html` | Full DB schema (renders `database.md` via marked.js + mermaid theme), plus per-table row counts as flipboards | `row-counts.json` + `database.md` |
 | **Code** | `/stats.html` | Codebase size dashboard (Solari split-flap digits) + by-language and by-repo tables | inline manual snapshot (live refresh pending Azure access) |
 | _(unlinked)_ | `/apis.html` | Per-helper detail page — kept for any deep-link bookmarks; not in nav | inline |
 | _(unlinked)_ | `/robots.html` | Per-robot list page — kept for any deep-link bookmarks; not in nav | inline |
 
-**Topbar nav (every page):** `About our systems · Yesterday · Brandwatch · 1stContact · Directory · TopUps · Pipeline · Brokers · Declines · Schema · Code`. Plus a hamburger drawer ≤960px viewport.
+**Topbar nav (every page):** `About our systems · Yesterday · Brandwatch · 1stContact · Directory · TopUps · Pipeline · Brokers · Schema · Code`. Plus a hamburger drawer ≤960px viewport.
 
 ---
 
@@ -142,7 +140,6 @@ All refresh workflows live in `.github/workflows/refresh-*.yml`. They share a co
 | `refresh-staff-activity.yml` | hourly :15 | `staff-activity.json` | Fabric warehouse | `FABRIC_*` secrets |
 | `refresh-topups.yml` | hourly :30 | `topups.json` | Fabric warehouse | `FABRIC_*` secrets |
 | `refresh-brokers.yml` | hourly :35 | `brokers.json` | Fabric warehouse (`Leads` × `Brokers.Campaigns` × `Brokers.Sources`) | `FABRIC_*` secrets |
-| `refresh-declines.yml` | hourly :50 | `declines.json` | Fabric warehouse (`Leads` rejections + `Flags`-via-`Applications`-lender-join) | `FABRIC_*` secrets |
 | `refresh-pipeline.yml` | hourly :45 | `pipeline.json` | Fabric warehouse | `FABRIC_*` secrets |
 | `refresh-pipeline-samples.yml` | hourly :50 | `pipeline-samples.json` | Fabric warehouse (PII-masked output) | `FABRIC_*` secrets |
 | `refresh-source-quality.yml` | daily 07:05 | `source-quality.json` | Fabric warehouse (heavy join over 60d of Leads) | `FABRIC_*` secrets. Daily not hourly — analysis takes ~3-5 min and the underlying signal is stable over a day. 45-min timeout configured. |
@@ -195,7 +192,6 @@ Each refresh workflow runs one Python script under `scripts/`. They all read env
 | `scan_pipeline.py` | `Applications` (March cohort) × `Leads` × `Tasks` | `pipeline.json` | Lead-result enum aggregated for the Sankey funnel; strict-stage definitions per TaskTypeId + GtRef; produces the data for the two-Sankey diagram on the Pipeline page |
 | `scan_pipeline_samples.py` | Same tables + `Customers` + `Addresses` + `ESignatures` + `WebBehaviours` + `Communications.Messages` + `Brokers.Sources` + `Brokers.Campaigns` + `LoanPurposes` + `LeadResultTypes` + `TaskTypes` + `BrokerStatuses` | `pipeline-samples.json` | Per dead-end endpoint: 25 random ARefs with full interaction timeline. Identity-links by (FirstName, Surname, DOB) so the timeline spans every application the same person made. All PII masked server-side: ARefs to last-5, surnames to ******, DOB to ****-**-**, addresses to state only, plus email / phone / SSN / card-number redaction in message bodies. |
 | `scan_brokers.py` | `Leads` × `Brokers.Campaigns` × `Brokers.Sources` × `Applications` × `Tasks` × `BrokerStatuses` | `brokers.json` | Server-side CTE aggregation over 90-day window — never pulls multi-million-row Leads to the runner. Per source: 7-stage funnel + average loan + paid-out $ + top-3 rejection reasons. Tunable via `BROKER_WINDOW_DAYS` / `BROKER_LENDER_ID` env vars. |
-| `scan_declines.py` | `Leads` (LeadResultTypeId) + `Flags` joined to `Applications` for lender filter | `declines.json` | 90-day window. Reason text is whitespace + case + trailing-period normalised before group-by so 'BANK CHECK FAILED' and 'bank check failed.' fold into the same bucket. Emits top reasons per flag type + daily trend per type + ClientType breakdown + top-20 ClientUsernames raising declines. |
 | `scan_source_quality.py` | `Leads` × `Brokers.Sources` × `Brokers.Campaigns` × `dbo.SourceTypes` × `Applications` | `source-quality.json` | **The heaviest scanner.** Three analyses keyed on **(Broker, SourceReference1)** cells over a 60-day window ending 30 days ago (maturation lag). See §11.5 for the full spec — too detailed to compress here. Tunables: `SQ_WINDOW_DAYS`, `SQ_MATURATION_DAYS`, `SQ_BOUNCEBACK_WINDOW_DAYS`, `SQ_MIN_VOLUME`, `SQ_MIN_EXCLUDED`, `SQ_SAMPLE_PER_CAMPAIGN`, `SQ_NULL_SR1_SAMPLE`. |
 | `diff_brandwatch_mentions.py` | `brandwatch.json` + `brandwatch-seen.json` | `notify-mentions.json` + updated `brandwatch-seen.json` | Tracks already-notified mention IDs. Filters out sources `bbb` and `reviewcentre` before notification. See §14 for the email integration. |
 | `scan_telegram.py` + `telegram_monitor.py` + `discord_monitor.py` | Public Telegram channels (Telethon) + public Discord servers (discord.py), read-only on dedicated accounts → shared `monitor.db` → public-safe `telegram-mentions.json` + `discord-mentions.json` | `telegram-mentions.json`, `discord-mentions.json` | Match lists in `telegram-watchlist.json` / `discord-watchlist.json`. Excerpts go through email / phone / SSN / card / ARef-shape redaction before being written. Workflows dormant until secrets configured. |
@@ -382,7 +378,7 @@ There's no Cloudflare API integration. If we ever need one, the old DNS-flip tok
 
 | Secret | Used by | What it is |
 |---|---|---|
-| `FABRIC_CLIENT_SECRET` | all warehouse-bound workflows (row-counts, yesterday-payouts, 1st-contact, staff-activity, topups, pipeline, pipeline-samples, brokers, declines, source-quality) | Service-principal client secret for the Fabric warehouse |
+| `FABRIC_CLIENT_SECRET` | all warehouse-bound workflows (row-counts, yesterday-payouts, 1st-contact, staff-activity, topups, pipeline, pipeline-samples, brokers, source-quality) | Service-principal client secret for the Fabric warehouse |
 | `SCRAPERAPI_KEY` | brandwatch | ScraperAPI residential-proxy API key (for Trustpilot / BBB / Reddit which 403 cloud IPs) |
 | `YOUTUBE_API_KEY` | brandwatch | YouTube Data API v3 key |
 | `WORKSPACE_SERVICE_ACCOUNT_JSON` | directory | Full JSON key for `directory-reader@letme-directory.iam.gserviceaccount.com` (Google Cloud SA with domain-wide delegation) |
@@ -944,18 +940,7 @@ After reading the Partnerships Handbook, 10 of 13 candidate improvements shipped
 
 For the three deferred items: each needs either a new data source or a substantial scanner reshape. Document trade-offs here when picking them back up.
 
-### 11.6 Declines page (`declines.html`)
-
-90-day rolling analysis of two distinct decline pools (powered by `scan_declines.py`):
-
-1. **Lead rejections** — `Leads.LeadResultTypeId` enum (negative values + specific "rejected" types). Grouped by reason text.
-2. **Application-stage declines** — `Flags` table joined to `Applications` (for lender filter). FlagTypeId 2 = Decline, 3 = DNL (do not lend), 4 = Cancelled, 6 = FraudRisk.
-
-For each pool: top reasons table, daily trend SVG, ClientType breakdown, and top-20 ClientUsernames raising decline flags.
-
-**Reason-text normalisation** in the scanner: lowercase + trim + strip trailing period, so `'BANK CHECK FAILED'` and `'bank check failed.'` fold into the same bucket. Critical — without this the top-reasons distribution fragments.
-
-### 11.7 Pipeline page (`pipeline.html`)
+### 11.6 Pipeline page (`pipeline.html`)
 
 March-cohort application-pipeline analysis with two d3-sankey diagrams (Lead funnel + Application progression). Powered by `scan_pipeline.py` + `scan_pipeline_samples.py`.
 
@@ -1107,7 +1092,7 @@ ROOT = Path('/Users/richmondrobot/Desktop/togetherbook')
 v = str(int(time.time()))
 pages = ['index.html','apis.html','robots.html','yesterday.html','brandwatch.html',
          '1stcontact.html','directory.html','database.html','stats.html','topups.html',
-         'brokers.html','declines.html','pipeline.html']
+         'brokers.html','pipeline.html']
 for f in pages:
     p = ROOT / f
     s = p.read_text()
