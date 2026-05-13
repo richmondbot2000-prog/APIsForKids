@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-13T20:59:52.695Z",
+  "updated_at": "2026-05-13T21:00:02.900Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -300,6 +300,13 @@
       "actor": "kelly.black@letme.com",
       "action": "get-forwarding",
       "target": "thomas.holloway@togetherloans.com",
+      "ok": true
+    },
+    {
+      "ts": "2026-05-13T21:00:02.900Z",
+      "actor": "kelly.black@letme.com",
+      "action": "get-forwarding",
+      "target": "james.benamor@letme.com",
       "ok": true
     }
   ]
