@@ -470,7 +470,9 @@ Workspace ↔ Activity ↔ Payroll are matched independently, because each syste
 | Employer, employee #, DOB, home address, termination | Payroll | — |
 | Phone, start date | Annotation > Payroll mobile/start_date | (form pre-fills with payroll; annotation overrides when saved) |
 | All other emails | Workspace siblings + Payroll email field | Displayed under "Other emails" — never silently replaces the primary |
-| Forwarding target on suspended accounts | `workspace-actions.json` (latest successful `suspend-and-route`) | — |
+| Forwarding target on suspended accounts | `annotations.json` (`forward_to` field set by `add-forwarding` / `suspend-and-route`); falls back to `workspace-actions.json` | — |
+| Profile photo (Directory-only) | `assets/photos/<email-safe>.jpg` (when uploaded via the page) | Workspace `photo_url` (Google's `thumbnailPhotoUrl`) | Initials placeholder |
+| TogetherBook admin status | `admins.json` (lowercase email list) | — (`OWNER_EMAIL` hardcoded in worker is always an admin) |
 
 **Conflict policy: disagreements are silent**, not surfaced. E.g. if Workspace's family-name is `Smith` and payroll's is `Jones` for the same person, we just don't match payroll → it's invisible rather than wrong. If a future flag-mismatches UI is wanted, the data is all client-side and the page can grow a banner.
 
@@ -516,35 +518,96 @@ Plus a stale-payroll warning when `payrollData.updated_at` is over 40 days old �
 
 **Search** (`#dirSearch`) covers name, email, every alias, title, department, plus payroll fields (first/last name in payroll, mobile, address, employee number). Single search box matches across all of them.
 
-#### 11.1.7 Workspace admin actions (Suspend + route, Unsuspend, Create user)
+#### 11.1.7 Workspace admin actions (the full verb set)
 
-The detail card's "Manage Workspace account" section drives Cloudflare Worker `apifk-workspace-worker2` at `book.togetherbook.net/api/workspace/*`. Actions:
+The detail card drives Cloudflare Worker `apifk-workspace-worker2` at `book.togetherbook.net/api/workspace/*`. Actions, grouped by surface:
 
-- **POST `/api/workspace/suspend-and-route`** `{ email, route_to }` — single atomic operation that (1) adds `route_to` as a `forwardingAddresses` on the user's mailbox (auto-verifies for in-domain addresses), (2) enables `autoForwarding` with `disposition: leaveInInbox`, (3) sets `suspended: true` on the user. The only "Suspend" path — there is no Suspend-without-routing, because forgetting to set up a forward is the main "ex-employee email goes into a black hole" failure mode.
-- **POST `/api/workspace/unsuspend`** `{ email }` — sets `suspended: false`, then best-effort disables `autoForwarding`.
-- **POST `/api/workspace/create`** `{ given_name, family_name, email, password, org_unit_path? }` — creates a new Workspace user with `changePasswordAtNextLogin: true`.
-- **No Delete endpoint.** Deleting permanently removes the seat and its mailbox from the audit history; we never want that. Suspended-with-routing is the leaver workflow.
+**Suspension / lifecycle:**
+- `suspend-and-route` `{ email, route_to, tenant? }` — adds `route_to` as a `forwardingAddresses` entry, enables `autoForwarding` with `disposition: leaveInInbox`, sets `suspended: true`. Atomic.
+- `suspend-no-forward` `{ email, tenant? }` — suspends without setting any forwarding. Used when you want the seat fee gone but mail to bounce.
+- `unsuspend` `{ email, tenant? }` — sets `suspended: false`, best-effort disables `autoForwarding`.
+- `recover` `{ user_id, tenant? }` — undeletes a user inside Google's 20-day window. **Requires immutable id** (the email may have been recycled).
+- `convert-to-group` `{ email, forward_to, tenant? }` — renames the user to `<localpart>.parked.<unixts>@<domain>` and deletes by immutable id. Writes a `pending_conversion` annotation with `scheduled_for = deleted_at + 20d`. The companion cron `.github/workflows/refresh-pending-conversions.yml` (daily 06:30 UTC) calls `create-forwarding-group` once the address has cleared Google's 20-day reuse lockout. Result: a forwarding-only Group at the freed address.
+- `create-forwarding-group` `{ email, name, description?, forward_to, tenant? }` — internal: called by the daily cron. Not normally hit from the page.
+- `create` `{ given_name, family_name, email, password, org_unit_path?, tenant? }` — creates a new Workspace user with `changePasswordAtNextLogin: true`.
+- **No Delete endpoint.** Convert-to-group is the leaver workflow.
 
-**On the active user's card** (when they're in 1+ groups):
-- The standard "Suspend + route" button (suspends + sets forwarding).
-- A second **"Suspend + route + remove from N groups"** button that runs the full leaver workflow in one click: suspend+route, then loop `group-member-remove` across every membership. Confirmation strip lists every group that'll be touched. Best-effort: a failed group-remove doesn't roll back the suspension. Banner summarises wins + failures.
+**Forwarding management** (the autoForwarding setting on a single user's Gmail):
+- `add-forwarding` `{ email, route_to, tenant? }` — set forwarding on a still-live or already-suspended user.
+- `disable-forwarding` `{ email, tenant? }` — turn off `autoForwarding` while keeping the user live and the `forwardingAddresses` list intact.
+- `cancel-forwarding` `{ email, tenant? }` — turn off forwarding AND clear the routing annotation (used when moving a suspended account to the "black hole" list).
+- `get-forwarding` `{ email, tenant? }` — read-only, used by the page on card open to detect a forwarding rule the user set themselves in Gmail.
 
-**On the suspended user's card:**
-- **"Unsuspend"** button — reverses the suspend + disables forwarding.
-- **"Remove from N groups"** button (appears only when the user is in 1+ groups) — loops `group-member-remove` across every group the user is a member of. Best-effort: one failure doesn't abort. A summary banner reports wins and any failures.
-- **Audit history section** — chronological list of every `suspend-and-route` / `unsuspend` event for this user, with timestamp, actor, and forward target. Read from `workspace-actions.json`. If the user is suspended but no `suspend-and-route` event is logged (e.g. someone used the Admin Console directly), the section flags the gap and warns that the forward target is unknown.
-- **Email button** on a suspended user mailto's the forwarding address (suffixed "via forward"), not the dead primary mailbox.
+**Groups:**
+- `group-create` `{ email, name, description?, tenant? }`
+- `group-delete` `{ email, tenant? }`
+- `group-member-add` `{ group_email, member_email, role?, tenant? }`
+- `group-member-remove` `{ group_email, member_email, tenant? }`
 
-Per-action authorisation chain:
-1. **Cloudflare Access** gates the route at the edge — only logged-in `@letme.com` sessions reach the Worker. Failure: 302 to CF Access login.
+**Account hygiene:**
+- `reset-password` `{ email, password, tenant? }` — sets a one-shot password and forces `changePasswordAtNextLogin: true`.
+- `user-alias-remove` `{ user_email, alias, tenant? }` — detach an editable alias. `nonEditableAlias` (auto-aliases) reject; the page filters them out of the picker.
+- `alias-to-group` `{ user_email, alias, group_name, initial_member?, description?, tenant? }` — one-shot: detach the alias, then create a Group at the freed address with the original user as initial member.
+- `rename-user` `{ current_email, new_email, tenant? }` — PATCH the user's `primaryEmail`. Instant on Google's side; the old address becomes a nonEditableAlias that Google retires after ~21 days. The page writes a `rename_decay` annotation so the card shows a countdown.
+
+**Directory-page assets (do NOT touch Workspace):**
+- `directory-photo-upload` `{ user_email, photo_b64 }` — commits the JPEG to `assets/photos/<email-safe>.jpg`. Annotation `directory_photo_uploaded_at` is set client-side as a cache-bust.
+- `directory-photo-remove` `{ user_email }` — deletes the file from `assets/photos/`.
+
+**Identity + admin management:**
+- `whoami` — open endpoint (any Access user). Returns `{ email, is_admin, is_owner, owner, admins }`. The page uses this on load to gate admin-only UI and surface "Signed in as X · role" under the header.
+- `list-admins` — admin-only. Returns the admin email list.
+- `admin-add` `{ target_email }` — admin-only. Adds to `admins.json` via GitHub Contents API. **Also auto-syncs** the Cloudflare Access allowlist (see §11.1.7c).
+- `admin-remove` `{ target_email }` — admin-only. The owner cannot be removed. Auto-syncs allowlist.
+
+**Cross-tenant routing.** Each action body may include `tenant`. The page's `workspaceAction` helper auto-injects it from either (a) the staff entry matching `body.email`, or (b) the group entry in `allGroups` matching `body.group_email`. The worker maps `tenant === "togetherloans"` to `env.IMPERSONATE_USER_TOGETHERLOANS`; everything else falls back to `env.IMPERSONATE_USER` (letme tenant). Without this, group operations on Together Loans groups return 403 from Google.
+
+**Per-action authorisation chain:**
+1. Cloudflare Access gates the route at the edge — only allowlisted emails reach the Worker. Failure: 302 to CF Access login.
 2. The Worker checks `Cf-Access-Jwt-Assertion` header presence. Failure: 401.
-3. The Worker checks the CF-Access-Authenticated-User-Email is in the `ADMIN_EMAILS` env var (comma-separated, currently `james.benamor@letme.com`). Failure: 403.
-4. **Two Google access tokens are minted** per action via service-account JWT + DWD:
-   - **Admin token** — impersonates `IMPERSONATE_USER` (`james.benamor@letme.co.uk`, a Super Admin), scope `admin.directory.user + apps.licensing`. Used for the suspend/unsuspend/create endpoints.
-   - **Mailbox token** — impersonates the **target user**, scope `gmail.settings.sharing`. Used for the forwarding setup. This is why Suspend+route needs `gmail.settings.sharing` added to the DWD config in `admin.google.com` (Step 3 of `worker/WORKSPACE_SETUP.md`).
-5. Failure: 502 with the Google error message.
+3. The Worker fetches `admins.json` (60s edge cache, owner-failsafe) and confirms the actor is in the list. **`whoami` and `list-admins` are exempt** — non-admins need whoami to know who they are. All other actions: 403 if not admin.
+4. Owner-protected actions (`suspend-and-route`, `suspend-no-forward`, `reset-password`, `admin-add`, `admin-remove`): 403 if the target is the owner and the actor is not the owner.
+5. Google access tokens are minted via service-account JWT + DWD:
+   - **Admin token** — impersonates the tenant's admin (`IMPERSONATE_USER` or `IMPERSONATE_USER_TOGETHERLOANS`), scope `admin.directory.user + group + group.member + apps.licensing`. Used for directory operations.
+   - **Mailbox token** — impersonates the **target user**, scope `gmail.settings.basic + gmail.settings.sharing`. Used for the forwarding endpoints.
+6. Failure: 502 with the Google error message.
 
-**Audit log:** every action appends an entry to `workspace-actions.json` in the repo via the GitHub Contents API. The Worker holds a fine-grained PAT (`GITHUB_TOKEN` secret) with `Contents: read+write` on `richmondbot2000-prog/togetherbook`. The audit file is FIFO-trimmed to 2000 entries; older history persists in git via the commit log (commit message is `Workspace: <action> <email> by <actor>`). The page reads `workspace-actions.json` to surface forwarding targets on suspended rows; if it ever disappears, the UI degrades by hiding the `→ chip` but actions still work.
+**Audit log.** Every action appends to `workspace-actions.json` in the repo via the GitHub Contents API. The audit file is FIFO-trimmed to 2000 entries; older history persists in git (commit message is `Workspace: <action> <target> by <actor>`). The page reads `workspace-actions.json` to surface forwarding targets on suspended rows.
+
+**Note on the long-running silent-fail bug:** the audit log silent-failed for weeks because `GITHUB_TOKEN` on the workspace worker only had `contents: read`. The same token gates `admins.json` commits + photo commits, so when admin-add was wired up in 2026-05-13 the symptom resurfaced. Token regenerated with `repo` scope on 2026-05-13; audit + admin + photo writes all working since.
+
+#### 11.1.7c TogetherBook Admin role + Owner protection
+
+A separate concept from Google's Workspace super-admin. Lives entirely in `admins.json` at the repo root:
+
+```jsonc
+{
+  "schema_version": 1,
+  "updated_at": "<ISO>",
+  "admins": ["amber.cole@letme.com", "berginie.botero@togetherloans.com", ...]
+}
+```
+
+The **Owner** is `james.benamor@letme.com` (hardcoded `OWNER_EMAIL` in `worker/workspace-worker.js`). They're always treated as admin even if removed from the list, and they're the only one who can change their own admin / suspended / password state.
+
+**Page integration:**
+- `fetchWhoami()` fires on load. The result populates `viewerEmail`, `viewerIsAdmin`, `viewerIsOwner`, `viewerAdmins`.
+- "Signed in as X · admin/owner/read-only" indicator under the page heading (helps debug when admin controls don't appear).
+- Admin-only UI hidden from non-admins: Manage Workspace section, Password section, Rename primary link, Convert-one-to-a-group link, "+ New user" button, Admin row on the edit card.
+- Per-user Admin row in the Workspace section: shows `yes` / `no` plus a Make admin / Remove admin link on every row except the owner's (which shows "(owner — locked)"). Suspend buttons on the owner's card are hidden from non-owner viewers and replaced with an explanatory line.
+
+**Cloudflare Access auto-sync.** After `admin-add` / `admin-remove` commits `admins.json`, the worker pushes the new admin list to the Access app on `book.togetherbook.net` so non-`@letme.com` admins can sign in from any IP without a dashboard click. Allowlist is built as `email_domain: letme.com` (covers all current/future letme staff) + every non-`@letme.com` admin as an explicit email entry. Implementation: `syncAccessAllowlist()` in `worker/workspace-worker.js`; constants `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_ACCESS_APP_ID` are hardcoded (not sensitive — they appear in dashboard URLs); the secret `CLOUDFLARE_API_TOKEN` is what unlocks the call. Sync is non-fatal: a failed sync still returns the successful admins.json change with `result.access_sync.error` populated.
+
+#### 11.1.7d Directory profile photos (page-only override)
+
+The page can store a profile photo that overrides Google's `thumbnailPhotoUrl` — only on `book.togetherbook.net`. Does NOT touch the user's actual Google Workspace profile photo (deliberate choice; Gmail/Drive/etc. keep their real photo).
+
+**Mechanism:**
+- Upload button under the photo block on every live user's card (admin-only).
+- Page resizes the chosen image to 400×400 JPEG via canvas, base64-encodes, ships to `directory-photo-upload`. Worker commits to `assets/photos/<email-safe>.jpg` (where `<email-safe>` is the lowercase email with `@` → `_at_`).
+- Page also saves a `directory_photo_uploaded_at` annotation (ISO timestamp) as cache-bust.
+- `dirPhotoUrl(u)` returns the override URL when the annotation is set, otherwise falls back to `u.photo_url`, otherwise renders an initials placeholder.
+- Remove button deletes the asset + clears the annotation.
 
 #### 11.1.7b Group management (free, doesn't consume seats)
 
@@ -577,7 +640,7 @@ The Directory page also manages **Google Groups** — email addresses like `fina
 - `admin.directory.group.readonly` + `admin.directory.group.member.readonly` (scanner)
 - `admin.directory.group` + `admin.directory.group.member` (Worker)
 
-**Worker endpoints** (all POST, same Cloudflare Access + `ADMIN_EMAILS` gating as the user actions, all logged to `workspace-actions.json`):
+**Worker endpoints** (all POST, same Cloudflare Access + `admins.json` gating as the user actions, all logged to `workspace-actions.json`):
 - `/api/workspace/group-create` `{ email, name, description? }`
 - `/api/workspace/group-delete` `{ email }`
 - `/api/workspace/group-member-add` `{ group_email, member_email, role? }` (default role `MEMBER`)
@@ -593,11 +656,19 @@ The Directory page also manages **Google Groups** — email addresses like `fina
 
 **Group deletion is permanent.** Members aren't affected (they keep their accounts), but the address dies and any mail aliases pointing at it stop working. Same blast radius as a Workspace user delete, hence the confirmation strip in the Danger zone of the group modal.
 
-#### 11.1.8 Annotations persistence (Notes form)
+#### 11.1.8 Annotations persistence
 
-- **Storage:** `annotations.json` at the repo root. Shape `{ schema_version, updated_at, annotations: { "<email-or-username>": { phone, start_date } } }`.
-- **Writes:** `book.togetherbook.net/api/annotations` → Worker `apifk-annotations-worker` (Cloudflare Worker name on the dashboard is the auto-generated `shiny-heart-00f8`). The Worker reads the current file via GitHub Contents API, merges in the new value (or deletes the key when both fields are empty), and commits back to `main`.
-- The form **pre-fills** Phone and Start Date with the matched payroll record's mobile/start_date when no annotation exists — so the user is editing an existing value rather than typing from a blank box.
+- **Storage:** `annotations.json` at the repo root. Shape `{ schema_version, updated_at, annotations: { "<email-or-username>": { ... } } }`.
+- **Writes:** `book.togetherbook.net/api/annotations` → Worker `apifk-annotations-worker` (Cloudflare Worker name on the dashboard is the auto-generated `shiny-heart-00f8`). The Worker reads the current file via GitHub Contents API, merges in the new value (or deletes the key when all fields are empty), and commits back to `main`. **Field-by-field preservation:** missing fields in the payload are kept; empty-string fields are cleared; values overwrite. Lets callers do partial updates.
+- **Recognised fields** (each preserved independently):
+  - `phone` — string. Manual override over payroll's mobile.
+  - `start_date` — `YYYY-MM-DD`. Manual override over payroll's start_date.
+  - `address` — string. Manual override over payroll's address.
+  - `forward_to` — string. Forwarding target for a suspended account. Set by `suspend-and-route` / `add-forwarding` flows. Used by the page to render the `→ chip` even when the audit log is incomplete.
+  - `payroll_match` — object `{ employer, employee_number, first_name, last_name }`. Manual payroll-link override when name-matching can't find the right record.
+  - `rename_decay` — object `{ old_address, renamed_at }`. Set when the page renames a user. Triggers the 21-day countdown shown under the name.
+  - `pending_conversion` — object `{ forward_to, scheduled_for, parked_at, deleted_at }`. Set when convert-to-group runs. The daily cron clears this once the group is created.
+  - `directory_photo_uploaded_at` — ISO timestamp. Set when a Directory profile photo is uploaded; used as cache-bust on the override URL.
 - **github.io fallback:** the public github.io URL can read `annotations.json` but cannot write — the Worker route only exists on `book.togetherbook.net`.
 
 #### 11.1.9 Payroll CSV ingestion (the manual process)
@@ -646,32 +717,40 @@ Reasonable expectation: ~60 records, ~28-30 KB minified. The 5.1 KB Worker Secre
 |---|---|---|
 | Payroll section missing on everyone | `PAYROLL_KV` empty / not bound; endpoint returns 503 | Re-run scanner → paste into KV → check `book.togetherbook.net/api/workspace/payroll` in browser returns JSON |
 | Payroll section missing on one specific person | No match — they aren't in either CSV, OR their Workspace name is too different from payroll's legal name (no alias covers the gap) | Check unmatched list with the Python diagnostic in `scripts/scan_payroll.py`; if it's worth fixing, either rename them in Workspace, add a nickname to the `NICKNAMES` map, or accept that one record won't match |
-| "Suspend + route" returns 502 | Most likely: `gmail.settings.sharing` scope not added in DWD | `admin.google.com → Security → Access and data control → API controls → Manage Domain-Wide Delegation` — edit the existing Client ID, add scope `https://www.googleapis.com/auth/gmail.settings.sharing` |
-| "Suspend + route" returns 401/403 | CF Access session expired, or `ADMIN_EMAILS` doesn't include the actor | Re-auth via book.togetherbook.net; or edit `ADMIN_EMAILS` env var on `apifk-workspace-worker2` and redeploy |
-| Forwarding chip ("→ X") missing on a suspended row | `workspace-actions.json` doesn't have a successful `suspend-and-route` for that email | Look at the file in repo; if the suspend happened outside this UI (e.g. via Admin Console directly) there's no record. Future-proof: have the suspender always use the page. |
+| "Suspend + route" returns 502 | Most likely: `gmail.settings.sharing` or `.basic` scope not added in DWD | `admin.google.com → Security → Access and data control → API controls → Manage Domain-Wide Delegation` — edit the existing Client ID, add scopes `https://www.googleapis.com/auth/gmail.settings.basic` and `…/gmail.settings.sharing` |
+| Any mutating action returns 401/403 | CF Access session expired, or the actor isn't in `admins.json` | Re-auth via book.togetherbook.net. Check `admins.json` in the repo. The "Signed in as X · role" line under the page header confirms what whoami sees. |
+| Admin controls don't appear for a known admin | Their Cloudflare Access email differs from what's in `admins.json` (e.g. `@letme.co.uk` vs `@letme.com`) | Read the "Signed in as X" line; add that exact email to `admins.json` via Make admin button, or fix the Owner constant if they should be owner |
+| `admin-add` returns 403 from GitHub | Workspace worker's `GITHUB_TOKEN` lacks `contents: write` | Regenerate at https://github.com/settings/tokens/new?scopes=repo → paste into the worker's `GITHUB_TOKEN` secret in Cloudflare → Deploy |
+| `access_sync.ok = false` after admin change | `CLOUDFLARE_API_TOKEN` worker secret missing or revoked, or token lacks `Access: Apps and Policies: Edit` | Generate at https://dash.cloudflare.com/profile/api-tokens with that exact permission → paste as worker secret → Deploy |
+| Forwarding chip ("→ X") missing on a suspended row | Neither `annotations.json` nor `workspace-actions.json` has a successful forward target for that email | If the suspend happened outside this UI (e.g. via Admin Console directly) there's no record. The page also calls `get-forwarding` for live users to detect autoForwarding the user set themselves in Gmail. |
 | Whole page blank / 404 | GitHub Pages CNAME `book.togetherbook.net` lost its HTTPS cert (state goes `bad_authz`) | `gh api repos/richmondbot2000-prog/togetherbook/pages` to check `https_certificate.state`. If bad, in repo Settings → Pages, uncheck and re-check "Enforce HTTPS" to retry ACME. |
+| Page stuck on "Loading…" forever | JS parse error preventing the data load to fire. The "+ New user" button being visible despite being admin-only is a tell. | DevTools Console will show the SyntaxError. Common cause: a duplicate `const` in `renderModalBody` from a sloppy edit. Fix and ship — the chain stays pending otherwise. |
 | Person's data is right in payroll but wrong on the page | Page caches `staff.json` etc. Check the cache-bust query string (`?v=<unix-ts>` on CSS/JSON refs) bumps on every directory.html commit |
+| Cross-tenant group action returns "Not Authorized" | `body.tenant` not injected (group not in `allGroups` yet, e.g. brand new group not in latest `groups.json`) | Re-run `refresh-groups.yml` then retry. The page reads `groups.json` to know each group's tenant. |
 
 #### 11.1.11 Setup checklist (rebuilding from scratch)
 
 If the Workers / KV / DWD ever need to be re-created:
 
 1. **Service account** (one-time): `directory-reader@letme-directory.iam.gserviceaccount.com` — key JSON stored locally at `~/Desktop/wiki/letme-directory-f8cf5d0a941f.json` (gitignored) and pasted into both Workers' `GOOGLE_SERVICE_ACCOUNT_JSON` secret.
-2. **DWD scopes** authorised in `admin.google.com` against the service account's numeric Client ID:
+2. **DWD scopes** authorised in `admin.google.com` against the service account's numeric Client ID (in **both** Workspace tenants — letme + togetherloans):
    - `https://www.googleapis.com/auth/admin.directory.user`
    - `https://www.googleapis.com/auth/admin.directory.user.readonly`
-   - `https://www.googleapis.com/auth/admin.directory.group` (full write — for the Groups CRUD endpoints)
+   - `https://www.googleapis.com/auth/admin.directory.group`
    - `https://www.googleapis.com/auth/admin.directory.group.member`
-   - `https://www.googleapis.com/auth/admin.directory.group.readonly` (for the read-only scanner)
+   - `https://www.googleapis.com/auth/admin.directory.group.readonly`
    - `https://www.googleapis.com/auth/admin.directory.group.member.readonly`
    - `https://www.googleapis.com/auth/apps.licensing`
+   - `https://www.googleapis.com/auth/gmail.settings.basic`
    - `https://www.googleapis.com/auth/gmail.settings.sharing`
-3. **GitHub PATs** (one-time): fine-grained on the user `richmondbot2000-prog`, `Contents: read+write` on `togetherbook` only. Same token is reused by both Workers as `GITHUB_TOKEN` secret.
-4. **Cloudflare Workers** (two of them):
-   - `apifk-workspace-worker2` — route `book.togetherbook.net/api/workspace/*`. Bindings: `GOOGLE_SERVICE_ACCOUNT_JSON`, `GITHUB_TOKEN`, `IMPERSONATE_USER` (`james.benamor@letme.co.uk`), `ADMIN_EMAILS` (`james.benamor@letme.com`), KV binding `PAYROLL_KV` → `apifk-payroll` namespace. Code: `worker/workspace-worker.js`.
+3. **GitHub PATs** (one-time): fine-grained on the user `richmondbot2000-prog`, `Contents: read+write` on `togetherbook` only. Same token is reused by both Workers as `GITHUB_TOKEN` secret. **Watch for the `read`-only foot-gun**: if the token has `Contents: read`, the audit log, admin commits, and photo commits all silent-fail. Re-issue with write if you ever see "personal access token" 403s.
+4. **Cloudflare API token** (one-time, for Access auto-sync): https://dash.cloudflare.com/profile/api-tokens → Custom token → permission `Account: Access: Apps and Policies: Edit` → scope to the togetherbook.net account. Paste into the workspace worker's `CLOUDFLARE_API_TOKEN` secret. Also save to `~/.togetherbook/cloudflare.json` (with the account ID) for ad-hoc CLI use by future Claude sessions.
+5. **Cloudflare Workers** (two of them):
+   - `apifk-workspace-worker2` — route `book.togetherbook.net/api/workspace/*`. Secrets: `GOOGLE_SERVICE_ACCOUNT_JSON`, `GITHUB_TOKEN`, `CLOUDFLARE_API_TOKEN`. Vars: `IMPERSONATE_USER` (`james.benamor@letme.co.uk`), `IMPERSONATE_USER_TOGETHERLOANS` (a TL super-admin). KV binding `PAYROLL_KV` → `apifk-payroll` namespace. Code: `worker/workspace-worker.js`.
    - `shiny-heart-00f8` (annotations) — route `book.togetherbook.net/api/annotations*`. Bindings: `GITHUB_TOKEN`. Code: `worker/annotations-worker.js`.
-5. **Cloudflare Access** application on the `togetherbook.net` zone with policy "Allow any `@letme.com` email" for the whole `book.togetherbook.net/*` path. The Worker enforces a stricter `ADMIN_EMAILS` for destructive actions on top.
-6. **GitHub Actions secrets** for the hourly refresh: `WORKSPACE_SERVICE_ACCOUNT_JSON`, `WORKSPACE_DELEGATE_USER`, `FABRIC_CLIENT_*`, `SMTP_USERNAME` / `SMTP_PASSWORD` (for the monthly payroll-request email).
+   - **Note:** `ADMIN_EMAILS` env var is **decommissioned** as of 2026-05-13. Don't re-add it. Admin list lives in `admins.json` in the repo.
+6. **Cloudflare Access** application on the `togetherbook.net` zone for `book.togetherbook.net/*`. One Allow policy named `Letme staff + Directory admins` with include rules: `email_domain: letme.com` + an explicit `email` entry for every non-`@letme.com` admin. **Auto-synced** by the workspace worker on every `admin-add` / `admin-remove`. Do not edit manually after initial setup — the next admin change will overwrite.
+7. **GitHub Actions secrets** for the hourly refresh: `WORKSPACE_SERVICE_ACCOUNT_JSON`, `WORKSPACE_DELEGATE_USER`, `FABRIC_CLIENT_*`, `SMTP_USERNAME` / `SMTP_PASSWORD` (for the monthly payroll-request email).
 
 Full setup walkthroughs:
 - `worker/SETUP.md` — annotations Worker (one-time, ~10 min)
