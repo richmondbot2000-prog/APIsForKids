@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778665023">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778665023">
-<link rel="stylesheet" href="quiet.css?v=1778665023">
-<link rel="stylesheet" href="quiet-extras.css?v=1778665023">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778665023">
+<link rel="stylesheet" href="style.css?v=1778665242">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778665242">
+<link rel="stylesheet" href="quiet.css?v=1778665242">
+<link rel="stylesheet" href="quiet-extras.css?v=1778665242">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778665242">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -80,54 +80,19 @@
   }
   .dir-health-row button:hover { text-decoration: none; }
 
-  /* Per-seat billing summary — three cards at the top of the page. The
-     dual-purpose statement of the Directory: track every user record AND
-     surface where the money is going. */
-  .dir-billing-summary {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
-    margin: 0 0 28px;
-  }
-  @media (max-width: 700px) {
-    .dir-billing-summary { grid-template-columns: 1fr; }
-  }
-  .dir-billing-card {
-    background: var(--bg-soft);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .dir-billing-card--live {
-    border-left: 4px solid #4A9A2E;
-  }
-  .dir-billing-card--suspended {
-    border-left: 4px solid var(--brass-600, #A47829);
-  }
-  .dir-billing-card--saved {
-    border-left: 4px solid var(--ink-700, #2C3E66);
-  }
-  .dir-billing-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.66rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+  /* Per-seat billing summary — single line of plain text. The user
+     explicitly asked for no cards, no colours, no surrounding prose. */
+  .dir-billing-line {
     color: var(--muted);
-  }
-  .dir-billing-value {
-    font-family: var(--font-display, "Newsreader", Georgia, serif);
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--ink);
-    line-height: 1.1;
-  }
-  .dir-billing-sub {
+    font-family: 'JetBrains Mono', monospace;
     font-size: 0.78rem;
-    color: var(--ink-soft);
-    font-style: italic;
+    margin: 0 0 16px;
+  }
+  .dir-billing-line b { color: var(--ink); font-weight: 700; }
+  .dir-filter-stack { display: flex; flex-direction: column; gap: 12px; }
+  #dirFilterToggle.is-active {
+    background: var(--accent);
+    color: var(--bg-soft);
   }
 
   /* Search + filter bar */
@@ -954,7 +919,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778665023" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778665242" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -983,50 +948,34 @@
 
       <div class="dir-health-panel" id="dirHealthPanel" hidden></div>
 
-      <div class="dir-billing-summary" id="dirBillingSummary" hidden>
-        <div class="dir-billing-card dir-billing-card--live">
-          <span class="dir-billing-label">Live Workspace seats</span>
-          <span class="dir-billing-value" id="dirBillingLive">—</span>
-          <span class="dir-billing-sub" id="dirBillingLiveSub"></span>
-        </div>
-        <div class="dir-billing-card dir-billing-card--suspended">
-          <span class="dir-billing-label">Suspended (not billed on Flex)</span>
-          <span class="dir-billing-value" id="dirBillingSuspended">—</span>
-          <span class="dir-billing-sub" id="dirBillingSuspendedSub"></span>
-        </div>
-        <div class="dir-billing-card dir-billing-card--saved">
-          <span class="dir-billing-label">Monthly cost on Flex</span>
-          <span class="dir-billing-value" id="dirBillingCost">—</span>
-          <span class="dir-billing-sub" id="dirBillingSaved"></span>
-        </div>
-      </div>
+      <p class="dir-billing-line" id="dirBillingLine" hidden></p>
 
       <div class="dir-controls" id="dirControls" hidden>
         <div class="dir-search-row">
           <input type="search" class="dir-search" id="dirSearch" placeholder="Search name, email, alias, title, department, payroll fields…">
+          <button type="button" class="dir-new-btn" id="dirFilterToggle" title="Show or hide the filter pills">Filter</button>
           <button type="button" class="dir-new-btn" id="dirExportBtn" title="Download the current directory state as CSV — useful for HR reconciliation">Export CSV</button>
           <button type="button" class="dir-new-btn" id="dirNewBtn" title="Create a new Google Workspace user">+ New user</button>
         </div>
-        <div class="dir-filter-row" id="dirStatusRow">
-          <span class="dir-filter-label">Status</span>
-          <button class="dir-pill dir-pill--status active" data-value="all">All <span class="dir-pill-count" id="dirStatusCountAll">0</span></button>
-          <button class="dir-pill dir-pill--status" data-value="active">Active <span class="dir-pill-count" id="dirStatusCountActive">0</span></button>
-          <button class="dir-pill dir-pill--status" data-value="suspended">Suspended <span class="dir-pill-count" id="dirStatusCountSuspended">0</span></button>
-        </div>
-        <div class="dir-filter-row" id="dirTenantRow">
-          <span class="dir-filter-label">Tenant</span>
-          <button class="dir-pill dir-pill--tenant active" data-value="all">All <span class="dir-pill-count" id="dirTenantCountAll">0</span></button>
-          <!-- tenant pills injected dynamically -->
-        </div>
-        <div class="dir-filter-row" id="dirWorkspaceRow" hidden>
-          <span class="dir-filter-label">Workspace</span>
-          <button class="dir-pill dir-pill--workspace active" data-value="all">All <span class="dir-pill-count" id="dirWorkspaceCountAll">0</span></button>
-          <!-- workspace tenant pills injected dynamically when staff.json has 2+ tenants -->
-        </div>
-        <div class="dir-filter-row" id="dirDeptRow">
-          <span class="dir-filter-label">Department</span>
-          <button class="dir-pill dir-pill--dept active" data-value="all">All <span class="dir-pill-count" id="dirCountAll">0</span></button>
-          <!-- department pills injected dynamically from the data -->
+        <div class="dir-filter-stack" id="dirFilterStack" hidden>
+          <div class="dir-filter-row" id="dirStatusRow">
+            <span class="dir-filter-label">Status</span>
+            <button class="dir-pill dir-pill--status active" data-value="all">All <span class="dir-pill-count" id="dirStatusCountAll">0</span></button>
+            <button class="dir-pill dir-pill--status" data-value="active">Active <span class="dir-pill-count" id="dirStatusCountActive">0</span></button>
+            <button class="dir-pill dir-pill--status" data-value="suspended">Suspended <span class="dir-pill-count" id="dirStatusCountSuspended">0</span></button>
+          </div>
+          <div class="dir-filter-row" id="dirTenantRow">
+            <span class="dir-filter-label">Tenant</span>
+            <button class="dir-pill dir-pill--tenant active" data-value="all">All <span class="dir-pill-count" id="dirTenantCountAll">0</span></button>
+          </div>
+          <div class="dir-filter-row" id="dirWorkspaceRow" hidden>
+            <span class="dir-filter-label">Workspace</span>
+            <button class="dir-pill dir-pill--workspace active" data-value="all">All <span class="dir-pill-count" id="dirWorkspaceCountAll">0</span></button>
+          </div>
+          <div class="dir-filter-row" id="dirDeptRow">
+            <span class="dir-filter-label">Department</span>
+            <button class="dir-pill dir-pill--dept active" data-value="all">All <span class="dir-pill-count" id="dirCountAll">0</span></button>
+          </div>
         </div>
       </div>
 
@@ -1428,10 +1377,41 @@
               return `${e.user.name || e.user.email} <code>${e.user.email}</code> — in: ${gs.map(g => escapeHtml(g.email)).join(", ")}`;
             }));
         } else if (kind === "active-no-payroll") {
-          showHealthDialog("Active users without a payroll record", activeNoPayroll.map(e => `${e.user.name || e.user.email} <code>${e.user.email}</code>`));
+          // Open a merge-picker per row so the user can link a payroll record
+          // directly from the dialog. Headline of the dialog is the action.
+          openActiveNoPayrollMerger(activeNoPayroll);
         } else if (kind === "unclaimed-payroll") {
           showHealthDialog("Payroll records without a Workspace match", unclaimed.map(p => `${p.first_name} ${p.last_name} · ${p.employer || ""} ${p.email ? `(${p.email})` : ""}`));
         }
+      });
+    });
+  }
+
+  // Bulk-merge view: lists every active Workspace user with no payroll match,
+  // each line has a 'Link payroll…' button that opens the per-user picker.
+  function openActiveNoPayrollMerger(entries) {
+    const modal = document.getElementById("dirModal");
+    const rows = entries.map(e => `
+      <li>
+        <span class="dir-group-member-email"><strong>${escapeHtml(e.user.name || e.user.email)}</strong> <span class="dir-modal-saved-hint" style="display:inline;margin:0;padding:0;">${escapeHtml(e.user.email)}</span></span>
+        <button type="button" data-link-entry="${escapeHtml(e.user.email)}">Link payroll…</button>
+      </li>`).join("");
+    modal.innerHTML = `
+      <button class="dir-modal-close" type="button" data-close aria-label="Close">×</button>
+      <div class="dir-modal-head"><div><h2 class="dir-modal-name">Workspace users without a payroll match</h2><p class="dir-modal-title">${entries.length} user${entries.length === 1 ? "" : "s"}. Click <strong>Link payroll…</strong> to manually match one to a payroll record.</p></div></div>
+      <div class="dir-modal-section">
+        <ul class="dir-group-member-list">${rows || `<li class="dir-modal-saved-hint" style="text-align:left;margin:0;padding:8px 0;">All active Workspace users have a payroll match.</li>`}</ul>
+      </div>`;
+    const backdrop = document.getElementById("dirModalBackdrop");
+    backdrop.classList.add("open");
+    backdrop.setAttribute("aria-hidden", "false");
+    document.body.classList.add("dir-modal-open");
+    modal.querySelector("[data-close]").addEventListener("click", closeCard);
+    modal.querySelectorAll("[data-link-entry]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const email = btn.dataset.linkEntry;
+        const entry = allEntries.find(e => e.type === "staff" && e.user && (e.user.email || "").toLowerCase() === email.toLowerCase());
+        if (entry) openPayrollLinkPicker(entry);
       });
     });
   }
@@ -1456,25 +1436,11 @@
     if (!staffEntries.length) return;
     const live = staffEntries.filter(e => !e.user.suspended).length;
     const suspended = staffEntries.filter(e => e.user.suspended).length;
-    const routed = staffEntries.filter(e => e.user.suspended && forwardingByEmail[(e.user.email || "").toLowerCase()]).length;
     const monthly = live * SEAT_GBP_PER_MONTH;
-    const saved = suspended * SEAT_GBP_PER_MONTH;
     const fmtGbp = n => "£" + n.toLocaleString("en-GB");
-
-    document.getElementById("dirBillingLive").textContent = live;
-    document.getElementById("dirBillingLiveSub").textContent =
-      `${fmtGbp(monthly)}/mo @ ${fmtGbp(SEAT_GBP_PER_MONTH)}/seat`;
-    document.getElementById("dirBillingSuspended").textContent = suspended;
-    document.getElementById("dirBillingSuspendedSub").textContent =
-      suspended > 0
-        ? `${routed} of ${suspended} have forwarding set`
-        : `No leavers tracked here yet`;
-    document.getElementById("dirBillingCost").textContent = fmtGbp(monthly);
-    document.getElementById("dirBillingSaved").textContent =
-      saved > 0
-        ? `Avoiding ${fmtGbp(saved)}/mo from suspended accounts`
-        : `Edit SEAT_GBP_PER_MONTH in source if your plan differs`;
-    document.getElementById("dirBillingSummary").hidden = false;
+    const line = document.getElementById("dirBillingLine");
+    line.innerHTML = `<b>${live}</b> live · <b>${suspended}</b> suspended · <b>${fmtGbp(monthly)}</b>/mo`;
+    line.hidden = false;
   }
 
   function buildWorkspacePills(byWorkspace) {
@@ -3073,6 +3039,12 @@
   // "+ New user" button -> open the create-user modal.
   document.getElementById("dirNewBtn").addEventListener("click", openCreateModal);
   document.getElementById("dirExportBtn").addEventListener("click", exportDirectoryCsv);
+  document.getElementById("dirFilterToggle").addEventListener("click", e => {
+    const stack = document.getElementById("dirFilterStack");
+    const expanded = !stack.hidden;
+    stack.hidden = expanded;
+    e.currentTarget.classList.toggle("is-active", !expanded);
+  });
   // "+ New group" button -> open the create-group modal.
   document.getElementById("dirNewGroupBtn").addEventListener("click", openCreateGroupModal);
   document.getElementById("dirGroupSearch").addEventListener("input", e => {
