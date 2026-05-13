@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778660953">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778660953">
-<link rel="stylesheet" href="quiet.css?v=1778660953">
-<link rel="stylesheet" href="quiet-extras.css?v=1778660953">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778660953">
+<link rel="stylesheet" href="style.css?v=1778661907">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778661907">
+<link rel="stylesheet" href="quiet.css?v=1778661907">
+<link rel="stylesheet" href="quiet-extras.css?v=1778661907">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778661907">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -871,7 +871,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778660953" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778661907" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1316,8 +1316,16 @@
     return true;
   }
 
-  function rowMetaHtml(a, key) {
+  function rowMetaHtml(a, key, entry) {
     const ann = annotationFor(key);
+    // Phone + start can come from annotations (winner) or payroll (fallback).
+    // Whichever source they're from, surface them in the row meta so the
+    // info is visible without opening the card.
+    const payroll = entry ? payrollFor(entry) : null;
+    const phone = ann.phone || (payroll && payroll.mobile) || "";
+    const startDate = ann.start_date || (payroll && payroll.start_date) || "";
+    const phoneSource = ann.phone ? "" : (phone ? " (payroll)" : "");
+    const startSource = ann.start_date ? "" : (startDate ? " (payroll)" : "");
     const parts = [];
     if (a) {
       const lastDate = a.last_active_utc
@@ -1328,13 +1336,13 @@
       if (tenants) parts.push(`<span class="dir-tenants">${tenants}</span>`);
       if (a.top_warehouse) parts.push(`<span class="dir-warehouse">mostly <em>${escapeHtml(a.top_warehouse)}</em></span>`);
     }
-    if (ann.phone) parts.push(`<span class="dir-note">phone <b>${escapeHtml(ann.phone)}</b></span>`);
-    if (ann.start_date) {
-      const d = new Date(ann.start_date);
+    if (phone) parts.push(`<span class="dir-note">phone <b>${escapeHtml(phone)}</b>${phoneSource}</span>`);
+    if (startDate) {
+      const d = new Date(startDate);
       const label = isNaN(d.getTime())
-        ? ann.start_date
+        ? startDate
         : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-      parts.push(`<span class="dir-note">started <b>${escapeHtml(label)}</b></span>`);
+      parts.push(`<span class="dir-note">started <b>${escapeHtml(label)}</b>${startSource}</span>`);
     }
     return parts.length ? `<div class="dir-row-meta">${parts.join("")}</div>` : "";
   }
@@ -1398,7 +1406,7 @@
             ${emailHtml}
             ${forwardChip}
           </div>
-          ${rowMetaHtml(a, u.email)}
+          ${rowMetaHtml(a, u.email, entry)}
         </div>
         <div class="dir-row-aside">${departmentChip}${workspaceChip}</div>
       </button>
@@ -1421,7 +1429,7 @@
             <span class="dir-title">no Workspace account</span>
             <span class="dir-email">${escapeHtml(username)}</span>
           </div>
-          ${rowMetaHtml(a, username)}
+          ${rowMetaHtml(a, username, entry)}
         </div>
         <div class="dir-row-aside"></div>
       </button>
@@ -1824,10 +1832,14 @@
         <div class="dir-modal-section">
           <h3>Manage Workspace account</h3>
           ${u.suspended
-            ? `<div class="dir-manage-actions">
+            ? (() => {
+                const memberOf = groupsForUser(u);
+                return `<div class="dir-manage-actions">
                  <button type="button" data-action="unsuspend">Unsuspend (turn forwarding off)</button>
+                 ${memberOf.length ? `<button type="button" class="danger" data-action="purge-groups">Remove from ${memberOf.length} group${memberOf.length === 1 ? "" : "s"}</button>` : ""}
                </div>
-               <p class="dir-modal-saved-hint">${forwardTo ? `Currently forwards to <code>${escapeHtml(forwardTo)}</code>. ` : ""}Unsuspending re-enables direct mailbox delivery and disables the forward.</p>`
+               <p class="dir-modal-saved-hint">${forwardTo ? `Currently forwards to <code>${escapeHtml(forwardTo)}</code>. ` : ""}Unsuspending re-enables direct mailbox delivery and disables the forward.${memberOf.length ? ` Leavers should typically be removed from all groups too — ${memberOf.length} membership${memberOf.length === 1 ? "" : "s"} still active.` : ""}</p>`;
+              })()
             : `<div class="dir-form-row">
                  <label for="dirRouteTo">Forward mail to</label>
                  <input id="dirRouteTo" name="route_to" type="email" placeholder="Type a colleague's email" list="dirRouteOptions" autocomplete="off">
@@ -1888,6 +1900,25 @@
     // Unsuspend doesn't need confirmation — it's reversible and non-destructive.
     if (action === "unsuspend") {
       runAction(entry, action, slot, {});
+      return;
+    }
+
+    if (action === "purge-groups") {
+      const memberOf = groupsForUser(u);
+      if (!memberOf.length) return;
+      slot.innerHTML = `
+        <div class="dir-confirm">
+          <div class="dir-confirm-text">
+            <strong>Remove ${escapeHtml(u.email)} from all ${memberOf.length} groups?</strong><br>
+            <span class="dir-modal-saved-hint" style="text-align:left;margin:0;">${memberOf.map(g => escapeHtml(g.email)).join(", ")}</span>
+          </div>
+          <div class="dir-confirm-actions">
+            <button type="button" data-cancel>Cancel</button>
+            <button type="button" class="confirm" data-confirm>Remove from all</button>
+          </div>
+        </div>`;
+      slot.querySelector("[data-cancel]").addEventListener("click", () => { slot.innerHTML = ""; });
+      slot.querySelector("[data-confirm]").addEventListener("click", () => purgeGroupMemberships(entry, u, memberOf, slot));
       return;
     }
 
@@ -1960,6 +1991,41 @@
     } catch (err) {
       showModalBanner(`${verbLabel.replace(/ing$/, "")} failed — ${err.message || err}`, "error");
       modal.querySelectorAll("[data-action], [data-confirm]").forEach(b => b.disabled = false);
+    }
+  }
+
+  // Loop group-member-remove across every group the user belongs to. Failures
+  // continue rather than abort — the leaver-cleanup is best-effort and the
+  // banner summarises wins + losses at the end.
+  async function purgeGroupMemberships(entry, u, memberOf, slot) {
+    const modal = document.getElementById("dirModal");
+    modal.querySelectorAll("[data-action], [data-confirm]").forEach(b => b.disabled = true);
+    const targetEmail = (u.email || "").toLowerCase();
+    let ok = 0;
+    const failures = [];
+    for (const g of memberOf) {
+      // The user could be a member via primary OR an alias — try each candidate
+      // until one removal succeeds.
+      const candidates = [u.email, ...(u.aliases || [])].filter(Boolean).map(s => s.toLowerCase());
+      const memberEmail = (g.members || []).find(m => candidates.includes((m.email || "").toLowerCase()))?.email || u.email;
+      try {
+        await workspaceAction("group-member-remove", { group_email: g.email, member_email: memberEmail });
+        // Optimistic update of in-memory state
+        g.members = (g.members || []).filter(m => m.email !== memberEmail);
+        g.member_count = g.members.length;
+        ok++;
+      } catch (err) {
+        failures.push(`${g.email}: ${err.message || err}`);
+      }
+    }
+    buildGroupMembershipIndex();
+    renderGroupsSection();
+    if (slot) slot.innerHTML = "";
+    openCard(entryKey(entry));
+    if (failures.length === 0) {
+      showModalBanner(`Removed ${u.email} from ${ok} group${ok === 1 ? "" : "s"}.`, "success");
+    } else {
+      showModalBanner(`Removed from ${ok} group${ok === 1 ? "" : "s"}; ${failures.length} failed: ${failures.join("; ")}`, ok > 0 ? "success" : "error");
     }
   }
 
