@@ -333,6 +333,15 @@ async function doResetPassword(token, body) {
 //      "Aliases of deleted users are not reserved").
 //   3. Create the Group at the freed original address.
 //   4. Add the forward target as a member.
+// Step 1 of convert-to-group: rename the user to a parked address, then
+// delete the renamed user. Google then locks the original address for
+// 20 days. After that period a daily cron creates the Group + adds the
+// forward target as a member (see scripts/finalise_pending_conversions.py).
+//
+// The page is expected to also record the pending conversion in
+// annotations.json (so the cron has everything it needs: forward_to +
+// scheduled_for). The Worker only handles the part that requires admin
+// API access; everything else is page + cron.
 async function doConvertToGroup(token, body) {
   if (!body.email) return { ok: false, error: "missing email" };
   if (!body.forward_to) return { ok: false, error: "missing forward_to" };
@@ -343,9 +352,8 @@ async function doConvertToGroup(token, body) {
   if (!local || !domain) return { ok: false, error: "email parse failed" };
   const parkedEmail = `${local}.parked.${Math.floor(Date.now() / 1000)}@${domain}`;
 
-  // 1. Look up the immutable user id (we need it for the delete step,
-  //    because the renamed primary email isn't immediately queryable due
-  //    to propagation lag).
+  // Look up the immutable user id for the delete step (the renamed primary
+  // isn't immediately queryable).
   let userId = body.user_id || null;
   if (!userId) {
     const fetched = await adminApi(token, "GET", `users/${encodeURIComponent(body.email)}`);
@@ -354,52 +362,32 @@ async function doConvertToGroup(token, body) {
     if (!userId) return { ok: false, error: "user record has no immutable id — can't proceed safely" };
   }
 
-  // 2. Rename
+  // Rename to a parked address.
   const ren = await adminApi(token, "PUT", `users/${encodeURIComponent(body.email)}`, {
     primaryEmail: parkedEmail,
   });
   if (!ren.ok) return { ok: false, error: "rename user: " + ren.error };
 
-  // 3. Delete the renamed user BY IMMUTABLE ID (the new primary isn't
-  //    queryable yet). 20-day lockout applies to the parked primary; the
-  //    original-email alias is released immediately.
+  // Delete the renamed user. The original address goes into 20-day lockout —
+  // unavoidable in Google's API surface. The page records a pending
+  // conversion which the daily cron will finalise once the window expires.
   const del = await adminApi(token, "DELETE", `users/${encodeURIComponent(userId)}`);
   if (!del.ok) {
     return { ok: false, error: "delete parked user (id=" + userId + ", renamed to " + parkedEmail + "): " + del.error };
   }
 
-  // 3. Create the Group at the freed original address.
-  const groupName = body.name || (local.replace(/[._-]+/g, " ") + " (ex-employee)");
-  const groupDescription = body.description ||
-    `Forwarding-only group at ${body.email}. The Workspace user was converted on ${new Date().toISOString().slice(0, 10)} — original mailbox is in Vault retention for 25 days, then unrecoverable.`;
-  const grp = await adminApi(token, "POST", "groups", {
-    email: body.email,
-    name: groupName,
-    description: groupDescription,
-  });
-  if (!grp.ok) {
-    return {
-      ok: false,
-      error: "create group: " + grp.error +
-        ". The renamed user has been deleted (recoverable via admin.google.com → Recently deleted within 20 days using " + parkedEmail + ").",
-    };
-  }
-
-  // 4. Add the forward target as a member.
-  const mem = await adminApi(token, "POST", `groups/${encodeURIComponent(body.email)}/members`, {
-    email: body.forward_to,
-    role: "MEMBER",
-  });
-  if (!mem.ok) {
-    return { ok: false, error: "group created but member add failed: " + mem.error };
-  }
-
+  // Compute the scheduled finalisation date (20 days + a 1-hour cushion).
+  const scheduledFor = new Date(Date.now() + (20 * 24 + 1) * 3600 * 1000).toISOString();
   return {
     ok: true,
     data: {
-      converted: true,
-      group_email: body.email,
-      member: body.forward_to,
+      stage: "pending",
+      original_email: body.email,
+      forward_to: body.forward_to,
+      parked_at: parkedEmail,
+      scheduled_for: scheduledFor,
+      message: "User deleted. Mail will bounce until " + scheduledFor.slice(0, 10) +
+               " (Google's 20-day address-reuse lockout). The cron will create the forwarding group on that date.",
     },
   };
 }

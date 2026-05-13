@@ -1,0 +1,57 @@
+name: Finalise pending convert-to-group operations
+
+# Each day this checks annotations.json for any pending convert-to-group
+# entries whose 20-day Google email-reuse lockout has elapsed, and creates
+# the forwarding-only Group at the (now-freed) original address.
+
+on:
+  schedule:
+    - cron: '30 6 * * *'   # 06:30 UTC daily — well clear of the other refreshes
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: finalise-pending-conversions
+  cancel-in-progress: false
+
+jobs:
+  finalise:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: pip install --quiet 'google-api-python-client>=2.100' 'google-auth>=2.30'
+
+      - name: Run
+        env:
+          WORKSPACE_SERVICE_ACCOUNT_JSON: ${{ secrets.WORKSPACE_SERVICE_ACCOUNT_JSON }}
+          WORKSPACE_DELEGATE_USER:        ${{ secrets.WORKSPACE_DELEGATE_USER }}
+        run: python scripts/finalise_pending_conversions.py
+
+      - name: Commit if annotations.json changed
+        run: |
+          set -euo pipefail
+          git add annotations.json
+          if git diff --cached --quiet -- annotations.json; then
+            echo "no changes — nothing to commit"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "Finalise pending convert-to-group conversions"
+          for attempt in 1 2 3; do
+            if git push; then break; fi
+            if [ "$attempt" -eq 3 ]; then echo "::error::Push failed"; exit 1; fi
+            git fetch origin main && git rebase origin/main
+          done

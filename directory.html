@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778680926">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778680926">
-<link rel="stylesheet" href="quiet.css?v=1778680926">
-<link rel="stylesheet" href="quiet-extras.css?v=1778680926">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778680926">
+<link rel="stylesheet" href="style.css?v=1778682215">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778682215">
+<link rel="stylesheet" href="quiet.css?v=1778682215">
+<link rel="stylesheet" href="quiet-extras.css?v=1778682215">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778682215">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -973,7 +973,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778680926" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778682215" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1269,6 +1269,23 @@
 
       // Groups section
       allGroups = (groupsFile && Array.isArray(groupsFile.groups)) ? groupsFile.groups : [];
+      // Synthesise pending-conversion entries from annotations.json so the
+      // Groups section shows in-progress conversions (between page-side
+      // delete + cron-side group create).
+      for (const [k, ann] of Object.entries(annotationsMap)) {
+        if (!ann || !ann.pending_conversion) continue;
+        if (allGroups.some(g => (g.email || "").toLowerCase() === k.toLowerCase())) continue;
+        allGroups.push({
+          email: k,
+          name: (k.split("@")[0] || "ex").replace(/[._-]+/g, " ") + " (pending forward)",
+          description: "",
+          tenant: "",
+          aliases: [],
+          member_count: 0,
+          members: [],
+          _pending_conversion: ann.pending_conversion,
+        });
+      }
       buildGroupMembershipIndex();
       renderGroupsSection();
     })
@@ -2721,24 +2738,48 @@
   async function runConvertToGroupNow(entry, u, forwardTo, slot) {
     const modal = document.getElementById("dirModal");
     modal.querySelectorAll("[data-action], [data-confirm]").forEach(b => b.disabled = true);
-    showModalBanner(`Converting ${u.email} to a forwarding group…`, "info");
+    showModalBanner(`Converting ${u.email}…`, "info");
     try {
-      await workspaceAction("convert-to-group", {
+      const result = await workspaceAction("convert-to-group", {
         email: u.email,
         forward_to: forwardTo,
         ...(u.id ? { user_id: u.id } : {}),
       });
+      const data = (result && result.data) || {};
+      const scheduledFor = data.scheduled_for || new Date(Date.now() + 21 * 86400000).toISOString();
+      const parkedAt = data.parked_at || "";
+
+      // Record the pending conversion in annotations.json (which has reliable
+      // writes). The daily cron picks these up to finalise once Google
+      // releases the 20-day lockout.
+      const lcEmail = u.email.toLowerCase();
+      annotationsMap[lcEmail] = annotationsMap[lcEmail] || {};
+      annotationsMap[lcEmail].pending_conversion = {
+        forward_to: forwardTo,
+        scheduled_for: scheduledFor,
+        parked_at: parkedAt,
+        deleted_at: new Date().toISOString(),
+      };
+      saveAnnotationRemote(lcEmail, undefined, undefined, {
+        pending_conversion: annotationsMap[lcEmail].pending_conversion,
+      }).catch(err => console.warn("pending_conversion save failed", err));
+
+      // Remove the deleted user from in-memory state. Add a synthetic
+      // pending entry to the Groups section so the user sees something.
       const idx = allEntries.findIndex(e => e === entry);
       if (idx >= 0) allEntries.splice(idx, 1);
       allGroups.push({
         email: u.email,
-        name: (u.email.split("@")[0] || "ex").replace(/[._-]+/g, " ") + " (ex-employee)",
-        description: `Forwarding-only group at ${u.email}. Created on ${new Date().toISOString().slice(0, 10)} after the Workspace user was offboarded.`,
+        name: (u.email.split("@")[0] || "ex").replace(/[._-]+/g, " ") + " (pending forward)",
+        description: "",
         tenant: "",
         aliases: [],
-        member_count: 1,
-        members: [{ email: forwardTo, role: "MEMBER", type: "USER", status: "ACTIVE" }],
-        _converted: true,
+        member_count: 0,
+        members: [],
+        _pending_conversion: {
+          forward_to: forwardTo,
+          scheduled_for: scheduledFor,
+        },
       });
       buildGroupMembershipIndex();
       renderGroupsSection();
@@ -2746,8 +2787,9 @@
       renderStatusPills();
       renderHealth();
       renderGrid();
-      showModalBanner(`${u.email} is now a Group forwarding to ${forwardTo}. £0/month.`, "success");
-      setTimeout(closeCard, 1800);
+      const days = Math.max(0, Math.ceil((new Date(scheduledFor).getTime() - Date.now()) / 86400000));
+      showModalBanner(`${u.email} deleted. Forwarding group activates on ${scheduledFor.slice(0, 10)} (${days} days). Mail bounces until then.`, "success");
+      setTimeout(closeCard, 2800);
     } catch (err) {
       showModalBanner(`Convert failed — ${err.message || err}`, "error");
       modal.querySelectorAll("[data-action], [data-confirm]").forEach(b => b.disabled = false);
@@ -3188,20 +3230,23 @@
   }
 
   function renderGroupRow(g) {
-    // Identify groups by EMAIL — the address is what matters operationally.
-    // The Workspace 'name' field is descriptive admin metadata and not
-    // useful when scanning a list of forwarding-only / distribution-list groups.
     const local = (g.email || "").split("@")[0] || "G";
     const initials = local.split(/[._-]+/).filter(Boolean).slice(0, 2).map(t => t.charAt(0).toUpperCase()).join("") || "G";
-    const isEx = isExEmployeeGroup(g);
-    const isDead = isDefunctGroup(g);
+    const isPending = !!g._pending_conversion;
+    const isEx = !isPending && isExEmployeeGroup(g);
+    const isDead = !isPending && isDefunctGroup(g);
     const exChip = isEx
-      ? `<span class="dir-ex-chip" title="This group was created by converting a Workspace user. Mail to this address forwards to the listed member(s) at £0/month.">ex-employee</span>`
+      ? `<span class="dir-ex-chip" title="Forwarding-only group from a converted Workspace user.">ex-employee</span>`
       : "";
     const deadChip = isDead
       ? `<span class="dir-defunct-chip" title="No current Workspace user matches any member of this group — mail to this address goes nowhere reachable. Either add a live member or delete the group.">defunct</span>`
       : "";
-    const classes = `dir-row dir-row--group${isDead ? " dir-row--defunct" : ""}`;
+    let pendingChip = "";
+    if (isPending) {
+      const days = Math.max(0, Math.ceil((new Date(g._pending_conversion.scheduled_for).getTime() - Date.now()) / 86400000));
+      pendingChip = `<span class="dir-defunct-chip" style="color:var(--manuscript-red);border-color:var(--manuscript-red);" title="User has been deleted. Google's 20-day address-reuse lockout is in effect. Forwarding group will be created on ${escapeHtml(g._pending_conversion.scheduled_for.slice(0, 10))}.">pending · ${days}d left</span>`;
+    }
+    const classes = `dir-row dir-row--group${isPending || isDead ? " dir-row--defunct" : ""}`;
     return `
       <button type="button" class="${classes}" data-group="${escapeHtml(g.email)}" title="View group ${escapeHtml(g.email)}">
         <div class="dir-photo-placeholder">${escapeHtml(initials)}</div>
@@ -3209,6 +3254,7 @@
           <div class="dir-row-headline">
             <span class="dir-name" style="font-family:'JetBrains Mono',monospace;font-weight:500;">${escapeHtml(g.email)}</span>
             ${exChip}
+            ${pendingChip}
             ${deadChip}
           </div>
           <div class="dir-row-meta">
