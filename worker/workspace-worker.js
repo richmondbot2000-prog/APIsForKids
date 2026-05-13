@@ -29,7 +29,23 @@
 
 const REPO = "richmondbot2000-prog/togetherbook";
 const AUDIT_PATH = "workspace-actions.json";
+const ADMINS_PATH = "admins.json";
 const BRANCH = "main";
+
+// The Owner is a special hardcoded admin who:
+//   1. Is always treated as an admin even if absent from admins.json
+//   2. Cannot be removed from admins by anyone (including themselves via API)
+//   3. Cannot be suspended, password-reset, or have their admin flag changed
+//      by anyone but themselves
+// This is the "you can't lock yourself out of your own system" safety latch.
+const OWNER_EMAIL = "james.benamor@letme.co.uk";
+const OWNER_PROTECTED_ACTIONS = new Set([
+  "suspend-and-route",
+  "suspend-no-forward",
+  "reset-password",
+  "admin-add",
+  "admin-remove",
+]);
 
 const ADMIN_SCOPES = [
   "https://www.googleapis.com/auth/admin.directory.user",
@@ -89,11 +105,82 @@ export default {
       return json({ error: "not authenticated via Cloudflare Access" }, 401, req);
     }
 
+    const url = new URL(req.url);
+    const action = url.pathname.replace(/^\/api\/workspace\/?/, "").replace(/\/$/, "");
+
     const actor = (req.headers.get("Cf-Access-Authenticated-User-Email") || "").toLowerCase();
-    const adminEmails = (env.ADMIN_EMAILS || "")
-      .split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
-    if (!adminEmails.includes(actor)) {
-      return json({ error: `not authorized — ${actor || "(no email)"} is not in ADMIN_EMAILS` }, 403, req);
+    const ownerLc = OWNER_EMAIL.toLowerCase();
+    const isOwner = actor === ownerLc;
+    const admins = await fetchAdmins();
+    const isAdmin = admins.includes(actor);
+
+    // `whoami` is the one open endpoint: any Cloudflare-Access-authenticated
+    // user can ask "who am I, and do I have admin rights here?" so the page
+    // can branch its UI accordingly. No admin check, no Google token needed.
+    // Admins also get the full admin list so the page can render per-row
+    // admin toggles without a second round-trip.
+    if (action === "whoami") {
+      return json({
+        ok: true,
+        email: actor,
+        is_admin: isAdmin,
+        is_owner: isOwner,
+        owner: ownerLc,
+        admins: isAdmin ? admins : null,
+      }, 200, req);
+    }
+
+    // `list-admins` is admin-only but doesn't need a Google token.
+    if (action === "list-admins") {
+      if (!isAdmin) return json({ error: "admin required" }, 403, req);
+      return json({ ok: true, admins, owner: ownerLc }, 200, req);
+    }
+
+    // Everything else requires admin status.
+    if (!isAdmin) {
+      return json({ error: `not authorized — ${actor || "(no email)"} is not an admin. Ask an admin to grant access.` }, 403, req);
+    }
+
+    let body;
+    try { body = await req.json(); }
+    catch { return json({ error: "invalid JSON body" }, 400, req); }
+
+    // Owner-protection: suspend, password reset, and admin flag changes ON
+    // the owner require the actor to BE the owner. Stops a rogue admin from
+    // locking the owner out of their own system.
+    if (OWNER_PROTECTED_ACTIONS.has(action)) {
+      const target = ((body.email || body.target_email || "") + "").toLowerCase();
+      if (target === ownerLc && !isOwner) {
+        return json({ error: "this action on the owner can only be performed by the owner themselves" }, 403, req);
+      }
+    }
+
+    // admin-add / admin-remove don't need a Google token; handle them before
+    // we waste the JWT exchange. The owner is also protected from being
+    // removed even when the actor IS the owner — we don't want to brick the
+    // system by an accidental click.
+    if (action === "admin-add" || action === "admin-remove") {
+      if (action === "admin-remove"
+          && (body.target_email || "").toLowerCase() === ownerLc) {
+        return json({ error: "the owner cannot be removed from admins" }, 403, req);
+      }
+      let result;
+      try {
+        result = await modifyAdminList(env, action, body.target_email, actor);
+      } catch (e) {
+        result = { ok: false, error: e.message };
+      }
+      try {
+        await appendAudit(env, {
+          ts: new Date().toISOString(),
+          actor,
+          action,
+          target: (body.target_email || "").toLowerCase(),
+          ok: !!result.ok,
+          ...(result.ok ? {} : { error: String(result.error || "").slice(0, 300) }),
+        });
+      } catch (e) {}
+      return json(result, result.ok ? 200 : 400, req);
     }
 
     if (!env.GOOGLE_SERVICE_ACCOUNT_JSON) {
@@ -102,13 +189,6 @@ export default {
     if (!env.IMPERSONATE_USER) {
       return json({ error: "IMPERSONATE_USER var not configured" }, 500, req);
     }
-
-    const url = new URL(req.url);
-    const action = url.pathname.replace(/^\/api\/workspace\/?/, "").replace(/\/$/, "");
-
-    let body;
-    try { body = await req.json(); }
-    catch { return json({ error: "invalid JSON body" }, 400, req); }
 
     // Tenant-aware impersonation: the page sends body.tenant for any
     // user-targeting action. Together Loans uses a different super-admin
@@ -657,6 +737,111 @@ async function getGoogleAccessToken(env, subject, scope) {
     throw new Error(`token exchange ${res.status}: ${(await res.text()).slice(0, 300)}`);
   }
   return (await res.json()).access_token;
+}
+
+/* ----------- Admin list (admins.json in repo) ----------- */
+
+// Reads admins.json off main with a 60-second edge cache. Always includes
+// the hardcoded owner — that's the failsafe so an empty / missing /
+// malformed admins.json never locks them out.
+async function fetchAdmins() {
+  let list = [];
+  try {
+    const res = await fetch(
+      `https://raw.githubusercontent.com/${REPO}/${BRANCH}/${ADMINS_PATH}`,
+      { cf: { cacheTtl: 60, cacheEverything: true } },
+    );
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data.admins)) {
+        list = data.admins
+          .map(e => (e || "").toString().trim().toLowerCase())
+          .filter(Boolean);
+      }
+    }
+  } catch (e) { /* fall through with empty list */ }
+  const ownerLc = OWNER_EMAIL.toLowerCase();
+  if (!list.includes(ownerLc)) list.push(ownerLc);
+  return list;
+}
+
+// Commits an admin-add or admin-remove to admins.json via the GitHub
+// Contents API. Same SHA-then-PUT pattern as appendAudit. Caller is
+// responsible for the owner-protection check (see fetch handler).
+async function modifyAdminList(env, action, targetRaw, actor) {
+  if (!env.GITHUB_TOKEN) {
+    return { ok: false, error: "GITHUB_TOKEN secret not configured on this Worker — admin list can't be modified" };
+  }
+  const target = (targetRaw || "").toString().trim().toLowerCase();
+  if (!target || !target.includes("@")) {
+    return { ok: false, error: "missing or invalid target_email" };
+  }
+
+  const ghHeaders = {
+    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "apifk-workspace-worker",
+  };
+
+  const getRes = await fetch(
+    `https://api.github.com/repos/${REPO}/contents/${ADMINS_PATH}?ref=${BRANCH}`,
+    { headers: ghHeaders },
+  );
+  let current = { schema_version: 1, updated_at: null, admins: [] };
+  let sha = null;
+  if (getRes.ok) {
+    const data = await getRes.json();
+    sha = data.sha;
+    try { current = JSON.parse(atob(data.content.replace(/\s/g, ""))); }
+    catch (e) {}
+  } else if (getRes.status !== 404) {
+    return { ok: false, error: `failed to read admins.json: ${getRes.status}` };
+  }
+  let admins = Array.isArray(current.admins)
+    ? current.admins.map(e => (e || "").toString().trim().toLowerCase()).filter(Boolean)
+    : [];
+
+  if (action === "admin-add") {
+    if (admins.includes(target)) {
+      return { ok: true, admins, no_op: true, message: `${target} is already an admin` };
+    }
+    admins.push(target);
+  } else if (action === "admin-remove") {
+    if (!admins.includes(target)) {
+      return { ok: true, admins, no_op: true, message: `${target} is not currently an admin` };
+    }
+    admins = admins.filter(e => e !== target);
+  }
+  admins.sort();
+
+  const out = {
+    schema_version: 1,
+    updated_at: new Date().toISOString(),
+    admins,
+  };
+  const newContent = b64Encode(JSON.stringify(out, null, 2) + "\n");
+  const msg = action === "admin-add"
+    ? `Admin granted: ${target} (by ${actor})`
+    : `Admin revoked: ${target} (by ${actor})`;
+
+  const putRes = await fetch(
+    `https://api.github.com/repos/${REPO}/contents/${ADMINS_PATH}`,
+    {
+      method: "PUT",
+      headers: { ...ghHeaders, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: msg,
+        content: newContent,
+        branch: BRANCH,
+        sha: sha || undefined,
+      }),
+    },
+  );
+  if (!putRes.ok) {
+    const detail = (await putRes.text()).slice(0, 200);
+    return { ok: false, error: `failed to commit admins.json (${putRes.status}): ${detail}` };
+  }
+  return { ok: true, admins, target, action };
 }
 
 /* ----------- Audit log ----------- */

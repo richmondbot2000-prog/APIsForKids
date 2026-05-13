@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778700375">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778700375">
-<link rel="stylesheet" href="quiet.css?v=1778700375">
-<link rel="stylesheet" href="quiet-extras.css?v=1778700375">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778700375">
+<link rel="stylesheet" href="style.css?v=1778701974">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778701974">
+<link rel="stylesheet" href="quiet.css?v=1778701974">
+<link rel="stylesheet" href="quiet-extras.css?v=1778701974">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778701974">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -1065,7 +1065,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778700375" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778701974" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1164,12 +1164,52 @@
   let activeStatus = "all";       // all | active | suspended
   let searchTerm = "";
 
+  // Viewer identity, learned from /api/workspace/whoami on page load. Until
+  // whoami resolves we assume the viewer is NOT an admin so any admin-only
+  // UI is hidden by default (fail-closed). The page works fine without it —
+  // worker enforces the real gate on every mutating call.
+  let viewerEmail = "";
+  let viewerIsAdmin = false;
+  let viewerIsOwner = false;
+  let viewerOwner = "";
+  let viewerAdmins = [];   // lowercase emails — only populated when viewerIsAdmin
+  function fetchWhoami() {
+    return fetch("/api/workspace/whoami", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}",
+    }).then(r => r.ok ? r.json() : null).catch(() => null).then(data => {
+      if (data && data.ok) {
+        viewerEmail = (data.email || "").toLowerCase();
+        viewerIsAdmin = !!data.is_admin;
+        viewerIsOwner = !!data.is_owner;
+        viewerOwner = (data.owner || "").toLowerCase();
+        viewerAdmins = Array.isArray(data.admins) ? data.admins.map(e => (e || "").toLowerCase()) : [];
+      }
+      return data;
+    });
+  }
+
   // Tenant priority: transform/together → RG internal (rgroup, rgdc, letme) → other.
   const tenantRank = t => {
     if (t === "transform" || t === "together") return 0;
     if (t === "rgroup" || t === "rgdc" || t === "letme") return 1;
     return 2;
   };
+
+  // Fire viewer-identity fetch in parallel with the data loads. Doesn't block
+  // initial render — if whoami is slow, the grid renders without admin UI and
+  // upgrades once whoami resolves (re-renders the open card if any).
+  fetchWhoami().then(() => {
+    // Hide the global "+ New user" button from non-admins.
+    const newBtn = document.getElementById("dirNewBtn");
+    if (newBtn) newBtn.hidden = !viewerIsAdmin;
+    const modal = document.getElementById("dirModal");
+    if (modal && modal.dataset.notesKey) {
+      // Re-open the active card so admin-only UI appears now we know identity.
+      openCard(modal.dataset.notesKey);
+    }
+  });
 
   Promise.all([
     fetch("staff.json", { cache: "no-store" }).then(r => r.ok ? r.json() : Promise.reject("staff.json HTTP " + r.status)),
@@ -2050,6 +2090,10 @@
     if (renamePanelLink) {
       renamePanelLink.addEventListener("click", () => openRenamePanel(entry));
     }
+    // Admin toggle (Make / Remove admin).
+    modal.querySelectorAll("[data-admin-toggle]").forEach(btn => {
+      btn.addEventListener("click", () => runAdminToggle(entry, btn.dataset.adminToggle, btn.dataset.adminTarget, btn));
+    });
 
     // For active users, check the live autoForwarding state via the Gmail
     // API and swap the Manage section into 'Live + forwarding active' mode
@@ -2279,6 +2323,11 @@
     // For a suspended account, the email no longer accepts direct delivery —
     // it forwards. Render it strikethrough and tag with the forward target.
     const isSuspended = !!(u && u.suspended);
+    // Owner-protection: when the target user IS the owner and the viewer is
+    // NOT the owner, hide suspend / reset-password / admin-toggle buttons —
+    // the worker would reject the call anyway, but hiding gives a cleaner UX.
+    const targetIsOwner = !!(u && viewerOwner && (u.email || "").toLowerCase() === viewerOwner);
+    const ownerProtected = targetIsOwner && !viewerIsOwner;
     const forwardTo = isSuspended ? forwardingByEmail[primaryEmail] : null;
     const emailDisplay = u
       ? (isSuspended
@@ -2298,7 +2347,7 @@
     const editableAliases = (u && Array.isArray(u.aliases_editable))
       ? u.aliases_editable.filter(a => a && a.toLowerCase() !== (u.email || "").toLowerCase())
       : [];
-    const canOfferAliasToGroup = !!(u && !u.suspended && !u.deletion_time && editableAliases.length);
+    const canOfferAliasToGroup = !!(u && viewerIsAdmin && !u.suspended && !u.deletion_time && editableAliases.length);
     const otherEmailsCell = otherEmails.length
       ? otherEmailHtml + (canOfferAliasToGroup
           ? `<div style="margin-top:6px;"><button type="button" class="dir-link-btn" data-open-alias-panel="1">Convert one to a group</button></div>`
@@ -2320,10 +2369,30 @@
       }
     }
 
-    const canOfferRename = !!(u && !u.suspended && !u.deletion_time);
+    const canOfferRename = !!(u && viewerIsAdmin && !u.suspended && !u.deletion_time);
     const renameLink = canOfferRename
       ? ` <button type="button" class="dir-link-btn" data-open-rename-panel="1" style="margin-left:8px;font-size:0.78rem;">Rename primary</button>`
       : "";
+
+    // TogetherBook admin status (separate from Google Workspace super-admin).
+    // Only visible to viewers who are themselves admins. Owner is uneditable
+    // by anyone (including themselves via the toggle); other rows get a
+    // Make admin / Remove admin button.
+    let tbAdminRow = "";
+    if (u && viewerIsAdmin) {
+      const targetLc = (u.email || "").toLowerCase();
+      const isTargetAdmin = !!(viewerAdmins && viewerAdmins.includes(targetLc));
+      const isTargetOwner = targetLc === viewerOwner;
+      let actionBtn = "";
+      if (isTargetOwner) {
+        actionBtn = `<span class="dir-modal-saved-hint" style="display:inline;margin:0 0 0 8px;">(owner — locked)</span>`;
+      } else if (isTargetAdmin) {
+        actionBtn = ` <button type="button" class="dir-link-btn" data-admin-toggle="remove" data-admin-target="${escapeHtml(targetLc)}" style="margin-left:8px;font-size:0.78rem;">Remove admin</button>`;
+      } else {
+        actionBtn = ` <button type="button" class="dir-link-btn" data-admin-toggle="add" data-admin-target="${escapeHtml(targetLc)}" style="margin-left:8px;font-size:0.78rem;">Make admin</button>`;
+      }
+      tbAdminRow = `<dt>Admin</dt><dd>${isTargetAdmin ? "yes" : "no"}${actionBtn}</dd>`;
+    }
 
     const workspaceDl = u ? `
       <dt>Email</dt><dd>${emailDisplay}${renameLink}</dd>
@@ -2332,7 +2401,8 @@
       ${u.department ? `<dt>Department</dt><dd>${escapeHtml(u.department)}</dd>` : ""}
       ${tenantList.length ? `<dt>Workspace</dt><dd>${tenantList.map(t => escapeHtml(t)).join(", ")}</dd>` : ""}
       <dt>Suspended</dt><dd>${yesno(u.suspended)}</dd>
-      <dt>Admin</dt><dd>${yesno(u.admin)}</dd>
+      ${u.admin ? `<dt>Google super-admin</dt><dd>yes</dd>` : ""}
+      ${tbAdminRow}
     ` : `
       <dt>Username</dt><dd>${escapeHtml(a.username || "—")}</dd>
       <dt>Workspace</dt><dd>none (warehouse-only operator)</dd>
@@ -2424,7 +2494,7 @@
           <dl class="dir-detail-grid">${activityDl}</dl>
         </div>` : ""}
 
-      ${u ? `
+      ${u && viewerIsAdmin ? `
         <div class="dir-modal-section">
           <h3>Manage Workspace account</h3>
           ${u.deletion_time
@@ -2450,10 +2520,12 @@
                  <datalist id="dirRouteOptions">${adminEmailOptions()}</datalist>
                </div>
                <div class="dir-manage-actions">
-                 <button type="button" class="danger" data-action="convert-and-forward">Suspend account and start forwarding (takes 21 days)</button>
+                 ${ownerProtected ? "" : `<button type="button" class="danger" data-action="convert-and-forward">Suspend account and start forwarding (takes 21 days)</button>`}
                  <button type="button" data-action="unsuspend">Move back to live (£11/mo)</button>
                </div>
-               <p class="dir-modal-saved-hint"><strong>Convert to group</strong> deletes the user immediately and creates a forwarding-only Group at this address after Google's 20-day address-reuse lockout. ~20 more days of bounced mail, then mail forwards to the target forever. £0/month. <br><strong>Move back to live</strong> resumes the £11/mo seat — use only if you want the account active again.</p>`
+               ${ownerProtected ? `<p class="dir-modal-saved-hint">Suspend actions on the owner are restricted to the owner themselves.</p>` : `<p class="dir-modal-saved-hint"><strong>Convert to group</strong> deletes the user immediately and creates a forwarding-only Group at this address after Google's 20-day address-reuse lockout. ~20 more days of bounced mail, then mail forwards to the target forever. £0/month. <br><strong>Move back to live</strong> resumes the £11/mo seat — use only if you want the account active again.</p>`}`
+            : ownerProtected
+            ? `<p class="dir-modal-saved-hint" style="text-align:left;margin:0;">Suspend actions on the owner are restricted to the owner themselves.</p>`
             : `<div id="dirManageLive">
                  <div class="dir-form-row">
                    <label for="dirRouteTo">Forward mail to</label>
@@ -2469,7 +2541,8 @@
           <div class="dir-confirm-slot"></div>
         </div>` : ""}
 
-      ${u && !u.deletion_time && !u.suspended ? `
+      ${u && viewerIsAdmin && !u.deletion_time && !u.suspended
+          && !((u.email || "").toLowerCase() === viewerOwner && !viewerIsOwner) ? `
         <div class="dir-modal-section">
           <h3>Password</h3>
           <div class="dir-manage-actions">
@@ -3366,6 +3439,35 @@
       commitBtn.textContent = "RENAME";
       closeBtn.disabled = false;
       showModalBanner(`Rename failed: ${err.message || err}`, "error");
+    }
+  }
+
+  // Grant or revoke another user's TogetherBook admin status. Worker commits
+  // admins.json to the repo; we patch viewerAdmins locally for instant feedback
+  // then re-render the open card.
+  async function runAdminToggle(entry, mode, targetEmail, btn) {
+    const target = (targetEmail || "").toLowerCase();
+    if (!target) return;
+    if (mode === "remove" && !confirm(`Remove admin rights from ${target}?`)) return;
+    btn.disabled = true;
+    const original = btn.textContent;
+    btn.textContent = mode === "add" ? "Granting…" : "Revoking…";
+    try {
+      const action = mode === "add" ? "admin-add" : "admin-remove";
+      const out = await workspaceAction(action, { target_email: target });
+      if (Array.isArray(out && out.admins)) {
+        viewerAdmins = out.admins.map(e => (e || "").toLowerCase());
+      } else if (mode === "add") {
+        if (!viewerAdmins.includes(target)) viewerAdmins.push(target);
+      } else {
+        viewerAdmins = viewerAdmins.filter(e => e !== target);
+      }
+      openCard(entryKey(entry));
+      showModalBanner(`${mode === "add" ? "Granted" : "Revoked"} admin for ${target}.`, "success");
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = original;
+      showModalBanner(`Admin change failed: ${err.message || err}`, "error");
     }
   }
 
