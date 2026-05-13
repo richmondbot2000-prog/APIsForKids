@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778704804">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778704804">
-<link rel="stylesheet" href="quiet.css?v=1778704804">
-<link rel="stylesheet" href="quiet-extras.css?v=1778704804">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778704804">
+<link rel="stylesheet" href="style.css?v=1778706251">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778706251">
+<link rel="stylesheet" href="quiet.css?v=1778706251">
+<link rel="stylesheet" href="quiet-extras.css?v=1778706251">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778706251">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -1065,7 +1065,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778704804" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778706251" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1855,8 +1855,9 @@
       (u.family || "").charAt(0)
     ).toUpperCase() || (u.email || "?").charAt(0).toUpperCase();
 
-    const photo = u.photo_url
-      ? `<img class="dir-photo" src="${escapeHtml(u.photo_url)}" alt="${escapeHtml(u.name)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=&quot;dir-photo-placeholder&quot;>${escapeHtml(initials)}</div>'">`
+    const photoSrc = dirPhotoUrl(u);
+    const photo = photoSrc
+      ? `<img class="dir-photo" src="${escapeHtml(photoSrc)}" alt="${escapeHtml(u.name)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=&quot;dir-photo-placeholder&quot;>${escapeHtml(initials)}</div>'">`
       : `<div class="dir-photo-placeholder">${escapeHtml(initials)}</div>`;
 
     // Only show the Workspace-tenant chip when 2+ tenants exist (avoids
@@ -1973,6 +1974,24 @@
     return entry.type === "staff" ? (entry.user.email || "") : (entry.activity.username || "");
   }
 
+  // Directory-only profile photo lookup. If an admin has uploaded a photo
+  // for this user, it lives at `assets/photos/<email-safe>.jpg` and the
+  // annotation records the upload timestamp (used as a cache-bust). Falls
+  // back to the Workspace thumbnail (Google's `photo_url`) when no upload
+  // exists.
+  function dirPhotoKey(email) {
+    return (email || "").toString().trim().toLowerCase().replace(/@/g, "_at_");
+  }
+  function dirPhotoUrl(u) {
+    if (!u) return "";
+    const email = (u.email || "").toLowerCase();
+    const ann = annotationsMap[email];
+    if (ann && ann.directory_photo_uploaded_at) {
+      return `assets/photos/${dirPhotoKey(email)}.jpg?v=${encodeURIComponent(ann.directory_photo_uploaded_at)}`;
+    }
+    return u.photo_url || "";
+  }
+
   // Return ALL payroll records that match this entry. Email is the strongest
   // key (only LetMe rows carry it); falls back to several normalised name
   // variants. Aliases live in the scanner; here we add a hyphenated-family
@@ -2045,6 +2064,9 @@
     if (opts && Object.prototype.hasOwnProperty.call(opts, "rename_decay")) {
       payload.rename_decay = opts.rename_decay;
     }
+    if (opts && Object.prototype.hasOwnProperty.call(opts, "directory_photo_uploaded_at")) {
+      payload.directory_photo_uploaded_at = opts.directory_photo_uploaded_at;
+    }
     const res = await fetch(ANNOTATIONS_API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -2103,6 +2125,11 @@
     modal.querySelectorAll("[data-admin-toggle]").forEach(btn => {
       btn.addEventListener("click", () => runAdminToggle(entry, btn.dataset.adminToggle, btn.dataset.adminTarget, btn));
     });
+    // Upload / Remove profile photo.
+    const photoUpBtn = modal.querySelector("[data-photo-upload]");
+    if (photoUpBtn) photoUpBtn.addEventListener("click", () => triggerPhotoUpload(entry));
+    const photoRmBtn = modal.querySelector("[data-photo-remove]");
+    if (photoRmBtn) photoRmBtn.addEventListener("click", () => runPhotoRemove(entry, photoRmBtn));
 
     // For active users, check the live autoForwarding state via the Gmail
     // API and swap the Manage section into 'Live + forwarding active' mode
@@ -2288,9 +2315,17 @@
       ? (((u.given || u.name || "?").charAt(0) + (u.family || "").charAt(0)).toUpperCase()
          || (u.email || "?").charAt(0).toUpperCase())
       : (((a.username || "?").charAt(0) + ((a.username || "").split(/[._-]/)[1]?.charAt(0) || "")).toUpperCase());
-    const photo = (u && u.photo_url)
-      ? `<img class="dir-photo" src="${escapeHtml(u.photo_url)}" alt="${escapeHtml(display)}" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=&quot;dir-photo-placeholder&quot;>${escapeHtml(initials)}</div>'">`
-      : `<div class="dir-photo-placeholder">${escapeHtml(initials)}</div>`;
+    const modalPhotoSrc = u ? dirPhotoUrl(u) : "";
+    const hasUploadedPhoto = !!(u && annotationsMap[(u.email || "").toLowerCase()] && annotationsMap[(u.email || "").toLowerCase()].directory_photo_uploaded_at);
+    const photoChangeLink = (u && viewerIsAdmin && !u.deletion_time)
+      ? `<div style="margin-top:6px;display:flex;gap:10px;flex-wrap:wrap;">
+           <button type="button" class="dir-link-btn" data-photo-upload="1" style="font-size:0.78rem;">${hasUploadedPhoto ? "Change photo" : "Upload photo"}</button>
+           ${hasUploadedPhoto ? `<button type="button" class="dir-link-btn" data-photo-remove="1" style="font-size:0.78rem;">Remove</button>` : ""}
+         </div>`
+      : "";
+    const photo = modalPhotoSrc
+      ? `<div><img class="dir-photo" src="${escapeHtml(modalPhotoSrc)}" alt="${escapeHtml(display)}" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=&quot;dir-photo-placeholder&quot;>${escapeHtml(initials)}</div>'">${photoChangeLink}</div>`
+      : `<div><div class="dir-photo-placeholder">${escapeHtml(initials)}</div>${photoChangeLink}</div>`;
 
     const fmtDateTime = s => {
       if (!s) return "—";
@@ -3456,6 +3491,102 @@
       commitBtn.textContent = "RENAME";
       closeBtn.disabled = false;
       showModalBanner(`Rename failed: ${err.message || err}`, "error");
+    }
+  }
+
+  // Open a file picker, resize the chosen image to 400x400 JPEG (so files
+  // stay small in git), and ship the base64 payload to the workspace worker
+  // for commit under `assets/photos/`. Then save an annotation timestamp so
+  // the page knows to load the override URL and the browser cache-busts.
+  function triggerPhotoUpload(entry) {
+    const u = entry.user;
+    if (!u || !u.email) return;
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.addEventListener("change", () => {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          // Resize so the longest side is at most 400px. Center-crop to a
+          // square so the result is always 400x400 — keeps cards uniform.
+          const size = 400;
+          const canvas = document.createElement("canvas");
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext("2d");
+          const minSide = Math.min(img.width, img.height);
+          const sx = (img.width - minSide) / 2;
+          const sy = (img.height - minSide) / 2;
+          ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
+          const b64 = dataUrl.split(",")[1] || "";
+          runPhotoUpload(entry, b64, dataUrl);
+        };
+        img.onerror = () => showModalBanner("Couldn't read that image — try a different file.", "error");
+        img.src = reader.result;
+      };
+      reader.onerror = () => showModalBanner("Couldn't read that file.", "error");
+      reader.readAsDataURL(file);
+    });
+    input.click();
+  }
+
+  async function runPhotoUpload(entry, b64, previewDataUrl) {
+    const u = entry.user;
+    showModalBanner("Uploading photo…", "success");
+    try {
+      const res = await workspaceAction("directory-photo-upload", {
+        user_email: u.email,
+        photo_b64: b64,
+      });
+      const ts = new Date().toISOString();
+      // Record the upload timestamp in annotations so the page knows to use
+      // the override URL and so browsers cache-bust after re-render.
+      try {
+        await saveAnnotationRemote(u.email, undefined, undefined, {
+          directory_photo_uploaded_at: ts,
+        });
+      } catch (e) { console.warn("photo annotation save failed", e); }
+      const cur = annotationsMap[(u.email || "").toLowerCase()] || {};
+      annotationsMap[(u.email || "").toLowerCase()] = { ...cur, directory_photo_uploaded_at: ts };
+      // Instant preview: swap the modal photo to the local FileReader result
+      // while we wait for GitHub Pages to deploy the committed file.
+      const modal = document.getElementById("dirModal");
+      const img = modal && modal.querySelector(".dir-photo");
+      if (img && previewDataUrl) img.src = previewDataUrl;
+      renderGrid();
+      showModalBanner("Photo uploaded. It will appear on every page within ~30s once GitHub Pages publishes.", "success");
+    } catch (err) {
+      showModalBanner(`Photo upload failed: ${err.message || err}`, "error");
+    }
+  }
+
+  async function runPhotoRemove(entry, btn) {
+    const u = entry.user;
+    if (!confirm(`Remove the uploaded photo for ${u.name || u.email}?`)) return;
+    btn.disabled = true;
+    btn.textContent = "Removing…";
+    try {
+      await workspaceAction("directory-photo-remove", { user_email: u.email });
+      try {
+        await saveAnnotationRemote(u.email, undefined, undefined, {
+          directory_photo_uploaded_at: "",
+        });
+      } catch (e) {}
+      const cur = annotationsMap[(u.email || "").toLowerCase()] || {};
+      delete cur.directory_photo_uploaded_at;
+      annotationsMap[(u.email || "").toLowerCase()] = cur;
+      openCard(entryKey(entry));
+      renderGrid();
+      showModalBanner("Photo removed — card reverts to the Workspace photo (or initials).", "success");
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = "Remove";
+      showModalBanner(`Photo remove failed: ${err.message || err}`, "error");
     }
   }
 

@@ -228,6 +228,8 @@ export default {
         case "user-alias-remove":    result = await doUserAliasRemove(adminToken, body); break;
         case "alias-to-group":       result = await doAliasToGroup(adminToken, body); break;
         case "rename-user":          result = await doRenameUser(adminToken, body); break;
+        case "directory-photo-upload": result = await doDirectoryPhotoUpload(env, body, actor); break;
+        case "directory-photo-remove": result = await doDirectoryPhotoRemove(env, body, actor); break;
         default:
           return json({ error: `unknown action: ${action}` }, 404, req);
       }
@@ -737,6 +739,123 @@ async function getGoogleAccessToken(env, subject, scope) {
     throw new Error(`token exchange ${res.status}: ${(await res.text()).slice(0, 300)}`);
   }
   return (await res.json()).access_token;
+}
+
+/* ----------- Directory-page profile photos ----------- */
+
+// Sanitise an email into a safe filename: lowercase, `@` -> `_at_`. The
+// path remains URL-safe and uniquely reversible.
+function photoFilename(email) {
+  return (email || "").toString().trim().toLowerCase().replace(/@/g, "_at_") + ".jpg";
+}
+
+// Upload a photo for use only on the Directory page (does NOT touch the
+// user's Google Workspace profile photo). Commits the file under
+// `assets/photos/` so GitHub Pages serves it directly.
+async function doDirectoryPhotoUpload(env, body, actor) {
+  if (!env.GITHUB_TOKEN) {
+    return { ok: false, error: "GITHUB_TOKEN secret not configured" };
+  }
+  const email = (body.user_email || "").toString().trim().toLowerCase();
+  if (!email || !email.includes("@")) {
+    return { ok: false, error: "missing or invalid user_email" };
+  }
+  const b64 = (body.photo_b64 || "").toString();
+  if (!b64) return { ok: false, error: "missing photo_b64" };
+  // GitHub's Contents API has a 100MB body limit but practical limits are
+  // much smaller. A 400x400 JPEG is typically <80 KB; cap raw base64 to
+  // 2 MB so a stray giant upload doesn't bloat the repo.
+  if (b64.length > 2 * 1024 * 1024) {
+    return { ok: false, error: `photo too large (${Math.round(b64.length / 1024)} KB base64) — resize client-side` };
+  }
+
+  const path = `assets/photos/${photoFilename(email)}`;
+  return await commitFile(env, path, b64, `Directory photo: upload ${email} (by ${actor})`);
+}
+
+// Remove an uploaded Directory photo, reverting the card to the Workspace
+// thumbnail (or initials placeholder).
+async function doDirectoryPhotoRemove(env, body, actor) {
+  if (!env.GITHUB_TOKEN) {
+    return { ok: false, error: "GITHUB_TOKEN secret not configured" };
+  }
+  const email = (body.user_email || "").toString().trim().toLowerCase();
+  if (!email || !email.includes("@")) {
+    return { ok: false, error: "missing or invalid user_email" };
+  }
+  const path = `assets/photos/${photoFilename(email)}`;
+
+  const ghHeaders = {
+    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "apifk-workspace-worker",
+  };
+  const getRes = await fetch(
+    `https://api.github.com/repos/${REPO}/contents/${path}?ref=${BRANCH}`,
+    { headers: ghHeaders },
+  );
+  if (getRes.status === 404) {
+    return { ok: true, no_op: true, message: "no photo to remove" };
+  }
+  if (!getRes.ok) {
+    return { ok: false, error: `failed to read photo: ${getRes.status}` };
+  }
+  const sha = (await getRes.json()).sha;
+  const delRes = await fetch(
+    `https://api.github.com/repos/${REPO}/contents/${path}`,
+    {
+      method: "DELETE",
+      headers: { ...ghHeaders, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: `Directory photo: remove ${email} (by ${actor})`,
+        sha,
+        branch: BRANCH,
+      }),
+    },
+  );
+  if (!delRes.ok) {
+    const detail = (await delRes.text()).slice(0, 200);
+    return { ok: false, error: `failed to delete (${delRes.status}): ${detail}` };
+  }
+  return { ok: true, path };
+}
+
+// Shared helper: PUT a file to the GitHub Contents API. Handles new files
+// (no SHA) and updates (must include SHA of the prior version).
+async function commitFile(env, path, b64Content, message) {
+  const ghHeaders = {
+    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "apifk-workspace-worker",
+  };
+  // Look up the existing SHA if the file is already in the repo.
+  let sha = null;
+  const getRes = await fetch(
+    `https://api.github.com/repos/${REPO}/contents/${path}?ref=${BRANCH}`,
+    { headers: ghHeaders },
+  );
+  if (getRes.ok) sha = (await getRes.json()).sha;
+  else if (getRes.status !== 404) {
+    return { ok: false, error: `pre-commit GET failed: ${getRes.status}` };
+  }
+  const putRes = await fetch(
+    `https://api.github.com/repos/${REPO}/contents/${path}`,
+    {
+      method: "PUT",
+      headers: { ...ghHeaders, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message,
+        content: b64Content,
+        branch: BRANCH,
+        sha: sha || undefined,
+      }),
+    },
+  );
+  if (!putRes.ok) {
+    const detail = (await putRes.text()).slice(0, 200);
+    return { ok: false, error: `commit failed (${putRes.status}): ${detail}` };
+  }
+  return { ok: true, path };
 }
 
 /* ----------- Admin list (admins.json in repo) ----------- */

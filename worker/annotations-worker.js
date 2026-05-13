@@ -39,7 +39,7 @@ export default {
     let body;
     try { body = await req.json(); }
     catch { return json({ error: "invalid JSON body" }, 400, req); }
-    const { key, phone, start_date, address, payroll_match, forward_to, rename_decay } = body || {};
+    const { key, phone, start_date, address, payroll_match, forward_to, rename_decay, directory_photo_uploaded_at } = body || {};
     if (!key || typeof key !== "string") {
       return json({ error: "missing 'key' (email or username)" }, 400, req);
     }
@@ -90,6 +90,9 @@ export default {
     setScalar("start_date", start_date);
     setScalar("address", address);
     setScalar("forward_to", forward_to);
+    // Cache-bust for the Directory profile photo. Set to an ISO timestamp when
+    // a new upload commits to assets/photos/, or to "" to clear when removed.
+    setScalar("directory_photo_uploaded_at", directory_photo_uploaded_at);
 
     // payroll_match is an object (not a string) — handle separately.
     if (has("payroll_match")) {
