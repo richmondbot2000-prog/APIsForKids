@@ -1,17 +1,15 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-13T09:33:25Z",
+  "updated_at": "2026-05-13T17:53:18Z",
   "totals": {
-    "groups": 97,
-    "members": 110
+    "groups": 118,
+    "members": 219
   },
   "tenants": [
     "letme.co.uk",
-    "rgroup.co.uk"
+    "togetherloans"
   ],
-  "fetch_errors": [
-    "tenant rgroup.co.uk: <HttpError 403 when requesting https://admin.googleapis.com/admin/directory/v1/groups?customer=my_customer&maxResults=200&orderBy=email&alt=json returned \"Not Authorized to access this resource/api\". Details: \"[{'message': 'Not Authorized to access this resource/api', 'domain': 'global', 'reason': 'forbidden'}]\">"
-  ],
+  "fetch_errors": [],
   "groups": [
     {
       "email": "accounts@clearloans.com.au",
@@ -1724,6 +1722,868 @@
       "aliases": [],
       "member_count": 0,
       "members": []
+    },
+    {
+      "email": "affiliates@togetherloans.com",
+      "name": "Together Loans Affiliates",
+      "description": "",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 2,
+      "members": [
+        {
+          "email": "kelly.black@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "marketing@togetherloans.com",
+          "role": "MEMBER",
+          "type": "GROUP",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "email": "alert@togetherloans.com",
+      "name": "Together Loans Alerts",
+      "description": "",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 30,
+      "members": [
+        {
+          "email": "adnan.turken@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "amber.cole@rgroup.co.uk",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": ""
+        },
+        {
+          "email": "ashwin.john@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "ben.gardner@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "berginie.botero@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "bernardo.fonseca@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "bryony.leach@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "claire.stratford@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "clementia.dsouza@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "dan.meineck@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "ed.heaney@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "ekrem.yurtman@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "igor.kravcov@togetherloans.com",
+          "role": "OWNER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "jack.bassilious@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "james.benamor@rgroup.co.uk",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": ""
+        },
+        {
+          "email": "james.webster@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "kamran.kamaei@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "kelly.black@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "laura.chadbourne@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "lucian.teodoroiu@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "matt.brunet@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "morgan.smith@togetherloans.com",
+          "role": "OWNER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "mourad.malki@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "navodi.sammani@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "paulo.cesar@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "raveeha.ejaz@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "sophia.ugwunne@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "sophie.polychronopulos@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "thomas.holloway@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "tina.suppa@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "email": "allstaff@togetherloans.com",
+      "name": "Together Loans Global List",
+      "description": "",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 0,
+      "members": []
+    },
+    {
+      "email": "audit@togetherloans.com",
+      "name": "Together Loans Internal Audit",
+      "description": "",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 5,
+      "members": [
+        {
+          "email": "claire.stratford@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "laura.chadbourne@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "morgan.smith@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "sophie.polychronopulos@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "thomas.holloway@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "email": "business.change@togetherloans.com",
+      "name": "Together Loans Business Change",
+      "description": "Use for business change team to test",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 2,
+      "members": [
+        {
+          "email": "morgan.smith@togetherloans.com",
+          "role": "OWNER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "sophie.polychronopulos@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "email": "classroom_teachers@togetherloans.com",
+      "name": "Classroom Teachers",
+      "description": "This group includes all Classroom teachers in your domain. Users who say they are teachers are added as pending members until you approve. Note that members of this group have additional privileges, which you can control in the Admin Console. WARNING: Do not delete this group.",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 0,
+      "members": []
+    },
+    {
+      "email": "compliance@togetherloans.com",
+      "name": "Together Loans Compliance",
+      "description": "",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 8,
+      "members": [
+        {
+          "email": "claire.stratford@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "kelly.black@togetherloans.com",
+          "role": "OWNER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "laura.chadbourne@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "mourad.malki@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "oleg.goland@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "raveeha.ejaz@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "rebekah.dewaard@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "tina.suppa@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "email": "development@togetherloans.com",
+      "name": "Together Loans Development",
+      "description": "",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 18,
+      "members": [
+        {
+          "email": "adnan.turken@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "ben.gardner@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "berginie.botero@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "bernardo.fonseca@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "claire.stratford@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "dan.meineck@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "development@transformcredit.com",
+          "role": "MEMBER",
+          "type": "GROUP",
+          "status": ""
+        },
+        {
+          "email": "ekrem.yurtman@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "igor.kravcov@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "jack.bassilious@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "james.webster@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "kamran.kamaei@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "kelly.black@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "laura.chadbourne@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "morgan.smith@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "paulo.cesar@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "sophie.polychronopulos@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "stan.majerski@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "email": "dmarc@togetherloans.com",
+      "name": "dmarc",
+      "description": "",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 1,
+      "members": [
+        {
+          "email": "development@togetherloans.com",
+          "role": "MEMBER",
+          "type": "GROUP",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "email": "finance@togetherloans.com",
+      "name": "Together Loans Finance",
+      "description": "",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 5,
+      "members": [
+        {
+          "email": "ashwin.john@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "clementia.dsouza@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "finance@transformcredit.com",
+          "role": "OWNER",
+          "type": "USER",
+          "status": ""
+        },
+        {
+          "email": "kelly.black@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "navodi.sammani@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "email": "issueslog@togetherloans.com",
+      "name": "Issues Log",
+      "description": "",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 4,
+      "members": [
+        {
+          "email": "claire.stratford@togetherloans.com",
+          "role": "OWNER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "kelly.black@togetherloans.com",
+          "role": "OWNER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "raveeha.ejaz@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "tina.suppa@togetherloans.com",
+          "role": "OWNER",
+          "type": "USER",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "email": "litigation@togetherloans.com",
+      "name": "Together Loans Litigation",
+      "description": "",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 3,
+      "members": [
+        {
+          "email": "berginie.botero@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "bryony.leach@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "kelly.black@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "email": "marketing@togetherloans.com",
+      "name": "Together Loans Marketing",
+      "description": "",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 4,
+      "members": [
+        {
+          "email": "kelly.black@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "lucian.teodoroiu@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "morgan.smith@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "taylor.draper@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "email": "mb.partnership@togetherloans.com",
+      "name": "Together Loans MB Partnership",
+      "description": "",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 7,
+      "members": [
+        {
+          "email": "berginie.botero@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "claire.stratford@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "finance@togetherloans.com",
+          "role": "MEMBER",
+          "type": "GROUP",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "igor.kravcov@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "kelly.black@togetherloans.com",
+          "role": "OWNER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "morgan.smith@togetherloans.com",
+          "role": "OWNER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "sophia.ugwunne@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "email": "oncall-bcp@togetherloans.com",
+      "name": "On Call Business Continuity",
+      "description": "",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 1,
+      "members": [
+        {
+          "email": "development@togetherloans.com",
+          "role": "MEMBER",
+          "type": "GROUP",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "email": "oncall-irp@togetherloans.com",
+      "name": "On Call Incident Response",
+      "description": "",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 1,
+      "members": [
+        {
+          "email": "development@togetherloans.com",
+          "role": "MEMBER",
+          "type": "GROUP",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "email": "operations@togetherloans.com",
+      "name": "Together Loans Operations",
+      "description": "Ops functions group email",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 6,
+      "members": [
+        {
+          "email": "ben.gardner@togetherloans.com",
+          "role": "OWNER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "berginie.botero@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "jack.bassilious@togetherloans.com",
+          "role": "OWNER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "laura.chadbourne@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "mourad.malki@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "sophia.ugwunne@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "email": "postmaster@togetherloans.com",
+      "name": "Together Loans Postmaster",
+      "description": "",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 1,
+      "members": [
+        {
+          "email": "jack.bassilious@transformcredit.com",
+          "role": "OWNER",
+          "type": "USER",
+          "status": ""
+        }
+      ]
+    },
+    {
+      "email": "product@togetherloans.com",
+      "name": "Together Loans Product",
+      "description": "",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 2,
+      "members": [
+        {
+          "email": "ben.gardner@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "jack.bassilious@transformcredit.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": ""
+        }
+      ]
+    },
+    {
+      "email": "research.development@togetherloans.com",
+      "name": "Together Loans R&D",
+      "description": "Email for R&D team to use for sign ups.",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 8,
+      "members": [
+        {
+          "email": "ben.gardner@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "claire.stratford@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "jack.bassilious@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "james.webster@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "kelly.black@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "matt.brunet@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "morgan.smith@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        },
+        {
+          "email": "raveeha.ejaz@togetherloans.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
+      "email": "security@togetherloans.com",
+      "name": "Together Loans IT Security",
+      "description": "",
+      "tenant": "togetherloans",
+      "aliases": [],
+      "member_count": 1,
+      "members": [
+        {
+          "email": "development@togetherloans.com",
+          "role": "MEMBER",
+          "type": "GROUP",
+          "status": "ACTIVE"
+        }
+      ]
     }
   ]
 }
