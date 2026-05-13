@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-13T21:00:02.900Z",
+  "updated_at": "2026-05-13T21:00:10.603Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -307,6 +307,13 @@
       "actor": "kelly.black@letme.com",
       "action": "get-forwarding",
       "target": "james.benamor@letme.com",
+      "ok": true
+    },
+    {
+      "ts": "2026-05-13T21:00:10.603Z",
+      "actor": "kelly.black@letme.com",
+      "action": "get-forwarding",
+      "target": "kelly.black@letme.com",
       "ok": true
     }
   ]
