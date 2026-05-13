@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778627104">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778627104">
-<link rel="stylesheet" href="quiet.css?v=1778627104">
-<link rel="stylesheet" href="quiet-extras.css?v=1778627104">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778627104">
+<link rel="stylesheet" href="style.css?v=1778655169">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778655169">
+<link rel="stylesheet" href="quiet.css?v=1778655169">
+<link rel="stylesheet" href="quiet-extras.css?v=1778655169">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778655169">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -846,7 +846,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778627104" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778655169" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -896,6 +896,12 @@
           <input type="search" class="dir-search" id="dirSearch" placeholder="Search by name, email, title, department, or warehouse username…">
           <button type="button" class="dir-new-btn" id="dirNewBtn" title="Create a new Google Workspace user">+ New user</button>
         </div>
+        <div class="dir-filter-row" id="dirStatusRow">
+          <span class="dir-filter-label">Status</span>
+          <button class="dir-pill dir-pill--status active" data-value="all">All <span class="dir-pill-count" id="dirStatusCountAll">0</span></button>
+          <button class="dir-pill dir-pill--status" data-value="active">Active <span class="dir-pill-count" id="dirStatusCountActive">0</span></button>
+          <button class="dir-pill dir-pill--status" data-value="suspended">Suspended <span class="dir-pill-count" id="dirStatusCountSuspended">0</span></button>
+        </div>
         <div class="dir-filter-row" id="dirTenantRow">
           <span class="dir-filter-label">Tenant</span>
           <button class="dir-pill dir-pill--tenant active" data-value="all">All <span class="dir-pill-count" id="dirTenantCountAll">0</span></button>
@@ -944,6 +950,7 @@
   let activeDept = "all";
   let activeTenant = "all";
   let activeWorkspace = "all";   // Google Workspace tenant (letme.co.uk vs rgroup vs etc.)
+  let activeStatus = "all";       // all | active | suspended
   let searchTerm = "";
 
   // Tenant priority: transform/together → RG internal (rgroup, rgdc, letme) → other.
@@ -1072,6 +1079,7 @@
       buildDeptPills(byDept);
       buildTenantPills(byTenant);
       buildWorkspacePills(byWorkspace);
+      renderStatusPills();
       renderBillingSummary();
       document.getElementById("dirControls").hidden = allEntries.length === 0;
       renderGrid();
@@ -1144,6 +1152,27 @@
   // to count live vs suspended seats and price the live ones at the configured
   // per-seat rate. Suspended-on-Flex don't cost — that's the dual-purpose
   // visibility ("did we actually stop the bill when so-and-so left?").
+  function renderStatusPills() {
+    const staffEntries = allEntries.filter(e => e.type === "staff" && e.user);
+    const active = staffEntries.filter(e => !e.user.suspended).length;
+    const suspended = staffEntries.filter(e => e.user.suspended).length;
+    document.getElementById("dirStatusCountAll").textContent = allEntries.length;
+    document.getElementById("dirStatusCountActive").textContent = active;
+    document.getElementById("dirStatusCountSuspended").textContent = suspended;
+    document.querySelectorAll(".dir-pill--status").forEach(p => {
+      p.classList.toggle("active", p.dataset.value === activeStatus);
+      // Avoid attaching duplicate handlers across re-renders
+      if (p.dataset.wired) return;
+      p.dataset.wired = "1";
+      p.addEventListener("click", () => {
+        document.querySelectorAll(".dir-pill--status").forEach(b => b.classList.remove("active"));
+        p.classList.add("active");
+        activeStatus = p.dataset.value;
+        renderGrid();
+      });
+    });
+  }
+
   function renderBillingSummary() {
     const staffEntries = allEntries.filter(e => e.type === "staff" && e.user);
     if (!staffEntries.length) return;
@@ -1216,6 +1245,14 @@
   }
 
   function visible(entry) {
+    if (activeStatus !== "all") {
+      // Status filter — only meaningful for staff entries (externals have
+      // no Workspace account to be suspended).
+      if (entry.type !== "staff" || !entry.user) return false;
+      const isSusp = !!entry.user.suspended;
+      if (activeStatus === "suspended" && !isSusp) return false;
+      if (activeStatus === "active" && isSusp) return false;
+    }
     if (activeTenant !== "all") {
       // Tenant filter applies to anyone with activity data, staff or external.
       if (!entry.activity || entry.activity.primary_tenant !== activeTenant) return false;
