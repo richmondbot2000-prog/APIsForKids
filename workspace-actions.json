@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-13T20:33:45.945Z",
+  "updated_at": "2026-05-13T20:33:47.148Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -132,6 +132,13 @@
       "ts": "2026-05-13T20:33:45.945Z",
       "actor": "james.benamor@letme.com",
       "action": "admin-add",
+      "target": "clementia.dsouza@letme.com",
+      "ok": true
+    },
+    {
+      "ts": "2026-05-13T20:33:47.148Z",
+      "actor": "james.benamor@letme.com",
+      "action": "get-forwarding",
       "target": "clementia.dsouza@letme.com",
       "ok": true
     }
