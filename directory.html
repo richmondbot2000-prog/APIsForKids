@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778663729">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778663729">
-<link rel="stylesheet" href="quiet.css?v=1778663729">
-<link rel="stylesheet" href="quiet-extras.css?v=1778663729">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778663729">
+<link rel="stylesheet" href="style.css?v=1778663966">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778663966">
+<link rel="stylesheet" href="quiet.css?v=1778663966">
+<link rel="stylesheet" href="quiet-extras.css?v=1778663966">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778663966">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -917,7 +917,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778663729" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778663966" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -967,6 +967,7 @@
       <div class="dir-controls" id="dirControls" hidden>
         <div class="dir-search-row">
           <input type="search" class="dir-search" id="dirSearch" placeholder="Search name, email, alias, title, department, payroll fields…">
+          <button type="button" class="dir-new-btn" id="dirExportBtn" title="Download the current directory state as CSV — useful for HR reconciliation">Export CSV</button>
           <button type="button" class="dir-new-btn" id="dirNewBtn" title="Create a new Google Workspace user">+ New user</button>
         </div>
         <div class="dir-filter-row" id="dirStatusRow">
@@ -2291,6 +2292,56 @@
     }
   }
 
+  // Download the current directory as CSV — joins staff.json + payroll +
+  // forwarding state + group memberships into one row per Workspace user.
+  // Excludes warehouse-only external users since they don't carry HR data.
+  function exportDirectoryCsv() {
+    const rows = allEntries.filter(e => e.type === "staff" && e.user).map(e => {
+      const u = e.user;
+      const p = payrollFor(e) || {};
+      const fwd = u.suspended ? (forwardingByEmail[(u.email || "").toLowerCase()] || "") : "";
+      const groups = groupsForUser(u).map(g => g.email).join("; ");
+      return {
+        email:            u.email || "",
+        name:             u.name || "",
+        given:            u.given || "",
+        family:           u.family || "",
+        title:            u.title || "",
+        department:       u.department || "",
+        suspended:        u.suspended ? "yes" : "no",
+        admin:            u.admin ? "yes" : "no",
+        forward_target:   fwd,
+        aliases:          (u.aliases || []).join("; "),
+        groups:           groups,
+        payroll_match:    p.first_name ? "yes" : "no",
+        employer:         p.employer || "",
+        employee_number:  p.employee_number || "",
+        payroll_start:    p.start_date || "",
+        payroll_dob:      p.dob || "",
+        payroll_mobile:   p.mobile || "",
+        payroll_address:  p.address || "",
+        payroll_terminated: p.termination_date || "",
+        warehouse_writes_60d: (e.activity && e.activity.writes_60d) || 0,
+        warehouse_last_active: (e.activity && e.activity.last_active_utc) || "",
+      };
+    });
+    if (!rows.length) return;
+    const cols = Object.keys(rows[0]);
+    const esc = v => {
+      const s = String(v == null ? "" : v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const csv = [cols.join(",")].concat(rows.map(r => cols.map(c => esc(r[c])).join(","))).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `togetherbook-directory-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 0);
+  }
+
   // Pin a banner at the top of the open modal. Auto-dismisses after 8s.
   function showModalBanner(text, kind) {
     const modal = document.getElementById("dirModal");
@@ -2761,6 +2812,7 @@
   });
   // "+ New user" button -> open the create-user modal.
   document.getElementById("dirNewBtn").addEventListener("click", openCreateModal);
+  document.getElementById("dirExportBtn").addEventListener("click", exportDirectoryCsv);
   // "+ New group" button -> open the create-group modal.
   document.getElementById("dirNewGroupBtn").addEventListener("click", openCreateGroupModal);
   document.getElementById("dirGroupSearch").addEventListener("input", e => {
