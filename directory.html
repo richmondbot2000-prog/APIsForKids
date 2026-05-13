@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778664438">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778664438">
-<link rel="stylesheet" href="quiet.css?v=1778664438">
-<link rel="stylesheet" href="quiet-extras.css?v=1778664438">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778664438">
+<link rel="stylesheet" href="style.css?v=1778664620">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778664620">
+<link rel="stylesheet" href="quiet.css?v=1778664620">
+<link rel="stylesheet" href="quiet-extras.css?v=1778664620">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778664620">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -917,7 +917,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778664438" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778664620" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1081,14 +1081,61 @@
         for (const e of activity.external_users || []) externalUsers.push(e);
       }
 
-      // Build the merged entry list.
+      // Build the merged entry list. Workspace seats belonging to the same
+      // person (matched by lowercase given+family) collapse into a single
+      // entry so e.g. Mourad Malki @letme.com and @clearloans.com.au render
+      // as ONE row. The merged entry keeps every seat in `accounts[]` so
+      // per-seat actions (suspend a specific email) still work; the primary
+      // user is chosen as the most-active or first-alphabetical account.
       allEntries = [];
+      const personGroups = new Map();
+      const orphan = [];
       for (const u of allWorkspaceUsers) {
-        allEntries.push({
-          type: "staff",
-          user: u,
-          activity: activityByEmail[(u.email || "").toLowerCase()] || null,
+        const g = (u.given || "").trim().toLowerCase();
+        const f = (u.family || "").trim().toLowerCase();
+        if (!g || !f) { orphan.push(u); continue; }   // no name -> can't merge safely
+        const key = `${g}|${f}`;
+        if (!personGroups.has(key)) personGroups.set(key, []);
+        personGroups.get(key).push(u);
+      }
+      const pushStaff = (user, accounts) => {
+        const activities = accounts.map(a => activityByEmail[(a.email || "").toLowerCase()]).filter(Boolean);
+        const mergedActivity = activities.length === 0 ? null : (activities.length === 1 ? activities[0] : {
+          email: user.email,
+          writes_60d: activities.reduce((n, x) => n + (x.writes_60d || 0), 0),
+          last_active_utc: activities.map(x => x.last_active_utc).filter(Boolean).sort().slice(-1)[0] || null,
+          tenants: [...new Set(activities.flatMap(x => x.tenants || []))],
+          primary_tenant: activities.sort((a, b) => (b.writes_60d || 0) - (a.writes_60d || 0))[0].primary_tenant,
+          top_warehouse: activities.sort((a, b) => (b.writes_60d || 0) - (a.writes_60d || 0))[0].top_warehouse,
         });
+        allEntries.push({ type: "staff", user, accounts, activity: mergedActivity });
+      };
+      for (const u of orphan) pushStaff(u, [u]);
+      for (const [, members] of personGroups) {
+        if (members.length === 1) { pushStaff(members[0], members); continue; }
+        // Pick primary: most-recent active, then alphabetical email.
+        const scored = members.map(m => {
+          const act = activityByEmail[(m.email || "").toLowerCase()];
+          return { m, score: act ? (act.writes_60d || 1) : 0 };
+        });
+        scored.sort((a, b) => (b.score - a.score) || (a.m.email || "").localeCompare(b.m.email || ""));
+        const primary = scored[0].m;
+        // Synthesise a merged "user" — primary fields, but emails + aliases of every seat unioned.
+        const allAliases = new Set();
+        for (const m of members) {
+          for (const a of (m.aliases || [])) if (a) allAliases.add(a.toLowerCase());
+          if (m.email && m.email.toLowerCase() !== (primary.email || "").toLowerCase()) {
+            allAliases.add(m.email.toLowerCase());
+          }
+        }
+        const mergedUser = {
+          ...primary,
+          aliases: [...allAliases].sort(),
+          suspended: members.every(m => m.suspended),    // greyed only if ALL seats are suspended
+          admin: members.some(m => m.admin),
+          tenants: [...new Set(members.flatMap(m => m.tenants || (m.tenant ? [m.tenant] : [])))],
+        };
+        pushStaff(mergedUser, members);
       }
       for (const e of externalUsers) {
         allEntries.push({ type: "external", user: null, activity: e });
@@ -2169,6 +2216,12 @@
   async function runAction(entry, action, slot, extras) {
     const u = entry.user;
     const modal = document.getElementById("dirModal");
+    // Multi-account person (merged row): suspend / unsuspend EVERY seat the
+    // person has, not just the primary — otherwise the other seats keep
+    // costing money or stay live after a leaver event.
+    const seats = (entry.accounts && entry.accounts.length > 0)
+      ? entry.accounts
+      : [u];
     let toast = modal.querySelector("[data-toast]");
     if (!toast) {
       toast = document.createElement("p");
@@ -2178,33 +2231,45 @@
       toast.classList.remove("error");
     }
     const verbLabel = action === "suspend-and-route" ? "Suspending + routing" : (action[0].toUpperCase() + action.slice(1) + "ing");
-    toast.textContent = `${verbLabel} ${u.email}…`;
+    toast.textContent = `${verbLabel} ${seats.length > 1 ? `${seats.length} seats for ` : ""}${u.email}…`;
     modal.querySelectorAll("[data-action], [data-confirm]").forEach(b => b.disabled = true);
 
-    try {
-      await workspaceAction(action, { email: u.email, ...(extras || {}) });
-      // Optimistic in-memory state update.
-      if (action === "suspend-and-route") {
-        u.suspended = true;
-        if (extras && extras.route_to) forwardingByEmail[u.email.toLowerCase()] = extras.route_to;
+    const failures = [];
+    let okCount = 0;
+    for (const seat of seats) {
+      try {
+        await workspaceAction(action, { email: seat.email, ...(extras || {}) });
+        seat.suspended = action === "suspend-and-route" ? true : (action === "unsuspend" ? false : seat.suspended);
+        if (action === "suspend-and-route" && extras && extras.route_to) {
+          forwardingByEmail[seat.email.toLowerCase()] = extras.route_to;
+        } else if (action === "unsuspend") {
+          delete forwardingByEmail[(seat.email || "").toLowerCase()];
+        }
+        okCount++;
+      } catch (err) {
+        failures.push(`${seat.email}: ${err.message || err}`);
       }
-      if (action === "unsuspend") {
-        u.suspended = false;
-        delete forwardingByEmail[(u.email || "").toLowerCase()];
-      }
-      if (slot) slot.innerHTML = "";
-      renderGrid();
-      // Re-render the modal into its post-action state and pin a prominent
-      // success banner at the top so the user sees clearly what just happened.
-      openCard(entryKey(entry));
+    }
+
+    // Roll up the merged user's flags from the seats.
+    u.suspended = seats.every(s => s.suspended);
+
+    if (slot) slot.innerHTML = "";
+    renderGrid();
+    renderBillingSummary();
+    renderStatusPills();
+    renderHealth();
+    openCard(entryKey(entry));
+
+    if (failures.length === 0) {
       const successText = action === "suspend-and-route"
-        ? `Suspended — mail to ${u.email} now forwards to ${extras && extras.route_to ? extras.route_to : "the address you set"}.`
+        ? `Suspended ${okCount} seat${okCount === 1 ? "" : "s"} for ${u.name || u.email} — mail forwards to ${extras && extras.route_to ? extras.route_to : "the address you set"}.`
         : action === "unsuspend"
-          ? `Unsuspended — ${u.email} is active again, forwarding turned off.`
+          ? `Unsuspended ${okCount} seat${okCount === 1 ? "" : "s"} for ${u.name || u.email}. Forwarding turned off.`
           : `${u.email} — ${action.replace(/-/g, " ")} succeeded.`;
       showModalBanner(successText, "success");
-    } catch (err) {
-      showModalBanner(`${verbLabel.replace(/ing$/, "")} failed — ${err.message || err}`, "error");
+    } else {
+      showModalBanner(`${okCount}/${seats.length} seat${seats.length === 1 ? "" : "s"} actioned; failures: ${failures.join("; ")}`, okCount > 0 ? "success" : "error");
       modal.querySelectorAll("[data-action], [data-confirm]").forEach(b => b.disabled = false);
     }
   }
