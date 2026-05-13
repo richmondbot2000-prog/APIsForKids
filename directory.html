@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778669851">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778669851">
-<link rel="stylesheet" href="quiet.css?v=1778669851">
-<link rel="stylesheet" href="quiet-extras.css?v=1778669851">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778669851">
+<link rel="stylesheet" href="style.css?v=1778670881">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778670881">
+<link rel="stylesheet" href="quiet.css?v=1778670881">
+<link rel="stylesheet" href="quiet-extras.css?v=1778670881">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778670881">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -953,7 +953,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778669851" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778670881" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -2209,9 +2209,9 @@
                  ${noForward ? `<button type="button" data-action="add-forwarding">Add forwarding</button>` : ""}
                  <button type="button" data-action="unsuspend">Unsuspend (turn forwarding off)</button>
                  ${memberOf.length ? `<button type="button" class="danger" data-action="purge-groups">Remove from ${memberOf.length} group${memberOf.length === 1 ? "" : "s"}</button>` : ""}
-                 <button type="button" class="danger" data-action="convert-to-group">Convert to group (free, mailbox lost)</button>
+                 <button type="button" class="danger" data-action="convert-to-group">Convert to group (free, mailbox parked)</button>
                </div>
-               <p class="dir-modal-saved-hint">${forwardTo ? `Currently forwards to <code>${escapeHtml(forwardTo)}</code>. ` : `<strong style="color:var(--manuscript-red);">No forwarding configured — mail to this address is going nowhere.</strong> Type a colleague's email above and click <strong>Add forwarding</strong>. The account is briefly unsuspended (~2s) to set the rule, then re-suspended. `}Unsuspending re-enables direct mailbox delivery and disables the forward.${memberOf.length ? ` Leavers should typically be removed from all groups too — ${memberOf.length} membership${memberOf.length === 1 ? "" : "s"} still active.` : ""}<br><br><strong>Convert to group</strong> deletes the user (mailbox lost, 25-day Vault retention) and re-creates the email address as a forwarding-only Group. Free forever, no Workspace seat. Use when you don't need the leaver's old mailbox.</p>`;
+               <p class="dir-modal-saved-hint">${forwardTo ? `Currently forwards to <code>${escapeHtml(forwardTo)}</code>. ` : `<strong style="color:var(--manuscript-red);">No forwarding configured — mail to this address is going nowhere.</strong> Type a colleague's email above and click <strong>Add forwarding</strong>. The account is briefly unsuspended (~2s) to set the rule, then re-suspended. `}Unsuspending re-enables direct mailbox delivery and disables the forward.${memberOf.length ? ` Leavers should typically be removed from all groups too — ${memberOf.length} membership${memberOf.length === 1 ? "" : "s"} still active.` : ""}<br><br><strong>Convert to group</strong>: renames the user to <code>&lt;local&gt;.archived.&lt;timestamp&gt;@&lt;domain&gt;</code> and parks them suspended (mailbox preserved, free), then re-creates the original email address as a forwarding-only Group with the target as a member. Free forever, no Workspace seat, and the original mailbox is recoverable by renaming back if ever needed.</p>`;
               })()
             : (() => {
                 const memberOf = groupsForUser(u);
@@ -2326,7 +2326,7 @@
         <div class="dir-confirm">
           <div class="dir-confirm-text">
             <strong>Convert ${escapeHtml(u.email)} to a forwarding group?</strong><br>
-            <span class="dir-modal-saved-hint" style="text-align:left;margin:0;">This will (1) delete the Workspace user (mailbox kept in Vault for 25 days then unrecoverable), (2) create a Group at <code>${escapeHtml(u.email)}</code>, and (3) add the forward target as a member. Costs £0/month forever.</span>
+            <span class="dir-modal-saved-hint" style="text-align:left;margin:0;">This will (1) rename the Workspace user to <code>&lt;local&gt;.archived.&lt;timestamp&gt;@&lt;domain&gt;</code> and suspend them (mailbox preserved, £0/mo), (2) create a Group at <code>${escapeHtml(u.email)}</code>, and (3) add the forward target as a member. Reversible: rename the parked user back if you ever need the mailbox active again.</span>
             <div class="dir-form-row" style="margin-top:10px;">
               <label for="dirConvFwdTo">Forward mail to</label>
               <input id="dirConvFwdTo" name="conv_fwd_to" type="email" value="${escapeHtml(existingForward)}" placeholder="Type a colleague's email" list="dirRouteOptions" autocomplete="off">
