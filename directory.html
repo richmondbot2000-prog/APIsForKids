@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778685585">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778685585">
-<link rel="stylesheet" href="quiet.css?v=1778685585">
-<link rel="stylesheet" href="quiet-extras.css?v=1778685585">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778685585">
+<link rel="stylesheet" href="style.css?v=1778685750">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778685750">
+<link rel="stylesheet" href="quiet.css?v=1778685750">
+<link rel="stylesheet" href="quiet-extras.css?v=1778685750">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778685750">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -989,7 +989,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778685585" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778685750" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1209,8 +1209,59 @@
         };
         pushStaff(mergedUser, members);
       }
+      // Absorb external (warehouse-only) entries into matching staff entries
+      // by email/alias OR by derived name. Only render as a standalone
+      // external entry when there's no staff match — typically warehouse
+      // operators who genuinely have no Workspace account. This stops the
+      // case where a Workspace user (especially newly-added TL ones)
+      // appears as 'no Workspace account' just because scan_staff_activity
+      // didn't recognise their email domain at the time it ran.
+      const staffByEmail = new Map();
+      for (const en of allEntries) {
+        if (en.type !== "staff" || !en.user) continue;
+        const addrs = [en.user.email, ...(en.user.aliases || []), ...((en.accounts || []).flatMap(s => [s.email, ...(s.aliases || [])]))];
+        for (const a of addrs) {
+          if (a) staffByEmail.set(a.toLowerCase(), en);
+        }
+      }
+      const staffByName = new Map();
+      for (const en of allEntries) {
+        if (en.type !== "staff" || !en.user) continue;
+        const g = (en.user.given || "").toLowerCase().trim();
+        const f = (en.user.family || "").toLowerCase().trim();
+        if (g && f) staffByName.set(`${g} ${f}`, en);
+        const n = (en.user.name || "").toLowerCase().trim();
+        if (n) staffByName.set(n, en);
+      }
+      const mergeActivity = (target, extra) => {
+        if (!extra) return;
+        if (!target.activity) { target.activity = { ...extra }; return; }
+        const t = target.activity;
+        t.writes_60d = (t.writes_60d || 0) + (extra.writes_60d || 0);
+        if (extra.last_active_utc && (!t.last_active_utc || extra.last_active_utc > t.last_active_utc)) {
+          t.last_active_utc = extra.last_active_utc;
+        }
+        t.tenants = [...new Set([...(t.tenants || []), ...(extra.tenants || [])])];
+        if (!t.primary_tenant || (extra.writes_60d || 0) > (t.writes_60d || 0)) {
+          t.primary_tenant = extra.primary_tenant || t.primary_tenant;
+        }
+        if (!t.top_warehouse || (extra.writes_60d || 0) > (t.writes_60d || 0)) {
+          t.top_warehouse = extra.top_warehouse || t.top_warehouse;
+        }
+      };
+
       for (const e of externalUsers) {
-        allEntries.push({ type: "external", user: null, activity: e });
+        const eUsername = (e.email || e.username || "").toLowerCase();
+        const local = eUsername.split("@")[0] || "";
+        const derivedName = local.replace(/[._-]+/g, " ").trim().toLowerCase();
+        const byEmail = eUsername ? staffByEmail.get(eUsername) : null;
+        const byName = derivedName ? staffByName.get(derivedName) : null;
+        const matched = byEmail || byName;
+        if (matched) {
+          mergeActivity(matched, e);
+        } else {
+          allEntries.push({ type: "external", user: null, activity: e });
+        }
       }
 
       // Sort order: deleted last, then suspended, then live. Within each
