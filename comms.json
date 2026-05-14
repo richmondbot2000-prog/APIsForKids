@@ -1,0 +1,3414 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-05-14T08:18:42Z",
+  "year": 2026,
+  "channels": [
+    "SMS",
+    "Email"
+  ],
+  "buckets": [
+    "unknown",
+    "applicant",
+    "live_loan",
+    "arrears"
+  ],
+  "max_reply_minutes": 20160,
+  "totals_by_bucket": {
+    "unknown": {
+      "n_total": 958517,
+      "n_reply_all": 408057,
+      "n_reply_human": 193362
+    },
+    "applicant": {
+      "n_total": 17821,
+      "n_reply_all": 14995,
+      "n_reply_human": 9601
+    },
+    "live_loan": {
+      "n_total": 545,
+      "n_reply_all": 469,
+      "n_reply_human": 406
+    },
+    "arrears": {
+      "n_total": 356,
+      "n_reply_all": 302,
+      "n_reply_human": 231
+    },
+    "other": {
+      "n_total": 0,
+      "n_reply_all": 0,
+      "n_reply_human": 0
+    }
+  },
+  "series": {
+    "unknown": {
+      "2026-01-23": {
+        "n_total": 9477,
+        "n_reply_all": 3768,
+        "sum_reply_all": 3218275.0,
+        "n_reply_human": 1730,
+        "sum_reply_human": 4403089.0
+      },
+      "2026-01-02": {
+        "n_total": 9112,
+        "n_reply_all": 4074,
+        "sum_reply_all": 3446401.0,
+        "n_reply_human": 1977,
+        "sum_reply_human": 5184784.0
+      },
+      "2026-05-10": {
+        "n_total": 5846,
+        "n_reply_all": 2196,
+        "sum_reply_all": 767952.0,
+        "n_reply_human": 589,
+        "sum_reply_human": 1012409.0
+      },
+      "2026-01-01": {
+        "n_total": 6937,
+        "n_reply_all": 2866,
+        "sum_reply_all": 2576901.0,
+        "n_reply_human": 1180,
+        "sum_reply_human": 3425472.0
+      },
+      "2026-02-01": {
+        "n_total": 6118,
+        "n_reply_all": 2276,
+        "sum_reply_all": 2158548.0,
+        "n_reply_human": 958,
+        "sum_reply_human": 3251031.0
+      },
+      "2026-01-31": {
+        "n_total": 6999,
+        "n_reply_all": 2738,
+        "sum_reply_all": 3127467.0,
+        "n_reply_human": 1238,
+        "sum_reply_human": 4506691.0
+      },
+      "2026-01-08": {
+        "n_total": 10088,
+        "n_reply_all": 4386,
+        "sum_reply_all": 2080374.0,
+        "n_reply_human": 2167,
+        "sum_reply_human": 3150595.0
+      },
+      "2026-01-03": {
+        "n_total": 7830,
+        "n_reply_all": 3030,
+        "sum_reply_all": 4222731.0,
+        "n_reply_human": 1222,
+        "sum_reply_human": 5540597.0
+      },
+      "2026-01-04": {
+        "n_total": 6834,
+        "n_reply_all": 2365,
+        "sum_reply_all": 2202331.0,
+        "n_reply_human": 764,
+        "sum_reply_human": 2795946.0
+      },
+      "2026-01-06": {
+        "n_total": 9788,
+        "n_reply_all": 4121,
+        "sum_reply_all": 2205729.0,
+        "n_reply_human": 1999,
+        "sum_reply_human": 3136861.0
+      },
+      "2026-01-11": {
+        "n_total": 5758,
+        "n_reply_all": 2140,
+        "sum_reply_all": 1740582.0,
+        "n_reply_human": 793,
+        "sum_reply_human": 2365885.0
+      },
+      "2026-01-07": {
+        "n_total": 9727,
+        "n_reply_all": 4173,
+        "sum_reply_all": 2210797.0,
+        "n_reply_human": 2121,
+        "sum_reply_human": 3154827.0
+      },
+      "2026-01-13": {
+        "n_total": 9126,
+        "n_reply_all": 4009,
+        "sum_reply_all": 2688482.0,
+        "n_reply_human": 2094,
+        "sum_reply_human": 3845870.0
+      },
+      "2026-01-15": {
+        "n_total": 8624,
+        "n_reply_all": 3752,
+        "sum_reply_all": 2954600.0,
+        "n_reply_human": 1977,
+        "sum_reply_human": 4156011.0
+      },
+      "2026-01-14": {
+        "n_total": 8316,
+        "n_reply_all": 3802,
+        "sum_reply_all": 3528741.0,
+        "n_reply_human": 2046,
+        "sum_reply_human": 4747532.0
+      },
+      "2026-01-16": {
+        "n_total": 9191,
+        "n_reply_all": 3835,
+        "sum_reply_all": 3357885.0,
+        "n_reply_human": 1934,
+        "sum_reply_human": 4495079.0
+      },
+      "2026-01-18": {
+        "n_total": 6246,
+        "n_reply_all": 2227,
+        "sum_reply_all": 2141807.0,
+        "n_reply_human": 870,
+        "sum_reply_human": 2999509.0
+      },
+      "2026-01-17": {
+        "n_total": 7234,
+        "n_reply_all": 2883,
+        "sum_reply_all": 2759398.0,
+        "n_reply_human": 1359,
+        "sum_reply_human": 3900963.0
+      },
+      "2026-01-09": {
+        "n_total": 9581,
+        "n_reply_all": 4074,
+        "sum_reply_all": 3007023.0,
+        "n_reply_human": 2121,
+        "sum_reply_human": 4308533.0
+      },
+      "2026-01-12": {
+        "n_total": 8999,
+        "n_reply_all": 3978,
+        "sum_reply_all": 1864749.0,
+        "n_reply_human": 2055,
+        "sum_reply_human": 2760698.0
+      },
+      "2026-01-10": {
+        "n_total": 7554,
+        "n_reply_all": 2991,
+        "sum_reply_all": 2749055.0,
+        "n_reply_human": 1264,
+        "sum_reply_human": 3836012.0
+      },
+      "2026-01-05": {
+        "n_total": 9394,
+        "n_reply_all": 4035,
+        "sum_reply_all": 2093101.0,
+        "n_reply_human": 1991,
+        "sum_reply_human": 3161940.0
+      },
+      "2026-01-30": {
+        "n_total": 9016,
+        "n_reply_all": 3843,
+        "sum_reply_all": 2547464.0,
+        "n_reply_human": 1960,
+        "sum_reply_human": 3831626.0
+      },
+      "2026-02-18": {
+        "n_total": 8297,
+        "n_reply_all": 3853,
+        "sum_reply_all": 2368047.0,
+        "n_reply_human": 1976,
+        "sum_reply_human": 3514042.0
+      },
+      "2026-04-07": {
+        "n_total": 7342,
+        "n_reply_all": 3043,
+        "sum_reply_all": 3192647.0,
+        "n_reply_human": 1531,
+        "sum_reply_human": 4577795.0
+      },
+      "2026-01-22": {
+        "n_total": 10454,
+        "n_reply_all": 4349,
+        "sum_reply_all": 3759855.0,
+        "n_reply_human": 1969,
+        "sum_reply_human": 4694029.0
+      },
+      "2026-01-29": {
+        "n_total": 9087,
+        "n_reply_all": 3947,
+        "sum_reply_all": 2446678.0,
+        "n_reply_human": 1975,
+        "sum_reply_human": 3621868.0
+      },
+      "2026-05-09": {
+        "n_total": 7510,
+        "n_reply_all": 2627,
+        "sum_reply_all": 1010661.0,
+        "n_reply_human": 722,
+        "sum_reply_human": 1334484.0
+      },
+      "2026-01-27": {
+        "n_total": 8950,
+        "n_reply_all": 3956,
+        "sum_reply_all": 2534202.0,
+        "n_reply_human": 2059,
+        "sum_reply_human": 3612424.0
+      },
+      "2026-04-03": {
+        "n_total": 6835,
+        "n_reply_all": 2683,
+        "sum_reply_all": 3734604.0,
+        "n_reply_human": 1266,
+        "sum_reply_human": 5244027.0
+      },
+      "2026-04-06": {
+        "n_total": 6731,
+        "n_reply_all": 2936,
+        "sum_reply_all": 3045830.0,
+        "n_reply_human": 1464,
+        "sum_reply_human": 4556956.0
+      },
+      "2026-01-26": {
+        "n_total": 8687,
+        "n_reply_all": 3816,
+        "sum_reply_all": 2130748.0,
+        "n_reply_human": 1956,
+        "sum_reply_human": 3012552.0
+      },
+      "2026-01-25": {
+        "n_total": 6218,
+        "n_reply_all": 2428,
+        "sum_reply_all": 2247540.0,
+        "n_reply_human": 1019,
+        "sum_reply_human": 3061805.0
+      },
+      "2026-03-31": {
+        "n_total": 7056,
+        "n_reply_all": 2993,
+        "sum_reply_all": 3708086.0,
+        "n_reply_human": 1578,
+        "sum_reply_human": 5256000.0
+      },
+      "2026-04-02": {
+        "n_total": 7040,
+        "n_reply_all": 2971,
+        "sum_reply_all": 3640031.0,
+        "n_reply_human": 1524,
+        "sum_reply_human": 5956852.0
+      },
+      "2026-04-11": {
+        "n_total": 5701,
+        "n_reply_all": 2074,
+        "sum_reply_all": 2400636.0,
+        "n_reply_human": 868,
+        "sum_reply_human": 3470120.0
+      },
+      "2026-04-01": {
+        "n_total": 7044,
+        "n_reply_all": 2909,
+        "sum_reply_all": 3483423.0,
+        "n_reply_human": 1557,
+        "sum_reply_human": 5124257.0
+      },
+      "2026-02-03": {
+        "n_total": 8953,
+        "n_reply_all": 4072,
+        "sum_reply_all": 1845516.0,
+        "n_reply_human": 2124,
+        "sum_reply_human": 2716637.0
+      },
+      "2026-02-10": {
+        "n_total": 7739,
+        "n_reply_all": 3570,
+        "sum_reply_all": 1110242.0,
+        "n_reply_human": 1875,
+        "sum_reply_human": 1617960.0
+      },
+      "2026-01-24": {
+        "n_total": 7521,
+        "n_reply_all": 3123,
+        "sum_reply_all": 2778523.0,
+        "n_reply_human": 1372,
+        "sum_reply_human": 4315504.0
+      },
+      "2026-03-30": {
+        "n_total": 6728,
+        "n_reply_all": 2889,
+        "sum_reply_all": 2336545.0,
+        "n_reply_human": 1519,
+        "sum_reply_human": 3564000.0
+      },
+      "2026-03-28": {
+        "n_total": 5325,
+        "n_reply_all": 1964,
+        "sum_reply_all": 3544160.0,
+        "n_reply_human": 807,
+        "sum_reply_human": 4600996.0
+      },
+      "2026-04-04": {
+        "n_total": 5352,
+        "n_reply_all": 1995,
+        "sum_reply_all": 3620972.0,
+        "n_reply_human": 818,
+        "sum_reply_human": 5001534.0
+      },
+      "2026-03-25": {
+        "n_total": 7140,
+        "n_reply_all": 2921,
+        "sum_reply_all": 3326563.0,
+        "n_reply_human": 1430,
+        "sum_reply_human": 4640681.0
+      },
+      "2026-05-14": {
+        "n_total": 1180,
+        "n_reply_all": 414,
+        "sum_reply_all": 7792.0,
+        "n_reply_human": 50,
+        "sum_reply_human": 1273.0
+      },
+      "2026-05-08": {
+        "n_total": 5630,
+        "n_reply_all": 2718,
+        "sum_reply_all": 1163975.0,
+        "n_reply_human": 1205,
+        "sum_reply_human": 1578470.0
+      },
+      "2026-05-13": {
+        "n_total": 9755,
+        "n_reply_all": 3823,
+        "sum_reply_all": 199430.0,
+        "n_reply_human": 1080,
+        "sum_reply_human": 181793.0
+      },
+      "2026-01-28": {
+        "n_total": 8777,
+        "n_reply_all": 3844,
+        "sum_reply_all": 2496789.0,
+        "n_reply_human": 1950,
+        "sum_reply_human": 3654859.0
+      },
+      "2026-01-21": {
+        "n_total": 10463,
+        "n_reply_all": 4508,
+        "sum_reply_all": 4199579.0,
+        "n_reply_human": 2098,
+        "sum_reply_human": 6226326.0
+      },
+      "2026-03-26": {
+        "n_total": 6667,
+        "n_reply_all": 2786,
+        "sum_reply_all": 3778582.0,
+        "n_reply_human": 1314,
+        "sum_reply_human": 5542445.0
+      },
+      "2026-03-17": {
+        "n_total": 6577,
+        "n_reply_all": 2829,
+        "sum_reply_all": 3037716.0,
+        "n_reply_human": 1396,
+        "sum_reply_human": 4109357.0
+      },
+      "2026-03-21": {
+        "n_total": 4819,
+        "n_reply_all": 1809,
+        "sum_reply_all": 3356421.0,
+        "n_reply_human": 811,
+        "sum_reply_human": 4827098.0
+      },
+      "2026-03-09": {
+        "n_total": 6446,
+        "n_reply_all": 2968,
+        "sum_reply_all": 2702819.0,
+        "n_reply_human": 1553,
+        "sum_reply_human": 4005375.0
+      },
+      "2026-03-29": {
+        "n_total": 4598,
+        "n_reply_all": 1604,
+        "sum_reply_all": 2698708.0,
+        "n_reply_human": 615,
+        "sum_reply_human": 3584158.0
+      },
+      "2026-01-19": {
+        "n_total": 7734,
+        "n_reply_all": 3273,
+        "sum_reply_all": 1796323.0,
+        "n_reply_human": 1673,
+        "sum_reply_human": 2603852.0
+      },
+      "2026-01-20": {
+        "n_total": 10102,
+        "n_reply_all": 4645,
+        "sum_reply_all": 3231111.0,
+        "n_reply_human": 2245,
+        "sum_reply_human": 4738541.0
+      },
+      "2026-04-05": {
+        "n_total": 4162,
+        "n_reply_all": 1433,
+        "sum_reply_all": 2076759.0,
+        "n_reply_human": 487,
+        "sum_reply_human": 2649327.0
+      },
+      "2026-03-23": {
+        "n_total": 6289,
+        "n_reply_all": 2786,
+        "sum_reply_all": 4126518.0,
+        "n_reply_human": 1425,
+        "sum_reply_human": 5987455.0
+      },
+      "2026-03-22": {
+        "n_total": 4177,
+        "n_reply_all": 1537,
+        "sum_reply_all": 2391245.0,
+        "n_reply_human": 590,
+        "sum_reply_human": 3444501.0
+      },
+      "2026-05-07": {
+        "n_total": 6385,
+        "n_reply_all": 3141,
+        "sum_reply_all": 1890758.0,
+        "n_reply_human": 1435,
+        "sum_reply_human": 2730703.0
+      },
+      "2026-03-27": {
+        "n_total": 6807,
+        "n_reply_all": 2776,
+        "sum_reply_all": 4442672.0,
+        "n_reply_human": 1343,
+        "sum_reply_human": 6588304.0
+      },
+      "2026-05-12": {
+        "n_total": 9506,
+        "n_reply_all": 3925,
+        "sum_reply_all": 617296.0,
+        "n_reply_human": 1434,
+        "sum_reply_human": 744621.0
+      },
+      "2026-04-09": {
+        "n_total": 7500,
+        "n_reply_all": 3235,
+        "sum_reply_all": 3142767.0,
+        "n_reply_human": 1613,
+        "sum_reply_human": 4859939.0
+      },
+      "2026-05-11": {
+        "n_total": 8325,
+        "n_reply_all": 3604,
+        "sum_reply_all": 793707.0,
+        "n_reply_human": 1373,
+        "sum_reply_human": 1035249.0
+      },
+      "2026-05-06": {
+        "n_total": 9400,
+        "n_reply_all": 3989,
+        "sum_reply_all": 2176709.0,
+        "n_reply_human": 1590,
+        "sum_reply_human": 2991365.0
+      },
+      "2026-02-09": {
+        "n_total": 7266,
+        "n_reply_all": 3375,
+        "sum_reply_all": 1238080.0,
+        "n_reply_human": 1875,
+        "sum_reply_human": 1969283.0
+      },
+      "2026-03-18": {
+        "n_total": 6713,
+        "n_reply_all": 2901,
+        "sum_reply_all": 3355794.0,
+        "n_reply_human": 1516,
+        "sum_reply_human": 4651970.0
+      },
+      "2026-02-17": {
+        "n_total": 6828,
+        "n_reply_all": 3048,
+        "sum_reply_all": 1846207.0,
+        "n_reply_human": 1537,
+        "sum_reply_human": 2548823.0
+      },
+      "2026-04-08": {
+        "n_total": 7363,
+        "n_reply_all": 3246,
+        "sum_reply_all": 2956113.0,
+        "n_reply_human": 1605,
+        "sum_reply_human": 4616022.0
+      },
+      "2026-02-07": {
+        "n_total": 6118,
+        "n_reply_all": 2332,
+        "sum_reply_all": 1806491.0,
+        "n_reply_human": 924,
+        "sum_reply_human": 2683496.0
+      },
+      "2026-05-05": {
+        "n_total": 9422,
+        "n_reply_all": 4104,
+        "sum_reply_all": 2623347.0,
+        "n_reply_human": 1718,
+        "sum_reply_human": 3618988.0
+      },
+      "2026-05-01": {
+        "n_total": 6945,
+        "n_reply_all": 3165,
+        "sum_reply_all": 2695697.0,
+        "n_reply_human": 1402,
+        "sum_reply_human": 4127500.0
+      },
+      "2026-03-24": {
+        "n_total": 7081,
+        "n_reply_all": 3008,
+        "sum_reply_all": 4362582.0,
+        "n_reply_human": 1570,
+        "sum_reply_human": 6039715.0
+      },
+      "2026-03-20": {
+        "n_total": 6428,
+        "n_reply_all": 2684,
+        "sum_reply_all": 3974025.0,
+        "n_reply_human": 1317,
+        "sum_reply_human": 5298151.0
+      },
+      "2026-03-05": {
+        "n_total": 6781,
+        "n_reply_all": 3111,
+        "sum_reply_all": 3729641.0,
+        "n_reply_human": 1698,
+        "sum_reply_human": 5395920.0
+      },
+      "2026-02-08": {
+        "n_total": 5585,
+        "n_reply_all": 2136,
+        "sum_reply_all": 1193043.0,
+        "n_reply_human": 869,
+        "sum_reply_human": 1667300.0
+      },
+      "2026-05-03": {
+        "n_total": 6755,
+        "n_reply_all": 2564,
+        "sum_reply_all": 2155633.0,
+        "n_reply_human": 876,
+        "sum_reply_human": 3099926.0
+      },
+      "2026-03-08": {
+        "n_total": 4327,
+        "n_reply_all": 1648,
+        "sum_reply_all": 2365331.0,
+        "n_reply_human": 702,
+        "sum_reply_human": 3238240.0
+      },
+      "2026-02-02": {
+        "n_total": 8885,
+        "n_reply_all": 3894,
+        "sum_reply_all": 1473486.0,
+        "n_reply_human": 2013,
+        "sum_reply_human": 2208467.0
+      },
+      "2026-04-29": {
+        "n_total": 8301,
+        "n_reply_all": 3421,
+        "sum_reply_all": 2771749.0,
+        "n_reply_human": 1569,
+        "sum_reply_human": 3872352.0
+      },
+      "2026-05-02": {
+        "n_total": 7051,
+        "n_reply_all": 2716,
+        "sum_reply_all": 2173378.0,
+        "n_reply_human": 978,
+        "sum_reply_human": 3033622.0
+      },
+      "2026-03-04": {
+        "n_total": 6980,
+        "n_reply_all": 3104,
+        "sum_reply_all": 2625553.0,
+        "n_reply_human": 1625,
+        "sum_reply_human": 3589501.0
+      },
+      "2026-03-19": {
+        "n_total": 6492,
+        "n_reply_all": 2942,
+        "sum_reply_all": 3396970.0,
+        "n_reply_human": 1504,
+        "sum_reply_human": 4934021.0
+      },
+      "2026-02-15": {
+        "n_total": 4748,
+        "n_reply_all": 1899,
+        "sum_reply_all": 1566939.0,
+        "n_reply_human": 773,
+        "sum_reply_human": 2214876.0
+      },
+      "2026-02-04": {
+        "n_total": 8484,
+        "n_reply_all": 3747,
+        "sum_reply_all": 1317039.0,
+        "n_reply_human": 1776,
+        "sum_reply_human": 1783752.0
+      },
+      "2026-02-16": {
+        "n_total": 6850,
+        "n_reply_all": 2973,
+        "sum_reply_all": 1317648.0,
+        "n_reply_human": 1481,
+        "sum_reply_human": 1970762.0
+      },
+      "2026-03-07": {
+        "n_total": 4995,
+        "n_reply_all": 2009,
+        "sum_reply_all": 3068186.0,
+        "n_reply_human": 909,
+        "sum_reply_human": 4558369.0
+      },
+      "2026-03-10": {
+        "n_total": 6658,
+        "n_reply_all": 2991,
+        "sum_reply_all": 2884556.0,
+        "n_reply_human": 1579,
+        "sum_reply_human": 4192509.0
+      },
+      "2026-04-30": {
+        "n_total": 8744,
+        "n_reply_all": 3854,
+        "sum_reply_all": 2952939.0,
+        "n_reply_human": 1608,
+        "sum_reply_human": 4214953.0
+      },
+      "2026-05-04": {
+        "n_total": 9317,
+        "n_reply_all": 4317,
+        "sum_reply_all": 2344521.0,
+        "n_reply_human": 1924,
+        "sum_reply_human": 3410959.0
+      },
+      "2026-03-13": {
+        "n_total": 6270,
+        "n_reply_all": 2715,
+        "sum_reply_all": 3947207.0,
+        "n_reply_human": 1407,
+        "sum_reply_human": 5291324.0
+      },
+      "2026-03-14": {
+        "n_total": 4447,
+        "n_reply_all": 1656,
+        "sum_reply_all": 2907767.0,
+        "n_reply_human": 679,
+        "sum_reply_human": 3665800.0
+      },
+      "2026-03-16": {
+        "n_total": 6403,
+        "n_reply_all": 2857,
+        "sum_reply_all": 2550518.0,
+        "n_reply_human": 1478,
+        "sum_reply_human": 3603393.0
+      },
+      "2026-03-15": {
+        "n_total": 4198,
+        "n_reply_all": 1615,
+        "sum_reply_all": 1527290.0,
+        "n_reply_human": 652,
+        "sum_reply_human": 2206988.0
+      },
+      "2026-02-05": {
+        "n_total": 8252,
+        "n_reply_all": 3678,
+        "sum_reply_all": 1202260.0,
+        "n_reply_human": 1851,
+        "sum_reply_human": 1943305.0
+      },
+      "2026-04-10": {
+        "n_total": 7518,
+        "n_reply_all": 3011,
+        "sum_reply_all": 2913914.0,
+        "n_reply_human": 1370,
+        "sum_reply_human": 4230045.0
+      },
+      "2026-03-12": {
+        "n_total": 6676,
+        "n_reply_all": 2827,
+        "sum_reply_all": 2827187.0,
+        "n_reply_human": 1461,
+        "sum_reply_human": 3833333.0
+      },
+      "2026-03-11": {
+        "n_total": 6416,
+        "n_reply_all": 2936,
+        "sum_reply_all": 2639218.0,
+        "n_reply_human": 1576,
+        "sum_reply_human": 3916559.0
+      },
+      "2026-02-12": {
+        "n_total": 7088,
+        "n_reply_all": 3188,
+        "sum_reply_all": 1421151.0,
+        "n_reply_human": 1573,
+        "sum_reply_human": 2119186.0
+      },
+      "2026-02-14": {
+        "n_total": 5747,
+        "n_reply_all": 2260,
+        "sum_reply_all": 1757219.0,
+        "n_reply_human": 985,
+        "sum_reply_human": 2661724.0
+      },
+      "2026-04-21": {
+        "n_total": 7514,
+        "n_reply_all": 3264,
+        "sum_reply_all": 2516077.0,
+        "n_reply_human": 1499,
+        "sum_reply_human": 3508236.0
+      },
+      "2026-03-06": {
+        "n_total": 6690,
+        "n_reply_all": 3099,
+        "sum_reply_all": 4297919.0,
+        "n_reply_human": 1628,
+        "sum_reply_human": 5573371.0
+      },
+      "2026-03-03": {
+        "n_total": 6710,
+        "n_reply_all": 3009,
+        "sum_reply_all": 2142413.0,
+        "n_reply_human": 1602,
+        "sum_reply_human": 3092731.0
+      },
+      "2026-02-13": {
+        "n_total": 7537,
+        "n_reply_all": 3378,
+        "sum_reply_all": 1651897.0,
+        "n_reply_human": 1757,
+        "sum_reply_human": 2734603.0
+      },
+      "2026-02-06": {
+        "n_total": 7990,
+        "n_reply_all": 3523,
+        "sum_reply_all": 1368127.0,
+        "n_reply_human": 1742,
+        "sum_reply_human": 2175599.0
+      },
+      "2026-04-28": {
+        "n_total": 8311,
+        "n_reply_all": 3763,
+        "sum_reply_all": 2639042.0,
+        "n_reply_human": 1782,
+        "sum_reply_human": 3719801.0
+      },
+      "2026-03-02": {
+        "n_total": 6423,
+        "n_reply_all": 3079,
+        "sum_reply_all": 2014184.0,
+        "n_reply_human": 1746,
+        "sum_reply_human": 2758503.0
+      },
+      "2026-04-22": {
+        "n_total": 8096,
+        "n_reply_all": 3391,
+        "sum_reply_all": 2519891.0,
+        "n_reply_human": 1460,
+        "sum_reply_human": 3693045.0
+      },
+      "2026-04-23": {
+        "n_total": 7588,
+        "n_reply_all": 3269,
+        "sum_reply_all": 2256900.0,
+        "n_reply_human": 1479,
+        "sum_reply_human": 3239554.0
+      },
+      "2026-03-01": {
+        "n_total": 4270,
+        "n_reply_all": 1746,
+        "sum_reply_all": 1577550.0,
+        "n_reply_human": 805,
+        "sum_reply_human": 2231341.0
+      },
+      "2026-02-28": {
+        "n_total": 4961,
+        "n_reply_all": 2188,
+        "sum_reply_all": 2338907.0,
+        "n_reply_human": 1125,
+        "sum_reply_human": 3323818.0
+      },
+      "2026-04-24": {
+        "n_total": 7129,
+        "n_reply_all": 3132,
+        "sum_reply_all": 2303335.0,
+        "n_reply_human": 1444,
+        "sum_reply_human": 3356605.0
+      },
+      "2026-04-27": {
+        "n_total": 7720,
+        "n_reply_all": 3534,
+        "sum_reply_all": 2715499.0,
+        "n_reply_human": 1755,
+        "sum_reply_human": 3557105.0
+      },
+      "2026-04-20": {
+        "n_total": 7318,
+        "n_reply_all": 3397,
+        "sum_reply_all": 2317744.0,
+        "n_reply_human": 1600,
+        "sum_reply_human": 3139170.0
+      },
+      "2026-02-27": {
+        "n_total": 6471,
+        "n_reply_all": 2873,
+        "sum_reply_all": 2530215.0,
+        "n_reply_human": 1560,
+        "sum_reply_human": 3726994.0
+      },
+      "2026-02-23": {
+        "n_total": 7143,
+        "n_reply_all": 3322,
+        "sum_reply_all": 1870081.0,
+        "n_reply_human": 1835,
+        "sum_reply_human": 2872739.0
+      },
+      "2026-02-26": {
+        "n_total": 6925,
+        "n_reply_all": 3094,
+        "sum_reply_all": 1878387.0,
+        "n_reply_human": 1712,
+        "sum_reply_human": 3008551.0
+      },
+      "2026-04-26": {
+        "n_total": 5111,
+        "n_reply_all": 1986,
+        "sum_reply_all": 1649596.0,
+        "n_reply_human": 675,
+        "sum_reply_human": 2156243.0
+      },
+      "2026-02-24": {
+        "n_total": 7329,
+        "n_reply_all": 3379,
+        "sum_reply_all": 2266550.0,
+        "n_reply_human": 1880,
+        "sum_reply_human": 3223262.0
+      },
+      "2026-04-17": {
+        "n_total": 7298,
+        "n_reply_all": 3184,
+        "sum_reply_all": 3608862.0,
+        "n_reply_human": 1577,
+        "sum_reply_human": 5087499.0
+      },
+      "2026-04-25": {
+        "n_total": 5653,
+        "n_reply_all": 2213,
+        "sum_reply_all": 2383722.0,
+        "n_reply_human": 881,
+        "sum_reply_human": 3140264.0
+      },
+      "2026-02-25": {
+        "n_total": 7258,
+        "n_reply_all": 3296,
+        "sum_reply_all": 2076060.0,
+        "n_reply_human": 1815,
+        "sum_reply_human": 3142609.0
+      },
+      "2026-04-18": {
+        "n_total": 5563,
+        "n_reply_all": 2386,
+        "sum_reply_all": 2761373.0,
+        "n_reply_human": 1045,
+        "sum_reply_human": 3699699.0
+      },
+      "2026-02-22": {
+        "n_total": 5173,
+        "n_reply_all": 2074,
+        "sum_reply_all": 1684754.0,
+        "n_reply_human": 815,
+        "sum_reply_human": 2372439.0
+      },
+      "2026-04-19": {
+        "n_total": 4920,
+        "n_reply_all": 1969,
+        "sum_reply_all": 2411277.0,
+        "n_reply_human": 805,
+        "sum_reply_human": 3452625.0
+      },
+      "2026-02-11": {
+        "n_total": 7326,
+        "n_reply_all": 3195,
+        "sum_reply_all": 1273716.0,
+        "n_reply_human": 1621,
+        "sum_reply_human": 1864676.0
+      },
+      "2026-02-21": {
+        "n_total": 6353,
+        "n_reply_all": 2718,
+        "sum_reply_all": 2766722.0,
+        "n_reply_human": 1319,
+        "sum_reply_human": 3959618.0
+      },
+      "2026-02-19": {
+        "n_total": 8280,
+        "n_reply_all": 3797,
+        "sum_reply_all": 2755237.0,
+        "n_reply_human": 1977,
+        "sum_reply_human": 4036937.0
+      },
+      "2026-02-20": {
+        "n_total": 7801,
+        "n_reply_all": 3457,
+        "sum_reply_all": 3049472.0,
+        "n_reply_human": 1805,
+        "sum_reply_human": 4305003.0
+      },
+      "2026-04-15": {
+        "n_total": 7648,
+        "n_reply_all": 3402,
+        "sum_reply_all": 2277773.0,
+        "n_reply_human": 1595,
+        "sum_reply_human": 3498228.0
+      },
+      "2026-04-16": {
+        "n_total": 7278,
+        "n_reply_all": 3214,
+        "sum_reply_all": 2415393.0,
+        "n_reply_human": 1536,
+        "sum_reply_human": 3307969.0
+      },
+      "2026-04-13": {
+        "n_total": 7131,
+        "n_reply_all": 3250,
+        "sum_reply_all": 2538392.0,
+        "n_reply_human": 1659,
+        "sum_reply_human": 3741684.0
+      },
+      "2026-04-14": {
+        "n_total": 7499,
+        "n_reply_all": 3400,
+        "sum_reply_all": 2928033.0,
+        "n_reply_human": 1678,
+        "sum_reply_human": 4105099.0
+      },
+      "2026-04-12": {
+        "n_total": 5164,
+        "n_reply_all": 1816,
+        "sum_reply_all": 1563792.0,
+        "n_reply_human": 670,
+        "sum_reply_human": 2288902.0
+      }
+    },
+    "applicant": {
+      "2026-04-07": {
+        "n_total": 177,
+        "n_reply_all": 159,
+        "sum_reply_all": 524902.0,
+        "n_reply_human": 93,
+        "sum_reply_human": 493642.0
+      },
+      "2026-01-03": {
+        "n_total": 96,
+        "n_reply_all": 82,
+        "sum_reply_all": 163599.0,
+        "n_reply_human": 59,
+        "sum_reply_human": 208260.0
+      },
+      "2026-01-01": {
+        "n_total": 113,
+        "n_reply_all": 99,
+        "sum_reply_all": 85115.0,
+        "n_reply_human": 63,
+        "sum_reply_human": 132144.0
+      },
+      "2026-01-30": {
+        "n_total": 160,
+        "n_reply_all": 132,
+        "sum_reply_all": 94227.0,
+        "n_reply_human": 82,
+        "sum_reply_human": 168753.0
+      },
+      "2026-01-08": {
+        "n_total": 96,
+        "n_reply_all": 70,
+        "sum_reply_all": 92462.0,
+        "n_reply_human": 43,
+        "sum_reply_human": 114234.0
+      },
+      "2026-01-13": {
+        "n_total": 149,
+        "n_reply_all": 129,
+        "sum_reply_all": 124640.0,
+        "n_reply_human": 99,
+        "sum_reply_human": 216021.0
+      },
+      "2026-01-14": {
+        "n_total": 119,
+        "n_reply_all": 108,
+        "sum_reply_all": 151944.0,
+        "n_reply_human": 80,
+        "sum_reply_human": 202503.0
+      },
+      "2026-01-02": {
+        "n_total": 171,
+        "n_reply_all": 156,
+        "sum_reply_all": 209677.0,
+        "n_reply_human": 118,
+        "sum_reply_human": 336539.0
+      },
+      "2026-01-15": {
+        "n_total": 110,
+        "n_reply_all": 101,
+        "sum_reply_all": 96367.0,
+        "n_reply_human": 66,
+        "sum_reply_human": 93228.0
+      },
+      "2026-01-10": {
+        "n_total": 82,
+        "n_reply_all": 75,
+        "sum_reply_all": 104785.0,
+        "n_reply_human": 45,
+        "sum_reply_human": 124323.0
+      },
+      "2026-01-12": {
+        "n_total": 138,
+        "n_reply_all": 120,
+        "sum_reply_all": 153214.0,
+        "n_reply_human": 81,
+        "sum_reply_human": 118926.0
+      },
+      "2026-01-29": {
+        "n_total": 181,
+        "n_reply_all": 153,
+        "sum_reply_all": 117180.0,
+        "n_reply_human": 92,
+        "sum_reply_human": 107553.0
+      },
+      "2026-01-06": {
+        "n_total": 145,
+        "n_reply_all": 122,
+        "sum_reply_all": 70149.0,
+        "n_reply_human": 78,
+        "sum_reply_human": 69319.0
+      },
+      "2026-01-05": {
+        "n_total": 128,
+        "n_reply_all": 108,
+        "sum_reply_all": 212790.0,
+        "n_reply_human": 54,
+        "sum_reply_human": 77504.0
+      },
+      "2026-01-07": {
+        "n_total": 120,
+        "n_reply_all": 98,
+        "sum_reply_all": 109625.0,
+        "n_reply_human": 66,
+        "sum_reply_human": 195936.0
+      },
+      "2026-01-09": {
+        "n_total": 133,
+        "n_reply_all": 114,
+        "sum_reply_all": 101876.0,
+        "n_reply_human": 81,
+        "sum_reply_human": 148971.0
+      },
+      "2026-04-06": {
+        "n_total": 123,
+        "n_reply_all": 99,
+        "sum_reply_all": 150353.0,
+        "n_reply_human": 65,
+        "sum_reply_human": 181213.0
+      },
+      "2026-01-27": {
+        "n_total": 132,
+        "n_reply_all": 120,
+        "sum_reply_all": 127890.0,
+        "n_reply_human": 88,
+        "sum_reply_human": 147199.0
+      },
+      "2026-01-26": {
+        "n_total": 138,
+        "n_reply_all": 119,
+        "sum_reply_all": 75256.0,
+        "n_reply_human": 79,
+        "sum_reply_human": 89846.0
+      },
+      "2026-05-14": {
+        "n_total": 37,
+        "n_reply_all": 11,
+        "sum_reply_all": 174.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-01-24": {
+        "n_total": 130,
+        "n_reply_all": 112,
+        "sum_reply_all": 88706.0,
+        "n_reply_human": 66,
+        "sum_reply_human": 129391.0
+      },
+      "2026-01-28": {
+        "n_total": 167,
+        "n_reply_all": 155,
+        "sum_reply_all": 111137.0,
+        "n_reply_human": 118,
+        "sum_reply_human": 159564.0
+      },
+      "2026-02-01": {
+        "n_total": 84,
+        "n_reply_all": 65,
+        "sum_reply_all": 68967.0,
+        "n_reply_human": 47,
+        "sum_reply_human": 140417.0
+      },
+      "2026-05-13": {
+        "n_total": 262,
+        "n_reply_all": 175,
+        "sum_reply_all": 13335.0,
+        "n_reply_human": 62,
+        "sum_reply_human": 16325.0
+      },
+      "2026-01-16": {
+        "n_total": 104,
+        "n_reply_all": 95,
+        "sum_reply_all": 128122.0,
+        "n_reply_human": 70,
+        "sum_reply_human": 183327.0
+      },
+      "2026-01-17": {
+        "n_total": 83,
+        "n_reply_all": 74,
+        "sum_reply_all": 98432.0,
+        "n_reply_human": 45,
+        "sum_reply_human": 170617.0
+      },
+      "2026-01-18": {
+        "n_total": 55,
+        "n_reply_all": 46,
+        "sum_reply_all": 56622.0,
+        "n_reply_human": 29,
+        "sum_reply_human": 62996.0
+      },
+      "2026-01-20": {
+        "n_total": 117,
+        "n_reply_all": 102,
+        "sum_reply_all": 153236.0,
+        "n_reply_human": 79,
+        "sum_reply_human": 207631.0
+      },
+      "2026-01-23": {
+        "n_total": 132,
+        "n_reply_all": 122,
+        "sum_reply_all": 175631.0,
+        "n_reply_human": 83,
+        "sum_reply_human": 209077.0
+      },
+      "2026-01-22": {
+        "n_total": 149,
+        "n_reply_all": 125,
+        "sum_reply_all": 144993.0,
+        "n_reply_human": 83,
+        "sum_reply_human": 225151.0
+      },
+      "2026-05-11": {
+        "n_total": 257,
+        "n_reply_all": 203,
+        "sum_reply_all": 45442.0,
+        "n_reply_human": 96,
+        "sum_reply_human": 50342.0
+      },
+      "2026-01-21": {
+        "n_total": 143,
+        "n_reply_all": 115,
+        "sum_reply_all": 102996.0,
+        "n_reply_human": 90,
+        "sum_reply_human": 203019.0
+      },
+      "2026-05-09": {
+        "n_total": 133,
+        "n_reply_all": 104,
+        "sum_reply_all": 39492.0,
+        "n_reply_human": 40,
+        "sum_reply_human": 56953.0
+      },
+      "2026-01-25": {
+        "n_total": 75,
+        "n_reply_all": 60,
+        "sum_reply_all": 71715.0,
+        "n_reply_human": 33,
+        "sum_reply_human": 95487.0
+      },
+      "2026-05-10": {
+        "n_total": 103,
+        "n_reply_all": 79,
+        "sum_reply_all": 26190.0,
+        "n_reply_human": 25,
+        "sum_reply_human": 30850.0
+      },
+      "2026-01-04": {
+        "n_total": 67,
+        "n_reply_all": 57,
+        "sum_reply_all": 63763.0,
+        "n_reply_human": 38,
+        "sum_reply_human": 82313.0
+      },
+      "2026-01-31": {
+        "n_total": 97,
+        "n_reply_all": 95,
+        "sum_reply_all": 143246.0,
+        "n_reply_human": 67,
+        "sum_reply_human": 298590.0
+      },
+      "2026-01-11": {
+        "n_total": 54,
+        "n_reply_all": 39,
+        "sum_reply_all": 23339.0,
+        "n_reply_human": 20,
+        "sum_reply_human": 50930.0
+      },
+      "2026-03-26": {
+        "n_total": 137,
+        "n_reply_all": 108,
+        "sum_reply_all": 239080.0,
+        "n_reply_human": 74,
+        "sum_reply_human": 282294.0
+      },
+      "2026-05-01": {
+        "n_total": 216,
+        "n_reply_all": 174,
+        "sum_reply_all": 199545.0,
+        "n_reply_human": 79,
+        "sum_reply_human": 227393.0
+      },
+      "2026-02-09": {
+        "n_total": 174,
+        "n_reply_all": 151,
+        "sum_reply_all": 36671.0,
+        "n_reply_human": 94,
+        "sum_reply_human": 60356.0
+      },
+      "2026-03-09": {
+        "n_total": 125,
+        "n_reply_all": 113,
+        "sum_reply_all": 223367.0,
+        "n_reply_human": 66,
+        "sum_reply_human": 209966.0
+      },
+      "2026-04-04": {
+        "n_total": 79,
+        "n_reply_all": 71,
+        "sum_reply_all": 137385.0,
+        "n_reply_human": 42,
+        "sum_reply_human": 239361.0
+      },
+      "2026-03-28": {
+        "n_total": 86,
+        "n_reply_all": 67,
+        "sum_reply_all": 169580.0,
+        "n_reply_human": 45,
+        "sum_reply_human": 212948.0
+      },
+      "2026-04-05": {
+        "n_total": 50,
+        "n_reply_all": 32,
+        "sum_reply_all": 67860.0,
+        "n_reply_human": 16,
+        "sum_reply_human": 78620.0
+      },
+      "2026-01-19": {
+        "n_total": 103,
+        "n_reply_all": 82,
+        "sum_reply_all": 82380.0,
+        "n_reply_human": 56,
+        "sum_reply_human": 101784.0
+      },
+      "2026-02-18": {
+        "n_total": 171,
+        "n_reply_all": 154,
+        "sum_reply_all": 108227.0,
+        "n_reply_human": 113,
+        "sum_reply_human": 162338.0
+      },
+      "2026-04-01": {
+        "n_total": 111,
+        "n_reply_all": 99,
+        "sum_reply_all": 82265.0,
+        "n_reply_human": 54,
+        "sum_reply_human": 96209.0
+      },
+      "2026-02-10": {
+        "n_total": 179,
+        "n_reply_all": 145,
+        "sum_reply_all": 80710.0,
+        "n_reply_human": 104,
+        "sum_reply_human": 113759.0
+      },
+      "2026-03-25": {
+        "n_total": 136,
+        "n_reply_all": 111,
+        "sum_reply_all": 136992.0,
+        "n_reply_human": 67,
+        "sum_reply_human": 170689.0
+      },
+      "2026-04-03": {
+        "n_total": 110,
+        "n_reply_all": 88,
+        "sum_reply_all": 155147.0,
+        "n_reply_human": 59,
+        "sum_reply_human": 271129.0
+      },
+      "2026-04-11": {
+        "n_total": 69,
+        "n_reply_all": 48,
+        "sum_reply_all": 117980.0,
+        "n_reply_human": 26,
+        "sum_reply_human": 153432.0
+      },
+      "2026-05-05": {
+        "n_total": 274,
+        "n_reply_all": 214,
+        "sum_reply_all": 159260.0,
+        "n_reply_human": 107,
+        "sum_reply_human": 158327.0
+      },
+      "2026-04-02": {
+        "n_total": 161,
+        "n_reply_all": 127,
+        "sum_reply_all": 194658.0,
+        "n_reply_human": 98,
+        "sum_reply_human": 338043.0
+      },
+      "2026-03-21": {
+        "n_total": 46,
+        "n_reply_all": 43,
+        "sum_reply_all": 89037.0,
+        "n_reply_human": 28,
+        "sum_reply_human": 96433.0
+      },
+      "2026-02-08": {
+        "n_total": 77,
+        "n_reply_all": 63,
+        "sum_reply_all": 56372.0,
+        "n_reply_human": 49,
+        "sum_reply_human": 69444.0
+      },
+      "2026-03-24": {
+        "n_total": 127,
+        "n_reply_all": 104,
+        "sum_reply_all": 174429.0,
+        "n_reply_human": 71,
+        "sum_reply_human": 202285.0
+      },
+      "2026-03-20": {
+        "n_total": 139,
+        "n_reply_all": 122,
+        "sum_reply_all": 225077.0,
+        "n_reply_human": 86,
+        "sum_reply_human": 274870.0
+      },
+      "2026-03-23": {
+        "n_total": 122,
+        "n_reply_all": 108,
+        "sum_reply_all": 250920.0,
+        "n_reply_human": 72,
+        "sum_reply_human": 302623.0
+      },
+      "2026-03-29": {
+        "n_total": 52,
+        "n_reply_all": 37,
+        "sum_reply_all": 86834.0,
+        "n_reply_human": 15,
+        "sum_reply_human": 75282.0
+      },
+      "2026-05-12": {
+        "n_total": 251,
+        "n_reply_all": 179,
+        "sum_reply_all": 29652.0,
+        "n_reply_human": 79,
+        "sum_reply_human": 37471.0
+      },
+      "2026-04-21": {
+        "n_total": 194,
+        "n_reply_all": 165,
+        "sum_reply_all": 162563.0,
+        "n_reply_human": 103,
+        "sum_reply_human": 205217.0
+      },
+      "2026-03-22": {
+        "n_total": 50,
+        "n_reply_all": 43,
+        "sum_reply_all": 91654.0,
+        "n_reply_human": 21,
+        "sum_reply_human": 113915.0
+      },
+      "2026-05-08": {
+        "n_total": 118,
+        "n_reply_all": 98,
+        "sum_reply_all": 86700.0,
+        "n_reply_human": 54,
+        "sum_reply_human": 99965.0
+      },
+      "2026-02-17": {
+        "n_total": 138,
+        "n_reply_all": 121,
+        "sum_reply_all": 55538.0,
+        "n_reply_human": 73,
+        "sum_reply_human": 53102.0
+      },
+      "2026-03-10": {
+        "n_total": 150,
+        "n_reply_all": 118,
+        "sum_reply_all": 135880.0,
+        "n_reply_human": 81,
+        "sum_reply_human": 191723.0
+      },
+      "2026-03-11": {
+        "n_total": 150,
+        "n_reply_all": 129,
+        "sum_reply_all": 160120.0,
+        "n_reply_human": 98,
+        "sum_reply_human": 225591.0
+      },
+      "2026-03-13": {
+        "n_total": 174,
+        "n_reply_all": 145,
+        "sum_reply_all": 151356.0,
+        "n_reply_human": 111,
+        "sum_reply_human": 226078.0
+      },
+      "2026-05-07": {
+        "n_total": 152,
+        "n_reply_all": 113,
+        "sum_reply_all": 105891.0,
+        "n_reply_human": 74,
+        "sum_reply_human": 158251.0
+      },
+      "2026-03-15": {
+        "n_total": 57,
+        "n_reply_all": 52,
+        "sum_reply_all": 83010.0,
+        "n_reply_human": 28,
+        "sum_reply_human": 119350.0
+      },
+      "2026-03-14": {
+        "n_total": 79,
+        "n_reply_all": 60,
+        "sum_reply_all": 57362.0,
+        "n_reply_human": 34,
+        "sum_reply_human": 34933.0
+      },
+      "2026-03-31": {
+        "n_total": 128,
+        "n_reply_all": 108,
+        "sum_reply_all": 175844.0,
+        "n_reply_human": 69,
+        "sum_reply_human": 224648.0
+      },
+      "2026-03-12": {
+        "n_total": 157,
+        "n_reply_all": 127,
+        "sum_reply_all": 117647.0,
+        "n_reply_human": 100,
+        "sum_reply_human": 185186.0
+      },
+      "2026-02-03": {
+        "n_total": 167,
+        "n_reply_all": 146,
+        "sum_reply_all": 61190.0,
+        "n_reply_human": 99,
+        "sum_reply_human": 114960.0
+      },
+      "2026-03-27": {
+        "n_total": 147,
+        "n_reply_all": 134,
+        "sum_reply_all": 249600.0,
+        "n_reply_human": 94,
+        "sum_reply_human": 415145.0
+      },
+      "2026-04-25": {
+        "n_total": 119,
+        "n_reply_all": 102,
+        "sum_reply_all": 107019.0,
+        "n_reply_human": 60,
+        "sum_reply_human": 127212.0
+      },
+      "2026-05-06": {
+        "n_total": 248,
+        "n_reply_all": 197,
+        "sum_reply_all": 145749.0,
+        "n_reply_human": 99,
+        "sum_reply_human": 147314.0
+      },
+      "2026-03-19": {
+        "n_total": 104,
+        "n_reply_all": 89,
+        "sum_reply_all": 144114.0,
+        "n_reply_human": 63,
+        "sum_reply_human": 205229.0
+      },
+      "2026-03-16": {
+        "n_total": 128,
+        "n_reply_all": 103,
+        "sum_reply_all": 197079.0,
+        "n_reply_human": 72,
+        "sum_reply_human": 222161.0
+      },
+      "2026-05-04": {
+        "n_total": 251,
+        "n_reply_all": 206,
+        "sum_reply_all": 141601.0,
+        "n_reply_human": 97,
+        "sum_reply_human": 254352.0
+      },
+      "2026-03-07": {
+        "n_total": 111,
+        "n_reply_all": 101,
+        "sum_reply_all": 95170.0,
+        "n_reply_human": 82,
+        "sum_reply_human": 133622.0
+      },
+      "2026-02-16": {
+        "n_total": 114,
+        "n_reply_all": 99,
+        "sum_reply_all": 81630.0,
+        "n_reply_human": 60,
+        "sum_reply_human": 76558.0
+      },
+      "2026-04-09": {
+        "n_total": 195,
+        "n_reply_all": 144,
+        "sum_reply_all": 233856.0,
+        "n_reply_human": 90,
+        "sum_reply_human": 281412.0
+      },
+      "2026-04-10": {
+        "n_total": 144,
+        "n_reply_all": 114,
+        "sum_reply_all": 184478.0,
+        "n_reply_human": 64,
+        "sum_reply_human": 235131.0
+      },
+      "2026-02-13": {
+        "n_total": 156,
+        "n_reply_all": 130,
+        "sum_reply_all": 56360.0,
+        "n_reply_human": 83,
+        "sum_reply_human": 133629.0
+      },
+      "2026-04-22": {
+        "n_total": 199,
+        "n_reply_all": 176,
+        "sum_reply_all": 230635.0,
+        "n_reply_human": 118,
+        "sum_reply_human": 312111.0
+      },
+      "2026-03-18": {
+        "n_total": 135,
+        "n_reply_all": 113,
+        "sum_reply_all": 198547.0,
+        "n_reply_human": 75,
+        "sum_reply_human": 175584.0
+      },
+      "2026-02-07": {
+        "n_total": 94,
+        "n_reply_all": 78,
+        "sum_reply_all": 83008.0,
+        "n_reply_human": 59,
+        "sum_reply_human": 120152.0
+      },
+      "2026-05-02": {
+        "n_total": 128,
+        "n_reply_all": 103,
+        "sum_reply_all": 114906.0,
+        "n_reply_human": 51,
+        "sum_reply_human": 162978.0
+      },
+      "2026-03-30": {
+        "n_total": 143,
+        "n_reply_all": 122,
+        "sum_reply_all": 204445.0,
+        "n_reply_human": 73,
+        "sum_reply_human": 269464.0
+      },
+      "2026-02-15": {
+        "n_total": 55,
+        "n_reply_all": 43,
+        "sum_reply_all": 57784.0,
+        "n_reply_human": 23,
+        "sum_reply_human": 79174.0
+      },
+      "2026-03-06": {
+        "n_total": 121,
+        "n_reply_all": 99,
+        "sum_reply_all": 172921.0,
+        "n_reply_human": 78,
+        "sum_reply_human": 267337.0
+      },
+      "2026-03-05": {
+        "n_total": 124,
+        "n_reply_all": 112,
+        "sum_reply_all": 109243.0,
+        "n_reply_human": 81,
+        "sum_reply_human": 119775.0
+      },
+      "2026-02-06": {
+        "n_total": 154,
+        "n_reply_all": 137,
+        "sum_reply_all": 104730.0,
+        "n_reply_human": 96,
+        "sum_reply_human": 154973.0
+      },
+      "2026-02-02": {
+        "n_total": 143,
+        "n_reply_all": 128,
+        "sum_reply_all": 120643.0,
+        "n_reply_human": 84,
+        "sum_reply_human": 82523.0
+      },
+      "2026-03-08": {
+        "n_total": 56,
+        "n_reply_all": 50,
+        "sum_reply_all": 43973.0,
+        "n_reply_human": 39,
+        "sum_reply_human": 41814.0
+      },
+      "2026-03-17": {
+        "n_total": 167,
+        "n_reply_all": 156,
+        "sum_reply_all": 272987.0,
+        "n_reply_human": 130,
+        "sum_reply_human": 342401.0
+      },
+      "2026-03-03": {
+        "n_total": 154,
+        "n_reply_all": 141,
+        "sum_reply_all": 134332.0,
+        "n_reply_human": 103,
+        "sum_reply_human": 165616.0
+      },
+      "2026-02-28": {
+        "n_total": 68,
+        "n_reply_all": 53,
+        "sum_reply_all": 50295.0,
+        "n_reply_human": 31,
+        "sum_reply_human": 83568.0
+      },
+      "2026-05-03": {
+        "n_total": 105,
+        "n_reply_all": 81,
+        "sum_reply_all": 140249.0,
+        "n_reply_human": 35,
+        "sum_reply_human": 156020.0
+      },
+      "2026-02-04": {
+        "n_total": 176,
+        "n_reply_all": 145,
+        "sum_reply_all": 78586.0,
+        "n_reply_human": 92,
+        "sum_reply_human": 114998.0
+      },
+      "2026-04-24": {
+        "n_total": 193,
+        "n_reply_all": 171,
+        "sum_reply_all": 433860.0,
+        "n_reply_human": 107,
+        "sum_reply_human": 219199.0
+      },
+      "2026-04-20": {
+        "n_total": 205,
+        "n_reply_all": 179,
+        "sum_reply_all": 186667.0,
+        "n_reply_human": 107,
+        "sum_reply_human": 289442.0
+      },
+      "2026-04-30": {
+        "n_total": 181,
+        "n_reply_all": 149,
+        "sum_reply_all": 170163.0,
+        "n_reply_human": 89,
+        "sum_reply_human": 150148.0
+      },
+      "2026-03-04": {
+        "n_total": 120,
+        "n_reply_all": 105,
+        "sum_reply_all": 131645.0,
+        "n_reply_human": 78,
+        "sum_reply_human": 147528.0
+      },
+      "2026-02-14": {
+        "n_total": 103,
+        "n_reply_all": 88,
+        "sum_reply_all": 99021.0,
+        "n_reply_human": 57,
+        "sum_reply_human": 113163.0
+      },
+      "2026-03-01": {
+        "n_total": 59,
+        "n_reply_all": 57,
+        "sum_reply_all": 47955.0,
+        "n_reply_human": 41,
+        "sum_reply_human": 134045.0
+      },
+      "2026-03-02": {
+        "n_total": 144,
+        "n_reply_all": 127,
+        "sum_reply_all": 64700.0,
+        "n_reply_human": 99,
+        "sum_reply_human": 76201.0
+      },
+      "2026-02-05": {
+        "n_total": 198,
+        "n_reply_all": 180,
+        "sum_reply_all": 68186.0,
+        "n_reply_human": 128,
+        "sum_reply_human": 115655.0
+      },
+      "2026-04-23": {
+        "n_total": 174,
+        "n_reply_all": 142,
+        "sum_reply_all": 152440.0,
+        "n_reply_human": 84,
+        "sum_reply_human": 213035.0
+      },
+      "2026-04-26": {
+        "n_total": 75,
+        "n_reply_all": 65,
+        "sum_reply_all": 63846.0,
+        "n_reply_human": 31,
+        "sum_reply_human": 93030.0
+      },
+      "2026-02-26": {
+        "n_total": 122,
+        "n_reply_all": 104,
+        "sum_reply_all": 84915.0,
+        "n_reply_human": 70,
+        "sum_reply_human": 94663.0
+      },
+      "2026-02-27": {
+        "n_total": 91,
+        "n_reply_all": 78,
+        "sum_reply_all": 80457.0,
+        "n_reply_human": 56,
+        "sum_reply_human": 119806.0
+      },
+      "2026-04-17": {
+        "n_total": 181,
+        "n_reply_all": 157,
+        "sum_reply_all": 255479.0,
+        "n_reply_human": 106,
+        "sum_reply_human": 260127.0
+      },
+      "2026-04-29": {
+        "n_total": 191,
+        "n_reply_all": 165,
+        "sum_reply_all": 184621.0,
+        "n_reply_human": 91,
+        "sum_reply_human": 170114.0
+      },
+      "2026-02-12": {
+        "n_total": 130,
+        "n_reply_all": 104,
+        "sum_reply_all": 58770.0,
+        "n_reply_human": 76,
+        "sum_reply_human": 80973.0
+      },
+      "2026-02-25": {
+        "n_total": 149,
+        "n_reply_all": 119,
+        "sum_reply_all": 129158.0,
+        "n_reply_human": 89,
+        "sum_reply_human": 167833.0
+      },
+      "2026-04-27": {
+        "n_total": 183,
+        "n_reply_all": 149,
+        "sum_reply_all": 298970.0,
+        "n_reply_human": 79,
+        "sum_reply_human": 271906.0
+      },
+      "2026-02-22": {
+        "n_total": 83,
+        "n_reply_all": 66,
+        "sum_reply_all": 54089.0,
+        "n_reply_human": 45,
+        "sum_reply_human": 63209.0
+      },
+      "2026-02-24": {
+        "n_total": 115,
+        "n_reply_all": 103,
+        "sum_reply_all": 180093.0,
+        "n_reply_human": 70,
+        "sum_reply_human": 106025.0
+      },
+      "2026-02-23": {
+        "n_total": 133,
+        "n_reply_all": 117,
+        "sum_reply_all": 98886.0,
+        "n_reply_human": 81,
+        "sum_reply_human": 94774.0
+      },
+      "2026-02-19": {
+        "n_total": 184,
+        "n_reply_all": 161,
+        "sum_reply_all": 133362.0,
+        "n_reply_human": 126,
+        "sum_reply_human": 211407.0
+      },
+      "2026-02-20": {
+        "n_total": 215,
+        "n_reply_all": 197,
+        "sum_reply_all": 139975.0,
+        "n_reply_human": 138,
+        "sum_reply_human": 243345.0
+      },
+      "2026-02-21": {
+        "n_total": 98,
+        "n_reply_all": 93,
+        "sum_reply_all": 102414.0,
+        "n_reply_human": 74,
+        "sum_reply_human": 149456.0
+      },
+      "2026-02-11": {
+        "n_total": 148,
+        "n_reply_all": 123,
+        "sum_reply_all": 55991.0,
+        "n_reply_human": 77,
+        "sum_reply_human": 121298.0
+      },
+      "2026-04-28": {
+        "n_total": 179,
+        "n_reply_all": 157,
+        "sum_reply_all": 159253.0,
+        "n_reply_human": 86,
+        "sum_reply_human": 282705.0
+      },
+      "2026-04-08": {
+        "n_total": 147,
+        "n_reply_all": 129,
+        "sum_reply_all": 330689.0,
+        "n_reply_human": 70,
+        "sum_reply_human": 310315.0
+      },
+      "2026-04-18": {
+        "n_total": 85,
+        "n_reply_all": 66,
+        "sum_reply_all": 53559.0,
+        "n_reply_human": 41,
+        "sum_reply_human": 89490.0
+      },
+      "2026-04-16": {
+        "n_total": 186,
+        "n_reply_all": 166,
+        "sum_reply_all": 205253.0,
+        "n_reply_human": 107,
+        "sum_reply_human": 314300.0
+      },
+      "2026-04-19": {
+        "n_total": 61,
+        "n_reply_all": 49,
+        "sum_reply_all": 78898.0,
+        "n_reply_human": 33,
+        "sum_reply_human": 154175.0
+      },
+      "2026-04-15": {
+        "n_total": 164,
+        "n_reply_all": 141,
+        "sum_reply_all": 111573.0,
+        "n_reply_human": 93,
+        "sum_reply_human": 162401.0
+      },
+      "2026-04-14": {
+        "n_total": 148,
+        "n_reply_all": 136,
+        "sum_reply_all": 153192.0,
+        "n_reply_human": 99,
+        "sum_reply_human": 238816.0
+      },
+      "2026-04-13": {
+        "n_total": 114,
+        "n_reply_all": 98,
+        "sum_reply_all": 101028.0,
+        "n_reply_human": 54,
+        "sum_reply_human": 96664.0
+      },
+      "2026-04-12": {
+        "n_total": 54,
+        "n_reply_all": 35,
+        "sum_reply_all": 36092.0,
+        "n_reply_human": 19,
+        "sum_reply_human": 51881.0
+      }
+    },
+    "live_loan": {
+      "2026-05-13": {
+        "n_total": 2,
+        "n_reply_all": 0,
+        "sum_reply_all": 0.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-01-13": {
+        "n_total": 8,
+        "n_reply_all": 8,
+        "sum_reply_all": 8180.0,
+        "n_reply_human": 8,
+        "sum_reply_human": 11304.0
+      },
+      "2026-01-15": {
+        "n_total": 4,
+        "n_reply_all": 3,
+        "sum_reply_all": 2095.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 2095.0
+      },
+      "2026-01-07": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 307.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 307.0
+      },
+      "2026-01-28": {
+        "n_total": 5,
+        "n_reply_all": 5,
+        "sum_reply_all": 15059.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 9062.0
+      },
+      "2026-01-21": {
+        "n_total": 11,
+        "n_reply_all": 5,
+        "sum_reply_all": 19650.0,
+        "n_reply_human": 5,
+        "sum_reply_human": 32944.0
+      },
+      "2026-01-03": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 11922.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 11922.0
+      },
+      "2026-01-06": {
+        "n_total": 5,
+        "n_reply_all": 5,
+        "sum_reply_all": 17736.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 13123.0
+      },
+      "2026-01-27": {
+        "n_total": 12,
+        "n_reply_all": 12,
+        "sum_reply_all": 30793.0,
+        "n_reply_human": 9,
+        "sum_reply_human": 9348.0
+      },
+      "2026-01-26": {
+        "n_total": 5,
+        "n_reply_all": 4,
+        "sum_reply_all": 9786.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 9770.0
+      },
+      "2026-01-22": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 8498.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 6795.0
+      },
+      "2026-02-06": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 15343.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 15702.0
+      },
+      "2026-01-02": {
+        "n_total": 8,
+        "n_reply_all": 8,
+        "sum_reply_all": 45998.0,
+        "n_reply_human": 8,
+        "sum_reply_human": 46260.0
+      },
+      "2026-01-09": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 7857.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 7857.0
+      },
+      "2026-01-12": {
+        "n_total": 6,
+        "n_reply_all": 5,
+        "sum_reply_all": 6016.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 9099.0
+      },
+      "2026-01-23": {
+        "n_total": 8,
+        "n_reply_all": 8,
+        "sum_reply_all": 23915.0,
+        "n_reply_human": 8,
+        "sum_reply_human": 23915.0
+      },
+      "2026-01-14": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 2628.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 2628.0
+      },
+      "2026-01-04": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 6978.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 6978.0
+      },
+      "2026-05-07": {
+        "n_total": 7,
+        "n_reply_all": 6,
+        "sum_reply_all": 2608.0,
+        "n_reply_human": 5,
+        "sum_reply_human": 9388.0
+      },
+      "2026-05-09": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 995.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 1070.0
+      },
+      "2026-04-03": {
+        "n_total": 12,
+        "n_reply_all": 10,
+        "sum_reply_all": 35289.0,
+        "n_reply_human": 10,
+        "sum_reply_human": 42052.0
+      },
+      "2026-01-19": {
+        "n_total": 6,
+        "n_reply_all": 6,
+        "sum_reply_all": 38481.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 8050.0
+      },
+      "2026-03-12": {
+        "n_total": 15,
+        "n_reply_all": 14,
+        "sum_reply_all": 36675.0,
+        "n_reply_human": 14,
+        "sum_reply_human": 50004.0
+      },
+      "2026-04-02": {
+        "n_total": 10,
+        "n_reply_all": 7,
+        "sum_reply_all": 8983.0,
+        "n_reply_human": 5,
+        "sum_reply_human": 11778.0
+      },
+      "2026-04-23": {
+        "n_total": 6,
+        "n_reply_all": 4,
+        "sum_reply_all": 2788.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 3698.0
+      },
+      "2026-05-04": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 16.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-03-09": {
+        "n_total": 14,
+        "n_reply_all": 10,
+        "sum_reply_all": 37787.0,
+        "n_reply_human": 9,
+        "sum_reply_human": 47067.0
+      },
+      "2026-04-30": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 16.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 10408.0
+      },
+      "2026-03-30": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 14.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 4504.0
+      },
+      "2026-03-13": {
+        "n_total": 5,
+        "n_reply_all": 3,
+        "sum_reply_all": 15345.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 15329.0
+      },
+      "2026-05-10": {
+        "n_total": 2,
+        "n_reply_all": 1,
+        "sum_reply_all": 3719.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 3719.0
+      },
+      "2026-03-14": {
+        "n_total": 3,
+        "n_reply_all": 3,
+        "sum_reply_all": 218.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 218.0
+      },
+      "2026-04-16": {
+        "n_total": 10,
+        "n_reply_all": 9,
+        "sum_reply_all": 5702.0,
+        "n_reply_human": 9,
+        "sum_reply_human": 12931.0
+      },
+      "2026-03-31": {
+        "n_total": 7,
+        "n_reply_all": 7,
+        "sum_reply_all": 240.0,
+        "n_reply_human": 7,
+        "sum_reply_human": 240.0
+      },
+      "2026-03-27": {
+        "n_total": 7,
+        "n_reply_all": 5,
+        "sum_reply_all": 2534.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 10910.0
+      },
+      "2026-02-27": {
+        "n_total": 10,
+        "n_reply_all": 9,
+        "sum_reply_all": 22975.0,
+        "n_reply_human": 9,
+        "sum_reply_human": 22975.0
+      },
+      "2026-03-03": {
+        "n_total": 7,
+        "n_reply_all": 6,
+        "sum_reply_all": 18247.0,
+        "n_reply_human": 6,
+        "sum_reply_human": 18247.0
+      },
+      "2026-01-18": {
+        "n_total": 3,
+        "n_reply_all": 3,
+        "sum_reply_all": 3247.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 3089.0
+      },
+      "2026-02-17": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 4194.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 4178.0
+      },
+      "2026-03-06": {
+        "n_total": 3,
+        "n_reply_all": 3,
+        "sum_reply_all": 8661.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 8661.0
+      },
+      "2026-03-08": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 709.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 709.0
+      },
+      "2026-03-17": {
+        "n_total": 6,
+        "n_reply_all": 5,
+        "sum_reply_all": 4522.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 4506.0
+      },
+      "2026-05-08": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 7582.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 15154.0
+      },
+      "2026-05-06": {
+        "n_total": 3,
+        "n_reply_all": 2,
+        "sum_reply_all": 2634.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 6161.0
+      },
+      "2026-02-05": {
+        "n_total": 7,
+        "n_reply_all": 7,
+        "sum_reply_all": 15033.0,
+        "n_reply_human": 6,
+        "sum_reply_human": 8252.0
+      },
+      "2026-03-11": {
+        "n_total": 7,
+        "n_reply_all": 6,
+        "sum_reply_all": 9419.0,
+        "n_reply_human": 6,
+        "sum_reply_human": 16410.0
+      },
+      "2026-03-26": {
+        "n_total": 8,
+        "n_reply_all": 6,
+        "sum_reply_all": 2611.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 23094.0
+      },
+      "2026-03-07": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 16074.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 16074.0
+      },
+      "2026-01-29": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 1387.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 1387.0
+      },
+      "2026-03-02": {
+        "n_total": 9,
+        "n_reply_all": 9,
+        "sum_reply_all": 4594.0,
+        "n_reply_human": 9,
+        "sum_reply_human": 9019.0
+      },
+      "2026-02-24": {
+        "n_total": 11,
+        "n_reply_all": 7,
+        "sum_reply_all": 20593.0,
+        "n_reply_human": 5,
+        "sum_reply_human": 20561.0
+      },
+      "2026-03-05": {
+        "n_total": 8,
+        "n_reply_all": 8,
+        "sum_reply_all": 5809.0,
+        "n_reply_human": 8,
+        "sum_reply_human": 5949.0
+      },
+      "2026-03-04": {
+        "n_total": 8,
+        "n_reply_all": 4,
+        "sum_reply_all": 12545.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 15791.0
+      },
+      "2026-03-29": {
+        "n_total": 3,
+        "n_reply_all": 1,
+        "sum_reply_all": 16.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-02-02": {
+        "n_total": 7,
+        "n_reply_all": 7,
+        "sum_reply_all": 21590.0,
+        "n_reply_human": 6,
+        "sum_reply_human": 19805.0
+      },
+      "2026-02-09": {
+        "n_total": 7,
+        "n_reply_all": 7,
+        "sum_reply_all": 9323.0,
+        "n_reply_human": 6,
+        "sum_reply_human": 9661.0
+      },
+      "2026-02-26": {
+        "n_total": 8,
+        "n_reply_all": 7,
+        "sum_reply_all": 13594.0,
+        "n_reply_human": 6,
+        "sum_reply_human": 15307.0
+      },
+      "2026-02-19": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 25093.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 14976.0
+      },
+      "2026-02-12": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 11387.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-02-04": {
+        "n_total": 11,
+        "n_reply_all": 10,
+        "sum_reply_all": 35638.0,
+        "n_reply_human": 9,
+        "sum_reply_human": 34316.0
+      },
+      "2026-02-20": {
+        "n_total": 15,
+        "n_reply_all": 14,
+        "sum_reply_all": 28107.0,
+        "n_reply_human": 12,
+        "sum_reply_human": 21922.0
+      },
+      "2026-02-10": {
+        "n_total": 7,
+        "n_reply_all": 5,
+        "sum_reply_all": 5395.0,
+        "n_reply_human": 5,
+        "sum_reply_human": 5395.0
+      },
+      "2026-02-21": {
+        "n_total": 4,
+        "n_reply_all": 3,
+        "sum_reply_all": 8996.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 8980.0
+      },
+      "2026-01-24": {
+        "n_total": 3,
+        "n_reply_all": 3,
+        "sum_reply_all": 6976.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 6976.0
+      },
+      "2026-03-19": {
+        "n_total": 4,
+        "n_reply_all": 2,
+        "sum_reply_all": 9054.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 314.0
+      },
+      "2026-04-08": {
+        "n_total": 5,
+        "n_reply_all": 4,
+        "sum_reply_all": 17425.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 215.0
+      },
+      "2026-04-21": {
+        "n_total": 4,
+        "n_reply_all": 3,
+        "sum_reply_all": 845.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 4376.0
+      },
+      "2026-04-17": {
+        "n_total": 4,
+        "n_reply_all": 3,
+        "sum_reply_all": 1036.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 2146.0
+      },
+      "2026-02-22": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 5722.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 5722.0
+      },
+      "2026-01-31": {
+        "n_total": 6,
+        "n_reply_all": 5,
+        "sum_reply_all": 3982.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 6300.0
+      },
+      "2026-04-18": {
+        "n_total": 2,
+        "n_reply_all": 0,
+        "sum_reply_all": 0.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-02-25": {
+        "n_total": 3,
+        "n_reply_all": 3,
+        "sum_reply_all": 3682.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 3682.0
+      },
+      "2026-03-23": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 5935.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 6048.0
+      },
+      "2026-03-25": {
+        "n_total": 3,
+        "n_reply_all": 2,
+        "sum_reply_all": 6141.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 11573.0
+      },
+      "2026-02-23": {
+        "n_total": 11,
+        "n_reply_all": 10,
+        "sum_reply_all": 16977.0,
+        "n_reply_human": 10,
+        "sum_reply_human": 17018.0
+      },
+      "2026-02-18": {
+        "n_total": 3,
+        "n_reply_all": 2,
+        "sum_reply_all": 14462.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 14462.0
+      },
+      "2026-04-15": {
+        "n_total": 9,
+        "n_reply_all": 8,
+        "sum_reply_all": 7944.0,
+        "n_reply_human": 7,
+        "sum_reply_human": 11063.0
+      },
+      "2026-03-24": {
+        "n_total": 12,
+        "n_reply_all": 10,
+        "sum_reply_all": 8585.0,
+        "n_reply_human": 8,
+        "sum_reply_human": 17487.0
+      },
+      "2026-04-24": {
+        "n_total": 4,
+        "n_reply_all": 2,
+        "sum_reply_all": 162.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 18633.0
+      },
+      "2026-04-13": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 5498.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 8264.0
+      },
+      "2026-02-03": {
+        "n_total": 8,
+        "n_reply_all": 8,
+        "sum_reply_all": 10651.0,
+        "n_reply_human": 8,
+        "sum_reply_human": 17124.0
+      },
+      "2026-04-07": {
+        "n_total": 5,
+        "n_reply_all": 5,
+        "sum_reply_all": 10839.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 961.0
+      },
+      "2026-04-28": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 11408.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 18811.0
+      },
+      "2026-03-18": {
+        "n_total": 7,
+        "n_reply_all": 6,
+        "sum_reply_all": 3293.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 3793.0
+      },
+      "2026-04-29": {
+        "n_total": 4,
+        "n_reply_all": 3,
+        "sum_reply_all": 14236.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 8494.0
+      },
+      "2026-02-16": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 1531.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 3.0
+      },
+      "2026-04-14": {
+        "n_total": 3,
+        "n_reply_all": 3,
+        "sum_reply_all": 3284.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 4988.0
+      },
+      "2026-04-27": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 67.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 51.0
+      },
+      "2026-04-09": {
+        "n_total": 6,
+        "n_reply_all": 5,
+        "sum_reply_all": 6992.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 6976.0
+      },
+      "2026-01-25": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 1276.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 1276.0
+      },
+      "2026-02-08": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 3212.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 3212.0
+      },
+      "2026-02-07": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 9731.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 9731.0
+      },
+      "2026-02-14": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 2921.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 2921.0
+      },
+      "2026-03-10": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 3618.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 3941.0
+      },
+      "2026-03-20": {
+        "n_total": 6,
+        "n_reply_all": 5,
+        "sum_reply_all": 18716.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 25261.0
+      },
+      "2026-02-28": {
+        "n_total": 5,
+        "n_reply_all": 5,
+        "sum_reply_all": 32288.0,
+        "n_reply_human": 5,
+        "sum_reply_human": 40748.0
+      },
+      "2026-02-01": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 14787.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 14787.0
+      },
+      "2026-02-11": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 11083.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 16812.0
+      },
+      "2026-04-22": {
+        "n_total": 8,
+        "n_reply_all": 8,
+        "sum_reply_all": 12192.0,
+        "n_reply_human": 8,
+        "sum_reply_human": 13558.0
+      },
+      "2026-01-05": {
+        "n_total": 3,
+        "n_reply_all": 3,
+        "sum_reply_all": 10574.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 4723.0
+      },
+      "2026-01-01": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 4353.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 4353.0
+      },
+      "2026-05-05": {
+        "n_total": 1,
+        "n_reply_all": 0,
+        "sum_reply_all": 0.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-05-12": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 16.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-01-30": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 5964.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 5964.0
+      },
+      "2026-02-13": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 1954.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 1954.0
+      },
+      "2026-03-16": {
+        "n_total": 2,
+        "n_reply_all": 1,
+        "sum_reply_all": 11636.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 16156.0
+      },
+      "2026-03-28": {
+        "n_total": 1,
+        "n_reply_all": 0,
+        "sum_reply_all": 0.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-04-20": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 1544.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 1544.0
+      },
+      "2026-04-01": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 16.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-05-03": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 4887.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 4887.0
+      }
+    },
+    "arrears": {
+      "2026-01-02": {
+        "n_total": 13,
+        "n_reply_all": 13,
+        "sum_reply_all": 7962.0,
+        "n_reply_human": 10,
+        "sum_reply_human": 29186.0
+      },
+      "2026-01-14": {
+        "n_total": 3,
+        "n_reply_all": 3,
+        "sum_reply_all": 13479.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 6447.0
+      },
+      "2026-03-25": {
+        "n_total": 6,
+        "n_reply_all": 4,
+        "sum_reply_all": 18644.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 3197.0
+      },
+      "2026-01-21": {
+        "n_total": 3,
+        "n_reply_all": 3,
+        "sum_reply_all": 8527.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 20433.0
+      },
+      "2026-01-29": {
+        "n_total": 4,
+        "n_reply_all": 3,
+        "sum_reply_all": 1273.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 1257.0
+      },
+      "2026-01-28": {
+        "n_total": 8,
+        "n_reply_all": 8,
+        "sum_reply_all": 5260.0,
+        "n_reply_human": 8,
+        "sum_reply_human": 7104.0
+      },
+      "2026-01-06": {
+        "n_total": 5,
+        "n_reply_all": 3,
+        "sum_reply_all": 48.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-01-26": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 1622.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 1606.0
+      },
+      "2026-01-27": {
+        "n_total": 2,
+        "n_reply_all": 1,
+        "sum_reply_all": 10137.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-01-30": {
+        "n_total": 5,
+        "n_reply_all": 5,
+        "sum_reply_all": 16998.0,
+        "n_reply_human": 5,
+        "sum_reply_human": 17439.0
+      },
+      "2026-01-05": {
+        "n_total": 6,
+        "n_reply_all": 5,
+        "sum_reply_all": 3648.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 35490.0
+      },
+      "2026-01-13": {
+        "n_total": 5,
+        "n_reply_all": 2,
+        "sum_reply_all": 262.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 262.0
+      },
+      "2026-01-12": {
+        "n_total": 4,
+        "n_reply_all": 3,
+        "sum_reply_all": 10533.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 10826.0
+      },
+      "2026-01-19": {
+        "n_total": 4,
+        "n_reply_all": 3,
+        "sum_reply_all": 1437.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 26.0
+      },
+      "2026-03-14": {
+        "n_total": 5,
+        "n_reply_all": 4,
+        "sum_reply_all": 6025.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 5912.0
+      },
+      "2026-01-03": {
+        "n_total": 2,
+        "n_reply_all": 0,
+        "sum_reply_all": 0.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-01-08": {
+        "n_total": 3,
+        "n_reply_all": 2,
+        "sum_reply_all": 11818.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 23330.0
+      },
+      "2026-01-24": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 2909.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 2909.0
+      },
+      "2026-03-30": {
+        "n_total": 2,
+        "n_reply_all": 1,
+        "sum_reply_all": 15.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 4505.0
+      },
+      "2026-03-13": {
+        "n_total": 8,
+        "n_reply_all": 8,
+        "sum_reply_all": 45158.0,
+        "n_reply_human": 5,
+        "sum_reply_human": 10729.0
+      },
+      "2026-03-12": {
+        "n_total": 6,
+        "n_reply_all": 6,
+        "sum_reply_all": 9098.0,
+        "n_reply_human": 6,
+        "sum_reply_human": 22303.0
+      },
+      "2026-04-01": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 16.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-04-02": {
+        "n_total": 3,
+        "n_reply_all": 2,
+        "sum_reply_all": 7639.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 8846.0
+      },
+      "2026-05-04": {
+        "n_total": 5,
+        "n_reply_all": 5,
+        "sum_reply_all": 3223.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 12547.0
+      },
+      "2026-03-11": {
+        "n_total": 3,
+        "n_reply_all": 2,
+        "sum_reply_all": 8802.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 8802.0
+      },
+      "2026-03-09": {
+        "n_total": 3,
+        "n_reply_all": 3,
+        "sum_reply_all": 12049.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 23791.0
+      },
+      "2026-02-10": {
+        "n_total": 7,
+        "n_reply_all": 7,
+        "sum_reply_all": 1544.0,
+        "n_reply_human": 5,
+        "sum_reply_human": 448.0
+      },
+      "2026-01-20": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 424.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 424.0
+      },
+      "2026-02-09": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 2630.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 261.0
+      },
+      "2026-05-05": {
+        "n_total": 6,
+        "n_reply_all": 5,
+        "sum_reply_all": 7776.0,
+        "n_reply_human": 5,
+        "sum_reply_human": 10731.0
+      },
+      "2026-05-08": {
+        "n_total": 1,
+        "n_reply_all": 0,
+        "sum_reply_all": 0.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-04-10": {
+        "n_total": 4,
+        "n_reply_all": 3,
+        "sum_reply_all": 8079.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 8063.0
+      },
+      "2026-02-06": {
+        "n_total": 3,
+        "n_reply_all": 3,
+        "sum_reply_all": 23448.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 16604.0
+      },
+      "2026-02-28": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 2873.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 2873.0
+      },
+      "2026-02-02": {
+        "n_total": 9,
+        "n_reply_all": 8,
+        "sum_reply_all": 6408.0,
+        "n_reply_human": 8,
+        "sum_reply_human": 10799.0
+      },
+      "2026-05-12": {
+        "n_total": 1,
+        "n_reply_all": 0,
+        "sum_reply_all": 0.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-03-19": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 936.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 936.0
+      },
+      "2026-03-04": {
+        "n_total": 5,
+        "n_reply_all": 5,
+        "sum_reply_all": 3132.0,
+        "n_reply_human": 5,
+        "sum_reply_human": 3132.0
+      },
+      "2026-03-27": {
+        "n_total": 2,
+        "n_reply_all": 1,
+        "sum_reply_all": 5411.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 5411.0
+      },
+      "2026-03-31": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 178.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 178.0
+      },
+      "2026-04-30": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 8510.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 8510.0
+      },
+      "2026-03-24": {
+        "n_total": 6,
+        "n_reply_all": 5,
+        "sum_reply_all": 6033.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 11651.0
+      },
+      "2026-01-04": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 2987.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 2987.0
+      },
+      "2026-03-02": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 1613.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 3133.0
+      },
+      "2026-05-01": {
+        "n_total": 1,
+        "n_reply_all": 0,
+        "sum_reply_all": 0.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-03-03": {
+        "n_total": 6,
+        "n_reply_all": 5,
+        "sum_reply_all": 6405.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 4974.0
+      },
+      "2026-02-21": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 3775.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 3775.0
+      },
+      "2026-03-16": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 3011.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 3011.0
+      },
+      "2026-03-06": {
+        "n_total": 3,
+        "n_reply_all": 3,
+        "sum_reply_all": 15045.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 17002.0
+      },
+      "2026-02-05": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 250.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 6095.0
+      },
+      "2026-02-19": {
+        "n_total": 4,
+        "n_reply_all": 3,
+        "sum_reply_all": 20331.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 100.0
+      },
+      "2026-03-17": {
+        "n_total": 3,
+        "n_reply_all": 3,
+        "sum_reply_all": 2423.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 4258.0
+      },
+      "2026-02-11": {
+        "n_total": 9,
+        "n_reply_all": 9,
+        "sum_reply_all": 25321.0,
+        "n_reply_human": 7,
+        "sum_reply_human": 21160.0
+      },
+      "2026-03-05": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 18130.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 54640.0
+      },
+      "2026-02-12": {
+        "n_total": 5,
+        "n_reply_all": 5,
+        "sum_reply_all": 16551.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 2818.0
+      },
+      "2026-02-26": {
+        "n_total": 2,
+        "n_reply_all": 1,
+        "sum_reply_all": 16.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-02-20": {
+        "n_total": 9,
+        "n_reply_all": 7,
+        "sum_reply_all": 36134.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 24766.0
+      },
+      "2026-02-22": {
+        "n_total": 5,
+        "n_reply_all": 3,
+        "sum_reply_all": 2540.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 2524.0
+      },
+      "2026-02-18": {
+        "n_total": 7,
+        "n_reply_all": 4,
+        "sum_reply_all": 20305.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 10606.0
+      },
+      "2026-04-14": {
+        "n_total": 5,
+        "n_reply_all": 5,
+        "sum_reply_all": 3957.0,
+        "n_reply_human": 5,
+        "sum_reply_human": 15489.0
+      },
+      "2026-01-18": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 1259.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 1259.0
+      },
+      "2026-02-24": {
+        "n_total": 4,
+        "n_reply_all": 3,
+        "sum_reply_all": 10298.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 10298.0
+      },
+      "2026-04-23": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 1140.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 1124.0
+      },
+      "2026-03-23": {
+        "n_total": 6,
+        "n_reply_all": 6,
+        "sum_reply_all": 26010.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 11439.0
+      },
+      "2026-03-26": {
+        "n_total": 3,
+        "n_reply_all": 3,
+        "sum_reply_all": 4138.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 15002.0
+      },
+      "2026-01-15": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 3460.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 3460.0
+      },
+      "2026-02-03": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 9908.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 32.0
+      },
+      "2026-04-08": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 64.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 9924.0
+      },
+      "2026-04-16": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 8989.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 14970.0
+      },
+      "2026-04-17": {
+        "n_total": 3,
+        "n_reply_all": 2,
+        "sum_reply_all": 32.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 9728.0
+      },
+      "2026-04-07": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 1366.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 2589.0
+      },
+      "2026-04-06": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 175.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 159.0
+      },
+      "2026-04-20": {
+        "n_total": 5,
+        "n_reply_all": 4,
+        "sum_reply_all": 5989.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 5989.0
+      },
+      "2026-05-11": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 1034.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-02-17": {
+        "n_total": 6,
+        "n_reply_all": 3,
+        "sum_reply_all": 38285.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-02-16": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 3479.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 1683.0
+      },
+      "2026-02-25": {
+        "n_total": 4,
+        "n_reply_all": 3,
+        "sum_reply_all": 19713.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 36802.0
+      },
+      "2026-02-13": {
+        "n_total": 5,
+        "n_reply_all": 5,
+        "sum_reply_all": 18060.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 305.0
+      },
+      "2026-03-18": {
+        "n_total": 4,
+        "n_reply_all": 3,
+        "sum_reply_all": 1916.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 11935.0
+      },
+      "2026-04-09": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 23089.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 14290.0
+      },
+      "2026-04-25": {
+        "n_total": 2,
+        "n_reply_all": 1,
+        "sum_reply_all": 259.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 259.0
+      },
+      "2026-04-15": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 86.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 1563.0
+      },
+      "2026-04-21": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 4360.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 8368.0
+      },
+      "2026-04-24": {
+        "n_total": 5,
+        "n_reply_all": 4,
+        "sum_reply_all": 163.0,
+        "n_reply_human": 4,
+        "sum_reply_human": 17718.0
+      },
+      "2026-01-09": {
+        "n_total": 2,
+        "n_reply_all": 1,
+        "sum_reply_all": 71.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 71.0
+      },
+      "2026-01-23": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 5556.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 14722.0
+      },
+      "2026-01-07": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 2125.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 4238.0
+      },
+      "2026-01-17": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 1.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 1.0
+      },
+      "2026-01-16": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 110.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 110.0
+      },
+      "2026-05-07": {
+        "n_total": 4,
+        "n_reply_all": 4,
+        "sum_reply_all": 21077.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 127.0
+      },
+      "2026-04-13": {
+        "n_total": 3,
+        "n_reply_all": 2,
+        "sum_reply_all": 16169.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-01-22": {
+        "n_total": 3,
+        "n_reply_all": 2,
+        "sum_reply_all": 11427.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 23776.0
+      },
+      "2026-04-03": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 8601.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 8601.0
+      },
+      "2026-04-29": {
+        "n_total": 4,
+        "n_reply_all": 3,
+        "sum_reply_all": 1671.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 32.0
+      },
+      "2026-02-04": {
+        "n_total": 3,
+        "n_reply_all": 3,
+        "sum_reply_all": 11395.0,
+        "n_reply_human": 3,
+        "sum_reply_human": 12719.0
+      },
+      "2026-02-27": {
+        "n_total": 1,
+        "n_reply_all": 0,
+        "sum_reply_all": 0.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-04-22": {
+        "n_total": 2,
+        "n_reply_all": 2,
+        "sum_reply_all": 1169.0,
+        "n_reply_human": 2,
+        "sum_reply_human": 2366.0
+      },
+      "2026-02-23": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 2505.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      },
+      "2026-03-10": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 4151.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 10022.0
+      },
+      "2026-05-06": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 1393.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 1393.0
+      },
+      "2026-02-01": {
+        "n_total": 1,
+        "n_reply_all": 1,
+        "sum_reply_all": 983.0,
+        "n_reply_human": 1,
+        "sum_reply_human": 983.0
+      },
+      "2026-04-26": {
+        "n_total": 2,
+        "n_reply_all": 0,
+        "sum_reply_all": 0.0,
+        "n_reply_human": 0,
+        "sum_reply_human": 0.0
+      }
+    },
+    "other": {}
+  }
+}
