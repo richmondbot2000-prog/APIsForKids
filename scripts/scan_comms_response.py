@@ -39,6 +39,8 @@ from __future__ import annotations
 import datetime
 import json
 import os
+import random
+import re
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -516,6 +518,148 @@ def classify(inbound, loan_history, signed_gt_arefs) -> str:
     return "applicant"
 
 
+# --------------------------------------------------------------------------
+# Message-sample / redaction (for the page's "10 examples per bucket" panel)
+
+# Scanner picks 100 candidates per bucket; the page then randomly draws 10
+# of those on every reload so the user sees a fresh sample each time without
+# hitting the warehouse on click.
+SAMPLES_PER_BUCKET = 100
+SAMPLE_BODY_CAP    = 320     # chars
+
+RX_ARE_F     = re.compile(r"\b\d{22}\b")
+RX_LOANBOOK  = re.compile(r"\b\d{4,8}[A-Z]{3,6}\b")
+RX_SSN       = re.compile(r"\b\d{3}[-\s]?\d{2}[-\s]?\d{4}\b")
+RX_EMAIL     = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b")
+RX_CARD      = re.compile(r"\b(?:\d[ -]?){13,19}\b")
+RX_PHONE     = re.compile(r"(?<!\d)\+?\d[\d\s\-().]{7,}\d(?!\d)")
+
+
+def redact(body: str, names: set[str]) -> str:
+    if not body: return ""
+    s = body
+    s = RX_CARD.sub("****", s)
+    s = RX_SSN.sub("****", s)
+    s = RX_ARE_F.sub("****", s)
+    s = RX_LOANBOOK.sub("****", s)
+    s = RX_EMAIL.sub("****@****", s)
+    s = RX_PHONE.sub("****", s)
+    # Names from the Customers table. Whole-word case-insensitive.
+    for n in names:
+        if len(n) < 3: continue
+        s = re.compile(r"\b" + re.escape(n) + r"\b", re.IGNORECASE).sub("****", s)
+    if len(s) > SAMPLE_BODY_CAP:
+        s = s[:SAMPLE_BODY_CAP].rstrip() + " …[truncated]"
+    return s
+
+
+def sample_messages(inbounds, signed_gt, loan_history) -> dict:
+    """Pick up to SAMPLES_PER_BUCKET inbounds per bucket where a reply landed
+    in the 14-day window. Fetch each message body + the first reply body in
+    bulk, redact, and return."""
+    rng = random.Random()  # non-deterministic — pool reshuffles each scan
+    pools = defaultdict(list)
+    for i in inbounds:
+        if i["ReplyMinAll"] is None: continue
+        b = classify(i, loan_history, signed_gt)
+        if b in ("unknown", "applicant", "live_loan", "arrears"):
+            pools[b].append(i)
+    chosen: dict[str, list] = {}
+    for b, pool in pools.items():
+        if not pool: chosen[b] = []; continue
+        chosen[b] = rng.sample(pool, min(SAMPLES_PER_BUCKET, len(pool)))
+
+    # Flatten for bulk fetch
+    flat = [(b, i) for b, lst in chosen.items() for i in lst]
+    if not flat:
+        return {b: [] for b in ("unknown", "applicant", "live_loan", "arrears")}
+
+    msg_ids = [i["MessageId"] for _, i in flat]
+    print(f"[samples] fetching bodies for {len(msg_ids)} inbound + reply pairs…", flush=True)
+    inbound_info = {}
+    reply_info = {}
+    cn = pyodbc.connect(conn_str("ReportingCommunications"), timeout=60)
+    try:
+        cur = cn.cursor()
+        # 1. Inbound rows (body + subject + ExternalAddress + UTCTime + Description)
+        ph = ",".join("?" * len(msg_ids))
+        cur.execute(
+            f"""SELECT MessageId, UTCTime, ExternalAddress, MessageBody, Subject, Description
+                FROM dbo.Messages WHERE MessageId IN ({ph})""",
+            msg_ids,
+        )
+        for mid, ts, ext, body, subj, desc in cur.fetchall():
+            inbound_info[mid] = {
+                "ts": ts, "ext": (ext or "").strip(),
+                "body": body or "", "subj": subj or "",
+                "desc": desc,
+            }
+        # 2. First reply per inbound — one query each, but only 40 total.
+        for mid, info in inbound_info.items():
+            cur.execute(
+                """SELECT TOP 1 UTCTime, MessageBody, Subject, ClientType
+                    FROM dbo.Messages
+                    WHERE ExternalAddress = ?
+                      AND Description >= 3
+                      AND UTCTime >  ?
+                      AND UTCTime <= DATEADD(MINUTE, ?, ?)
+                      AND (ClientType IS NULL OR ClientType <> 'MessageFactory')
+                    ORDER BY UTCTime ASC""",
+                info["ext"], info["ts"], MAX_REPLY_MINUTES, info["ts"],
+            )
+            r = cur.fetchone()
+            if r:
+                reply_info[mid] = {
+                    "ts": r[0], "body": r[1] or "",
+                    "subj": r[2] or "", "client_type": (r[3] or "").strip(),
+                }
+    finally:
+        cn.close()
+
+    # 3. Pull first + last names for redaction. Use all ARefs we sampled.
+    sample_arefs = {i["ARef"] for _, i in flat if i["ARef"]}
+    names: set[str] = set()
+    if sample_arefs:
+        cn = pyodbc.connect(conn_str("ReportingApplications"), timeout=30)
+        try:
+            cur = cn.cursor()
+            for chunk in chunked(sample_arefs, 1500):
+                ph = ",".join("?" * len(chunk))
+                cur.execute(
+                    f"""SELECT FirstName, Surname FROM dbo.Customers WHERE ARef IN ({ph})""",
+                    list(chunk),
+                )
+                for fn, sn in cur.fetchall():
+                    if fn: names.add(fn.strip())
+                    if sn: names.add(sn.strip())
+        finally:
+            cn.close()
+    print(f"[samples] pulled {len(names)} names for redaction", flush=True)
+
+    out: dict[str, list] = {b: [] for b in ("unknown", "applicant", "live_loan", "arrears")}
+    for bucket, i in flat:
+        mid = i["MessageId"]
+        info = inbound_info.get(mid)
+        reply = reply_info.get(mid)
+        if not info or not reply: continue
+        in_body = (info["subj"] + " :: " + info["body"]) if info["subj"] else info["body"]
+        re_body = (reply["subj"] + " :: " + reply["body"]) if reply["subj"] else reply["body"]
+        gap = reply["ts"] - info["ts"]
+        gap_min = int(gap.total_seconds() / 60)
+        aref = i["ARef"] or ""
+        out[bucket].append({
+            "aref_last5":      aref[-5:] if aref else None,
+            "channel":         "Email" if info["desc"] == 1 else "SMS",
+            "received_at":     info["ts"].strftime("%Y-%m-%d %H:%M") if hasattr(info["ts"], "strftime") else str(info["ts"]),
+            "reply_at":        reply["ts"].strftime("%Y-%m-%d %H:%M") if hasattr(reply["ts"], "strftime") else str(reply["ts"]),
+            "response_minutes": gap_min,
+            "client_type":     reply["client_type"],
+            "message":         redact(in_body, names),
+            "reply":           redact(re_body, names),
+        })
+    return out
+
+
 def main() -> None:
     print_outbound_clienttype_diagnostic()
     inbounds = fetch_inbound_paired()
@@ -621,6 +765,14 @@ def main() -> None:
         for b, days in series.items()
     }
 
+    # Sample 10 message/reply pairs per bucket for visual inspection on the
+    # page. Skips messages with no reply within 14 days. Bodies are PII-
+    # redacted: any first/last name we know from Customers gets ****'d, plus
+    # standard regex stripping of ARef-shape, LoanbookId-shape, phone, SSN,
+    # card-number, and email patterns. Only the last 5 chars of ARef are
+    # exposed so the user can spot-check the bucket without seeing the full
+    # customer identifier.
+    samples = sample_messages(inbounds, signed_gt, loan_history)
     out = {
         "schema_version":    1,
         "updated_at":        datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -630,6 +782,7 @@ def main() -> None:
         "max_reply_minutes": MAX_REPLY_MINUTES,
         "totals_by_bucket":  totals,
         "series":            series,
+        "samples":           samples,
     }
 
     OUTPUT_PATH.write_text(

@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Comms response time</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778751798">
-<link rel="stylesheet" href="quiet.css?v=1778751798">
-<link rel="stylesheet" href="quiet-extras.css?v=1778751798">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778752258">
+<link rel="stylesheet" href="quiet.css?v=1778752258">
+<link rel="stylesheet" href="quiet-extras.css?v=1778752258">
 <style>
   .cm-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .cm-section { padding: 2px 0 32px; } }
@@ -118,6 +118,63 @@
     color: var(--ink-500); font-style: italic;
   }
 
+  /* Sample message panels — one per bucket, each shows up to 10 random
+     (message, reply) pairs re-picked on every page reload. */
+  .cm-samples {
+    margin-top: 28px;
+  }
+  .cm-samples h3 {
+    font: 500 18px/1.2 var(--font-display);
+    color: var(--ink-900);
+    margin: 18px 0 6px;
+  }
+  .cm-samples h3 .cm-samples-hint {
+    font: 400 13px/1 var(--font-display);
+    color: var(--ink-500);
+    font-style: italic;
+    margin-left: 8px;
+  }
+  .cm-sample-row {
+    display: grid;
+    grid-template-columns: 130px 1fr 1fr;
+    gap: 12px;
+    padding: 10px 12px;
+    background: var(--paper-50);
+    border: 1px solid var(--paper-300);
+    margin: 6px 0;
+    font: 400 13px/1.4 var(--font-body);
+    color: var(--ink-700);
+  }
+  .cm-sample-row .meta {
+    font: 500 11px/1.4 var(--font-mono);
+    color: var(--ink-500);
+  }
+  .cm-sample-row .meta .aref {
+    background: var(--paper-300);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: 600;
+    color: var(--ink-900);
+  }
+  .cm-sample-row .col-label {
+    font: 500 10px/1 var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-500);
+    margin-bottom: 3px;
+  }
+  .cm-shuffle-btn {
+    background: var(--paper-50);
+    border: 1px solid var(--paper-300);
+    color: var(--ink-700);
+    font: 500 12px/1 var(--font-display);
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+  .cm-shuffle-btn:hover { background: var(--paper-300); }
+
   /* Summary cards row */
   .cm-totals { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 18px; }
   .cm-totals-card {
@@ -148,7 +205,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778751798" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778752258" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -204,6 +261,15 @@
       </div>
       <div id="cmChart"></div>
     </div>
+
+    <div class="cm-samples" id="cmSamples">
+      <h2 class="cm-chart-title" style="margin-top:8px;">
+        Sample messages
+        <button type="button" class="cm-shuffle-btn" id="cmShuffle">Shuffle</button>
+      </h2>
+      <p class="cm-chart-sub">10 random (message → our reply) pairs per bucket, re-picked on every page load (or click <em>Shuffle</em>). PII is redacted: names ****'d, only the last 5 chars of ARef shown.</p>
+      <div id="cmSamplesBody"></div>
+    </div>
   </section>
 </main>
 
@@ -230,6 +296,7 @@
 
   document.getElementById("cmExcludeRR").addEventListener("change", renderAll);
   document.getElementById("cmExcludeNoReply").addEventListener("change", renderAll);
+  document.getElementById("cmShuffle").addEventListener("click", renderSamples);
 
   function renderAll() {
     if (!dataset) return;
@@ -242,6 +309,50 @@
     const series = computeSeries(dataset, excludeRR, includeNoReply);
     drawChart(series);
     drawTotals(dataset, excludeRR, includeNoReply);
+    renderSamples();
+  }
+
+  // Pick 10 random samples per bucket from the larger pool the scanner
+  // committed. Re-runs on page load and on Shuffle click — so the user sees
+  // fresh examples each time without re-querying the warehouse.
+  function renderSamples() {
+    if (!dataset || !dataset.samples) {
+      document.getElementById("cmSamplesBody").innerHTML = `<p class="cm-empty">No samples in this dataset yet.</p>`;
+      return;
+    }
+    const out = [];
+    for (const bucket of BUCKETS) {
+      const pool = (dataset.samples[bucket] || []).slice();
+      // Fisher-Yates shuffle, take first 10.
+      for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      const picked = pool.slice(0, 10);
+      if (!picked.length) continue;
+      out.push(`<h3>${escapeHtml(BUCKET_LABEL[bucket])} <span class="cm-samples-hint">(${picked.length} of ${pool.length} pool)</span></h3>`);
+      for (const s of picked) {
+        const aref = s.aref_last5 ? `<span class="aref">…${escapeHtml(s.aref_last5)}</span>` : "<em>no ARef</em>";
+        const ct = s.client_type ? `<br>by <code>${escapeHtml(s.client_type)}</code>` : "";
+        out.push(`
+          <div class="cm-sample-row">
+            <div class="meta">
+              ${aref}<br>
+              ${escapeHtml(s.channel || "")}<br>
+              ${formatGap(s.response_minutes)}${ct}
+            </div>
+            <div>
+              <div class="col-label">Received ${escapeHtml(s.received_at || "")}</div>
+              ${escapeHtml(s.message || "(no body)")}
+            </div>
+            <div>
+              <div class="col-label">Replied ${escapeHtml(s.reply_at || "")}</div>
+              ${escapeHtml(s.reply || "(no body)")}
+            </div>
+          </div>`);
+      }
+    }
+    document.getElementById("cmSamplesBody").innerHTML = out.join("");
   }
 
   // Roll a YYYY-MM-DD string back to its Monday (UTC). Days are bucketed
