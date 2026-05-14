@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-14T08:09:10.135Z",
+  "updated_at": "2026-05-14T08:09:36.996Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -1805,6 +1805,13 @@
       "actor": "james.benamor@letme.com",
       "action": "get-forwarding",
       "target": "adnan.turken@letme.co.uk",
+      "ok": true
+    },
+    {
+      "ts": "2026-05-14T08:09:36.996Z",
+      "actor": "james.benamor@letme.com",
+      "action": "get-forwarding",
+      "target": "tarek.benamor@letme.com",
       "ok": true
     }
   ]
