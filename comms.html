@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Comms response time</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778751659">
-<link rel="stylesheet" href="quiet.css?v=1778751659">
-<link rel="stylesheet" href="quiet-extras.css?v=1778751659">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778751798">
+<link rel="stylesheet" href="quiet.css?v=1778751798">
+<link rel="stylesheet" href="quiet-extras.css?v=1778751798">
 <style>
   .cm-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .cm-section { padding: 2px 0 32px; } }
@@ -148,7 +148,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778751659" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778751798" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -345,12 +345,12 @@
     const innerW = W - PAD.left - PAD.right;
     const innerH = H - PAD.top - PAD.bottom;
 
-    // Compute global max across visible series (in minutes).
-    let maxMin = 0;
-    for (const b of BUCKETS) for (const p of series[b]) maxMin = Math.max(maxMin, p.mean);
-    if (maxMin <= 0) maxMin = 60;
-    const { unit, divisor, label: unitLabel } = pickUnit(maxMin);
-    const yMax = niceCeil(maxMin / divisor);
+    // Fixed Y axis: always hours, locked at 0–336 h (= 14 days, the reply
+    // window). Lines don't auto-rescale when filters change, so visual
+    // comparisons across filter combinations are honest.
+    const divisor = 60;          // minutes -> hours
+    const unitLabel = "hours";
+    const yMax = 336;            // = 14 d × 24 h
     const yScale = v => PAD.top + innerH - (v / yMax) * innerH;
 
     // X scale: linear across the day index for 2026 (Jan 1 .. Dec 31 = 365 days).
@@ -366,13 +366,13 @@
     const svg = [];
     svg.push(`<svg class="cm-chart-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Daily mean response time by customer state">`);
 
-    // Y gridlines + ticks
-    const yTicks = 5;
-    for (let i = 0; i <= yTicks; i++) {
-      const v = yMax * i / yTicks;
+    // Y gridlines + ticks — fixed 48-hour increments (0, 48, 96, …, 336).
+    // 8 ticks total, evenly spaced; labels in hours.
+    const yTickStep = 48;
+    for (let v = 0; v <= yMax; v += yTickStep) {
       const y = yScale(v);
       svg.push(`<line class="cm-grid" x1="${PAD.left}" x2="${W - PAD.right}" y1="${y}" y2="${y}"/>`);
-      svg.push(`<text class="cm-axis-tick" x="${PAD.left - 8}" y="${y + 3}" text-anchor="end">${formatTick(v)}</text>`);
+      svg.push(`<text class="cm-axis-tick" x="${PAD.left - 8}" y="${y + 3}" text-anchor="end">${v} h</text>`);
     }
 
     // X month labels
