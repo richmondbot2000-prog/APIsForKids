@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-14T07:35:12.821Z",
+  "updated_at": "2026-05-14T07:35:27.571Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -1112,6 +1112,13 @@
       "actor": "james.benamor@letme.com",
       "action": "get-forwarding",
       "target": "lucas.bishop@togetherloans.com",
+      "ok": true
+    },
+    {
+      "ts": "2026-05-14T07:35:27.571Z",
+      "actor": "james.benamor@letme.com",
+      "action": "directory-photo-upload",
+      "target": "",
       "ok": true
     }
   ]
