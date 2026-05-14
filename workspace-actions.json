@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-14T16:34:03.105Z",
+  "updated_at": "2026-05-14T16:34:17.781Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -2284,6 +2284,14 @@
       "action": "group-create",
       "target": "WorkPlace@letme.com",
       "ok": true
+    },
+    {
+      "ts": "2026-05-14T16:34:17.781Z",
+      "actor": "james.benamor@letme.com",
+      "action": "group-member-add",
+      "target": "WorkPlace@letme.com",
+      "ok": true,
+      "member_email": "james.benamor@letme.com"
     }
   ]
 }
