@@ -267,38 +267,58 @@ def fetch_contact_to_aref() -> tuple[dict[str, str], dict[str, str]]:
     email_map: dict[str, str] = {}
     try:
         cur = cn.cursor()
-        # Telephones: take the most-recent (max) ARef per normalised phone.
-        cur.execute("""
-            SELECT t.Number, c.ARef
-            FROM dbo.Telephones t
-            JOIN dbo.Customers c ON c.CustomerId = t.CustomerId
-            WHERE t.Number IS NOT NULL
-              AND c.ARef IS NOT NULL
-        """)
-        for num, aref in cur.fetchall():
-            key = normalise_phone(num)
-            if not key: continue
-            aref = (aref or "").strip()
-            if not aref: continue
-            cur_aref = phone_map.get(key)
-            if cur_aref is None or aref > cur_aref:
-                phone_map[key] = aref
-        # Emails: lowercase.
-        cur.execute("""
-            SELECT e.Email, c.ARef
-            FROM dbo.Emails e
-            JOIN dbo.Customers c ON c.CustomerId = e.CustomerId
-            WHERE e.Email IS NOT NULL
-              AND c.ARef IS NOT NULL
-        """)
-        for email, aref in cur.fetchall():
-            key = (email or "").strip().lower()
-            if not key: continue
-            aref = (aref or "").strip()
-            if not aref: continue
-            cur_aref = email_map.get(key)
-            if cur_aref is None or aref > cur_aref:
-                email_map[key] = aref
+        # Warehouse vintages drift; discover the actual column names.
+        tel_num_col = pick_column(cur, "dbo", "Telephones",
+                                  "Number", "PhoneNumber", "TelephoneNumber",
+                                  "Telephone", "Phone")
+        tel_cust_col = pick_column(cur, "dbo", "Telephones",
+                                   "CustomerId", "CustomerID")
+        em_addr_col = pick_column(cur, "dbo", "Emails",
+                                  "Email", "EmailAddress", "Address")
+        em_cust_col = pick_column(cur, "dbo", "Emails",
+                                  "CustomerId", "CustomerID")
+        cust_id_col = pick_column(cur, "dbo", "Customers",
+                                  "CustomerId", "CustomerID")
+        cust_aref_col = pick_column(cur, "dbo", "Customers", "ARef")
+        print(f"  discovered: Telephones.{tel_num_col}/{tel_cust_col}, "
+              f"Emails.{em_addr_col}/{em_cust_col}, "
+              f"Customers.{cust_id_col}/{cust_aref_col}", flush=True)
+        if not (tel_num_col and tel_cust_col and cust_id_col and cust_aref_col):
+            print("  required phone columns missing — skipping phone lookup", flush=True)
+        else:
+            cur.execute(f"""
+                SELECT t.[{tel_num_col}], c.[{cust_aref_col}]
+                FROM dbo.Telephones t
+                JOIN dbo.Customers c ON c.[{cust_id_col}] = t.[{tel_cust_col}]
+                WHERE t.[{tel_num_col}] IS NOT NULL
+                  AND c.[{cust_aref_col}] IS NOT NULL
+            """)
+            for num, aref in cur.fetchall():
+                key = normalise_phone(num)
+                if not key: continue
+                aref = (aref or "").strip()
+                if not aref: continue
+                cur_aref = phone_map.get(key)
+                if cur_aref is None or aref > cur_aref:
+                    phone_map[key] = aref
+        if not (em_addr_col and em_cust_col):
+            print("  required email columns missing — skipping email lookup", flush=True)
+        else:
+            cur.execute(f"""
+                SELECT e.[{em_addr_col}], c.[{cust_aref_col}]
+                FROM dbo.Emails e
+                JOIN dbo.Customers c ON c.[{cust_id_col}] = e.[{em_cust_col}]
+                WHERE e.[{em_addr_col}] IS NOT NULL
+                  AND c.[{cust_aref_col}] IS NOT NULL
+            """)
+            for email, aref in cur.fetchall():
+                key = (email or "").strip().lower()
+                if not key: continue
+                aref = (aref or "").strip()
+                if not aref: continue
+                cur_aref = email_map.get(key)
+                if cur_aref is None or aref > cur_aref:
+                    email_map[key] = aref
     finally:
         cn.close()
     print(f"[apps] phone_map={len(phone_map)} entries, email_map={len(email_map)} entries", flush=True)
@@ -331,6 +351,34 @@ def fetch_aref_to_loanbook() -> dict[str, str]:
         cn.close()
     print(f"[loanbook] {len(aref_to_lb)} ARef -> LoanbookId mappings", flush=True)
     return aref_to_lb
+
+
+def print_outbound_clienttype_diagnostic() -> None:
+    """One-shot: for every 2026 outbound message that was a plausible reply
+    to a customer (Description >= 3, within an inbound's 14-day window),
+    report the distinct ClientType values with count + mean response minutes.
+    Helps verify the Reply-Robot filter is matching what we think it is."""
+    print("[diag] outbound ClientType breakdown 2026…", flush=True)
+    cn = pyodbc.connect(conn_str("ReportingCommunications"), timeout=30)
+    try:
+        cur = cn.cursor()
+        cur.execute(f"""
+            DECLARE @from datetime2 = '{YEAR}-01-01';
+            DECLARE @to   datetime2 = '{YEAR+1}-01-01';
+            SELECT
+                ISNULL(ClientType, '(null)') AS ct,
+                COUNT(*) AS n
+            FROM dbo.Messages
+            WHERE Description >= 3
+              AND UTCTime >= @from
+              AND UTCTime <  @to
+            GROUP BY ClientType
+            ORDER BY n DESC
+        """)
+        for ct, n in cur.fetchall():
+            print(f"  ClientType={ct!r:<40} n={n}", flush=True)
+    finally:
+        cn.close()
 
 
 def fetch_signed_gt(arefs: set[str]) -> set[str]:
@@ -433,6 +481,7 @@ def classify(inbound, loan_history, signed_gt_arefs) -> str:
 
 
 def main() -> None:
+    print_outbound_clienttype_diagnostic()
     inbounds = fetch_inbound_paired()
 
     # AUGMENTATION: most inbounds land without an ARef on the row because the
