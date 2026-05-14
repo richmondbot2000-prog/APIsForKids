@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-14T08:59:30.510Z",
+  "updated_at": "2026-05-14T08:59:42.456Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -1953,6 +1953,14 @@
       "action": "get-forwarding",
       "target": "clementia.dsouza@letme.com",
       "ok": true
+    },
+    {
+      "ts": "2026-05-14T08:59:42.456Z",
+      "actor": "clementia.dsouza@togetherloans.com",
+      "action": "group-member-remove",
+      "target": "tcfinance@letme.com",
+      "ok": true,
+      "member_email": "max.dynowski@letme.co.uk"
     }
   ]
 }
