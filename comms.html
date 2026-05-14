@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Comms response time</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778751552">
-<link rel="stylesheet" href="quiet.css?v=1778751552">
-<link rel="stylesheet" href="quiet-extras.css?v=1778751552">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778751659">
+<link rel="stylesheet" href="quiet.css?v=1778751659">
+<link rel="stylesheet" href="quiet-extras.css?v=1778751659">
 <style>
   .cm-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .cm-section { padding: 2px 0 32px; } }
@@ -148,7 +148,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778751552" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778751659" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -174,6 +174,7 @@
   <section class="cm-section">
     <h1>Comms response time</h1>
     <p class="lead">When a customer messages us by SMS or email, how long do they wait for our next message back on the same channel? Each point is the <strong>weekly mean response time</strong> — daily noise from evenings and weekends gets folded into one number per week (Monday-anchored). <em>Message Factory</em> sends are excluded from counting as a reply (they're broadcast campaigns, not actual replies). Replies more than 14 days later are treated as "no reply within 14 days".</p>
+    <p class="lead"><strong>Data maturity:</strong> a message received in the last 14 days hasn't had its full chance to be replied to yet, so the chart only shows weeks where every message in them is 14+ days old. The current week and the last two are hidden.</p>
     <p class="lead">The four lines split by the sender's state <em>at the moment they sent the message</em>: no ARef yet ("unknown"), have an ARef but no live loan ("applicant"), live loan and not in arrears ("live loan"), or live loan in arrears.</p>
     <p class="cm-meta" id="cmMeta">Loading…</p>
 
@@ -261,6 +262,14 @@
   //   excludeRR=true,  includeNoReply=true  → (Σsum_reply_human + ΣnoReply * MAX) / Σn_total
   function computeSeries(d, excludeRR, includeNoReply) {
     const MAX = d.max_reply_minutes || MAX_REPLY_MINUTES_DEFAULT;
+    // Data-maturity cutoff: skip any week whose last day (Sunday) isn't yet
+    // 14 days old. Replies can land up to 14 days after an inbound, so a
+    // week's stats only stabilise once every message in it has had its
+    // chance. Equivalent rule: weekMonday <= today - 21 days.
+    const matureBefore = new Date();
+    matureBefore.setUTCDate(matureBefore.getUTCDate() - 21);
+    const matureIso = matureBefore.toISOString().slice(0, 10);
+
     const out = {};
     for (const bucket of BUCKETS) {
       const days = (d.series && d.series[bucket]) || {};
@@ -268,6 +277,7 @@
       const weekly = {};
       Object.keys(days).forEach(date => {
         const wk = startOfWeek(date);
+        if (wk > matureIso) return;   // week not yet 14d-mature; skip
         const v = days[date];
         const w = weekly[wk] || (weekly[wk] = {
           n_total: 0, n_reply_all: 0, sum_reply_all: 0,
