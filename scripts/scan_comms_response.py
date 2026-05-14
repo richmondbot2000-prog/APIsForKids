@@ -28,6 +28,11 @@ caps these to 14 days when the "include no-reply" filter is on.
 
 Required env vars: FABRIC_SQL_ENDPOINT, FABRIC_TENANT_ID, FABRIC_CLIENT_ID,
 FABRIC_CLIENT_SECRET.
+
+The three reporting databases live in Fabric as separate items so each is
+queried via its own connection; loan state + signed-GT info is joined on
+the Python side because Fabric warehouse items can't cross-join with the
+ServicePrincipal auth flow we use elsewhere.
 """
 from __future__ import annotations
 
@@ -35,6 +40,7 @@ import datetime
 import json
 import os
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 import pyodbc
@@ -43,6 +49,7 @@ import pyodbc
 YEAR = 2026
 OUTPUT_PATH = Path("comms.json")
 MAX_REPLY_MINUTES = 14 * 24 * 60   # 14 days
+ARREARS_FLAG_TYPES = (2, 3, 4, 6)  # Decline, DNL, Cancelled, FraudRisk
 
 
 def env(name: str) -> str:
@@ -64,11 +71,9 @@ def conn_str(database: str) -> str:
     )
 
 
-# The whole pipeline runs in one CTE-stacked query so we never pull message
-# bodies to the Python runner; only ~(365 * 4) (day, bucket, …) rows come back.
-# Bucket assignment is point-in-time using LoanHistory snapshots and a NOT
-# EXISTS check for signed-not-rejected guarantors.
-QUERY = f"""
+# Step 1: inbound + paired-outbound, all inside ReportingCommunications.
+# Returns one row per inbound — small enough to bring back to Python.
+COMMS_QUERY = f"""
 DECLARE @from datetime2 = '{YEAR}-01-01';
 DECLARE @to   datetime2 = '{YEAR+1}-01-01';
 DECLARE @maxMinutes int = {MAX_REPLY_MINUTES};
@@ -90,164 +95,228 @@ WITH inbound AS (
       AND m.DateReceivedUtc <  @to
       AND m.ExternalAddress IS NOT NULL
       AND m.ExternalAddress <> ''
-),
-
-paired AS (
-    SELECT
-        i.MessageId,
-        i.ARef,
-        i.LoanbookId,
-        i.DateReceivedUtc,
-        i.Channel,
-        -- Minutes to the next non-Message-Factory outbound in the same channel
-        -- within 14 days. NULL if no such reply landed in window.
-        (
-            SELECT TOP 1 DATEDIFF(MINUTE, i.DateReceivedUtc, o.DateSentUtc)
-            FROM Communications.Messages o
-            WHERE o.ExternalAddress = i.ExternalAddress
-              AND o.Description = CASE i.Channel
-                                      WHEN 'SMS'   THEN 'OutboundSMS'
-                                      WHEN 'Email' THEN 'OutboundEmail'
-                                  END
-              AND o.DateSentUtc >  i.DateReceivedUtc
-              AND o.DateSentUtc <= DATEADD(MINUTE, @maxMinutes, i.DateReceivedUtc)
-              AND (o.ClientType IS NULL OR o.ClientType <> 'MessageFactory')
-            ORDER BY o.DateSentUtc ASC
-        ) AS ReplyMinAll,
-        -- Same, but additionally exclude Reply Robot / Robot Responder. Any
-        -- ClientType containing 'Responder' is treated as the reply robot,
-        -- which covers RobotResponder / TogetherLoansRobotResponder / similar.
-        (
-            SELECT TOP 1 DATEDIFF(MINUTE, i.DateReceivedUtc, o.DateSentUtc)
-            FROM Communications.Messages o
-            WHERE o.ExternalAddress = i.ExternalAddress
-              AND o.Description = CASE i.Channel
-                                      WHEN 'SMS'   THEN 'OutboundSMS'
-                                      WHEN 'Email' THEN 'OutboundEmail'
-                                  END
-              AND o.DateSentUtc >  i.DateReceivedUtc
-              AND o.DateSentUtc <= DATEADD(MINUTE, @maxMinutes, i.DateReceivedUtc)
-              AND (
-                  o.ClientType IS NULL
-                  OR (
-                      o.ClientType <> 'MessageFactory'
-                      AND o.ClientType NOT LIKE '%Responder%'
-                  )
-              )
-            ORDER BY o.DateSentUtc ASC
-        ) AS ReplyMinHuman
-    FROM inbound i
-),
-
--- Point-in-time loan state: latest LoanHistory row up to and including the
--- message timestamp. Only joined when the inbound carries a LoanbookId.
-loan_state AS (
-    SELECT
-        p.MessageId,
-        lh.CurrentBalance,
-        lh.Arrears,
-        lh.DateInArrearsLocal
-    FROM paired p
-    CROSS APPLY (
-        SELECT TOP 1 lh.CurrentBalance, lh.Arrears, lh.DateInArrearsLocal
-        FROM Loanbook.LoanHistory lh
-        WHERE lh.LoanbookId = p.LoanbookId
-          AND lh.DateTimeUtc <= p.DateReceivedUtc
-        ORDER BY lh.DateTimeUtc DESC
-    ) lh
-    WHERE p.LoanbookId IS NOT NULL
-      AND p.LoanbookId <> ''
-),
-
--- Signed-not-rejected guarantor at message time. A GT is "signed" iff there
--- is an ESignatures row for them (GtRef IS NOT NULL on the matching Customer
--- row in Applications.Customers) with DateSignedUtc <= message time, AND no
--- active decline-shape Flag on (ARef, GtRef) at that time. Flag types
--- 2 Decline, 3 DNL, 4 Cancelled, 6 FraudRisk match the canonical "rejected"
--- definition used elsewhere.
-signed_gt AS (
-    SELECT DISTINCT p.MessageId
-    FROM paired p
-    JOIN Applications.Customers c
-      ON c.ARef = p.ARef AND c.GtRef IS NOT NULL
-    JOIN Applications.ESignatures e
-      ON e.EsignatureId = c.EsignatureId
-    WHERE p.ARef IS NOT NULL AND p.ARef <> ''
-      AND e.DateSignedUtc <= p.DateReceivedUtc
-      AND NOT EXISTS (
-          SELECT 1 FROM Applications.Flags f
-          WHERE f.ARef = p.ARef
-            AND f.GtRef = c.GtRef
-            AND f.FlagTypeId IN (2, 3, 4, 6)
-            AND f.DateAddedUtc <= p.DateReceivedUtc
-            AND (f.DateRemovedUtc IS NULL OR f.DateRemovedUtc > p.DateReceivedUtc)
-      )
-),
-
-classified AS (
-    SELECT
-        p.MessageId,
-        CAST(p.DateReceivedUtc AS date) AS Day,
-        CASE
-            WHEN p.ARef IS NULL OR p.ARef = '' THEN 'unknown'
-            WHEN ls.CurrentBalance > 10
-                 AND (ls.Arrears > 0 OR ls.DateInArrearsLocal IS NOT NULL)
-                THEN 'arrears'
-            WHEN ls.CurrentBalance > 10
-                 AND (ls.Arrears = 0 OR ls.Arrears IS NULL)
-                 AND ls.DateInArrearsLocal IS NULL
-                THEN 'live_loan'
-            WHEN sg.MessageId IS NULL THEN 'applicant'
-            ELSE 'other'  -- ARef + signed GT but no live loan; excluded from chart
-        END AS Bucket,
-        p.ReplyMinAll,
-        p.ReplyMinHuman
-    FROM paired p
-    LEFT JOIN loan_state ls ON ls.MessageId = p.MessageId
-    LEFT JOIN signed_gt  sg ON sg.MessageId = p.MessageId
 )
-
 SELECT
-    Day,
-    Bucket,
-    COUNT(*)                                                              AS N_total,
-    SUM(CASE WHEN ReplyMinAll   IS NOT NULL THEN 1 ELSE 0 END)            AS N_reply_all,
-    SUM(CASE WHEN ReplyMinAll   IS NOT NULL THEN ReplyMinAll ELSE 0 END)  AS Sum_reply_all,
-    SUM(CASE WHEN ReplyMinHuman IS NOT NULL THEN 1 ELSE 0 END)            AS N_reply_human,
-    SUM(CASE WHEN ReplyMinHuman IS NOT NULL THEN ReplyMinHuman ELSE 0 END) AS Sum_reply_human
-FROM classified
-GROUP BY Day, Bucket
-ORDER BY Day, Bucket;
+    i.MessageId,
+    i.ARef,
+    i.LoanbookId,
+    i.DateReceivedUtc,
+    i.Channel,
+    -- Minutes to first non-MessageFactory reply within 14 days
+    (
+        SELECT TOP 1 DATEDIFF(MINUTE, i.DateReceivedUtc, o.DateSentUtc)
+        FROM Communications.Messages o
+        WHERE o.ExternalAddress = i.ExternalAddress
+          AND o.Description = CASE i.Channel
+                                  WHEN 'SMS'   THEN 'OutboundSMS'
+                                  WHEN 'Email' THEN 'OutboundEmail'
+                              END
+          AND o.DateSentUtc >  i.DateReceivedUtc
+          AND o.DateSentUtc <= DATEADD(MINUTE, @maxMinutes, i.DateReceivedUtc)
+          AND (o.ClientType IS NULL OR o.ClientType <> 'MessageFactory')
+        ORDER BY o.DateSentUtc ASC
+    ) AS ReplyMinAll,
+    -- Same but additionally excluding Reply Robot (ClientType LIKE '%Responder%')
+    (
+        SELECT TOP 1 DATEDIFF(MINUTE, i.DateReceivedUtc, o.DateSentUtc)
+        FROM Communications.Messages o
+        WHERE o.ExternalAddress = i.ExternalAddress
+          AND o.Description = CASE i.Channel
+                                  WHEN 'SMS'   THEN 'OutboundSMS'
+                                  WHEN 'Email' THEN 'OutboundEmail'
+                              END
+          AND o.DateSentUtc >  i.DateReceivedUtc
+          AND o.DateSentUtc <= DATEADD(MINUTE, @maxMinutes, i.DateReceivedUtc)
+          AND (
+              o.ClientType IS NULL
+              OR (
+                  o.ClientType <> 'MessageFactory'
+                  AND o.ClientType NOT LIKE '%Responder%'
+              )
+          )
+        ORDER BY o.DateSentUtc ASC
+    ) AS ReplyMinHuman
+FROM inbound i;
 """
 
 
-def main() -> None:
-    print("connecting to Fabric…", flush=True)
-    cn = pyodbc.connect(conn_str("DataWarehouse"))
+def fetch_inbound_paired():
+    print("[comms] connecting + fetching inbound + paired outbound…", flush=True)
+    cn = pyodbc.connect(conn_str("ReportingCommunications"), timeout=30)
     try:
         cur = cn.cursor()
-        print(f"running comms response query for {YEAR}…", flush=True)
-        cur.execute(QUERY)
+        cur.execute(COMMS_QUERY)
         rows = cur.fetchall()
     finally:
         cn.close()
+    out = []
+    for r in rows:
+        out.append({
+            "MessageId":       r[0],
+            "ARef":            (r[1] or "").strip() if r[1] else "",
+            "LoanbookId":      (r[2] or "").strip() if r[2] else "",
+            "DateReceivedUtc": r[3],
+            "Channel":         r[4],
+            "ReplyMinAll":     r[5],
+            "ReplyMinHuman":   r[6],
+        })
+    print(f"[comms] {len(out)} inbound rows", flush=True)
+    return out
 
-    print(f"got {len(rows)} (day, bucket) rows", flush=True)
 
-    # Per-bucket per-day series. `other` (ARef + signed GT + no live loan) is
-    # captured but not rendered as a chart line — kept for diagnostics.
+def fetch_loan_history(loanbook_ids: set[str]) -> dict[str, list]:
+    """For each LoanbookId observed, fetch all LoanHistory snapshots so the
+    Python code can find the latest one ≤ each message's timestamp."""
+    if not loanbook_ids:
+        return {}
+    print(f"[loanbook] fetching LoanHistory for {len(loanbook_ids)} loans…", flush=True)
+    cn = pyodbc.connect(conn_str("ReportingLoanbook"), timeout=30)
+    try:
+        cur = cn.cursor()
+        # Stream the LoanbookId list via a TVP-equivalent temp table — pyodbc
+        # 'IN (...)' for >1000 values would hit the SQL Server limit.
+        cur.execute("CREATE TABLE #LoanIds (LoanbookId NVARCHAR(10) PRIMARY KEY);")
+        # Insert in batches; fast_executemany speeds up the round-trips.
+        cur.fast_executemany = True
+        rows = [(lb,) for lb in loanbook_ids]
+        cur.executemany("INSERT INTO #LoanIds (LoanbookId) VALUES (?);", rows)
+        cur.execute("""
+            SELECT lh.LoanbookId, lh.DateTimeUtc, lh.CurrentBalance, lh.Arrears, lh.DateInArrearsLocal
+            FROM Loanbook.LoanHistory lh
+            JOIN #LoanIds ids ON ids.LoanbookId = lh.LoanbookId
+            ORDER BY lh.LoanbookId, lh.DateTimeUtc;
+        """)
+        history = defaultdict(list)
+        for lb, dt, bal, arr, dia in cur.fetchall():
+            history[lb].append((dt, float(bal or 0.0), float(arr or 0.0), dia))
+    finally:
+        cn.close()
+    total = sum(len(v) for v in history.values())
+    print(f"[loanbook] {total} history rows across {len(history)} loans", flush=True)
+    return history
+
+
+def fetch_signed_gt(arefs: set[str]) -> set[str]:
+    """Return the set of (ARef) for which a guarantor was signed (ESignatures
+    with GtRef NOT NULL) and not currently rejected (no active Decline / DNL /
+    Cancelled / FraudRisk flag). Point-in-time accuracy is approximated to
+    'now' — see module docstring for a v1 trade-off note.
+
+    A more faithful implementation would also stream signed-at + flag history
+    so each message gets its own as-of check. Punted to v1.5.
+    """
+    if not arefs:
+        return set()
+    print(f"[apps] checking signed-GT status for {len(arefs)} ARefs…", flush=True)
+    cn = pyodbc.connect(conn_str("ReportingApplications"), timeout=30)
+    try:
+        cur = cn.cursor()
+        cur.execute("CREATE TABLE #ARefs (ARef NVARCHAR(22) PRIMARY KEY);")
+        cur.fast_executemany = True
+        rows = [(a,) for a in arefs]
+        cur.executemany("INSERT INTO #ARefs (ARef) VALUES (?);", rows)
+        flag_list = ",".join(str(f) for f in ARREARS_FLAG_TYPES)
+        cur.execute(f"""
+            SELECT DISTINCT c.ARef
+            FROM Applications.Customers c
+            JOIN Applications.ESignatures e
+              ON e.EsignatureId = c.EsignatureId
+            JOIN #ARefs a ON a.ARef = c.ARef
+            WHERE c.GtRef IS NOT NULL
+              AND e.DateSignedUtc IS NOT NULL
+              AND NOT EXISTS (
+                  SELECT 1 FROM Applications.Flags f
+                  WHERE f.ARef = c.ARef
+                    AND f.GtRef = c.GtRef
+                    AND f.FlagTypeId IN ({flag_list})
+                    AND f.DateRemovedUtc IS NULL
+              );
+        """)
+        result = {r[0].strip() for r in cur.fetchall() if r[0]}
+    finally:
+        cn.close()
+    print(f"[apps] {len(result)} ARefs have a signed-not-rejected guarantor", flush=True)
+    return result
+
+
+def loan_state_at(history: list, ts: datetime.datetime) -> tuple[float, float, object] | None:
+    """Find the latest LoanHistory snapshot at or before `ts`. Returns
+    (CurrentBalance, Arrears, DateInArrearsLocal) or None if no prior row."""
+    if not history:
+        return None
+    # history is sorted by DateTimeUtc ascending — binary search would be
+    # faster, but linear from the end is plenty for ~365 rows/loan.
+    chosen = None
+    for row in history:
+        if row[0] <= ts:
+            chosen = row
+        else:
+            break
+    if not chosen:
+        return None
+    return chosen[1], chosen[2], chosen[3]
+
+
+def classify(inbound, loan_history, signed_gt_arefs) -> str:
+    aref = inbound["ARef"]
+    if not aref:
+        return "unknown"
+    lb = inbound["LoanbookId"]
+    if lb:
+        snap = loan_state_at(loan_history.get(lb) or [], inbound["DateReceivedUtc"])
+        if snap is not None:
+            bal, arr, dia = snap
+            if bal > 10 and (arr > 0 or dia is not None):
+                return "arrears"
+            if bal > 10:
+                return "live_loan"
+    # ARef but no live loan
+    if aref in signed_gt_arefs:
+        return "other"  # ARef + signed GT but no live loan — excluded
+    return "applicant"
+
+
+def main() -> None:
+    inbounds = fetch_inbound_paired()
+
+    loanbook_ids = {i["LoanbookId"] for i in inbounds if i["LoanbookId"]}
+    arefs = {i["ARef"] for i in inbounds if i["ARef"]}
+    loan_history = fetch_loan_history(loanbook_ids)
+    signed_gt = fetch_signed_gt(arefs)
+
+    # Aggregate by (Day, Bucket)
     BUCKETS = ["unknown", "applicant", "live_loan", "arrears", "other"]
-    series: dict[str, dict[str, dict]] = {b: {} for b in BUCKETS}
+    agg: dict[tuple[str, str], dict] = defaultdict(lambda: {
+        "n_total":         0,
+        "n_reply_all":     0,
+        "sum_reply_all":   0.0,
+        "n_reply_human":   0,
+        "sum_reply_human": 0.0,
+    })
 
-    for day, bucket, n_total, n_all, sum_all, n_human, sum_human in rows:
-        bucket = bucket if bucket in series else "other"
-        iso = day.strftime("%Y-%m-%d") if hasattr(day, "strftime") else str(day)
-        series[bucket][iso] = {
-            "n_total":         int(n_total or 0),
-            "n_reply_all":     int(n_all or 0),
-            "sum_reply_all":   float(sum_all or 0.0),
-            "n_reply_human":   int(n_human or 0),
-            "sum_reply_human": float(sum_human or 0.0),
+    for i in inbounds:
+        bucket = classify(i, loan_history, signed_gt)
+        day = i["DateReceivedUtc"].strftime("%Y-%m-%d")
+        cell = agg[(day, bucket)]
+        cell["n_total"] += 1
+        if i["ReplyMinAll"] is not None:
+            cell["n_reply_all"] += 1
+            cell["sum_reply_all"] += float(i["ReplyMinAll"])
+        if i["ReplyMinHuman"] is not None:
+            cell["n_reply_human"] += 1
+            cell["sum_reply_human"] += float(i["ReplyMinHuman"])
+
+    # Pivot to per-bucket series
+    series: dict[str, dict[str, dict]] = {b: {} for b in BUCKETS}
+    for (day, bucket), cell in agg.items():
+        if bucket not in series:
+            bucket = "other"
+        series[bucket][day] = {
+            "n_total":         cell["n_total"],
+            "n_reply_all":     cell["n_reply_all"],
+            "sum_reply_all":   round(cell["sum_reply_all"], 1),
+            "n_reply_human":   cell["n_reply_human"],
+            "sum_reply_human": round(cell["sum_reply_human"], 1),
         }
 
     totals = {
@@ -260,14 +329,14 @@ def main() -> None:
     }
 
     out = {
-        "schema_version":  1,
-        "updated_at":      datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "year":            YEAR,
-        "channels":        ["SMS", "Email"],
-        "buckets":         ["unknown", "applicant", "live_loan", "arrears"],
+        "schema_version":    1,
+        "updated_at":        datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "year":              YEAR,
+        "channels":          ["SMS", "Email"],
+        "buckets":           ["unknown", "applicant", "live_loan", "arrears"],
         "max_reply_minutes": MAX_REPLY_MINUTES,
-        "totals_by_bucket": totals,
-        "series":          series,
+        "totals_by_bucket":  totals,
+        "series":            series,
     }
 
     OUTPUT_PATH.write_text(
