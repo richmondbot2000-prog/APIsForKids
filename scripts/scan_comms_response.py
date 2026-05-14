@@ -797,13 +797,67 @@ def main() -> None:
         for b, days in series.items()
     }
 
+    # Weekly stats with median (median doesn't decompose from daily sums, so
+    # we compute it server-side here over the raw per-message response_minutes
+    # within each (week, bucket) cell). Cheap because everything is already in
+    # memory.
+    import statistics
+    from datetime import timedelta
+    raw: dict[tuple[str, str], dict] = defaultdict(lambda: {
+        "total": 0,
+        "all_replied": [],
+        "human_replied": [],
+        "no_reply_all": 0,
+        "no_reply_human": 0,
+    })
+    for i in inbounds:
+        bucket = classify(i, loan_history, signed_gt)
+        if bucket not in ("unknown", "applicant", "live_loan", "arrears"):
+            continue
+        d = i["DateReceivedUtc"]
+        monday = d - timedelta(days=d.weekday())
+        wk = monday.strftime("%Y-%m-%d")
+        cell = raw[(wk, bucket)]
+        cell["total"] += 1
+        if i["ReplyMinAll"] is not None:
+            cell["all_replied"].append(float(i["ReplyMinAll"]))
+        else:
+            cell["no_reply_all"] += 1
+        if i["ReplyMinHuman"] is not None:
+            cell["human_replied"].append(float(i["ReplyMinHuman"]))
+        else:
+            cell["no_reply_human"] += 1
+
+    def variant_stats(replied_vals, no_reply_count):
+        result = {"n_replied": len(replied_vals)}
+        if replied_vals:
+            result["mean_replied"] = round(statistics.mean(replied_vals), 1)
+            result["median_replied"] = round(statistics.median(replied_vals), 1)
+        else:
+            result["mean_replied"] = None
+            result["median_replied"] = None
+        # 'inc' = no-reply messages capped at 14 d
+        inc = replied_vals + [MAX_REPLY_MINUTES] * no_reply_count
+        if inc:
+            result["mean_inc"] = round(statistics.mean(inc), 1)
+            result["median_inc"] = round(statistics.median(inc), 1)
+        else:
+            result["mean_inc"] = None
+            result["median_inc"] = None
+        return result
+
+    weekly_stats: dict[str, dict[str, dict]] = {b: {} for b in BUCKETS}
+    for (wk, bucket), cell in raw.items():
+        if bucket not in weekly_stats:
+            bucket = "other"
+        weekly_stats[bucket][wk] = {
+            "n_total": cell["total"],
+            "all":   variant_stats(cell["all_replied"],   cell["no_reply_all"]),
+            "human": variant_stats(cell["human_replied"], cell["no_reply_human"]),
+        }
+
     # Sample 10 message/reply pairs per bucket for visual inspection on the
-    # page. Skips messages with no reply within 14 days. Bodies are PII-
-    # redacted: any first/last name we know from Customers gets ****'d, plus
-    # standard regex stripping of ARef-shape, LoanbookId-shape, phone, SSN,
-    # card-number, and email patterns. Only the last 5 chars of ARef are
-    # exposed so the user can spot-check the bucket without seeing the full
-    # customer identifier.
+    # page. Bodies are PII-redacted.
     samples = sample_messages(inbounds, signed_gt, loan_history)
     out = {
         "schema_version":    1,
@@ -814,6 +868,7 @@ def main() -> None:
         "max_reply_minutes": MAX_REPLY_MINUTES,
         "totals_by_bucket":  totals,
         "series":            series,
+        "weekly_stats":      weekly_stats,
         "samples":           samples,
     }
 

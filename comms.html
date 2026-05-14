@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Comms response time</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778765770">
-<link rel="stylesheet" href="quiet.css?v=1778765770">
-<link rel="stylesheet" href="quiet-extras.css?v=1778765770">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778767430">
+<link rel="stylesheet" href="quiet.css?v=1778767430">
+<link rel="stylesheet" href="quiet-extras.css?v=1778767430">
 <style>
   .cm-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .cm-section { padding: 2px 0 32px; } }
@@ -214,7 +214,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778765770" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778767430" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -255,12 +255,19 @@
         Exclude messages that <strong>get no reply</strong>
         <span class="cm-filter-sub">(drops unreplied messages; untick to count them as 14 d)</span>
       </label>
+      <label style="margin-left:auto;">
+        <strong>Metric</strong>
+        <select id="cmMetric" style="margin-left:6px;padding:4px 8px;font-family:inherit;font-size:13px;border:1px solid var(--paper-300);background:white;">
+          <option value="mean" selected>Mean</option>
+          <option value="median">Median</option>
+        </select>
+      </label>
     </div>
 
     <div class="cm-totals" id="cmTotals"></div>
 
     <div class="cm-chart-wrap">
-      <h2 class="cm-chart-title">2026 weekly mean response time</h2>
+      <h2 class="cm-chart-title" id="cmChartTitle">2026 weekly response time</h2>
       <p class="cm-chart-sub">Y-axis auto-scales (minutes / hours / days). Hover a point for that week's mean + sample size. Weeks with no qualifying messages in a bucket are gaps in the line. Each point is anchored on the Monday of its week.</p>
       <div class="cm-legend">
         <span class="cm-legend-item"><span class="cm-legend-swatch cm-swatch-unknown"></span>Unknown sender</span>
@@ -305,6 +312,7 @@
 
   document.getElementById("cmExcludeRR").addEventListener("change", renderAll);
   document.getElementById("cmExcludeNoReply").addEventListener("change", renderAll);
+  document.getElementById("cmMetric").addEventListener("change", renderAll);
   document.getElementById("cmShuffle").addEventListener("click", renderSamples);
 
   function renderAll() {
@@ -315,8 +323,10 @@
     const excludeRR = document.getElementById("cmExcludeRR").checked;
     // Checkbox is "Exclude no-reply messages" so unchecked = include them.
     const includeNoReply = !document.getElementById("cmExcludeNoReply").checked;
-    const series = computeSeries(dataset, excludeRR, includeNoReply);
-    drawChart(series);
+    const metric = document.getElementById("cmMetric").value;   // "mean" | "median"
+    document.getElementById("cmChartTitle").textContent = `2026 weekly ${metric} response time`;
+    const series = computeSeries(dataset, excludeRR, includeNoReply, metric);
+    drawChart(series, metric);
     drawTotals(dataset, excludeRR, includeNoReply);
     renderSamples();
   }
@@ -402,56 +412,36 @@
   //   excludeRR=true,  includeNoReply=false → Σsum_reply_human / Σn_reply_human
   //   excludeRR=false, includeNoReply=true  → (Σsum_reply_all   + ΣnoReply * MAX) / Σn_total
   //   excludeRR=true,  includeNoReply=true  → (Σsum_reply_human + ΣnoReply * MAX) / Σn_total
-  function computeSeries(d, excludeRR, includeNoReply) {
-    const MAX = d.max_reply_minutes || MAX_REPLY_MINUTES_DEFAULT;
-    // Data-maturity cutoff: skip any week whose last day (Sunday) isn't yet
-    // 14 days old. Replies can land up to 14 days after an inbound, so a
-    // week's stats only stabilise once every message in it has had its
-    // chance. Equivalent rule: weekMonday <= today - 21 days.
+  function computeSeries(d, excludeRR, includeNoReply, metric) {
+    // Read the server-side weekly_stats block. Mean was previously
+    // computed client-side from daily aggregates; medians have to be done
+    // server-side (they don't decompose), so we just use the pre-computed
+    // mean alongside for consistency.
+    const variantKey = excludeRR ? "human" : "all";
+    const valueKey = (metric === "median"
+        ? (includeNoReply ? "median_inc" : "median_replied")
+        : (includeNoReply ? "mean_inc"   : "mean_replied"));
+    const nKey = includeNoReply ? "n_total" : "n_replied";
+
+    // Data-maturity cutoff: skip any week whose last day isn't yet 14 days
+    // old (weekMonday > today - 21 days).
     const matureBefore = new Date();
     matureBefore.setUTCDate(matureBefore.getUTCDate() - 21);
     const matureIso = matureBefore.toISOString().slice(0, 10);
 
     const out = {};
     for (const bucket of BUCKETS) {
-      const days = (d.series && d.series[bucket]) || {};
-      // 1. Roll up daily rows into weekly totals.
-      const weekly = {};
-      Object.keys(days).forEach(date => {
-        const wk = startOfWeek(date);
-        if (wk > matureIso) return;   // week not yet 14d-mature; skip
-        const v = days[date];
-        const w = weekly[wk] || (weekly[wk] = {
-          n_total: 0, n_reply_all: 0, sum_reply_all: 0,
-          n_reply_human: 0, sum_reply_human: 0,
-        });
-        w.n_total         += v.n_total         || 0;
-        w.n_reply_all     += v.n_reply_all     || 0;
-        w.sum_reply_all   += v.sum_reply_all   || 0;
-        w.n_reply_human   += v.n_reply_human   || 0;
-        w.sum_reply_human += v.sum_reply_human || 0;
-      });
-      // 2. Per week, apply the filter combination to get a mean.
+      const weeks = (d.weekly_stats && d.weekly_stats[bucket]) || {};
       const arr = [];
-      Object.keys(weekly).sort().forEach(wkDate => {
-        const w = weekly[wkDate];
-        const n_reply = excludeRR ? w.n_reply_human : w.n_reply_all;
-        const sum_reply = excludeRR ? w.sum_reply_human : w.sum_reply_all;
-        let mean = null, n = 0;
-        if (includeNoReply) {
-          const total = w.n_total;
-          if (total > 0) {
-            const noReply = Math.max(0, total - n_reply);
-            mean = (sum_reply + noReply * MAX) / total;
-            n = total;
-          }
-        } else {
-          if (n_reply > 0) {
-            mean = sum_reply / n_reply;
-            n = n_reply;
-          }
-        }
-        if (mean != null) arr.push({ date: wkDate, mean, n });
+      Object.keys(weeks).sort().forEach(wk => {
+        if (wk > matureIso) return;
+        const w = weeks[wk];
+        const variant = w && w[variantKey];
+        if (!variant) return;
+        const val = variant[valueKey];
+        if (val == null) return;
+        const n = (nKey === "n_total") ? w.n_total : variant.n_replied;
+        arr.push({ date: wk, mean: val, n });
       });
       out[bucket] = arr;
     }
