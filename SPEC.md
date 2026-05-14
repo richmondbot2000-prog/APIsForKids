@@ -90,10 +90,12 @@ The site is a flat set of HTML files. **No router, no SPA, no build step.** Each
 
 | Page | URL | What it shows | Data file(s) |
 |---|---|---|---|
-| **Home — About our systems** | `/index.html` | Long-scroll storybook in 7 chapters: hero · 8 helpers · 12 robots · 6 screens · 6 outside askers · loan story · 6 ground rules · 15 commandments | inline (no JSON) |
-| **Yesterday's payouts** | `/yesterday.html` | Three Leaflet maps of US borrowers paid out yesterday (clustered pins · per-state totals · per-state averages) + per-state breakdown tables | `yesterday-payouts.json` |
+| **Wall** | `/wall.html` | First top-level item. Placeholder for a running feed of what's happening across Central Services + TogetherBook — shape still being worked out. | none (placeholder) |
+| **Home — About our systems** | `/index.html` | Long-scroll storybook in 7 chapters: hero · 8 helpers · 12 robots · 6 screens · 6 outside askers · loan story · 6 ground rules · 15 commandments. Section-parent for Schema + Code sub-pages. | inline (no JSON) |
+| **Payout** | `/yesterday.html` | Three Leaflet maps of US borrowers paid out yesterday (clustered pins · per-state totals · per-state averages) + per-state breakdown tables. (File still `yesterday.html` — only the nav label changed to "Payout" 2026-05-14.) | `yesterday-payouts.json` |
 | **Brandwatch** | `/brandwatch.html` | Public mentions across 10 sources (Trustpilot, BBB, Reddit, Bluesky, Lemmy, Hacker News, CourtListener, Google News, CFPB, YouTube) | `brandwatch.json` |
-| **1stContact** | `/1stcontact.html` | First inbound email per US borrower / GT after payout, 3-month window, redacted PII; word cloud at top | `first-contact.json` |
+| **Reports** | `/reports.html` | Hub landing for the operational reports (1st Contact, Top Ups, Pipeline, Brokers, Comms). Section-parent. | none (links only) |
+| **1st Contact** | `/1stcontact.html` | First inbound email per US borrower / GT after payout, 3-month window, redacted PII; word cloud at top. Now lives under Reports. | `first-contact.json` |
 | **Directory** | `/directory.html` | **The control hub.** Every Workspace user joined with warehouse activity, payroll record, free-form annotations, and group memberships. Top-of-page panels: per-seat billing summary (live vs deleted/suspended seats + £/mo), data-quality health panel (leakage warnings). Deleted/suspended rows sink to the bottom with strikethrough email + forward chip. Full CRUD on users (Delete + forward, Delete account, Create) and Groups — Suspend was retired 2026-05-14 because Google bills suspended seats at full price; only deletion stops the charge. **Single point of reference + control for every user record across every Richmond Group system, and per-seat-billing accountability for leavers.** | `staff.json` + `staff-activity.json` + `annotations.json` + `workspace-actions.json` + `groups.json` + `PAYROLL_KV` (off-repo) |
 | **TopUps** | `/topups.html` | 24-month chart of distinct Transform Credit (LenderId 6) live loans split Primary / Top-Up, with a TUE-eligible-count line overlay; "last refreshed" badge | `topups.json` |
 | **Pipeline** | `/pipeline.html` | March-cohort application-pipeline analysis with two d3-sankey diagrams (Lead funnel + Application progression), per-stage drop-off table, and click-to-expand sampled customer timelines per dead-end endpoint. All PII masked server-side. | `pipeline.json` + `pipeline-samples.json` |
@@ -104,7 +106,12 @@ The site is a flat set of HTML files. **No router, no SPA, no build step.** Each
 | _(unlinked)_ | `/apis.html` | Per-helper detail page — kept for any deep-link bookmarks; not in nav | inline |
 | _(unlinked)_ | `/robots.html` | Per-robot list page — kept for any deep-link bookmarks; not in nav | inline |
 
-**Topbar nav (every page):** `About our systems · Yesterday · Brandwatch · 1stContact · Directory · TopUps · Pipeline · Brokers · Comms · Schema · Code`. Plus a hamburger drawer ≤960px viewport.
+**Topbar nav (every page, restructured 2026-05-14):** primary row is `Wall · About our systems · Payout · Brandwatch · Directory · Reports`. Two of those have sub-pages (rendered as a secondary row beneath the topbar, separated by the existing fine line):
+
+- **About our systems** → `Schema · Code`
+- **Reports** → `1st Contact · Top Ups · Pipeline · Brokers · Comms`
+
+The secondary row is sticky and only renders on pages inside a section that has sub-pages. On narrow viewports (≤960px) the hamburger drawer collapses the secondary row into an inline accordion — a top-level item with sub-pages expands its children on the first tap and navigates on the second. Logic lives in `nav.js` (shared script, included once per page); markup is driven by a `data-sub` JSON attribute on the parent link.
 
 ---
 

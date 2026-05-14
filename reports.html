@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TogetherBOOK — Reports</title>
+<link rel="icon" type="image/png" href="site-icon.png">
+<link rel="apple-touch-icon" href="site-icon.png">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778791697">
+<link rel="stylesheet" href="quiet.css?v=1778791697">
+<link rel="stylesheet" href="quiet-extras.css?v=1778791697">
+<style>
+  .rep-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
+  .rep-section h1 {
+    font: 400 56px/1.05 var(--font-display);
+    color: var(--ink-900);
+    letter-spacing: -0.018em;
+    margin: 8px 0 12px;
+  }
+  .rep-section .lead {
+    font: 400 17px/1.55 var(--font-display);
+    color: var(--ink-700);
+    margin: 0 0 24px; max-width: 720px;
+  }
+  .rep-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+    margin: 0;
+  }
+  .rep-card {
+    display: block;
+    padding: 16px 18px;
+    background: var(--paper-50);
+    border: 1px solid var(--paper-300);
+    border-left: 4px solid var(--brass-500);
+    text-decoration: none;
+    color: var(--ink-900);
+    transition: border-color var(--dur-fast) var(--ease-out),
+                background var(--dur-fast) var(--ease-out);
+  }
+  .rep-card:hover {
+    border-color: var(--ink-700);
+    border-left-color: var(--manuscript-red);
+    background: var(--paper-100);
+  }
+  .rep-card h2 {
+    font: 500 19px/1.2 var(--font-display);
+    margin: 0 0 6px;
+    color: var(--ink-900);
+  }
+  .rep-card p {
+    font: 400 13px/1.5 var(--font-display);
+    color: var(--ink-700);
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<header class="qb-topbar">
+  <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778791697" alt="TogetherBOOK">
+  </a>
+  <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
+          onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="qb-nav">
+    <a class="qb-nav-link" href="wall.html">Wall</a>
+    <a class="qb-nav-link" href="index.html" data-sub='[{"href": "database.html", "label": "Schema"}, {"href": "stats.html", "label": "Code"}]'>About our systems</a>
+    <a class="qb-nav-link" href="yesterday.html">Payout</a>
+    <a class="qb-nav-link" href="brandwatch.html">Brandwatch</a>
+    <a class="qb-nav-link" href="directory.html">Directory</a>
+    <a class="qb-nav-link is-active" href="reports.html" data-sub='[{"href": "1stcontact.html", "label": "1st Contact"}, {"href": "topups.html", "label": "Top Ups"}, {"href": "pipeline.html", "label": "Pipeline"}, {"href": "brokers.html", "label": "Brokers"}, {"href": "comms.html", "label": "Comms"}]'>Reports</a>
+  </nav>
+</header>
+<div class="qb-nav-backdrop" onclick="document.body.classList.remove('nav-open')"></div>
+<nav class="qb-subnav" aria-label="Section sub-pages">
+  <span class="qb-subnav-label">Reports</span>
+  <a class="qb-subnav-link" href="1stcontact.html">1st Contact</a>
+  <a class="qb-subnav-link" href="topups.html">Top Ups</a>
+  <a class="qb-subnav-link" href="pipeline.html">Pipeline</a>
+  <a class="qb-subnav-link" href="brokers.html">Brokers</a>
+  <a class="qb-subnav-link" href="comms.html">Comms</a>
+</nav>
+
+<main class="qb-page">
+  <section class="rep-section">
+    <h1>Reports</h1>
+    <p class="lead">Operational reports across the Central Services data warehouse — each refreshes hourly from the production replica. Pick one.</p>
+    <div class="rep-list">
+      <a class="rep-card" href="1stcontact.html">
+        <h2>1st Contact</h2>
+        <p>How quickly we get in touch with each fresh lead — daily and weekly view, split by hour-of-day so you can see where the calling team is fastest and slowest.</p>
+      </a>
+      <a class="rep-card" href="topups.html">
+        <h2>Top Ups</h2>
+        <p>Top-up eligibility (TUE) vs live-loan count over the last 24 months. Reference doc on what makes a loan TUE-eligible.</p>
+      </a>
+      <a class="rep-card" href="pipeline.html">
+        <h2>Pipeline</h2>
+        <p>End-to-end application funnel from Apply 1 through to Paid Out — daily counts at every stage with stage-to-stage conversion ratios.</p>
+      </a>
+      <a class="rep-card" href="brokers.html">
+        <h2>Brokers</h2>
+        <p>Per-affiliate-source 90-day funnel scorecard — lead volume, cost, conversion, CPA versus the 12% blended benchmark.</p>
+      </a>
+      <a class="rep-card" href="comms.html">
+        <h2>Comms</h2>
+        <p>Response-time tracker for inbound SMS + Email — split by customer state (unknown / applicant / live loan / arrears) with sample messages and a full CSV export.</p>
+      </a>
+    </div>
+  </section>
+</main>
+
+<script src="nav.js" defer></script>
+</body>
+</html>

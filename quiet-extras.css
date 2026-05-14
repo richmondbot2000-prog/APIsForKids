@@ -213,6 +213,44 @@ body.nav-open .qb-nav-backdrop {
   display: block; opacity: 1; pointer-events: auto;
 }
 
+/* ── Secondary nav row (sub-pages) ── */
+/* Shown only on pages that belong to a section with sub-pages — currently
+   About → Schema / Code, and Reports → 1stContact / TopUps / Pipeline /
+   Brokers / Comms. Sits flush under .qb-topbar, separated from it by the
+   topbar's own bottom-border (the "fine line"). */
+.qb-subnav {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  align-items: baseline;
+  padding: 8px 16px;
+  position: sticky; top: 72px; z-index: 999;
+  background: rgba(251, 246, 233, 0.92);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--divider);
+}
+.qb-subnav-label {
+  font: 500 11px/1 var(--font-mono);
+  color: var(--ink-500);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-right: 4px;
+}
+.qb-subnav-link {
+  font: 400 14px/1 var(--font-display);
+  color: var(--fg-muted);
+  text-decoration: none; cursor: pointer;
+  padding: 4px 0;
+  border-bottom: 1px solid transparent;
+  transition: color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out);
+}
+.qb-subnav-link:hover { color: var(--fg-strong); border-bottom-color: var(--brass-300); }
+.qb-subnav-link.is-active {
+  color: var(--fg-strong); font-style: italic;
+  border-bottom-color: var(--brass-500);
+}
+
 /* Narrow viewport — hide nav, show hamburger, drawer slides down */
 @media (max-width: 960px) {
   .qb-topbar { height: 64px; padding: 0 12px; }
@@ -250,6 +288,35 @@ body.nav-open .qb-nav-backdrop {
     opacity: 1;
     pointer-events: auto;
   }
+
+  /* Mobile sub-page accordion (driven by nav.js).
+     Desktop subnav row is hidden — sub-pages live inside the drawer instead.
+     A top-level link with data-sub waits for the first tap to expand its
+     children inline; the second tap navigates. */
+  .qb-subnav { display: none; }
+  .qb-nav-sublist {
+    display: flex; flex-direction: column;
+    padding: 0 0 8px 18px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .qb-nav-sublink {
+    padding: 10px 0;
+    font: 400 15px/1 var(--font-display);
+    color: var(--fg-muted);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--divider);
+  }
+  .qb-nav-sublink:last-child { border-bottom: none; }
+  .qb-nav-sublink.is-active { color: var(--fg-strong); font-style: italic; }
+  /* Visual cue on parent items that have children */
+  .qb-nav-link[data-sub]::after {
+    content: "  ▸";
+    color: var(--brass-500);
+    font-size: 13px;
+    transition: transform var(--dur-fast) var(--ease-out);
+    display: inline-block;
+  }
+  .qb-nav-link--expanded[data-sub]::after { transform: rotate(90deg); }
 }
 
 @media (max-width: 480px) {
@@ -257,6 +324,7 @@ body.nav-open .qb-nav-backdrop {
   .qb-topbar { height: 56px; padding: 0 12px; }
   .qb-nav { top: 56px; }
   .qb-nav-backdrop { inset: 56px 0 0 0; }
+  .qb-subnav { top: 56px; }
 }
 
 /* ── Section dividers + structure ── */
