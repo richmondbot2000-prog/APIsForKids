@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778754311">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778754311">
-<link rel="stylesheet" href="quiet.css?v=1778754311">
-<link rel="stylesheet" href="quiet-extras.css?v=1778754311">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778754311">
+<link rel="stylesheet" href="style.css?v=1778754904">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778754904">
+<link rel="stylesheet" href="quiet.css?v=1778754904">
+<link rel="stylesheet" href="quiet-extras.css?v=1778754904">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778754904">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -1155,7 +1155,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778754311" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778754904" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1190,11 +1190,10 @@
       <div class="dir-controls" id="dirControls" hidden>
         <div class="dir-search-row">
           <input type="search" class="dir-search" id="dirSearch" placeholder="Search name, email, alias, title, department, payroll fields…">
-          <button type="button" class="dir-new-btn" id="dirFilterToggle" title="Show or hide the filter pills">Filter</button>
           <button type="button" class="dir-new-btn" id="dirExportBtn" title="Download the current directory state as CSV — useful for HR reconciliation">Export CSV</button>
           <button type="button" class="dir-new-btn" id="dirNewBtn" title="Create a new Google Workspace user">+ New user</button>
         </div>
-        <div class="dir-filter-stack" id="dirFilterStack" hidden>
+        <div class="dir-filter-stack" id="dirFilterStack">
           <div class="dir-filter-row" id="dirGroupRow">
             <span class="dir-filter-label">Filter</span>
             <button class="dir-pill dir-pill--group active" data-value="all">All <span class="dir-pill-count" id="dirGroupCountAll">0</span></button>
@@ -1202,6 +1201,12 @@
             <button class="dir-pill dir-pill--group" data-value="togetherloans">@togetherloans <span class="dir-pill-count" id="dirGroupCountTL">0</span></button>
             <button class="dir-pill dir-pill--group" data-value="crm">CRM only <span class="dir-pill-count" id="dirGroupCountCrm">0</span></button>
             <button class="dir-pill dir-pill--group" data-value="suspended">Suspended <span class="dir-pill-count" id="dirGroupCountSuspended">0</span></button>
+          </div>
+          <div class="dir-filter-row" id="dirSortRow">
+            <span class="dir-filter-label">Order by</span>
+            <button class="dir-pill dir-pill--sort active" data-value="surname">Surname</button>
+            <button class="dir-pill dir-pill--sort" data-value="start_date">Start date (newest first)</button>
+            <button class="dir-pill dir-pill--sort" data-value="last_seen">Last seen (most recent first)</button>
           </div>
         </div>
       </div>
@@ -1248,6 +1253,11 @@
   //   crm            — warehouse-only entries (no Workspace account)
   //   suspended      — Workspace accounts currently in suspended state
   let activeGroup = "all";
+  // Sort axis. `surname` = original alphabetical (default).
+  // `start_date` = payroll start_date, newest first.
+  // `last_seen`  = Google last_login (fallback activity.last_active_utc),
+  //                most recent first.
+  let activeSort = "surname";
   let searchTerm = "";
 
   // Viewer identity, learned from /api/workspace/whoami on page load. Until
@@ -1489,19 +1499,9 @@
         const parts = raw.toLowerCase().replace(/[_.\-]+/g, " ").trim().split(/\s+/);
         return parts[parts.length - 1] || "";
       };
-      allEntries.sort((a, b) => {
-        const aDel = a.user && a.user.deletion_time ? 1 : 0;
-        const bDel = b.user && b.user.deletion_time ? 1 : 0;
-        if (aDel !== bDel) return aDel - bDel;
-        const aSusp = a.user && a.user.suspended ? 1 : 0;
-        const bSusp = b.user && b.user.suspended ? 1 : 0;
-        if (aSusp !== bSusp) return aSusp - bSusp;
-        const sn = surnameOf(a).localeCompare(surnameOf(b));
-        if (sn !== 0) return sn;
-        const aName = (a.user?.name || a.activity?.username || "").toLowerCase();
-        const bName = (b.user?.name || b.activity?.username || "").toLowerCase();
-        return aName.localeCompare(bName);
-      });
+      // Store surname-of for sortEntries to reuse without redefining.
+      window.__surnameOf = surnameOf;
+      sortEntries();
 
       const updated = staff.updated_at ? staff.updated_at.replace("T", " ").replace("Z", " UTC") : "—";
       const activeStaffCount = allEntries.filter(e => e.type === "staff" && e.activity).length;
@@ -1580,6 +1580,19 @@
         renderGrid();
       });
     }
+    // Sort pills.
+    document.querySelectorAll(".dir-pill--sort").forEach(p => {
+      p.classList.toggle("active", p.dataset.value === activeSort);
+      if (p.dataset.wired) return;
+      p.dataset.wired = "1";
+      p.addEventListener("click", () => {
+        document.querySelectorAll(".dir-pill--sort").forEach(b => b.classList.remove("active"));
+        p.classList.add("active");
+        activeSort = p.dataset.value;
+        sortEntries();
+        renderGrid();
+      });
+    });
   }
 
   // Compute + render the data-quality health panel. Three lines:
@@ -1707,6 +1720,47 @@
     const line = document.getElementById("dirBillingLine");
     line.innerHTML = `<b>${live}</b> live · <b>${suspended}</b> suspended${deleted ? ` · <b>${deleted}</b> deleted` : ""} · <b>${fmtGbp(monthly)}</b>/mo`;
     line.hidden = false;
+  }
+
+  // Sort allEntries in-place using activeSort. Deleted always last,
+  // suspended after live (regardless of sort key) — that's a stability rule.
+  function sortEntries() {
+    const surname = window.__surnameOf || (e => "");
+    const startDateOf = e => {
+      if (e.type !== "staff") return "";
+      const p = payrollFor(e);
+      return (p && p.start_date) || "";
+    };
+    const lastSeenOf = e => {
+      if (e.user && e.user.last_login && !e.user.last_login.startsWith("1970-")) return e.user.last_login;
+      if (e.activity && e.activity.last_active_utc) return e.activity.last_active_utc;
+      return "";
+    };
+    allEntries.sort((a, b) => {
+      const aDel = a.user && a.user.deletion_time ? 1 : 0;
+      const bDel = b.user && b.user.deletion_time ? 1 : 0;
+      if (aDel !== bDel) return aDel - bDel;
+      const aSusp = a.user && a.user.suspended ? 1 : 0;
+      const bSusp = b.user && b.user.suspended ? 1 : 0;
+      if (aSusp !== bSusp) return aSusp - bSusp;
+      if (activeSort === "start_date") {
+        const av = startDateOf(a), bv = startDateOf(b);
+        // Empties sink to the bottom; otherwise newest first.
+        if (!av && bv) return 1;
+        if (av && !bv) return -1;
+        if (av !== bv) return bv.localeCompare(av);
+      } else if (activeSort === "last_seen") {
+        const av = lastSeenOf(a), bv = lastSeenOf(b);
+        if (!av && bv) return 1;
+        if (av && !bv) return -1;
+        if (av !== bv) return bv.localeCompare(av);
+      }
+      const sn = surname(a).localeCompare(surname(b));
+      if (sn !== 0) return sn;
+      const aName = (a.user?.name || a.activity?.username || "").toLowerCase();
+      const bName = (b.user?.name || b.activity?.username || "").toLowerCase();
+      return aName.localeCompare(bName);
+    });
   }
 
   function renderGrid() {
@@ -4319,12 +4373,6 @@
   // "+ New user" button -> open the create-user modal.
   document.getElementById("dirNewBtn").addEventListener("click", openCreateModal);
   document.getElementById("dirExportBtn").addEventListener("click", exportDirectoryCsv);
-  document.getElementById("dirFilterToggle").addEventListener("click", e => {
-    const stack = document.getElementById("dirFilterStack");
-    const expanded = !stack.hidden;
-    stack.hidden = expanded;
-    e.currentTarget.classList.toggle("is-active", !expanded);
-  });
   // "+ New group" button -> open the create-group modal.
   document.getElementById("dirNewGroupBtn").addEventListener("click", openCreateGroupModal);
   document.getElementById("dirGroupSearch").addEventListener("input", e => {
