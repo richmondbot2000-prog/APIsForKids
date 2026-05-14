@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778754980">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778754980">
-<link rel="stylesheet" href="quiet.css?v=1778754980">
-<link rel="stylesheet" href="quiet-extras.css?v=1778754980">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778754980">
+<link rel="stylesheet" href="style.css?v=1778762339">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778762339">
+<link rel="stylesheet" href="quiet.css?v=1778762339">
+<link rel="stylesheet" href="quiet-extras.css?v=1778762339">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778762339">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -1155,7 +1155,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778754980" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778762339" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1731,11 +1731,7 @@
       const p = payrollFor(e);
       return (p && p.start_date) || "";
     };
-    const lastSeenOf = e => {
-      if (e.user && e.user.last_login && !e.user.last_login.startsWith("1970-")) return e.user.last_login;
-      if (e.activity && e.activity.last_active_utc) return e.activity.last_active_utc;
-      return "";
-    };
+    const lastSeenOf = entryLastSeen;
     allEntries.sort((a, b) => {
       const aDel = a.user && a.user.deletion_time ? 1 : 0;
       const bDel = b.user && b.user.deletion_time ? 1 : 0;
@@ -1777,6 +1773,22 @@
     }
     empty.hidden = true;
     grid.innerHTML = items.map(renderCard).join("");
+  }
+
+  // "Last seen" = the later of warehouse last_active_utc (DB write) and
+  // Google last_login (Gmail / Workspace sign-in). Either alone is a partial
+  // picture; max captures "any sign of life". Returns ISO string or "".
+  function entryLastSeen(e) {
+    const candidates = [];
+    if (e.user && e.user.last_login && !e.user.last_login.startsWith("1970-")) {
+      candidates.push(e.user.last_login);
+    }
+    if (e.activity && e.activity.last_active_utc) {
+      candidates.push(e.activity.last_active_utc);
+    }
+    if (!candidates.length) return "";
+    candidates.sort();
+    return candidates[candidates.length - 1];
   }
 
   // Helpers used by the single filter axis.
@@ -1838,11 +1850,14 @@
     const phoneSource = ann.phone ? "" : (phone ? " (payroll)" : "");
     const startSource = ann.start_date ? "" : (startDate ? " (payroll)" : "");
     const parts = [];
+    // "Last seen" uses the max of warehouse activity + Google last_login so
+    // the displayed value matches what the Last-seen sort sorts by.
+    const lastIso = entry ? entryLastSeen(entry) : (a && a.last_active_utc) || "";
+    if (lastIso) {
+      const lastDate = new Date(lastIso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+      parts.push(`<span class="dir-last">last seen <b>${escapeHtml(lastDate)}</b></span>`);
+    }
     if (a) {
-      const lastDate = a.last_active_utc
-        ? new Date(a.last_active_utc).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
-        : null;
-      if (lastDate) parts.push(`<span class="dir-last">last seen <b>${escapeHtml(lastDate)}</b></span>`);
       const tenants = (a.tenants || []).map(t => `<span class="dir-tenant">${escapeHtml(t)}</span>`).join("");
       if (tenants) parts.push(`<span class="dir-tenants">${tenants}</span>`);
       if (a.top_warehouse) parts.push(`<span class="dir-warehouse">mostly <em>${escapeHtml(a.top_warehouse)}</em></span>`);
