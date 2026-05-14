@@ -1,5 +1,183 @@
 {
   "schema_version": 1,
-  "updated_at": null,
-  "annotations": {}
+  "updated_at": "2026-05-14T08:14:03Z",
+  "annotations": {
+    "adnan.turken@letme.co.uk": {
+      "directory_photo_uploaded_at": "2026-05-14T09:09:07+01:00"
+    },
+    "adnan.turken@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T09:08:51+01:00"
+    },
+    "aerona.sheikh@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T09:08:15+01:00"
+    },
+    "alishia.kasdorf@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T09:07:34+01:00"
+    },
+    "annette.rodriguez@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T09:06:25+01:00"
+    },
+    "ashwin.john@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T09:05:41+01:00"
+    },
+    "axel.horsfall@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T09:02:42+01:00"
+    },
+    "berginie.botero@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T09:01:25+01:00"
+    },
+    "bernardo.fonseca@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T09:00:41+01:00"
+    },
+    "bryony.leach@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:59:54+01:00"
+    },
+    "bushra.tabassum@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:59:19+01:00"
+    },
+    "cherry.liu@letme.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:58:36+01:00"
+    },
+    "christian.joseph@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:58:00+01:00"
+    },
+    "claire.stratford@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:57:07+01:00"
+    },
+    "clementia.dsouza@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:56:24+01:00"
+    },
+    "dan.meineck@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:55:30+01:00"
+    },
+    "david.byatt@letme.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:54:40+01:00"
+    },
+    "david.dimmick@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:53:58+01:00"
+    },
+    "ekrem.yurtman@letme.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:52:40+01:00"
+    },
+    "ekrem.yurtman@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:53:06+01:00"
+    },
+    "grainne.cranna@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:51:43+01:00"
+    },
+    "harriet.gregory@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:50:53+01:00"
+    },
+    "irlendz.arne@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:49:49+01:00"
+    },
+    "jaimi.struble@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:48:34+01:00"
+    },
+    "james.benamor@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T09:11:10+01:00"
+    },
+    "john.christie@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:47:15+01:00"
+    },
+    "johnathon.ausborn@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T09:04:57+01:00"
+    },
+    "joseph.foard@letme.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:45:43+01:00"
+    },
+    "kelly.black@letme.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:43:02+01:00"
+    },
+    "kelly.black@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:43:19+01:00"
+    },
+    "kenishia.cotner@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:42:00+01:00"
+    },
+    "laura.chadbourne@letme.co.uk": {
+      "directory_photo_uploaded_at": "2026-05-14T08:40:26+01:00"
+    },
+    "laura.chadbourne@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:40:44+01:00"
+    },
+    "lucas.bishop@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:35:27+01:00"
+    },
+    "lucian.teodoroiu@letme.co.uk": {
+      "directory_photo_uploaded_at": "2026-05-14T08:34:55+01:00"
+    },
+    "marta.gallardo@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:33:29+01:00"
+    },
+    "matt.brunet@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:32:50+01:00"
+    },
+    "max.dynowski@letme.co.uk": {
+      "directory_photo_uploaded_at": "2026-05-14T08:32:15+01:00"
+    },
+    "mourad.malki@clearloans.com.au": {
+      "directory_photo_uploaded_at": "2026-05-14T08:28:30+01:00"
+    },
+    "mourad.malki@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:28:48+01:00"
+    },
+    "natasha.wright@letme.co.uk": {
+      "directory_photo_uploaded_at": "2026-05-14T08:27:52+01:00"
+    },
+    "navodi.sammani@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:27:19+01:00"
+    },
+    "oliver.holmes@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:26:37+01:00"
+    },
+    "paulo.cesar@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:26:00+01:00"
+    },
+    "raveeha.ejaz@letme.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:19:11+01:00"
+    },
+    "raveeha.ejaz@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:19:32+01:00"
+    },
+    "saoirse-brooke.polywka@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:18:33+01:00"
+    },
+    "sophia.ugwunne@letme.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:17:13+01:00"
+    },
+    "sophia.ugwunne@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:17:33+01:00"
+    },
+    "sophie.james@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T08:00:18+01:00"
+    },
+    "sophie.polychronopulos@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T07:59:45+01:00"
+    },
+    "stan.majerski@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T07:57:50+01:00"
+    },
+    "tarek.benamor@letme.com": {
+      "directory_photo_uploaded_at": "2026-05-14T09:09:46+01:00"
+    },
+    "taylor.draper@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T07:56:24+01:00"
+    },
+    "thomas.holloway@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T07:55:18+01:00"
+    },
+    "timothy.torres@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T07:54:38+01:00"
+    },
+    "tina.suppa@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T07:54:02+01:00"
+    },
+    "tyla.woods@togetherloans.com": {
+      "directory_photo_uploaded_at": "2026-05-14T07:53:09+01:00"
+    },
+    "victor.igbaifua@letme.com": {
+      "directory_photo_uploaded_at": "2026-05-14T07:52:25+01:00"
+    }
+  }
 }
