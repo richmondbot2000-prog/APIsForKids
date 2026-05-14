@@ -119,6 +119,19 @@
     background: var(--red-500); border: 1.5px solid var(--paper-50);
     border-radius: 50%; transform: translate(-50%, -50%);
   }
+  /* Second line: TUE-eligible borrowers who logged into the app that month.
+     Dashed + ink-blue to read as a subset of the red top-up-eligible line. */
+  .tu-legend-swatch.line-app {
+    height: 2px; border: none; background: transparent; width: 22px;
+    position: relative;
+    border-top: 2px dashed #2c6cb8;
+  }
+  .tu-legend-swatch.line-app::after {
+    content: ""; position: absolute; left: 50%; top: 50%;
+    width: 6px; height: 6px;
+    background: #2c6cb8; border: 1.5px solid var(--paper-50);
+    border-radius: 50%; transform: translate(-50%, -50%);
+  }
 
   /* The SVG itself */
   .tu-chart-svg { display: block; width: 100%; height: auto; max-height: 480px; }
@@ -139,6 +152,8 @@
   .tu-dot {
     fill: var(--red-500); stroke: var(--paper-50); stroke-width: 1.5;
   }
+  .tu-line-app { fill: none; stroke: #2c6cb8; stroke-width: 1.8; stroke-dasharray: 5 3; }
+  .tu-dot-app  { fill: #2c6cb8; stroke: var(--paper-50); stroke-width: 1.5; }
   .tu-grid { stroke: var(--ink-300); stroke-width: 0.5; opacity: 0.4; stroke-dasharray: 2 3; }
   .tu-axis { stroke: var(--ink-700); stroke-width: 1; }
 
@@ -245,11 +260,12 @@
 
     <div class="tu-chart-wrap">
       <h2 class="tu-chart-title">Monthly counts, last 24 months</h2>
-      <p class="tu-chart-sub">Each bar is the number of distinct Transform Credit loans that were live in that month — defined as <em id="tuLiveFilter">DIA &lt; 90 days AND CurrentBalance &gt; $10</em> — split between <em>primary</em> loans (the customer's first loan) and <em>top-up</em> loans (the customer already had a loan when this one was paid out; the existing loan was settled at payout). The line tracks how many of those loans were <em>top-up eligible</em> at any point that month.</p>
+      <p class="tu-chart-sub">Each bar is the number of distinct Transform Credit loans that were live in that month — defined as <em id="tuLiveFilter">DIA &lt; 90 days AND CurrentBalance &gt; $10</em> — split between <em>primary</em> loans (the customer's first loan) and <em>top-up</em> loans (the customer already had a loan when this one was paid out; the existing loan was settled at payout). The red line tracks how many of those loans were <em>top-up eligible</em> at any point that month. The dashed blue line is the subset of those eligible borrowers who <strong>logged into the TL app</strong> that month — relevant because the app is the only place a borrower can actually request a top-up.</p>
       <div class="tu-legend">
         <span class="tu-legend-item"><span class="tu-legend-swatch bar-primary"></span>Primary loans</span>
         <span class="tu-legend-item"><span class="tu-legend-swatch bar-topup"></span>Top-up loans</span>
         <span class="tu-legend-item"><span class="tu-legend-swatch line"></span>Top-up eligible</span>
+        <span class="tu-legend-item"><span class="tu-legend-swatch line-app"></span>Eligible &amp; logged into app</span>
       </div>
       <div id="tuChart"></div>
     </div>
@@ -262,6 +278,7 @@
           <th>Top-up loans</th>
           <th>Live total</th>
           <th>Top-up eligible</th>
+          <th>Eligible &amp; logged into app</th>
           <th>Eligible %</th>
         </tr></thead>
         <tbody></tbody>
@@ -381,6 +398,19 @@
       svg.push(`<circle class="tu-dot" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3.5"><title>${escapeHtml(s.month)}: ${formatNumber(s.tue_eligible)} top-up eligible</title></circle>`);
     });
 
+    // Line (TUE-eligible AND logged into app). Subset of the red line, so it
+    // necessarily sits at or below it. Only rendered if the scanner had
+    // AppLoginSuccesses available (older snapshots before the field landed
+    // will have all zeros — we keep drawing it so the legend stays honest).
+    const appPts = series.map((s, i) => `${xScale(i, true).toFixed(1)},${yScale(s.tue_logged_in || 0).toFixed(1)}`).join(" ");
+    svg.push(`<polyline class="tu-line-app" points="${appPts}"/>`);
+    series.forEach((s, i) => {
+      const cx = xScale(i, true);
+      const cy = yScale(s.tue_logged_in || 0);
+      const pct = (s.tue_eligible || 0) > 0 ? Math.round(100 * (s.tue_logged_in || 0) / s.tue_eligible) : 0;
+      svg.push(`<circle class="tu-dot-app" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3"><title>${escapeHtml(s.month)}: ${formatNumber(s.tue_logged_in || 0)} eligible &amp; logged into app (${pct}% of eligible)</title></circle>`);
+    });
+
     // X-axis labels (every Nth month so labels don't overlap; current month highlighted)
     const labelEvery = series.length > 18 ? 3 : 2;
     series.forEach((s, i) => {
@@ -407,12 +437,15 @@
     // Render newest first so the most recent months are at the top of the table
     const rows = [...series].reverse().map(s => {
       const pct = s.live_loans > 0 ? ((s.tue_eligible / s.live_loans) * 100) : 0;
+      const app = s.tue_logged_in || 0;
+      const appPct = (s.tue_eligible || 0) > 0 ? (100 * app / s.tue_eligible) : 0;
       return `<tr>
         <td>${escapeHtml(longMonth(s.month))}</td>
         <td class="num">${formatNumber(s.live_primary)}</td>
         <td class="num">${formatNumber(s.live_topup)}</td>
         <td class="num">${formatNumber(s.live_loans)}</td>
         <td class="num">${formatNumber(s.tue_eligible)}</td>
+        <td class="num">${formatNumber(app)}${app > 0 ? ` <span style="color:var(--ink-500);font-size:11px;">(${appPct.toFixed(0)}%)</span>` : ""}</td>
         <td class="pct">${pct.toFixed(1)}%</td>
       </tr>`;
     }).join("");

@@ -6,6 +6,10 @@ chart of:
   - live_loans     — distinct LoanbookIds with any LoanHistory entry that month
   - tue_eligible   — distinct LoanbookIds with at least one LoanHistory entry
                      where TueStatus=1 in that month
+  - tue_logged_in  — subset of tue_eligible where the borrower also has at
+                     least one AppLoginSuccesses row that month. The TL app is
+                     the only place a borrower can actually request a top up,
+                     so this is the on-ramp conversion potential.
 
 Source: `ReportingLoanbook.dbo.Loan_History` (~197M rows; snapshots per live
 loan per day, plus one row per transaction). The query buckets by month over
@@ -251,6 +255,47 @@ def main() -> None:
         live_filter_sql = ""
     print(f"# live-loan filter: applied = {has_live_filter}  arrears_date_col={arrears_date_col}  bal_col={bal_col}", flush=True)
 
+    # AppLoginSuccesses: per-borrower app login events. Needed for the
+    # tue_logged_in series — the TL app is the only place a borrower can
+    # actually request a top-up, so TUE-eligible AND logged in is the real
+    # on-ramp signal. Detected dynamically; if the warehouse doesn't yet
+    # have the table mirrored we just skip the new series.
+    cur.execute("""
+        SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'AppLoginSuccesses'
+    """, [TABLE_SCHEMA])
+    login_cols = {r[0] for r in cur.fetchall()}
+    login_ts_col = next((c for c in ('LoginDateTimeUtc', 'LoginDateTimeUTC', 'LoginDateTimeLocal') if c in login_cols), None)
+    has_logins = bool(login_cols) and 'LoanbookId' in login_cols and login_ts_col
+    print(f"# AppLoginSuccesses: present={bool(login_cols)} ts_col={login_ts_col} usable={has_logins}", flush=True)
+
+    # Logins CTE: per (month, loanbook) row if the borrower logged into the
+    # app at least once that month. LEFT JOINed below so absent = 0 login.
+    if has_logins:
+        logins_cte = f""",
+            logins_per_loan_month AS (
+                SELECT DISTINCT
+                    DATEFROMPARTS(YEAR([{login_ts_col}]), MONTH([{login_ts_col}]), 1) AS month_start,
+                    LoanbookId
+                FROM [{TABLE_SCHEMA}].[AppLoginSuccesses]
+                WHERE [{login_ts_col}] >= ?
+                  AND LoanbookId IS NOT NULL
+                  AND (SuccessfulLogin IS NULL OR SuccessfulLogin = 1)
+            )
+        """
+        logins_join = """
+            LEFT JOIN logins_per_loan_month lpm
+                ON lpm.month_start = plm.month_start
+               AND lpm.LoanbookId  = plm.LoanbookId
+        """
+        logins_select = """,
+            SUM(CASE WHEN plm.was_tue = 1 AND lpm.LoanbookId IS NOT NULL THEN 1 ELSE 0 END) AS tue_logged_in
+        """
+    else:
+        logins_cte = ""
+        logins_join = ""
+        logins_select = ", 0 AS tue_logged_in"
+
     if LENDER_ID is not None:
         # Build lender_loans CTE: LenderId from Loan, top-up flag from LoanAtInception.
         if has_topup_classifier:
@@ -286,17 +331,21 @@ def main() -> None:
                   AND lh.LoanbookId IS NOT NULL
                   {live_filter_sql}
                 GROUP BY DATEFROMPARTS(YEAR(lh.[{ts}]), MONTH(lh.[{ts}]), 1), lh.LoanbookId, ll.is_topup
-            )
+            ){logins_cte}
             SELECT
-                month_start,
-                SUM(CASE WHEN is_topup = 0 THEN 1 ELSE 0 END) AS live_primary,
-                SUM(CASE WHEN is_topup = 1 THEN 1 ELSE 0 END) AS live_topup,
-                SUM(was_tue) AS tue_eligible
-            FROM per_loan_month
-            GROUP BY month_start
-            ORDER BY month_start;
+                plm.month_start,
+                SUM(CASE WHEN plm.is_topup = 0 THEN 1 ELSE 0 END) AS live_primary,
+                SUM(CASE WHEN plm.is_topup = 1 THEN 1 ELSE 0 END) AS live_topup,
+                SUM(plm.was_tue) AS tue_eligible
+                {logins_select}
+            FROM per_loan_month plm
+            {logins_join}
+            GROUP BY plm.month_start
+            ORDER BY plm.month_start;
         """
         params = [LENDER_ID, cutoff]
+        if has_logins:
+            params.append(cutoff)
     else:
         q = f"""
             WITH per_loan_month AS (
@@ -309,16 +358,24 @@ def main() -> None:
                   AND lh.LoanbookId IS NOT NULL
                   {live_filter_sql}
                 GROUP BY DATEFROMPARTS(YEAR(lh.[{ts}]), MONTH(lh.[{ts}]), 1), lh.LoanbookId
-            )
-            SELECT month_start, COUNT(*) AS live_loans, 0 AS live_topup, SUM(was_tue) AS tue_eligible
-            FROM per_loan_month
-            GROUP BY month_start
-            ORDER BY month_start;
+            ){logins_cte}
+            SELECT
+                plm.month_start,
+                COUNT(*) AS live_loans,
+                0 AS live_topup,
+                SUM(plm.was_tue) AS tue_eligible
+                {logins_select}
+            FROM per_loan_month plm
+            {logins_join}
+            GROUP BY plm.month_start
+            ORDER BY plm.month_start;
         """
         params = [cutoff]
+        if has_logins:
+            params.append(cutoff)
     print(f"# running aggregation query…  lender filter: {LENDER_LABEL if LENDER_ID is not None else 'NONE (all lenders)'}", flush=True)
     cur.execute(q, params)
-    rows = [(r[0], int(r[1]), int(r[2]), int(r[3])) for r in cur.fetchall()]
+    rows = [(r[0], int(r[1]), int(r[2]), int(r[3]), int(r[4])) for r in cur.fetchall()]
     print(f"# returned {len(rows)} month rows", flush=True)
 
     # Build the output: ensure every month in the window is present (zeros if
@@ -329,15 +386,16 @@ def main() -> None:
     for _ in range(WINDOW_MONTHS):
         bucket = by_month.get((y, m))
         if bucket:
-            _, live_primary, live_topup, tue = bucket
+            _, live_primary, live_topup, tue, tue_app = bucket
         else:
-            live_primary, live_topup, tue = 0, 0, 0
+            live_primary, live_topup, tue, tue_app = 0, 0, 0, 0
         series.append({
             "month": f"{y:04d}-{m:02d}",
-            "live_primary": live_primary,
-            "live_topup":   live_topup,
-            "live_loans":   live_primary + live_topup,
-            "tue_eligible": tue,
+            "live_primary":   live_primary,
+            "live_topup":     live_topup,
+            "live_loans":     live_primary + live_topup,
+            "tue_eligible":   tue,
+            "tue_logged_in":  tue_app,
         })
         m += 1
         if m == 13:
@@ -349,6 +407,7 @@ def main() -> None:
     total_topup = sum(s["live_topup"] for s in series)
     total_live = total_primary + total_topup
     total_tue = sum(s["tue_eligible"] for s in series)
+    total_tue_app = sum(s["tue_logged_in"] for s in series)
 
     # Pull this lender's actual TUE thresholds. Try the lender_table we already
     # found; if it doesn't have the threshold columns, fall back to
@@ -384,11 +443,13 @@ def main() -> None:
         ),
         "lender_thresholds": lender_thresholds,
         "totals": {
-            "live_loans_loan_months":   total_live,   # SUM, not distinct
-            "live_primary_loan_months": total_primary,
-            "live_topup_loan_months":   total_topup,
-            "tue_eligible_loan_months": total_tue,
+            "live_loans_loan_months":      total_live,   # SUM, not distinct
+            "live_primary_loan_months":    total_primary,
+            "live_topup_loan_months":      total_topup,
+            "tue_eligible_loan_months":    total_tue,
+            "tue_logged_in_loan_months":   total_tue_app,
         },
+        "has_logins": has_logins,
         "series": series,
     }
     out_path = Path("topups.json")
