@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-14T07:33:32.702Z",
+  "updated_at": "2026-05-14T07:34:40.817Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -1084,6 +1084,13 @@
       "actor": "james.benamor@letme.com",
       "action": "get-forwarding",
       "target": "marta.gallardo@togetherloans.com",
+      "ok": true
+    },
+    {
+      "ts": "2026-05-14T07:34:40.817Z",
+      "actor": "james.benamor@letme.com",
+      "action": "get-forwarding",
+      "target": "lucian.teodoroiu@letme.co.uk",
       "ok": true
     }
   ]
