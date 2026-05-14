@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-14T06:55:54.649Z",
+  "updated_at": "2026-05-14T06:56:24.704Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -692,6 +692,13 @@
       "actor": "james.benamor@letme.com",
       "action": "get-forwarding",
       "target": "taylor.draper@togetherloans.com",
+      "ok": true
+    },
+    {
+      "ts": "2026-05-14T06:56:24.704Z",
+      "actor": "james.benamor@letme.com",
+      "action": "directory-photo-upload",
+      "target": "",
       "ok": true
     }
   ]
