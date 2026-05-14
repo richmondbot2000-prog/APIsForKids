@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-13T22:48:04Z",
+  "updated_at": "2026-05-14T09:19:52Z",
   "totals": {
     "groups": 118,
-    "members": 219
+    "members": 218
   },
   "tenants": [
     "letme.co.uk",
@@ -1474,7 +1474,7 @@
       "description": "",
       "tenant": "letme.co.uk",
       "aliases": [],
-      "member_count": 4,
+      "member_count": 3,
       "members": [
         {
           "email": "ben.gardner@letme.com",
@@ -1491,12 +1491,6 @@
         {
           "email": "kelly.black@letme.com",
           "role": "OWNER",
-          "type": "USER",
-          "status": "ACTIVE"
-        },
-        {
-          "email": "max.dynowski@letme.co.uk",
-          "role": "MEMBER",
           "type": "USER",
           "status": "ACTIVE"
         }
