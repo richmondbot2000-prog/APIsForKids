@@ -1,39 +1,39 @@
 {
   "schema_version": 1,
-  "snapshot_date": "2026-05-13",
-  "updated_at": "2026-05-13T16:01:26Z",
+  "snapshot_date": "2026-05-14",
+  "updated_at": "2026-05-14T08:20:11Z",
   "brands": [
     "Together Loans",
     "TransformCredit"
   ],
   "totals": {
-    "all": 312,
+    "all": 324,
     "by_source": {
-      "trustpilot": 259,
+      "trustpilot": 271,
       "bbb": 14,
-      "reddit": 25,
+      "reddit": 26,
       "bluesky": 0,
       "lemmy": 0,
       "hackernews": 0,
       "courtlistener": 0,
-      "google_news": 1,
+      "google_news": 0,
       "cfpb": 6,
       "youtube": 7
     },
     "by_brand": {
-      "together_loans": 294,
-      "transform_credit": 18
+      "together_loans": 307,
+      "transform_credit": 17
     }
   },
   "source_status": {
     "trustpilot": {
       "ok": true,
-      "fetched": 21,
+      "fetched": 12,
       "error": null
     },
     "bbb": {
       "ok": true,
-      "fetched": 2,
+      "fetched": 0,
       "error": null
     },
     "reddit": {
@@ -63,7 +63,7 @@
     },
     "google_news": {
       "ok": true,
-      "fetched": 63,
+      "fetched": 60,
       "error": null
     },
     "cfpb": {
@@ -78,6 +78,146 @@
     }
   },
   "mentions": [
+    {
+      "source": "reddit",
+      "brand": "together_loans",
+      "id": "rd-1tcq7pp",
+      "title": "Loan info",
+      "snippet": "In a bad spot at the moment and really have no other choice but to pull out a loan. Been looking into “together loans” and got approved (with co-sign) I have a 10k tax refund set to come in by July (maybe sooner but irs more than likely won’t release early …",
+      "url": "https://www.reddit.com/r/loanhelp_/comments/1tcq7pp/loan_info/",
+      "date": "2026-05-14",
+      "author": "u/Cruuzzz",
+      "score": 1,
+      "score_max": null,
+      "site_name": "r/loanhelp_",
+      "site_domain": "reddit.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a0524544fa7c015f7431351",
+      "title": "Definitely not impressed the the money…",
+      "snippet": "…had to give their bank account information as well as their debit card number. I was in a significant bind, but I definitely won’t be using Together Loans again",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a0524544fa7c015f7431351",
+      "date": "2026-05-13",
+      "author": "Less than impressed",
+      "score": 2,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a050d9f62273717c8e29448",
+      "title": "Very quick and easy to apply",
+      "snippet": "Very quick and easy to apply, and get approved. No hassle at all. Willingness to help my financial needs.",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a050d9f62273717c8e29448",
+      "date": "2026-05-13",
+      "author": "customer",
+      "score": 4,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a050d220bcdd504f5308158",
+      "title": "I believe they just saved my life",
+      "snippet": "I believe they just saved my life",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a050d220bcdd504f5308158",
+      "date": "2026-05-13",
+      "author": "Shawneca Johnson",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a050353436c62cea562503a",
+      "title": "Great Service",
+      "snippet": "Great service,Fast with my loan,I would highly recommend Together Loans",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a050353436c62cea562503a",
+      "date": "2026-05-13",
+      "author": "K.palmer",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a0501a42c8272bdbc4f350b",
+      "title": "They were great to work with.",
+      "snippet": "They were great to work with.",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a0501a42c8272bdbc4f350b",
+      "date": "2026-05-13",
+      "author": "customer",
+      "score": 4,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a04febf41e85c3e4b36a691",
+      "title": "My Experience was great",
+      "snippet": "My Experience was great, easy application, laid out transparent c terms, great customer service, always got back to me when I emailed or called and was very informative on how to get cosigner and if i understood how they work. I haven't made a payment yet but it has been funded…",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a04febf41e85c3e4b36a691",
+      "date": "2026-05-13",
+      "author": "Rachel Martin",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a04fb4451d191f2b4944e51",
+      "title": "Such an easy",
+      "snippet": "Such an easy, smooth transaction.",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a04fb4451d191f2b4944e51",
+      "date": "2026-05-13",
+      "author": "customer",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a04f9739259dc7b7d51f618",
+      "title": "Wonderful experience super easy and…",
+      "snippet": "Wonderful experience super easy and quick also I had no issues with getting questions answered",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a04f9739259dc7b7d51f618",
+      "date": "2026-05-13",
+      "author": "Alexis Contreras",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a04f8a4520390869f9bea5e",
+      "title": "Very easy to apply and was fast…",
+      "snippet": "Very easy to apply and was fast approval. Would highly recommend",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a04f8a4520390869f9bea5e",
+      "date": "2026-05-13",
+      "author": "Sabrina Briehof",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
     {
       "source": "trustpilot",
       "brand": "together_loans",
@@ -718,6 +858,48 @@
       "date": "2026-05-07",
       "author": "Lolo G",
       "score": 1,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a052ec563c3e99a974bc032",
+      "title": "Love this place recommend it to everyone",
+      "snippet": "Love this place recommend it to everyone",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a052ec563c3e99a974bc032",
+      "date": "2026-05-06",
+      "author": "Misty",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a04fc01bbe6c19fa9474b41",
+      "title": "Very helpful",
+      "snippet": "Very helpful, fast and reliable. Definitely appreciate Together Loans for coming thru in my time of need.",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a04fc01bbe6c19fa9474b41",
+      "date": "2026-05-06",
+      "author": "customer",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a04f75f25995fc0f764fa74",
+      "title": "Truly impressed with the speed and…",
+      "snippet": "Truly impressed with the speed and efficiency here! My application was finished within a day, and I received the transfer the next morning. I really appreciated not having to deal with the typical bureaucracy or having to call repeatedly to check the status. Thank you for the sm…",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a04f75f25995fc0f764fa74",
+      "date": "2026-05-06",
+      "author": "Robert",
+      "score": 5,
       "score_max": 5,
       "site_name": "Trustpilot",
       "site_domain": "trustpilot.com"
@@ -3797,7 +3979,7 @@
       "url": "https://www.reddit.com/r/findacosigner/comments/1sa4v8k/scammer_alert/",
       "date": "2026-04-02",
       "author": "u/dlopez2018",
-      "score": 5,
+      "score": 4,
       "score_max": null,
       "site_name": "r/findacosigner",
       "site_domain": "reddit.com"
@@ -3909,7 +4091,7 @@
       "url": "https://www.reddit.com/r/debtfree/comments/1rjs7hz/anyone_have_experience_with_together_loans_seems/",
       "date": "2026-03-03",
       "author": "u/PM_Me_Money_Daddy",
-      "score": 7,
+      "score": 5,
       "score_max": null,
       "site_name": "r/debtfree",
       "site_domain": "reddit.com"
@@ -3951,7 +4133,7 @@
       "url": "https://www.reddit.com/r/Scams/comments/1r8j5km/us_tcrdt_com_stkgpbbbg_phishingsmishing_scam/",
       "date": "2026-02-18",
       "author": "u/ImplementLong5304",
-      "score": 3,
+      "score": 2,
       "score_max": null,
       "site_name": "r/Scams",
       "site_domain": "reddit.com"
@@ -4259,7 +4441,7 @@
       "url": "https://www.reddit.com/r/findacosigner/comments/1oh5p65/co_sign/",
       "date": "2025-10-27",
       "author": "u/Flimsy_Suspect3208",
-      "score": 4,
+      "score": 3,
       "score_max": null,
       "site_name": "r/findacosigner",
       "site_domain": "reddit.com"
@@ -4273,7 +4455,7 @@
       "url": "https://www.reddit.com/r/findacosigner/comments/1ocmme8/need_a_cosigner/",
       "date": "2025-10-21",
       "author": "u/CodyPalmer7",
-      "score": 4,
+      "score": 5,
       "score_max": null,
       "site_name": "r/findacosigner",
       "site_domain": "reddit.com"
@@ -4375,20 +4557,6 @@
       "score_max": 5,
       "site_name": "Trustpilot",
       "site_domain": "trustpilot.com"
-    },
-    {
-      "source": "google_news",
-      "brand": "transform_credit",
-      "id": "gn-VoWDlPdmJ4eW4xLXpucFY2QmZMMXlCaW53VWxqUQ",
-      "title": "TransformCredit Review – Is it Safe and Legit? (April 2026) - Traders Union",
-      "snippet": "TransformCredit Review – Is it Safe and Legit? (April 2026) Traders Union",
-      "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE1iYk9KVV9PMVdfYXdhTFA5bXlrazlXZlhzRG5zNjByOGh2YXB4OU1HRW5PVGpnMkx5cktPMjdxUHZ1b0VPXzVoWDlPdmJ4eW4xLXpucFY2QmZMMXlCaW53VWxqUQ?oc=5",
-      "date": "2025-02-05",
-      "author": null,
-      "score": null,
-      "score_max": null,
-      "site_name": "Traders Union",
-      "site_domain": "tradersunion.com"
     },
     {
       "source": "youtube",
