@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Comms response time</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778743524">
-<link rel="stylesheet" href="quiet.css?v=1778743524">
-<link rel="stylesheet" href="quiet-extras.css?v=1778743524">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778747840">
+<link rel="stylesheet" href="quiet.css?v=1778747840">
+<link rel="stylesheet" href="quiet-extras.css?v=1778747840">
 <style>
   .cm-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .cm-section { padding: 2px 0 32px; } }
@@ -148,7 +148,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778743524" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778747840" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -173,7 +173,7 @@
 <main class="qb-page">
   <section class="cm-section">
     <h1>Comms response time</h1>
-    <p class="lead">When a customer messages us by SMS or email, how long do they wait for our next message back on the same channel? Each daily point is the <strong>mean response time</strong> across messages the customer sent that day. <em>Message Factory</em> sends are excluded from counting as a reply (they're broadcast campaigns, not actual replies). Replies more than 14 days later are treated as "no reply within 14 days".</p>
+    <p class="lead">When a customer messages us by SMS or email, how long do they wait for our next message back on the same channel? Each point is the <strong>weekly mean response time</strong> — daily noise from evenings and weekends gets folded into one number per week (Monday-anchored). <em>Message Factory</em> sends are excluded from counting as a reply (they're broadcast campaigns, not actual replies). Replies more than 14 days later are treated as "no reply within 14 days".</p>
     <p class="lead">The four lines split by the sender's state <em>at the moment they sent the message</em>: no ARef yet ("unknown"), have an ARef but no live loan ("applicant"), live loan and not in arrears ("live loan"), or live loan in arrears.</p>
     <p class="cm-meta" id="cmMeta">Loading…</p>
 
@@ -193,8 +193,8 @@
     <div class="cm-totals" id="cmTotals"></div>
 
     <div class="cm-chart-wrap">
-      <h2 class="cm-chart-title">2026 daily mean response time</h2>
-      <p class="cm-chart-sub">Y-axis auto-scales (minutes / hours / days). Hover a point for that day's mean + sample size. Days with no qualifying messages in a bucket are gaps in the line.</p>
+      <h2 class="cm-chart-title">2026 weekly mean response time</h2>
+      <p class="cm-chart-sub">Y-axis auto-scales (minutes / hours / days). Hover a point for that week's mean + sample size. Weeks with no qualifying messages in a bucket are gaps in the line. Each point is anchored on the Monday of its week.</p>
       <div class="cm-legend">
         <span class="cm-legend-item"><span class="cm-legend-swatch cm-swatch-unknown"></span>Unknown sender</span>
         <span class="cm-legend-item"><span class="cm-legend-swatch cm-swatch-applicant"></span>Applicant</span>
@@ -242,25 +242,51 @@
     drawTotals(dataset, excludeRR, includeNoReply);
   }
 
-  // For each bucket, build an array of { date, meanMinutes, n }.
-  // The "mean" depends on filters:
-  //   excludeRR=false, includeNoReply=false → sum_reply_all / n_reply_all
-  //   excludeRR=true,  includeNoReply=false → sum_reply_human / n_reply_human
-  //   excludeRR=false, includeNoReply=true  → (sum_reply_all   + (n_total - n_reply_all)   * MAX) / n_total
-  //   excludeRR=true,  includeNoReply=true  → (sum_reply_human + (n_total - n_reply_human) * MAX) / n_total
+  // Roll a YYYY-MM-DD string back to its Monday (UTC). Days are bucketed
+  // into ISO-style weeks so weekend / evening noise is smoothed out.
+  function startOfWeek(iso) {
+    const d = new Date(iso + "T00:00:00Z");
+    const dow = d.getUTCDay();                 // 0 Sun .. 6 Sat
+    const back = (dow === 0) ? 6 : dow - 1;    // days back to Monday
+    d.setUTCDate(d.getUTCDate() - back);
+    return d.toISOString().slice(0, 10);
+  }
+
+  // For each bucket, aggregate daily totals into weekly buckets (Monday
+  // anchor), then compute the weekly mean. The "mean" depends on filters:
+  //   excludeRR=false, includeNoReply=false → Σsum_reply_all / Σn_reply_all
+  //   excludeRR=true,  includeNoReply=false → Σsum_reply_human / Σn_reply_human
+  //   excludeRR=false, includeNoReply=true  → (Σsum_reply_all   + ΣnoReply * MAX) / Σn_total
+  //   excludeRR=true,  includeNoReply=true  → (Σsum_reply_human + ΣnoReply * MAX) / Σn_total
   function computeSeries(d, excludeRR, includeNoReply) {
     const MAX = d.max_reply_minutes || MAX_REPLY_MINUTES_DEFAULT;
     const out = {};
     for (const bucket of BUCKETS) {
       const days = (d.series && d.series[bucket]) || {};
-      const arr = [];
-      Object.keys(days).sort().forEach(date => {
+      // 1. Roll up daily rows into weekly totals.
+      const weekly = {};
+      Object.keys(days).forEach(date => {
+        const wk = startOfWeek(date);
         const v = days[date];
-        const n_reply = excludeRR ? v.n_reply_human : v.n_reply_all;
-        const sum_reply = excludeRR ? v.sum_reply_human : v.sum_reply_all;
+        const w = weekly[wk] || (weekly[wk] = {
+          n_total: 0, n_reply_all: 0, sum_reply_all: 0,
+          n_reply_human: 0, sum_reply_human: 0,
+        });
+        w.n_total         += v.n_total         || 0;
+        w.n_reply_all     += v.n_reply_all     || 0;
+        w.sum_reply_all   += v.sum_reply_all   || 0;
+        w.n_reply_human   += v.n_reply_human   || 0;
+        w.sum_reply_human += v.sum_reply_human || 0;
+      });
+      // 2. Per week, apply the filter combination to get a mean.
+      const arr = [];
+      Object.keys(weekly).sort().forEach(wkDate => {
+        const w = weekly[wkDate];
+        const n_reply = excludeRR ? w.n_reply_human : w.n_reply_all;
+        const sum_reply = excludeRR ? w.sum_reply_human : w.sum_reply_all;
         let mean = null, n = 0;
         if (includeNoReply) {
-          const total = v.n_total;
+          const total = w.n_total;
           if (total > 0) {
             const noReply = Math.max(0, total - n_reply);
             mean = (sum_reply + noReply * MAX) / total;
@@ -272,7 +298,7 @@
             n = n_reply;
           }
         }
-        if (mean != null) arr.push({ date, mean, n });
+        if (mean != null) arr.push({ date: wkDate, mean, n });
       });
       out[bucket] = arr;
     }
@@ -365,7 +391,7 @@
       const stroke = lineColor(bucket);
       points.forEach(p => {
         const cx = xScale(p.date), cy = yScale(p.mean / divisor);
-        svg.push(`<circle class="cm-dot" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="2.5" fill="${stroke}"><title>${p.date} · ${BUCKET_LABEL[bucket]}: ${formatGap(p.mean)} (n=${p.n})</title></circle>`);
+        svg.push(`<circle class="cm-dot" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3" fill="${stroke}"><title>Wk of ${p.date} · ${BUCKET_LABEL[bucket]}: ${formatGap(p.mean)} (n=${p.n})</title></circle>`);
       });
     }
 
