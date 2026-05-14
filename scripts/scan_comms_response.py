@@ -254,23 +254,27 @@ def fetch_signed_gt(arefs: set[str]) -> set[str]:
     cn = pyodbc.connect(conn_str("ReportingApplications"), timeout=30)
     try:
         cur = cn.cursor()
+        # The ARef ↔ ESignature link lives on dbo.Applications (BrwEsignatureId
+        # / GtEsignatureId), not on dbo.Customers. We only care about the GT
+        # signature for the "signed-not-rejected guarantor" check.
         flag_list = ",".join(str(f) for f in ARREARS_FLAG_TYPES)
         result: set[str] = set()
         for chunk in chunked(arefs, 1500):
             ph = ",".join("?" * len(chunk))
             cur.execute(
                 f"""
-                SELECT DISTINCT c.ARef
-                FROM dbo.Customers c
+                SELECT DISTINCT a.ARef
+                FROM dbo.Applications a
                 JOIN dbo.ESignatures e
-                  ON e.EsignatureId = c.EsignatureId
-                WHERE c.ARef IN ({ph})
-                  AND c.GtRef IS NOT NULL
+                  ON e.EsignatureId = a.GtEsignatureId
+                WHERE a.ARef IN ({ph})
+                  AND a.GtRef IS NOT NULL
+                  AND a.GtEsignatureId IS NOT NULL
                   AND e.DateSignedUtc IS NOT NULL
                   AND NOT EXISTS (
                       SELECT 1 FROM dbo.Flags f
-                      WHERE f.ARef = c.ARef
-                        AND f.GtRef = c.GtRef
+                      WHERE f.ARef = a.ARef
+                        AND f.GtRef = a.GtRef
                         AND f.FlagTypeId IN ({flag_list})
                         AND f.DateRemovedUtc IS NULL
                   );
