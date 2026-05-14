@@ -89,7 +89,7 @@ WITH inbound AS (
             WHEN m.Description = 'InboundSMS'   THEN 'SMS'
             WHEN m.Description = 'InboundEmail' THEN 'Email'
         END AS Channel
-    FROM Communications.Messages m
+    FROM dbo.Messages m
     WHERE m.Description IN ('InboundSMS', 'InboundEmail')
       AND m.DateReceivedUtc >= @from
       AND m.DateReceivedUtc <  @to
@@ -105,7 +105,7 @@ SELECT
     -- Minutes to first non-MessageFactory reply within 14 days
     (
         SELECT TOP 1 DATEDIFF(MINUTE, i.DateReceivedUtc, o.DateSentUtc)
-        FROM Communications.Messages o
+        FROM dbo.Messages o
         WHERE o.ExternalAddress = i.ExternalAddress
           AND o.Description = CASE i.Channel
                                   WHEN 'SMS'   THEN 'OutboundSMS'
@@ -119,7 +119,7 @@ SELECT
     -- Same but additionally excluding Reply Robot (ClientType LIKE '%Responder%')
     (
         SELECT TOP 1 DATEDIFF(MINUTE, i.DateReceivedUtc, o.DateSentUtc)
-        FROM Communications.Messages o
+        FROM dbo.Messages o
         WHERE o.ExternalAddress = i.ExternalAddress
           AND o.Description = CASE i.Channel
                                   WHEN 'SMS'   THEN 'OutboundSMS'
@@ -182,7 +182,7 @@ def fetch_loan_history(loanbook_ids: set[str]) -> dict[str, list]:
         cur.executemany("INSERT INTO #LoanIds (LoanbookId) VALUES (?);", rows)
         cur.execute("""
             SELECT lh.LoanbookId, lh.DateTimeUtc, lh.CurrentBalance, lh.Arrears, lh.DateInArrearsLocal
-            FROM Loanbook.LoanHistory lh
+            FROM dbo.LoanHistory lh
             JOIN #LoanIds ids ON ids.LoanbookId = lh.LoanbookId
             ORDER BY lh.LoanbookId, lh.DateTimeUtc;
         """)
@@ -218,14 +218,14 @@ def fetch_signed_gt(arefs: set[str]) -> set[str]:
         flag_list = ",".join(str(f) for f in ARREARS_FLAG_TYPES)
         cur.execute(f"""
             SELECT DISTINCT c.ARef
-            FROM Applications.Customers c
-            JOIN Applications.ESignatures e
+            FROM dbo.Customers c
+            JOIN dbo.ESignatures e
               ON e.EsignatureId = c.EsignatureId
             JOIN #ARefs a ON a.ARef = c.ARef
             WHERE c.GtRef IS NOT NULL
               AND e.DateSignedUtc IS NOT NULL
               AND NOT EXISTS (
-                  SELECT 1 FROM Applications.Flags f
+                  SELECT 1 FROM dbo.Flags f
                   WHERE f.ARef = c.ARef
                     AND f.GtRef = c.GtRef
                     AND f.FlagTypeId IN ({flag_list})
