@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-14T16:31:14.858Z",
+  "updated_at": "2026-05-14T16:31:23.491Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -2145,6 +2145,13 @@
       "actor": "james.benamor@letme.com",
       "action": "group-delete",
       "target": "wspolpraca@gwarantowaneautopozyczki.pl",
+      "ok": true
+    },
+    {
+      "ts": "2026-05-14T16:31:23.491Z",
+      "actor": "james.benamor@letme.com",
+      "action": "group-delete",
+      "target": "website.errors@rapidamoney.pl",
       "ok": true
     }
   ]
