@@ -359,6 +359,20 @@
   // both need `L` to be defined at parse time — running them in parallel
   // races the leaflet bundle and silently drops one of the layers.
   loadScript('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js')
+    .then(() => {
+      // Pin Leaflet's default-marker image URLs to the CDN explicitly.
+      // Leaflet's auto-detection scans <script> src attributes for
+      // /leaflet[.-]...js/; unpkg URLs sometimes slip past the regex,
+      // which is why singletons render as a broken-image + "Mark" text
+      // (the alt of <img alt="Marker"> when the src 404s).
+      if (window.L && L.Icon && L.Icon.Default) {
+        L.Icon.Default.mergeOptions({
+          iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+          iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+          shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        });
+      }
+    })
     .then(() => loadScript('https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js'))
     .catch(err => console.warn('leaflet plugin load failed', err))
     .finally(() => {
