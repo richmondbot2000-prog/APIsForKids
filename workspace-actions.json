@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-14T07:31:56.507Z",
+  "updated_at": "2026-05-14T07:32:15.759Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -1028,6 +1028,13 @@
       "actor": "james.benamor@letme.com",
       "action": "get-forwarding",
       "target": "max.dynowski@letme.co.uk",
+      "ok": true
+    },
+    {
+      "ts": "2026-05-14T07:32:15.759Z",
+      "actor": "james.benamor@letme.com",
+      "action": "directory-photo-upload",
+      "target": "",
       "ok": true
     }
   ]
