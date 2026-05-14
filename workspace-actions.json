@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-14T07:54:41.226Z",
+  "updated_at": "2026-05-14T07:54:43.598Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -1441,6 +1441,13 @@
       "actor": "james.benamor@letme.com",
       "action": "directory-photo-upload",
       "target": "",
+      "ok": true
+    },
+    {
+      "ts": "2026-05-14T07:54:43.598Z",
+      "actor": "james.benamor@letme.com",
+      "action": "get-forwarding",
+      "target": "david.byatt@letme.com",
       "ok": true
     }
   ]
