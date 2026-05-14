@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-14T08:52:12.611Z",
+  "updated_at": "2026-05-14T08:53:10.238Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -1903,6 +1903,13 @@
       "actor": "clementia.dsouza@togetherloans.com",
       "action": "get-forwarding",
       "target": "clementia.dsouza@letme.com",
+      "ok": true
+    },
+    {
+      "ts": "2026-05-14T08:53:10.238Z",
+      "actor": "ben.gardner@letme.com",
+      "action": "get-forwarding",
+      "target": "leticia.alexandre@letme.com",
       "ok": true
     }
   ]
