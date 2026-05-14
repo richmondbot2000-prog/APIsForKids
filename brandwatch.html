@@ -280,6 +280,27 @@
     color: var(--ink);
     margin: 12px 0 6px;
   }
+  /* Collapsible disclosure (used for the noisy lookalike-domains list). */
+  .bw-sec-details { margin: 12px 0 6px; }
+  .bw-sec-summary {
+    font: 600 13px/1.4 var(--font-display);
+    color: var(--accent-ink, var(--ink));
+    cursor: pointer;
+    list-style: none;
+    padding: 4px 0;
+    border-bottom: 1px dashed var(--border);
+    user-select: none;
+  }
+  .bw-sec-summary::-webkit-details-marker { display: none; }
+  .bw-sec-summary::before {
+    content: "▸ ";
+    color: var(--accent, var(--brass-500, #c79c4a));
+    transition: transform 0.15s ease;
+    display: inline-block;
+  }
+  .bw-sec-details[open] > .bw-sec-summary::before { content: "▾ "; }
+  .bw-sec-details[open] > .bw-sec-summary { margin-bottom: 6px; }
+  .bw-sec-summary:hover { color: var(--accent-ink); }
   .bw-sec-list { list-style: none; padding: 0; margin: 0 0 10px; }
   .bw-sec-list li {
     padding: 6px 0;
@@ -764,13 +785,16 @@
     }
     let lookalikes = "";
     if ((s.lookalikes.domains || []).length) {
-      lookalikes = `<h3 class="bw-sec-h3">Active lookalike domains</h3><ul class="bw-sec-list">`
-        + s.lookalikes.domains.slice(0, 10).map(d => `<li>
+      // Collapsed-by-default — the list is long and noisy. Click the summary
+      // line to reveal the resolving domains.
+      const shown = s.lookalikes.domains.slice(0, 10);
+      lookalikes = `<details class="bw-sec-details"><summary class="bw-sec-summary">Show ${shown.length} active lookalike domain${shown.length === 1 ? "" : "s"}</summary><ul class="bw-sec-list">`
+        + shown.map(d => `<li>
             <a href="${escapeHtml(d.urlscan)}" target="_blank" rel="noopener noreferrer"><strong>${escapeHtml(d.candidate)}</strong></a>
             <span class="bw-sec-meta">vs ${escapeHtml(d.brand)} · ${escapeHtml(d.permutation_type || "—")}</span>
             ${d.resolves_to ? `<div class="bw-sec-sub">resolves to ${escapeHtml(d.resolves_to)}</div>` : ""}
           </li>`).join("")
-        + `</ul>`;
+        + `</ul></details>`;
     }
     let certs = "";
     if ((s.ct_certificates.recent || []).length) {
