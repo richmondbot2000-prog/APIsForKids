@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778743524">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778743524">
-<link rel="stylesheet" href="quiet.css?v=1778743524">
-<link rel="stylesheet" href="quiet-extras.css?v=1778743524">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778743524">
+<link rel="stylesheet" href="style.css?v=1778746967">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778746967">
+<link rel="stylesheet" href="quiet.css?v=1778746967">
+<link rel="stylesheet" href="quiet-extras.css?v=1778746967">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778746967">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -1155,7 +1155,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778743524" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778746967" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -2227,12 +2227,12 @@
     const photoRmBtn = modal.querySelector("[data-photo-remove]");
     if (photoRmBtn) photoRmBtn.addEventListener("click", () => runPhotoRemove(entry, photoRmBtn));
 
-    // For active users, check the live autoForwarding state via the Gmail
-    // API and swap the Manage section into 'Live + forwarding active' mode
-    // if a rule is set. staff.json doesn't include this; we only know after
-    // an async fetch. Suspended users can't be impersonated so we rely on
-    // forwardingByEmail there.
-    if (entry.type === "staff" && entry.user && !entry.user.suspended && !entry.user.deletion_time) {
+    // Auto-detect Gmail's autoForwarding setting on card open. For LIVE users
+    // it swaps the Manage section into the Live+forwarding state; for
+    // SUSPENDED users it persists the discovered route_to into annotations
+    // so the chip shows up everywhere and survives reloads. Deleted users
+    // can't be impersonated so we skip them.
+    if (entry.type === "staff" && entry.user && !entry.user.deletion_time) {
       checkLiveForwarding(entry);
     }
 
@@ -3851,12 +3851,34 @@
       const res = await fetch(`${WORKSPACE_API}/get-forwarding`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: u.email }),
+        body: JSON.stringify({ email: u.email, tenant: u.tenant }),
       });
       if (!res.ok) return;
       const data = await res.json();
       if (!data || !data.ok || !data.data || !data.data.enabled) return;
       const target = data.data.emailAddress || "";
+      // Persist the discovered forwarding target — both in the in-memory map
+      // (so the UI updates immediately) and to annotations.json (so future
+      // page loads have it). Suspended cards rely on this to show the
+      // `→ chip` instead of falling into the "black hole" list.
+      const lcEmail = (u.email || "").toLowerCase();
+      if (target && !forwardingByEmail[lcEmail]) {
+        forwardingByEmail[lcEmail] = target;
+        try {
+          await saveAnnotationRemote(lcEmail, undefined, undefined, { forward_to: target });
+        } catch (e) { console.warn("forward_to annotation save failed", e); }
+        renderGrid();
+        renderBillingSummary();
+        renderHealth();
+      }
+      // For suspended cards there's no #dirManageLive container to swap —
+      // the card already renders the suspended UI which reads forwardingByEmail.
+      // Re-open the card so the freshly-detected forward_to drives the
+      // "Account is suspended, forwards to X" state instead of black-hole.
+      if (u.suspended) {
+        openCard(entryKey(entry));
+        return;
+      }
       // Render the Live+forwarding state in place of the default Live UI.
       const container = document.getElementById("dirManageLive");
       if (!container) return;
