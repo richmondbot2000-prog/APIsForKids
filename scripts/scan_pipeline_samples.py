@@ -777,7 +777,15 @@ def main() -> None:
         record(aref, {
             "kind": "application_started",
             "at": iso(info['created']),
-            "label": "Application started" + (f" (from purchased lead #{info['lead_id']})" if info['lead_id'] is not None else " (direct via website)"),
+            # Label gets enriched with the broker friendly name once the
+            # Leads block resolves Lead → Campaign → Source below. We
+            # stash lead_id as a structured field so the post-process
+            # pass can find it.
+            "label": "Application started" + (
+                f" (from purchased lead #{info['lead_id']})" if info['lead_id'] is not None
+                else " (direct via website)"
+            ),
+            "lead_id": info['lead_id'],
             "details": details,
         })
 
@@ -1017,6 +1025,10 @@ def main() -> None:
             info = aref_to_app.get(aref) or {}
             if info.get("lead_id") is not None:
                 lead_ids_to_aref[int(info["lead_id"])] = aref
+        # Populated during the leads-fetch loop below; consumed by the
+        # post-process pass that rewrites every application_started label
+        # to include the broker friendly name.
+        lead_to_broker_name: dict[int, str] = {}
         if lead_ids_to_aref:
             print(f"# pulling Leads for {len(lead_ids_to_aref)} LeadIds…", flush=True)
             sel_cols = ", ".join([
@@ -1078,6 +1090,14 @@ def main() -> None:
                         except (ValueError, TypeError):
                             s_label = None
                         details.append(["Broker", s_label or f"Source {source}"])
+                        # Remember this so the application_started label can
+                        # surface the broker name inline instead of just the
+                        # opaque "from purchased lead #N".
+                        if s_label:
+                            try:
+                                lead_to_broker_name[int(lid)] = s_label
+                            except (ValueError, TypeError):
+                                pass
                     if resolved_campaign_name:
                         details.append(["Broker campaign", resolved_campaign_name])
                     elif broker is not None:
@@ -1089,14 +1109,40 @@ def main() -> None:
                         except (ValueError, TypeError):
                             r_label = str(rtype)
                         details.append(["Lead result", r_label])
+                    broker_name_for_label = lead_to_broker_name.get(int(lid))
                     record(aref, {
                         "kind": "lead_presented",
                         "at": iso(dt),
-                        "label": f"Lead #{lid} presented by broker",
+                        "label": (
+                            f"Lead presented by {broker_name_for_label}"
+                            if broker_name_for_label
+                            else f"Lead #{lid} presented by broker"
+                        ),
                         "details": details,
                     })
 
     apps_conn.close()
+
+    # ──────────── Enrich application_started labels with broker names ──
+    # The application_started events were recorded before the Leads block
+    # ran (so the lead_id was known but not which broker sold it). Now
+    # that we have lead_to_broker_name, rewrite the labels so the timeline
+    # shows "Application started — sold by Lead Economy" instead of the
+    # opaque "(from purchased lead #666447305)".
+    if lead_to_broker_name:
+        patched = 0
+        for primary, events in interactions.items():
+            for ev in events:
+                if ev.get("kind") != "application_started":
+                    continue
+                lid = ev.get("lead_id")
+                if lid is None:
+                    continue
+                bname = lead_to_broker_name.get(int(lid))
+                if bname:
+                    ev["label"] = f"Application started — sold to us by {bname}"
+                    patched += 1
+        print(f"# enriched {patched} application_started labels with broker names", flush=True)
 
     # ──────────── (g) Messages ─────────────────────────────────────
     print("# pulling Messages from ReportingCommunications…", flush=True)
