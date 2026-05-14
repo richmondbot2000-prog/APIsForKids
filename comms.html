@@ -66,11 +66,13 @@
     text-decoration: none;
     border-radius: 3px;
     margin-left: 12px;
+    cursor: pointer;
   }
-  .cm-csv-btn:hover {
+  .cm-csv-btn:hover:not(:disabled) {
     background: var(--brass-300);
     color: var(--ink-900);
   }
+  .cm-csv-btn:disabled { opacity: 0.6; cursor: progress; }
 
   /* Chart */
   .cm-chart-wrap {
@@ -282,10 +284,10 @@
           <option value="median">Median</option>
         </select>
       </label>
-      <a id="cmCsvLink" href="comms-full.csv" download
-         class="cm-csv-btn" title="Download every inbound message in this analysis as a PII-redacted CSV — one row per message, with result + hours + reply detail.">
+      <button type="button" id="cmCsvLink"
+              class="cm-csv-btn" title="Download every inbound message in this analysis as a PII-redacted CSV — one row per message, with result + hours + reply detail. Streamed gzipped (~35 MB) and decompressed client-side to a plain .csv.">
         Download full list CSV
-      </a>
+      </button>
     </div>
 
     <div class="cm-totals" id="cmTotals"></div>
@@ -338,19 +340,48 @@
   document.getElementById("cmExcludeNoReply").addEventListener("change", renderAll);
   document.getElementById("cmMetric").addEventListener("change", renderAll);
   document.getElementById("cmShuffle").addEventListener("click", renderSamples);
+  document.getElementById("cmCsvLink").addEventListener("click", downloadFullCsv);
+
+  async function downloadFullCsv() {
+    const btn = document.getElementById("cmCsvLink");
+    const originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Downloading… (large file)";
+    try {
+      const url = "comms-full.csv.gz" + (window.__csvBust ? "?v=" + window.__csvBust : "");
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      // DecompressionStream is supported in Chrome/Edge 80+, Firefox 113+,
+      // Safari 16.4+. The Directory site is internal-only and we control
+      // browser versions enough that this is fine.
+      const decompressed = res.body.pipeThrough(new DecompressionStream("gzip"));
+      const blob = await new Response(decompressed).blob();
+      const csvUrl = URL.createObjectURL(new Blob([blob], { type: "text/csv;charset=utf-8" }));
+      const a = document.createElement("a");
+      a.href = csvUrl;
+      a.download = "comms-full.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(csvUrl), 60_000);
+    } catch (err) {
+      alert("CSV download failed: " + (err && err.message || err));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    }
+  }
 
   function renderAll() {
     if (!dataset) return;
     const updated = (dataset.updated_at || "").replace("T", " ").slice(0, 19) + " UTC";
     document.getElementById("cmMeta").textContent =
       `Year ${dataset.year} · ${dataset.channels.join(" + ")} · 14-day reply window · updated ${updated}`;
-    // Cache-bust the CSV link with the scan's updated_at so the browser
-    // always pulls a fresh CSV after refresh-comms rather than serving the
-    // previous scan's version from cache.
-    const csvLink = document.getElementById("cmCsvLink");
-    if (csvLink && dataset.updated_at) {
-      csvLink.href = "comms-full.csv?v=" + encodeURIComponent(dataset.updated_at);
-    }
+    // Stash the cache-bust query for the CSV download button. The artefact
+    // on the server is gzipped (~35 MB vs ~350 MB raw — GitHub's 100 MB file
+    // limit makes plaintext infeasible). We decompress client-side via
+    // DecompressionStream + hand the user a plain .csv blob.
+    window.__csvBust = dataset.updated_at ? encodeURIComponent(dataset.updated_at) : "";
     const excludeRR = document.getElementById("cmExcludeRR").checked;
     // Checkbox is "Exclude no-reply messages" so unchecked = include them.
     const includeNoReply = !document.getElementById("cmExcludeNoReply").checked;

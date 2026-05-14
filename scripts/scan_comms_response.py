@@ -61,7 +61,12 @@ import pyodbc
 
 YEAR = 2026
 OUTPUT_PATH = Path("comms.json")
-CSV_PATH = Path("comms-full.csv")
+# Gzipped because the raw CSV is ~350 MB (978k inbound rows × ~370 bytes) —
+# well over GitHub's 100 MB hard limit. Gzip compresses CSV ~10× so the
+# committed artefact lands at ~35 MB. The Directory page decompresses
+# client-side via DecompressionStream + offers the user a plain .csv to
+# save. No GH-LFS / external host needed.
+CSV_PATH = Path("comms-full.csv.gz")
 MAX_REPLY_MINUTES = 14 * 24 * 60   # 14 days
 ARREARS_FLAG_TYPES = (2, 3, 4, 6)  # Decline, DNL, Cancelled, FraudRisk
 
@@ -670,9 +675,15 @@ def write_full_csv(inbounds: list, loan_history, signed_gt, names_by_aref: dict[
       No qualifying reply in 14 days -> No reply
     """
     import csv as _csv
+    import gzip
+    import io
     print(f"[csv] writing {CSV_PATH} ({len(inbounds)} rows)…", flush=True)
     n_human = n_robot = n_none = 0
-    with open(CSV_PATH, "w", newline="", encoding="utf-8") as f:
+    # gzip-wrap a text writer so we stream rows straight to the compressed
+    # file without materialising the full 350 MB plaintext in memory.
+    gz = gzip.open(CSV_PATH, "wb", compresslevel=6)
+    f = io.TextIOWrapper(gz, encoding="utf-8", newline="")
+    try:
         w = _csv.writer(f, quoting=_csv.QUOTE_MINIMAL)
         w.writerow([
             "inbound_datetime_utc",
@@ -733,8 +744,13 @@ def write_full_csv(inbounds: list, loan_history, signed_gt, names_by_aref: dict[
                 aref[-5:] if aref else "",
                 bucket,
             ])
+    finally:
+        f.close()           # also flushes gzip
+        gz.close()
+    size_mb = CSV_PATH.stat().st_size / (1024 * 1024)
     print(
-        f"[csv] {CSV_PATH} written — Human={n_human}, Robot={n_robot}, NoReply={n_none}",
+        f"[csv] {CSV_PATH} written — Human={n_human}, Robot={n_robot}, "
+        f"NoReply={n_none}, file={size_mb:.1f} MB gzipped",
         flush=True,
     )
 
