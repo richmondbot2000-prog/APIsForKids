@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-14T08:53:10.238Z",
+  "updated_at": "2026-05-14T08:53:50.052Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -1910,6 +1910,13 @@
       "actor": "ben.gardner@letme.com",
       "action": "get-forwarding",
       "target": "leticia.alexandre@letme.com",
+      "ok": true
+    },
+    {
+      "ts": "2026-05-14T08:53:50.052Z",
+      "actor": "ben.gardner@letme.com",
+      "action": "get-forwarding",
+      "target": "ben.gardner@letme.com",
       "ok": true
     }
   ]
