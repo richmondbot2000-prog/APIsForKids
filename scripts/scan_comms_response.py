@@ -635,9 +635,9 @@ def fetch_names_by_aref(arefs: set[str]) -> dict[str, set[str]]:
     print(f"[csv] bulk-fetching Customer names (need {len(arefs)} ARefs)…", flush=True)
     out: dict[str, set[str]] = {}
     cn = pyodbc.connect(conn_str("ReportingApplications"), timeout=30)
+    cn.timeout = 600
     try:
         cur = cn.cursor()
-        cur.timeout = 600
         cur.execute("""
             SELECT ARef, FirstName, Surname
             FROM dbo.Customers
