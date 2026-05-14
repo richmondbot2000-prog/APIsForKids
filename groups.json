@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-14T16:31:00Z",
+  "updated_at": "2026-05-14T21:47:26Z",
   "totals": {
-    "groups": 118,
-    "members": 218
+    "groups": 105,
+    "members": 219
   },
   "tenants": [
     "letme.co.uk",
@@ -11,15 +11,6 @@
   ],
   "fetch_errors": [],
   "groups": [
-    {
-      "email": "accounts@clearloans.com.au",
-      "name": "Clearloans - Accounts",
-      "description": "",
-      "tenant": "letme.co.uk",
-      "aliases": [],
-      "member_count": 0,
-      "members": []
-    },
     {
       "email": "accounts@letme.com",
       "name": "RG - Accounts",
@@ -66,15 +57,6 @@
           "status": ""
         }
       ]
-    },
-    {
-      "email": "affiliates@clearloans.com.au",
-      "name": "Clearloans - Afilliates",
-      "description": "",
-      "tenant": "letme.co.uk",
-      "aliases": [],
-      "member_count": 0,
-      "members": []
     },
     {
       "email": "agents@clearloans.com.au",
@@ -138,15 +120,6 @@
           "status": "ACTIVE"
         }
       ]
-    },
-    {
-      "email": "all.sof@rapida.bg",
-      "name": "Rapida BG - All SOF",
-      "description": "",
-      "tenant": "letme.co.uk",
-      "aliases": [],
-      "member_count": 0,
-      "members": []
     },
     {
       "email": "all@rapida.bg",
@@ -755,15 +728,6 @@
       ]
     },
     {
-      "email": "guarantors@rapida.bg",
-      "name": "Rapida BG - Guarantors",
-      "description": "",
-      "tenant": "letme.co.uk",
-      "aliases": [],
-      "member_count": 0,
-      "members": []
-    },
-    {
       "email": "gwarant@rapidamoney.pl",
       "name": "Rapida - Guarantors",
       "description": "",
@@ -806,17 +770,6 @@
           "status": "ACTIVE"
         }
       ]
-    },
-    {
-      "email": "hello@rapida.bg",
-      "name": "Rapida BG - Hello",
-      "description": "",
-      "tenant": "letme.co.uk",
-      "aliases": [
-        "contacts@rapida.bg"
-      ],
-      "member_count": 0,
-      "members": []
     },
     {
       "email": "hr@letme.com",
@@ -1353,26 +1306,8 @@
       ]
     },
     {
-      "email": "recruitment@rapida.bg",
-      "name": "Rapida BG - Recruitment",
-      "description": "",
-      "tenant": "letme.co.uk",
-      "aliases": [],
-      "member_count": 0,
-      "members": []
-    },
-    {
       "email": "reporting@rapida.bg",
       "name": "Rapida BG - Reporting",
-      "description": "",
-      "tenant": "letme.co.uk",
-      "aliases": [],
-      "member_count": 0,
-      "members": []
-    },
-    {
-      "email": "reporting@rapidamoney.pl",
-      "name": "Rapida - Reporting",
       "description": "",
       "tenant": "letme.co.uk",
       "aliases": [],
@@ -1460,15 +1395,6 @@
       ]
     },
     {
-      "email": "support@rapida.bg",
-      "name": "Rapida BG - Support",
-      "description": "",
-      "tenant": "letme.co.uk",
-      "aliases": [],
-      "member_count": 0,
-      "members": []
-    },
-    {
       "email": "tcfinance@letme.com",
       "name": "TCFinance",
       "description": "",
@@ -1497,30 +1423,6 @@
       ]
     },
     {
-      "email": "teamboh@rapida.bg",
-      "name": "Rapida BG - Collections Team BOH",
-      "description": "",
-      "tenant": "letme.co.uk",
-      "aliases": [],
-      "member_count": 0,
-      "members": []
-    },
-    {
-      "email": "teamboh@rapidamoney.pl",
-      "name": "Rapida - Collections Team BOH",
-      "description": "",
-      "tenant": "letme.co.uk",
-      "aliases": [
-        "teamboh@grenwich-clearloans.com",
-        "teamboh@letme.co.uk",
-        "teamboh@mail.amigohome.co.uk",
-        "teamboh@mail.letme.co.uk",
-        "teamboh@rgroup.co.uk"
-      ],
-      "member_count": 0,
-      "members": []
-    },
-    {
       "email": "teamkrk@rapidamoney.pl",
       "name": "Rapida - Collections Team KRK",
       "description": "",
@@ -1535,15 +1437,6 @@
           "status": "ACTIVE"
         }
       ]
-    },
-    {
-      "email": "teamsof@rapida.bg",
-      "name": "Rapida BG - Collections Team SOF",
-      "description": "",
-      "tenant": "letme.co.uk",
-      "aliases": [],
-      "member_count": 0,
-      "members": []
     },
     {
       "email": "uwpohoalerts@letme.com",
@@ -1647,24 +1540,6 @@
       ]
     },
     {
-      "email": "website.errors@clearloans.com.au",
-      "name": "Website Errors",
-      "description": "",
-      "tenant": "letme.co.uk",
-      "aliases": [],
-      "member_count": 0,
-      "members": []
-    },
-    {
-      "email": "website.errors@rapidamoney.pl",
-      "name": "Rapida - Website Errors",
-      "description": "",
-      "tenant": "letme.co.uk",
-      "aliases": [],
-      "member_count": 0,
-      "members": []
-    },
-    {
       "email": "windykacja@rapidamoney.pl",
       "name": "Rapida - Collections",
       "description": "",
@@ -1693,6 +1568,22 @@
       ]
     },
     {
+      "email": "workplace@letme.com",
+      "name": "WorkPlace",
+      "description": "",
+      "tenant": "letme.co.uk",
+      "aliases": [],
+      "member_count": 1,
+      "members": [
+        {
+          "email": "james.benamor@letme.com",
+          "role": "MEMBER",
+          "type": "USER",
+          "status": "ACTIVE"
+        }
+      ]
+    },
+    {
       "email": "wplata@rapidamoney.pl",
       "name": "Rapida - Payment Confirmation",
       "description": "",
@@ -1707,15 +1598,6 @@
           "status": "ACTIVE"
         }
       ]
-    },
-    {
-      "email": "wspolpraca@gwarantowaneautopozyczki.pl",
-      "name": "Guaranteed Car Loans - Cooperation",
-      "description": "",
-      "tenant": "letme.co.uk",
-      "aliases": [],
-      "member_count": 0,
-      "members": []
     },
     {
       "email": "affiliates@togetherloans.com",
