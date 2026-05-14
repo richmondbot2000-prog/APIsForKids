@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Comms response time</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778747840">
-<link rel="stylesheet" href="quiet.css?v=1778747840">
-<link rel="stylesheet" href="quiet-extras.css?v=1778747840">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778751552">
+<link rel="stylesheet" href="quiet.css?v=1778751552">
+<link rel="stylesheet" href="quiet-extras.css?v=1778751552">
 <style>
   .cm-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .cm-section { padding: 2px 0 32px; } }
@@ -148,7 +148,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778747840" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778751552" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -180,13 +180,13 @@
     <div class="cm-filters">
       <label>
         <input type="checkbox" id="cmExcludeRR">
-        Exclude <strong>Reply Robot</strong> replies
+        Exclude <strong>Robot Responder</strong>
         <span class="cm-filter-sub">(only count human-agent replies)</span>
       </label>
       <label>
-        <input type="checkbox" id="cmIncludeNoReply">
-        Include <strong>no-reply</strong> messages, capped at 14 days
-        <span class="cm-filter-sub">(treats unreplied as 14 d to weight down slow days)</span>
+        <input type="checkbox" id="cmExcludeNoReply" checked>
+        Exclude messages that <strong>get no reply</strong>
+        <span class="cm-filter-sub">(drops unreplied messages; untick to count them as 14 d)</span>
       </label>
     </div>
 
@@ -228,7 +228,7 @@
     });
 
   document.getElementById("cmExcludeRR").addEventListener("change", renderAll);
-  document.getElementById("cmIncludeNoReply").addEventListener("change", renderAll);
+  document.getElementById("cmExcludeNoReply").addEventListener("change", renderAll);
 
   function renderAll() {
     if (!dataset) return;
@@ -236,7 +236,8 @@
     document.getElementById("cmMeta").textContent =
       `Year ${dataset.year} · ${dataset.channels.join(" + ")} · 14-day reply window · updated ${updated}`;
     const excludeRR = document.getElementById("cmExcludeRR").checked;
-    const includeNoReply = document.getElementById("cmIncludeNoReply").checked;
+    // Checkbox is "Exclude no-reply messages" so unchecked = include them.
+    const includeNoReply = !document.getElementById("cmExcludeNoReply").checked;
     const series = computeSeries(dataset, excludeRR, includeNoReply);
     drawChart(series);
     drawTotals(dataset, excludeRR, includeNoReply);
