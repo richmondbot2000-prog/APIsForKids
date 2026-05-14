@@ -2614,12 +2614,12 @@
                  <datalist id="dirRouteOptions">${adminEmailOptions()}</datalist>
                </div>
                <div class="dir-manage-actions">
-                 ${ownerProtected ? "" : `<button type="button" class="danger" data-action="convert-and-forward">Suspend account and start forwarding (takes 21 days)</button>`}
+                 ${ownerProtected ? "" : `<button type="button" class="danger" data-action="convert-and-forward">Delete account and forward mail (auto-completes in 21 days)</button>`}
                  <button type="button" data-action="unsuspend">Move back to live (£11/mo)</button>
                </div>
-               ${ownerProtected ? `<p class="dir-modal-saved-hint">Suspend actions on the owner are restricted to the owner themselves.</p>` : `<p class="dir-modal-saved-hint"><strong>Convert to group</strong> deletes the user immediately and creates a forwarding-only Group at this address after Google's 20-day address-reuse lockout. ~20 more days of bounced mail, then mail forwards to the target forever. £0/month. <br><strong>Move back to live</strong> resumes the £11/mo seat — use only if you want the account active again.</p>`}`
+               ${ownerProtected ? `<p class="dir-modal-saved-hint">Destructive actions on the owner are restricted to the owner themselves.</p>` : `<p class="dir-modal-saved-hint">This account is a legacy suspension. <strong>Delete + forward</strong> finishes the offboarding: deletes the user now (stops the £11/mo charge immediately), then auto-creates a forwarding-only Group at this address once Google's 20-day address-reuse lockout expires. ~20 days of bounced mail, then mail forwards to the target forever. £0/month. <br><strong>Move back to live</strong> resumes the £11/mo seat — use only if you want the account active again.</p>`}`
             : ownerProtected
-            ? `<p class="dir-modal-saved-hint" style="text-align:left;margin:0;">Suspend actions on the owner are restricted to the owner themselves.</p>`
+            ? `<p class="dir-modal-saved-hint" style="text-align:left;margin:0;">Destructive actions on the owner are restricted to the owner themselves.</p>`
             : `<div id="dirManageLive">
                  <div class="dir-form-row">
                    <label for="dirRouteTo">Forward mail to</label>
@@ -2627,10 +2627,10 @@
                    <datalist id="dirRouteOptions">${adminEmailOptions()}</datalist>
                  </div>
                  <div class="dir-manage-actions">
-                   <button type="button" class="danger" data-action="convert-and-forward">Suspend account and start forwarding (takes 21 days)</button>
-                   <button type="button" data-action="suspend-no-forward">Suspend without forwarding</button>
+                   <button type="button" class="danger" data-action="convert-and-forward">Delete account and forward mail (auto-completes in 21 days)</button>
+                   <button type="button" class="danger" data-action="delete-account">Delete account (no forwarding)</button>
                  </div>
-                 <p class="dir-modal-saved-hint"><strong>Convert to group</strong> deletes the Workspace user and re-creates the email address as a forwarding-only Group with the target as a member. Free forever (no seat fee), and mail reliably flows. Requires one manual step in admin.google.com (delete with 'Make email available immediately' ticked) — the next button will walk you through it. <br><strong>Suspend without forwarding</strong> just stops the seat fee; mail to this address will bounce.</p>
+                 <p class="dir-modal-saved-hint">Both actions <strong>delete the Workspace user immediately</strong> and stop the £11/mo seat charge as soon as Google's next billing tick. (Suspending doesn't save money — Google still charges full price for suspended seats.)<br><strong>Delete + forward</strong> also re-creates the email address as a forwarding-only Group with the target as a member, once Google's 20-day address-reuse lockout expires — a daily cron handles that automatically. <br><strong>Delete (no forwarding)</strong> just deletes; mail to this address will bounce. The account remains recoverable from admin.google.com for 20 days, then all data is permanently removed by Google.</p>
                </div>`}
           <div class="dir-confirm-slot"></div>
         </div>` : ""}
@@ -2886,21 +2886,24 @@
       return;
     }
 
-    if (action === "suspend-no-forward") {
-      // Just suspend. Mail will bounce — that's explicit in the button label.
+    if (action === "delete-account") {
+      // Actually deletes the Workspace user — only path that stops the seat
+      // charge (suspended accounts keep billing at full price). Mail bounces
+      // during the 20-day Google recovery window; admin.google.com can
+      // restore within that window if this was a mistake.
       slot.innerHTML = `
         <div class="dir-confirm">
           <div class="dir-confirm-text">
-            <strong>Suspend ${escapeHtml(u.email)} without forwarding?</strong><br>
-            <span class="dir-modal-saved-hint" style="text-align:left;margin:0;">Stops the seat fee (£0/mo on Flex). Mail to this address will bounce — no forwarding. Reversible via Move back to live.</span>
+            <strong>Delete ${escapeHtml(u.email)}?</strong><br>
+            <span class="dir-modal-saved-hint" style="text-align:left;margin:0;">Frees the £11/mo seat immediately and locks the account. Mail to this address will bounce. The account stays recoverable from admin.google.com for 20 days, after which Google permanently deletes the mailbox + Drive + everything.</span>
           </div>
           <div class="dir-confirm-actions">
             <button type="button" data-cancel>Cancel</button>
-            <button type="button" class="confirm" data-confirm>Suspend</button>
+            <button type="button" class="confirm" data-confirm>Delete account</button>
           </div>
         </div>`;
       slot.querySelector("[data-cancel]").addEventListener("click", () => { slot.innerHTML = ""; });
-      slot.querySelector("[data-confirm]").addEventListener("click", () => runAction(entry, "suspend-no-forward", slot, {}));
+      slot.querySelector("[data-confirm]").addEventListener("click", () => runAction(entry, "delete-account", slot, {}));
       return;
     }
 
@@ -2964,7 +2967,11 @@
     } else {
       toast.classList.remove("error");
     }
-    const verbLabel = action === "suspend-and-route" ? "Suspending + routing" : (action[0].toUpperCase() + action.slice(1) + "ing");
+    const verbLabel = action === "suspend-and-route"
+      ? "Suspending + routing"
+      : action === "delete-account"
+        ? "Deleting"
+        : (action[0].toUpperCase() + action.slice(1) + "ing");
     toast.textContent = `${verbLabel} ${seats.length > 1 ? `${seats.length} seats for ` : ""}${u.email}…`;
     modal.querySelectorAll("[data-action], [data-confirm]").forEach(b => b.disabled = true);
 
@@ -2973,7 +2980,8 @@
     for (const seat of seats) {
       try {
         await workspaceAction(action, { email: seat.email, ...(extras || {}) });
-        if (action === "suspend-and-route" || action === "suspend-no-forward") seat.suspended = true;
+        if (action === "suspend-and-route") seat.suspended = true;
+        if (action === "delete-account") seat.deletion_time = new Date().toISOString();
         if (action === "unsuspend") seat.suspended = false;
         const lcEmail = (seat.email || "").toLowerCase();
         // Persist forwarding state into annotations.json (the reliable
@@ -3009,7 +3017,9 @@
         ? `Suspended ${okCount} seat${okCount === 1 ? "" : "s"} for ${u.name || u.email} — mail forwards to ${extras && extras.route_to ? extras.route_to : "the address you set"}.`
         : action === "unsuspend"
           ? `Unsuspended ${okCount} seat${okCount === 1 ? "" : "s"} for ${u.name || u.email}. Forwarding turned off.`
-          : `${u.email} — ${action.replace(/-/g, " ")} succeeded.`;
+          : action === "delete-account"
+            ? `Deleted ${okCount} seat${okCount === 1 ? "" : "s"} for ${u.name || u.email}. Account recoverable from admin.google.com for the next 20 days; mail bounces in the meantime.`
+            : `${u.email} — ${action.replace(/-/g, " ")} succeeded.`;
       showModalBanner(successText, "success");
     } else {
       showModalBanner(`${okCount}/${seats.length} seat${seats.length === 1 ? "" : "s"} actioned; failures: ${failures.join("; ")}`, okCount > 0 ? "success" : "error");

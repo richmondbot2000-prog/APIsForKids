@@ -51,6 +51,7 @@ const OWNER_EMAIL = "james.benamor@letme.com";
 const OWNER_PROTECTED_ACTIONS = new Set([
   "suspend-and-route",
   "suspend-no-forward",
+  "delete-account",
   "reset-password",
   "admin-add",
   "admin-remove",
@@ -241,6 +242,7 @@ export default {
         case "convert-to-group":     result = await doConvertToGroup(adminToken, body); break;
         case "create-forwarding-group": result = await doCreateForwardingGroup(adminToken, body); break;
         case "suspend-no-forward":   result = await doSuspendNoForward(adminToken, body); break;
+        case "delete-account":       result = await doDelete(adminToken, body); break;
         case "create":               result = await doCreate(adminToken, body); break;
         case "group-create":         result = await doGroupCreate(adminToken, body); break;
         case "group-delete":         result = await doGroupDelete(adminToken, body); break;
@@ -521,6 +523,19 @@ async function doConvertToGroup(token, body) {
 async function doSuspendNoForward(token, body) {
   if (!body.email) return { ok: false, error: "missing email" };
   return adminApi(token, "PUT", `users/${encodeURIComponent(body.email)}`, { suspended: true });
+}
+
+// Delete the Workspace user via Admin SDK. This is the ONLY action that
+// stops the seat charge — suspending a user does not (Google bills suspended
+// seats at full price). After deletion the account is locked + recoverable
+// from admin.google.com for 20 days; on day 21 the mailbox + Drive + every
+// piece of data are permanently deleted by Google.
+//
+// The license is freed immediately, so the £11/mo charge stops as soon as
+// the next billing tick.
+async function doDelete(token, body) {
+  if (!body.email) return { ok: false, error: "missing email" };
+  return adminApi(token, "DELETE", `users/${encodeURIComponent(body.email)}`);
 }
 
 async function doCreateForwardingGroup(token, body) {
