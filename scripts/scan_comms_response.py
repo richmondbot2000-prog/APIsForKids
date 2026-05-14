@@ -621,27 +621,38 @@ def redact(body: str, names, cap: int | None = SAMPLE_BODY_CAP) -> str:
 def fetch_names_by_aref(arefs: set[str]) -> dict[str, set[str]]:
     """For every ARef in the inbound set, pull first/last name. Used by the
     full-list CSV so each row redacts only that customer's own name. Returns
-    {aref: {first, last}}; missing ARefs map to an empty set."""
+    {aref: {first, last}}; missing ARefs map to an empty set.
+
+    Implementation note: we previously chunked 1500 ARefs per IN-clause query.
+    For ~576k unique ARefs that's ~385 round trips × ~2 s each = 13 min, which
+    overflowed the 30-min workflow budget on top of the rest of the scan.
+    Bulk-pulling every Customers.ARef in a single query (then filtering in
+    Python) finishes in ~30-90 s — one round trip beats 385 of them even
+    when the result set is much larger.
+    """
     if not arefs:
         return {}
-    print(f"[csv] fetching names for {len(arefs)} ARefs (CSV redaction)…", flush=True)
+    print(f"[csv] bulk-fetching Customer names (need {len(arefs)} ARefs)…", flush=True)
     out: dict[str, set[str]] = {}
     cn = pyodbc.connect(conn_str("ReportingApplications"), timeout=30)
     try:
         cur = cn.cursor()
-        for chunk in chunked(arefs, 1500):
-            ph = ",".join("?" * len(chunk))
-            cur.execute(
-                f"""SELECT ARef, FirstName, Surname
-                    FROM dbo.Customers WHERE ARef IN ({ph})""",
-                list(chunk),
-            )
-            for aref, fn, sn in cur.fetchall():
-                aref = (aref or "").strip()
-                if not aref: continue
-                bag = out.setdefault(aref, set())
-                if fn and fn.strip(): bag.add(fn.strip())
-                if sn and sn.strip(): bag.add(sn.strip())
+        cur.timeout = 600
+        cur.execute("""
+            SELECT ARef, FirstName, Surname
+            FROM dbo.Customers
+            WHERE ARef IS NOT NULL
+        """)
+        total = 0
+        for aref, fn, sn in cur.fetchall():
+            total += 1
+            aref = (aref or "").strip()
+            if not aref or aref not in arefs:
+                continue
+            bag = out.setdefault(aref, set())
+            if fn and fn.strip(): bag.add(fn.strip())
+            if sn and sn.strip(): bag.add(sn.strip())
+        print(f"[csv] scanned {total} Customers rows", flush=True)
     finally:
         cn.close()
     print(f"[csv] name map built ({len(out)} ARefs resolved)", flush=True)
