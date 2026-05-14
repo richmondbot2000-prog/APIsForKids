@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-14T22:18:21.935Z",
+  "updated_at": "2026-05-14T22:19:30.701Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -2333,6 +2333,13 @@
       "actor": "james.benamor@letme.com",
       "action": "get-forwarding",
       "target": "customer.letters@letme.co.uk",
+      "ok": true
+    },
+    {
+      "ts": "2026-05-14T22:19:30.701Z",
+      "actor": "james.benamor@letme.com",
+      "action": "get-forwarding",
+      "target": "autobots@rapida.bg",
       "ok": true
     }
   ]
