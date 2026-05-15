@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778879500">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778879500">
-<link rel="stylesheet" href="quiet.css?v=1778879500">
-<link rel="stylesheet" href="quiet-extras.css?v=1778879500">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778879500">
+<link rel="stylesheet" href="style.css?v=1778881418">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778881418">
+<link rel="stylesheet" href="quiet.css?v=1778881418">
+<link rel="stylesheet" href="quiet-extras.css?v=1778881418">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778881418">
 <style>
   .hd-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   .hd-section h1 {
@@ -278,7 +278,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778879500" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778881418" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -387,11 +387,17 @@
   let yearEnd   = new Date(2027, 2, 31); // 31 Mar 2027 — overwritten from doc
 
   // ── Boot ──────────────────────────────────────────────────────────
+  // holidays.json is read straight from raw.githubusercontent.com so it
+  // bypasses the 30–60 s GitHub Pages rebuild lag. Without this, every
+  // save would take a minute to become visible after a page reload.
+  // staff.json + admins.json change rarely; the small lag there is fine.
+  const HOLIDAYS_RAW_URL = "https://raw.githubusercontent.com/richmondbot2000-prog/togetherbook/main/holidays.json";
   Promise.all([
     fetch(`${HD_API}/whoami`, { cache: "no-store" }).then(r => r.ok ? r.json() : Promise.reject("not signed in")),
     fetch("staff.json",       { cache: "no-store" }).then(r => r.ok ? r.json() : Promise.reject("staff.json missing")),
     fetch("admins.json",      { cache: "no-store" }).then(r => r.ok ? r.json() : ({ admins: [] })),
-    fetch("holidays.json",    { cache: "no-store" }).then(r => r.ok ? r.json() : ({ by_user: {}, log: [] })),
+    fetch(`${HOLIDAYS_RAW_URL}?ts=${Date.now()}`, { cache: "no-store" })
+      .then(r => r.ok ? r.json() : ({ by_user: {}, log: [] })),
   ]).then(([who, s, ad, hd]) => {
     viewerEmail = (who && who.email) || "";
     viewerName  = (who && who.name)  || "";
