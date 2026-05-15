@@ -31,6 +31,8 @@ const REPO = "richmondbot2000-prog/togetherbook";
 const AUDIT_PATH = "workspace-actions.json";
 const PENDING_TRANSFERS_PATH = "pending-transfers.json";
 const ADMINS_PATH = "admins.json";
+const WALL_PATH = "wall.json";
+const WALL_SEEN_PATH = "wall-seen.json";
 const BRANCH = "main";
 
 // Cloudflare Access: the allowlist on book.togetherbook.net is auto-synced
@@ -87,6 +89,15 @@ export default {
   async fetch(req, env) {
     if (req.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: cors(req) });
+    }
+
+    // ── Wall API ──────────────────────────────────────────────────────
+    // /api/wall/* lives in this same Worker but is routed separately so
+    // any Cloudflare-Access-authenticated user can post / comment /
+    // react. No admin gating — every logged-in viewer can use the Wall.
+    const url0 = new URL(req.url);
+    if (url0.pathname.startsWith("/api/wall/")) {
+      return await handleWall(req, env, url0);
     }
 
     // GET /api/workspace/payroll — returns the payroll JSON stored in the
@@ -1285,6 +1296,245 @@ async function appendAudit(env, entry) {
       sha: sha || undefined,
     }),
   });
+}
+
+/* ────────────────────────────── Wall ────────────────────────────── */
+/*
+ * /api/wall/whoami     GET  — returns { email, name } of the signed-in viewer.
+ * /api/wall/post       POST — { body, photos?[], channel? } → { post }
+ * /api/wall/comment    POST — { post_id, body, parent_comment_id? } → { comment }
+ * /api/wall/react      POST — { parent_id, parent_kind ("post"|"comment"), emoji }
+ *                              → { post_id, target_kind, reactions }   (toggles)
+ * /api/wall/mark-seen  POST — { at } → marks all of caller's own posts as seen
+ *                              up to that timestamp in wall-seen.json
+ *
+ * Storage: wall.json + wall-seen.json in the repo, written via GitHub
+ * Contents API with retry-on-409 (same pattern as workspace-actions.json).
+ */
+
+async function handleWall(req, env, url) {
+  const action = url.pathname.replace(/^\/api\/wall\/?/, "").replace(/\/$/, "");
+
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: cors(req) });
+  }
+  if (!req.headers.get("Cf-Access-Jwt-Assertion")) {
+    return json({ error: "not authenticated via Cloudflare Access" }, 401, req);
+  }
+
+  const viewerEmail = (req.headers.get("Cf-Access-Authenticated-User-Email") || "").toLowerCase();
+  const viewerName  = (req.headers.get("Cf-Access-Authenticated-User-Name") || "").trim();
+
+  if (action === "whoami") {
+    return json({ ok: true, email: viewerEmail, name: viewerName }, 200, req);
+  }
+  if (req.method !== "POST") {
+    return json({ error: "method not allowed" }, 405, req);
+  }
+
+  let body = {};
+  try { body = await req.json(); } catch (e) { return json({ error: "bad JSON body" }, 400, req); }
+
+  try {
+    switch (action) {
+      case "post":      return json(await wallPost(env, viewerEmail, viewerName, body), 200, req);
+      case "comment":   return json(await wallComment(env, viewerEmail, viewerName, body), 200, req);
+      case "react":     return json(await wallReact(env, viewerEmail, body), 200, req);
+      case "mark-seen": return json(await wallMarkSeen(env, viewerEmail, body), 200, req);
+      default:          return json({ error: `unknown wall action: ${action}` }, 404, req);
+    }
+  } catch (e) {
+    return json({ ok: false, error: e.message || String(e) }, 500, req);
+  }
+}
+
+function wallId(prefix) {
+  const ts = Date.now().toString(36);
+  const rnd = Math.random().toString(36).slice(2, 8);
+  return `${prefix}_${ts}_${rnd}`;
+}
+
+async function wallPost(env, viewerEmail, viewerName, body) {
+  if (!viewerEmail) throw new Error("not authenticated");
+  const text = (body.body || "").trim();
+  if (!text) throw new Error("empty body");
+  if (text.length > 10000) throw new Error("body exceeds 10,000 chars");
+  const photos = Array.isArray(body.photos) ? body.photos.slice(0, 10) : [];
+  const channel = (body.channel || "").toString().slice(0, 40) || null;
+
+  const now = new Date().toISOString();
+  const newPost = {
+    id: wallId("post"),
+    author_email: viewerEmail,
+    author_name:  viewerName || viewerEmail.split("@")[0],
+    created_at:   now,
+    body:         text,
+    photos,
+    channel,
+    reactions:    {},
+    comments:     [],
+  };
+
+  await updateWallJson(env, doc => {
+    doc.posts = Array.isArray(doc.posts) ? doc.posts : [];
+    doc.posts.unshift(newPost);
+    // FIFO-trim to keep the file under GitHub's 100 MB limit. ~2000 posts
+    // headroom at ~5 KB/post including a few short comments.
+    if (doc.posts.length > 2000) doc.posts = doc.posts.slice(0, 2000);
+  }, `Wall: post by ${viewerEmail}`);
+
+  return { ok: true, post: newPost };
+}
+
+async function wallComment(env, viewerEmail, viewerName, body) {
+  if (!viewerEmail) throw new Error("not authenticated");
+  const pid = (body.post_id || "").toString();
+  const text = (body.body || "").trim();
+  const parent = body.parent_comment_id ? body.parent_comment_id.toString() : null;
+  if (!pid)  throw new Error("missing post_id");
+  if (!text) throw new Error("empty body");
+  if (text.length > 2000) throw new Error("body exceeds 2,000 chars");
+
+  const newComment = {
+    id: wallId(parent ? "reply" : "com"),
+    parent_comment_id: parent,
+    author_email: viewerEmail,
+    author_name:  viewerName || viewerEmail.split("@")[0],
+    created_at:   new Date().toISOString(),
+    body:         text,
+    reactions:    {},
+  };
+
+  await updateWallJson(env, doc => {
+    const post = (doc.posts || []).find(p => p.id === pid);
+    if (!post) throw new Error("post not found");
+    post.comments = post.comments || [];
+    post.comments.push(newComment);
+  }, `Wall: comment on ${pid} by ${viewerEmail}`);
+
+  return { ok: true, comment: newComment };
+}
+
+async function wallReact(env, viewerEmail, body) {
+  if (!viewerEmail) throw new Error("not authenticated");
+  const parentId = (body.parent_id || "").toString();
+  const kind = body.parent_kind === "comment" ? "comment" : "post";
+  const emoji = (body.emoji || "").toString();
+  if (!parentId) throw new Error("missing parent_id");
+  if (!emoji)    throw new Error("missing emoji");
+  if ([...emoji].length > 4) throw new Error("emoji too long");
+
+  let resultPostId = null;
+  let resultReactions = null;
+
+  await updateWallJson(env, doc => {
+    const posts = doc.posts || [];
+    if (kind === "post") {
+      const post = posts.find(p => p.id === parentId);
+      if (!post) throw new Error("post not found");
+      post.reactions = post.reactions || {};
+      const set = new Set((post.reactions[emoji] || []).map(e => e.toLowerCase()));
+      if (set.has(viewerEmail)) set.delete(viewerEmail);
+      else set.add(viewerEmail);
+      if (set.size === 0) delete post.reactions[emoji];
+      else post.reactions[emoji] = Array.from(set);
+      resultPostId = post.id;
+      resultReactions = post.reactions;
+    } else {
+      let foundPost = null, foundComment = null;
+      for (const p of posts) {
+        const c = (p.comments || []).find(c => c.id === parentId);
+        if (c) { foundPost = p; foundComment = c; break; }
+      }
+      if (!foundComment) throw new Error("comment not found");
+      foundComment.reactions = foundComment.reactions || {};
+      const set = new Set((foundComment.reactions[emoji] || []).map(e => e.toLowerCase()));
+      if (set.has(viewerEmail)) set.delete(viewerEmail);
+      else set.add(viewerEmail);
+      if (set.size === 0) delete foundComment.reactions[emoji];
+      else foundComment.reactions[emoji] = Array.from(set);
+      resultPostId = foundPost.id;
+      resultReactions = foundComment.reactions;
+    }
+  }, `Wall: react ${emoji} on ${parentId} by ${viewerEmail}`);
+
+  return { ok: true, post_id: resultPostId, target_kind: kind, reactions: resultReactions };
+}
+
+async function wallMarkSeen(env, viewerEmail, body) {
+  if (!viewerEmail) throw new Error("not authenticated");
+  const at = (body.at || new Date().toISOString()).toString();
+
+  await updateGhJson(env, WALL_SEEN_PATH, doc => {
+    doc.schema_version = 1;
+    doc.by_user = doc.by_user || {};
+    const me = doc.by_user[viewerEmail] = doc.by_user[viewerEmail] || { posts: {} };
+    me.posts = me.posts || {};
+    me.last_marked_at = at;
+    // Best-effort: caller will pass a timestamp it considers "now"; we
+    // record it per-post the next time the page loads (page loads its
+    // own posts and patches lastSeenByPost client-side). Storing
+    // last_marked_at is enough for the read-side to compute unseen.
+  }, `Wall: mark-seen by ${viewerEmail}`);
+
+  return { ok: true, at };
+}
+
+/** Read → mutate → write wall.json with retry-on-409 (sha conflict). */
+async function updateWallJson(env, mutate, commitMsg) {
+  return updateGhJson(env, WALL_PATH, doc => {
+    doc.schema_version = 1;
+    doc.posts = Array.isArray(doc.posts) ? doc.posts : [];
+    mutate(doc);
+    doc.updated_at = new Date().toISOString();
+  }, commitMsg);
+}
+
+/** Generic read → mutate → write JSON via GitHub Contents API.
+ *  Retries up to 3 times on 409 (someone else committed in between). */
+async function updateGhJson(env, path, mutate, commitMsg) {
+  if (!env.GITHUB_TOKEN) throw new Error("GITHUB_TOKEN not configured on the worker");
+  const ghHeaders = {
+    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "apifk-workspace-worker",
+  };
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const getRes = await fetch(
+      `https://api.github.com/repos/${REPO}/contents/${path}?ref=${BRANCH}&_=${Date.now()}`,
+      { headers: ghHeaders },
+    );
+    let doc = {};
+    let sha = null;
+    if (getRes.ok) {
+      const meta = await getRes.json();
+      sha = meta.sha;
+      try { doc = JSON.parse(atob(meta.content.replace(/\s/g, ""))); } catch (e) { doc = {}; }
+    } else if (getRes.status !== 404) {
+      throw new Error(`read ${path} failed: HTTP ${getRes.status}`);
+    }
+    mutate(doc);
+    const newContent = b64Encode(JSON.stringify(doc, null, 2) + "\n");
+    const putRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+      method: "PUT",
+      headers: { ...ghHeaders, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: commitMsg,
+        content: newContent,
+        branch: BRANCH,
+        sha: sha || undefined,
+      }),
+    });
+    if (putRes.ok) return doc;
+    if (putRes.status === 409 || putRes.status === 422) {
+      // sha conflict — re-read and retry.
+      await new Promise(r => setTimeout(r, 200 * (attempt + 1)));
+      continue;
+    }
+    const detail = (await putRes.text()).slice(0, 200);
+    throw new Error(`write ${path} failed: HTTP ${putRes.status} ${detail}`);
+  }
+  throw new Error(`write ${path} failed after retries (concurrent writers)`);
 }
 
 /* ----------- helpers ----------- */

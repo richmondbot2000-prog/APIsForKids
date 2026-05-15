@@ -6,38 +6,272 @@
 <title>TogetherBOOK — Wall</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778791697">
-<link rel="stylesheet" href="quiet.css?v=1778791697">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778792419">
+<link rel="stylesheet" href="quiet.css?v=1778792419">
 <link rel="stylesheet" href="quiet-extras.css?v=1778792419">
 <style>
-  .wall-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
-  .wall-section h1 {
-    font: 400 56px/1.05 var(--font-display);
+  .wl-section { max-width: 720px; margin: 0 auto; padding: 18px 0 48px; }
+  @media (max-width: 800px) { .wl-section { padding: 8px 12px 32px; } }
+
+  /* Compose form */
+  .wl-compose {
+    background: var(--paper-50);
+    border: 1px solid var(--paper-300);
+    padding: 14px 16px;
+    margin: 0 0 18px;
+    border-radius: 6px;
+  }
+  .wl-compose-row { display: flex; gap: 12px; align-items: flex-start; }
+  .wl-compose-row .wl-avatar { flex: 0 0 auto; }
+  .wl-compose textarea {
+    flex: 1 1 auto;
+    width: 100%; min-height: 60px; max-height: 320px;
+    border: 1px solid var(--paper-300);
+    border-radius: 4px;
+    padding: 10px 12px;
+    font: 400 15px/1.5 var(--font-body);
     color: var(--ink-900);
-    letter-spacing: -0.018em;
-    margin: 8px 0 12px;
+    background: white;
+    resize: vertical;
   }
-  .wall-section .lead {
-    font: 400 17px/1.55 var(--font-display);
+  .wl-compose textarea:focus { outline: 1px solid var(--brass-500); border-color: var(--brass-500); }
+  .wl-compose-actions {
+    display: flex; gap: 10px; align-items: center;
+    margin-top: 10px; justify-content: space-between;
+  }
+  .wl-char-count { font: 500 11px/1 var(--font-mono); color: var(--ink-500); }
+  .wl-char-count.over { color: var(--manuscript-red); font-weight: 700; }
+  .wl-btn-post {
+    background: #2c6cb8; color: white;
+    border: none; border-radius: 4px;
+    padding: 8px 16px;
+    font: 600 14px/1 var(--font-display);
+    cursor: pointer;
+  }
+  .wl-btn-post:disabled { opacity: 0.45; cursor: not-allowed; }
+  .wl-btn-post:hover:not(:disabled) { background: #235898; }
+
+  /* Avatars */
+  .wl-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--paper-200);
+    object-fit: cover;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    font: 600 14px/1 var(--font-display);
     color: var(--ink-700);
-    margin: 0 0 18px; max-width: 720px;
+    flex-shrink: 0;
   }
-  .wall-placeholder {
-    margin-top: 18px;
-    padding: 60px 24px;
+  .wl-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* Post card */
+  .wl-post {
+    background: var(--paper-50);
+    border: 1px solid var(--paper-300);
+    border-radius: 6px;
+    margin: 0 0 14px;
+    padding: 14px 16px;
+  }
+  .wl-post-head { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+  .wl-post-head .wl-meta { flex: 1 1 auto; }
+  .wl-post-name { font: 600 14px/1.2 var(--font-display); color: var(--ink-900); }
+  .wl-post-time { font: 400 12px/1.2 var(--font-display); color: var(--ink-500); margin-top: 2px; }
+  .wl-post-body {
+    font: 400 15px/1.55 var(--font-body); color: var(--ink-900);
+    white-space: pre-wrap; word-wrap: break-word; margin: 0 0 10px;
+  }
+  .wl-see-more { color: #2c6cb8; cursor: pointer; text-decoration: none; font-weight: 600; }
+  .wl-see-more:hover { text-decoration: underline; }
+
+  /* Reactions */
+  .wl-reactions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0 4px; }
+  .wl-react-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px;
+    background: white;
+    border: 1px solid var(--paper-300);
+    border-radius: 12px;
+    font: 500 12px/1 var(--font-display);
+    color: var(--ink-700);
+    cursor: pointer;
+  }
+  .wl-react-pill.is-mine { background: #e8efff; border-color: #2c6cb8; color: #2c6cb8; }
+  .wl-react-pill:hover { border-color: var(--brass-500); }
+  .wl-react-add {
+    background: transparent; border: 1px solid transparent;
+    padding: 2px 6px; cursor: pointer; opacity: 0.55;
+    font-size: 16px;
+  }
+  .wl-react-add:hover { opacity: 1; }
+  .wl-see-all-react { color: #2c6cb8; cursor: pointer; font: 500 12px/1 var(--font-display); margin-left: 4px; background: none; border: none; }
+
+  /* Emoji picker */
+  .wl-emoji-popover {
+    position: absolute; background: white;
+    border: 1px solid var(--paper-300); border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    padding: 6px;
+    display: flex; flex-wrap: wrap; gap: 2px;
+    max-width: 280px; z-index: 100;
+  }
+  .wl-emoji-popover button {
+    background: transparent; border: none;
+    font-size: 22px; width: 32px; height: 32px;
+    cursor: pointer; border-radius: 4px; padding: 0;
+  }
+  .wl-emoji-popover button:hover { background: var(--paper-200); }
+
+  /* Comment bar */
+  .wl-comment-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 0;
+    border-top: 1px solid var(--paper-300);
+    margin-top: 8px;
+  }
+  .wl-comment-bar-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: #2c6cb8; cursor: pointer;
+    font: 500 13px/1 var(--font-display);
+    background: none; border: none; padding: 0;
+  }
+  .wl-comment-bar-link:hover { text-decoration: underline; }
+  .wl-comment-count { font: 500 12px/1 var(--font-display); color: var(--ink-500); }
+  .wl-comment-count.has-new { color: var(--manuscript-red); font-weight: 700; }
+
+  /* Comment composer */
+  .wl-comment-composer { display: flex; gap: 8px; align-items: center; margin: 6px 0 8px; }
+  .wl-comment-composer .wl-avatar { width: 32px; height: 32px; font-size: 11px; }
+  .wl-comment-composer input {
+    flex: 1 1 auto;
+    border: 1px solid var(--paper-300);
+    border-radius: 16px;
+    padding: 8px 14px;
+    font: 400 14px/1.4 var(--font-body);
+    background: white;
+  }
+  .wl-comment-composer input:focus { outline: 1px solid var(--brass-500); }
+
+  /* Comments */
+  .wl-comments { margin-top: 4px; }
+  .wl-comment { display: flex; gap: 10px; align-items: flex-start; padding: 8px 0; }
+  .wl-comment .wl-avatar { width: 32px; height: 32px; font-size: 11px; }
+  .wl-comment-body { flex: 1 1 auto; background: var(--paper-100); border-radius: 12px; padding: 8px 12px; }
+  .wl-comment-name { font: 600 13px/1.2 var(--font-display); color: var(--ink-900); }
+  .wl-comment-time { font: 400 11px/1.2 var(--font-display); color: var(--ink-500); margin-left: 6px; }
+  .wl-comment-text {
+    font: 400 14px/1.45 var(--font-body); color: var(--ink-900);
+    margin-top: 3px; white-space: pre-wrap; word-wrap: break-word;
+  }
+  .wl-comment-actions { display: flex; gap: 12px; align-items: center; margin-top: 6px; }
+  .wl-comment-actions .wl-react-pill { font-size: 11px; padding: 1px 7px; }
+  .wl-reply-link {
+    color: var(--ink-500); cursor: pointer;
+    font: 500 12px/1 var(--font-display);
+    background: none; border: none; padding: 0;
+  }
+  .wl-reply-link:hover { color: #2c6cb8; }
+  .wl-replies { margin-left: 42px; border-left: 1px solid var(--paper-300); padding-left: 8px; }
+  .wl-show-all-comments {
+    color: #2c6cb8; cursor: pointer;
+    font: 500 13px/1.2 var(--font-display);
+    padding: 8px 0;
+    background: none; border: none;
+  }
+  .wl-show-all-comments:hover { text-decoration: underline; }
+
+  /* Photo carousel */
+  .wl-photos { position: relative; margin: 10px 0 6px; }
+  .wl-photos img { width: 100%; max-height: 480px; object-fit: cover; border-radius: 4px; display: block; }
+  .wl-photos.has-many { display: flex; overflow-x: auto; gap: 6px; scroll-snap-type: x mandatory; }
+  .wl-photos.has-many img { flex: 0 0 100%; scroll-snap-align: center; }
+  .wl-photos-dots { display: flex; justify-content: center; gap: 4px; margin-top: 6px; }
+  .wl-photos-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--paper-300); }
+  .wl-photos-dot.is-current { background: var(--brass-500); }
+
+  /* Notification badge on the topbar Wall link */
+  .qb-nav-link.wl-has-notif { position: relative; }
+  .qb-nav-link.wl-has-notif::after {
+    content: attr(data-notif);
+    position: absolute; top: -4px; right: -14px;
+    min-width: 16px; height: 16px;
+    padding: 0 4px;
+    background: var(--manuscript-red);
+    color: white; border-radius: 8px;
+    font: 700 10px/16px var(--font-mono);
+    text-align: center; box-sizing: border-box;
+  }
+
+  /* Notifications dropdown */
+  .wl-notif-anchor { position: fixed; top: 16px; right: 16px; z-index: 1000; }
+  .wl-notif-btn {
+    background: var(--paper-50);
+    border: 1px solid var(--paper-300);
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    cursor: pointer; font-size: 18px; position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .wl-notif-btn[data-count]:not([data-count="0"])::after {
+    content: attr(data-count);
+    position: absolute; top: -4px; right: -4px;
+    min-width: 18px; height: 18px;
+    background: var(--manuscript-red); color: white;
+    border-radius: 9px;
+    font: 700 11px/18px var(--font-mono);
+    padding: 0 5px; box-sizing: border-box;
+  }
+  .wl-notif-panel {
+    position: absolute; top: 48px; right: 0;
+    width: 320px; max-height: 420px; overflow-y: auto;
+    background: white;
+    border: 1px solid var(--paper-300); border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    display: none;
+  }
+  .wl-notif-panel.is-open { display: block; }
+  .wl-notif-head {
+    padding: 10px 14px; border-bottom: 1px solid var(--paper-300);
+    font: 600 13px/1 var(--font-display);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .wl-notif-mark { color: #2c6cb8; cursor: pointer; font-size: 12px; background: none; border: none; }
+  .wl-notif-item {
+    display: block; padding: 10px 14px;
+    border-bottom: 1px solid var(--paper-200);
+    text-decoration: none; color: var(--ink-900);
+    font: 400 13px/1.4 var(--font-body);
+  }
+  .wl-notif-item:hover { background: var(--paper-100); }
+  .wl-notif-item-time { font: 500 11px/1 var(--font-mono); color: var(--ink-500); margin-top: 2px; }
+  .wl-notif-empty { padding: 24px 14px; text-align: center; color: var(--ink-500); font-style: italic; }
+
+  /* States */
+  .wl-loading { text-align: center; padding: 24px; color: var(--ink-500); font-style: italic; }
+  .wl-empty {
     background: var(--paper-50);
     border: 1px dashed var(--brass-300);
-    text-align: center;
-    color: var(--ink-500);
+    padding: 40px 24px; text-align: center;
+    color: var(--ink-700);
     font: 400 15px/1.5 var(--font-display);
+    border-radius: 6px;
   }
+
+  /* Banner */
+  .wl-banner {
+    position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+    background: var(--ink-900); color: white;
+    padding: 10px 18px; border-radius: 4px;
+    font: 500 13px/1 var(--font-display); z-index: 2000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .wl-banner.is-error { background: var(--manuscript-red); }
 </style>
 </head>
 <body>
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778791697" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778792419" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -54,16 +288,531 @@
 </header>
 <div class="qb-nav-backdrop" onclick="document.body.classList.remove('nav-open')"></div>
 
+<div class="wl-notif-anchor">
+  <button class="wl-notif-btn" id="wlNotifBtn" data-count="0" title="Notifications">🔔</button>
+  <div class="wl-notif-panel" id="wlNotifPanel">
+    <div class="wl-notif-head">
+      <span>New since you were last here</span>
+      <button class="wl-notif-mark" id="wlNotifMark">Mark all read</button>
+    </div>
+    <div id="wlNotifList"></div>
+  </div>
+</div>
+
 <main class="qb-page">
-  <section class="wall-section">
-    <h1>Wall</h1>
-    <p class="lead">A running feed of what's happening across Central Services and TogetherBook. Empty for now — the shape of this section is being worked out.</p>
-    <div class="wall-placeholder">
-      Coming soon.
+  <section class="wl-section">
+    <div class="wl-compose" id="wlCompose" style="display:none;">
+      <div class="wl-compose-row">
+        <div class="wl-avatar" id="wlMyAvatar">?</div>
+        <textarea id="wlComposeText" placeholder="What's on your mind?" maxlength="10000"></textarea>
+      </div>
+      <div class="wl-compose-actions">
+        <span class="wl-char-count" id="wlCharCount">0 / 10,000</span>
+        <button class="wl-btn-post" id="wlPostBtn" disabled>Post</button>
+      </div>
+    </div>
+
+    <div id="wlFeed">
+      <div class="wl-loading">Loading wall…</div>
     </div>
   </section>
 </main>
 
 <script src="nav.js" defer></script>
+<script>
+(function () {
+  "use strict";
+  let posts = [];
+  let staffByEmail = {};
+  let viewerEmail = "";
+  let viewerName  = "";
+  let viewerPhoto = "";
+  let lastSeenByPost = {};
+  const openPostIds   = new Set();
+  const expandedPostIds = new Set();
+  const openReplyTo   = new Set();
+
+  const REACTIONS = ["👍", "❤️", "😂", "😮", "😢", "🎉", "🙌", "🔥"];
+  const WALL_API = "/api/wall";
+  const BODY_PREVIEW = 250;
+
+  Promise.all([
+    fetch("wall.json",      { cache: "no-store" }).then(r => r.ok ? r.json() : { posts: [] }).catch(() => ({ posts: [] })),
+    fetch("staff.json",     { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("wall-seen.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch(`${WALL_API}/whoami`, { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+  ]).then(([wall, staff, seen, who]) => {
+    posts = Array.isArray(wall.posts) ? wall.posts : [];
+    if (staff && Array.isArray(staff.users)) {
+      for (const u of staff.users) {
+        const k = (u.email || "").toLowerCase();
+        if (k) staffByEmail[k] = u;
+      }
+    }
+    if (who && who.email) {
+      viewerEmail = who.email.toLowerCase();
+      const me = staffByEmail[viewerEmail];
+      viewerName  = (me && me.name)  || who.name  || viewerEmail.split("@")[0];
+      viewerPhoto = (me && photoUrlFor(me)) || "";
+      document.getElementById("wlMyAvatar").innerHTML = avatarInner(viewerName, viewerPhoto);
+      document.getElementById("wlCompose").style.display = "";
+    }
+    if (seen && seen.by_user && seen.by_user[viewerEmail] && seen.by_user[viewerEmail].posts) {
+      lastSeenByPost = seen.by_user[viewerEmail].posts || {};
+    }
+    sortPosts();
+    renderFeed();
+    renderNotifications();
+  }).catch(err => {
+    document.getElementById("wlFeed").innerHTML =
+      `<div class="wl-empty">Wall failed to load: ${escapeHtml(String(err))}</div>`;
+  });
+
+  const composeText = document.getElementById("wlComposeText");
+  const charCount = document.getElementById("wlCharCount");
+  const postBtn = document.getElementById("wlPostBtn");
+  composeText.addEventListener("input", () => {
+    const n = composeText.value.length;
+    charCount.textContent = `${n.toLocaleString()} / 10,000`;
+    charCount.classList.toggle("over", n > 10000);
+    postBtn.disabled = n === 0 || n > 10000;
+  });
+  postBtn.addEventListener("click", async () => {
+    const body = composeText.value.trim();
+    if (!body) return;
+    postBtn.disabled = true; postBtn.textContent = "Posting…";
+    try {
+      const res = await wallAction("post", { body });
+      if (res && res.post) {
+        posts.unshift(res.post);
+        sortPosts(); renderFeed(); renderNotifications();
+      }
+      composeText.value = "";
+      charCount.textContent = "0 / 10,000";
+      showBanner("Posted");
+    } catch (err) {
+      showBanner(err.message || String(err), true);
+    } finally {
+      postBtn.disabled = false; postBtn.textContent = "Post";
+    }
+  });
+
+  function renderFeed() {
+    const root = document.getElementById("wlFeed");
+    if (!posts.length) {
+      root.innerHTML = `<div class="wl-empty">Be the first to post.</div>`;
+      return;
+    }
+    root.innerHTML = posts.map(renderPost).join("");
+    wireFeed();
+  }
+  function sortPosts() {
+    posts.forEach(p => { p._sortKey = mostRecentActivity(p); });
+    posts.sort((a, b) => (a._sortKey < b._sortKey ? 1 : a._sortKey > b._sortKey ? -1 : 0));
+  }
+  function mostRecentActivity(post) {
+    let latest = post.created_at || "";
+    for (const c of (post.comments || [])) {
+      if ((c.created_at || "") > latest) latest = c.created_at;
+    }
+    return latest;
+  }
+
+  function renderPost(post) {
+    const name = displayName(post.author_email, post.author_name);
+    const photo = photoUrlFor(staffByEmail[(post.author_email || "").toLowerCase()] || {});
+    const expanded = expandedPostIds.has(post.id);
+    const body = renderBody(post.body || "", post.id, expanded);
+    const photos = renderPhotos(post.photos || []);
+    const reactions = renderReactions(post.reactions || {}, post.id, "post");
+    const channelTag = post.channel
+      ? ` <span style="color:var(--ink-500); font-weight:400;">› ${escapeHtml(post.channel)}</span>` : "";
+    const comments = post.comments || [];
+    const cmCount = (comments || []).filter(c => !c.parent_comment_id).length;
+    const open = openPostIds.has(post.id);
+    const newCount = unseenCommentCount(post);
+    return `
+      <article class="wl-post" data-post="${escapeHtml(post.id)}" id="post-${escapeHtml(post.id)}">
+        <div class="wl-post-head">
+          <div class="wl-avatar">${avatarInner(name, photo)}</div>
+          <div class="wl-meta">
+            <div class="wl-post-name">${escapeHtml(name)}${channelTag}</div>
+            <div class="wl-post-time">${formatTime(post.created_at)}</div>
+          </div>
+        </div>
+        <div class="wl-post-body">${body}</div>
+        ${photos}
+        ${reactions}
+        <div class="wl-comment-bar">
+          <button class="wl-comment-bar-link" data-toggle-comments="${escapeHtml(post.id)}">💬 Comment</button>
+          <span class="wl-comment-count ${newCount > 0 ? "has-new" : ""}">
+            ${cmCount === 0 ? "No comments yet" : (cmCount + (cmCount === 1 ? " comment" : " comments")) + (newCount > 0 ? ` · ${newCount} new` : "")}
+          </span>
+        </div>
+        <div class="wl-comment-composer">
+          <div class="wl-avatar">${avatarInner(viewerName, viewerPhoto)}</div>
+          <input type="text" placeholder="Add a comment…" data-add-comment="${escapeHtml(post.id)}" ${viewerEmail ? "" : "disabled"} maxlength="2000">
+        </div>
+        ${renderComments(post, open)}
+      </article>`;
+  }
+
+  function renderBody(body, postId, expanded) {
+    const safe = escapeHtml(body);
+    if (body.length <= BODY_PREVIEW || expanded) {
+      const link = body.length > BODY_PREVIEW
+        ? ` <a class="wl-see-more" data-expand="${escapeHtml(postId)}" data-collapse="1">See less</a>`
+        : "";
+      return safe + link;
+    }
+    return safe.slice(0, BODY_PREVIEW) + "… "
+      + `<a class="wl-see-more" data-expand="${escapeHtml(postId)}">See more</a>`;
+  }
+  function renderPhotos(photos) {
+    if (!photos.length) return "";
+    if (photos.length === 1) {
+      return `<div class="wl-photos"><img src="${escapeHtml(photos[0])}" alt="" loading="lazy"></div>`;
+    }
+    const imgs = photos.map(p => `<img src="${escapeHtml(p)}" alt="" loading="lazy">`).join("");
+    const dots = photos.map((_, i) => `<span class="wl-photos-dot ${i === 0 ? "is-current" : ""}"></span>`).join("");
+    return `<div class="wl-photos has-many" data-carousel>${imgs}</div><div class="wl-photos-dots">${dots}</div>`;
+  }
+  function renderReactions(rx, parentId, parentKind) {
+    const entries = Object.entries(rx || {})
+      .filter(([_, emails]) => Array.isArray(emails) && emails.length > 0)
+      .sort((a, b) => b[1].length - a[1].length);
+    const pills = entries.map(([emoji, emails]) => {
+      const mine = emails.map(e => (e || "").toLowerCase()).includes(viewerEmail);
+      return `<button class="wl-react-pill ${mine ? "is-mine" : ""}" data-react="${escapeHtml(emoji)}" data-on="${escapeHtml(parentId)}" data-kind="${escapeHtml(parentKind)}" title="${emails.map(escapeHtml).join(", ")}">${emoji} ${emails.length}</button>`;
+    }).join("");
+    return `
+      <div class="wl-reactions">
+        ${pills}
+        <button class="wl-react-add" data-add-react="${escapeHtml(parentId)}" data-kind="${escapeHtml(parentKind)}" title="Add reaction">🙂</button>
+      </div>`;
+  }
+  function renderComments(post, allOpen) {
+    const comments = (post.comments || []).slice();
+    if (!comments.length) return "";
+    const topLevel = comments.filter(c => !c.parent_comment_id);
+    topLevel.sort((a, b) => (a.created_at < b.created_at ? -1 : 1));
+    const showList = allOpen ? topLevel : topLevel.slice(-1);
+    const headerLink = !allOpen && topLevel.length > 1
+      ? `<button class="wl-show-all-comments" data-show-all="${escapeHtml(post.id)}">Show all ${topLevel.length} comments</button>`
+      : (allOpen && topLevel.length > 1
+          ? `<button class="wl-show-all-comments" data-show-all="${escapeHtml(post.id)}" data-collapse="1">Show only most recent</button>`
+          : "");
+    return `<div class="wl-comments">${headerLink}${showList.map(c => renderComment(post, c)).join("")}</div>`;
+  }
+  function renderComment(post, comment) {
+    const name = displayName(comment.author_email, comment.author_name);
+    const photo = photoUrlFor(staffByEmail[(comment.author_email || "").toLowerCase()] || {});
+    const replies = (post.comments || [])
+      .filter(c => c.parent_comment_id === comment.id)
+      .sort((a, b) => (a.created_at < b.created_at ? -1 : 1));
+    const replyKey = `${post.id}::${comment.id}`;
+    const replyComposerOpen = openReplyTo.has(replyKey);
+    return `
+      <div class="wl-comment" data-comment="${escapeHtml(comment.id)}">
+        <div class="wl-avatar">${avatarInner(name, photo)}</div>
+        <div style="flex:1;">
+          <div class="wl-comment-body">
+            <div>
+              <span class="wl-comment-name">${escapeHtml(name)}</span>
+              <span class="wl-comment-time">${formatTime(comment.created_at)}</span>
+            </div>
+            <div class="wl-comment-text">${escapeHtml(comment.body || "")}</div>
+            ${renderReactions(comment.reactions || {}, comment.id, "comment")}
+          </div>
+          <div class="wl-comment-actions">
+            <button class="wl-reply-link" data-reply="${escapeHtml(replyKey)}">Reply</button>
+          </div>
+          ${replyComposerOpen ? `
+            <div class="wl-comment-composer">
+              <div class="wl-avatar">${avatarInner(viewerName, viewerPhoto)}</div>
+              <input type="text" placeholder="Reply to ${escapeHtml(name)}…" data-add-reply="${escapeHtml(replyKey)}" maxlength="2000" autofocus>
+            </div>` : ""}
+          ${replies.length ? `<div class="wl-replies">${replies.map(r => renderComment(post, r)).join("")}</div>` : ""}
+        </div>
+      </div>`;
+  }
+  function unseenCommentCount(post) {
+    if (!viewerEmail || (post.author_email || "").toLowerCase() !== viewerEmail) return 0;
+    const seen = lastSeenByPost[post.id] || "";
+    return (post.comments || []).filter(c => (c.created_at || "") > seen && (c.author_email || "").toLowerCase() !== viewerEmail).length;
+  }
+
+  function wireFeed() {
+    document.querySelectorAll("[data-expand]").forEach(el => {
+      el.addEventListener("click", () => {
+        const id = el.dataset.expand;
+        if (el.dataset.collapse) expandedPostIds.delete(id);
+        else expandedPostIds.add(id);
+        renderFeed();
+      });
+    });
+    document.querySelectorAll("[data-toggle-comments]").forEach(el => {
+      el.addEventListener("click", () => {
+        const id = el.dataset.toggleComments;
+        if (openPostIds.has(id)) openPostIds.delete(id);
+        else openPostIds.add(id);
+        renderFeed();
+      });
+    });
+    document.querySelectorAll("[data-show-all]").forEach(el => {
+      el.addEventListener("click", () => {
+        const id = el.dataset.showAll;
+        if (el.dataset.collapse) openPostIds.delete(id);
+        else openPostIds.add(id);
+        renderFeed();
+      });
+    });
+    document.querySelectorAll("[data-add-comment]").forEach(el => {
+      el.addEventListener("keydown", async e => {
+        if (e.key !== "Enter") return;
+        const body = el.value.trim();
+        if (!body) return;
+        const postId = el.dataset.addComment;
+        el.disabled = true;
+        try {
+          const res = await wallAction("comment", { post_id: postId, body });
+          if (res && res.comment) {
+            const post = posts.find(p => p.id === postId);
+            if (post) { post.comments = post.comments || []; post.comments.push(res.comment); }
+            el.value = "";
+            sortPosts(); renderFeed();
+          }
+        } catch (err) {
+          showBanner(err.message || String(err), true);
+        } finally {
+          el.disabled = false; el.focus();
+        }
+      });
+    });
+    document.querySelectorAll("[data-reply]").forEach(el => {
+      el.addEventListener("click", () => {
+        const key = el.dataset.reply;
+        if (openReplyTo.has(key)) openReplyTo.delete(key);
+        else openReplyTo.add(key);
+        const [pid] = key.split("::");
+        openPostIds.add(pid);
+        renderFeed();
+      });
+    });
+    document.querySelectorAll("[data-add-reply]").forEach(el => {
+      el.addEventListener("keydown", async e => {
+        if (e.key !== "Enter") return;
+        const body = el.value.trim();
+        if (!body) return;
+        const [pid, parent] = el.dataset.addReply.split("::");
+        el.disabled = true;
+        try {
+          const res = await wallAction("comment", { post_id: pid, parent_comment_id: parent, body });
+          if (res && res.comment) {
+            const post = posts.find(p => p.id === pid);
+            if (post) { post.comments = post.comments || []; post.comments.push(res.comment); }
+            openReplyTo.delete(`${pid}::${parent}`);
+            sortPosts(); renderFeed();
+          }
+        } catch (err) {
+          showBanner(err.message || String(err), true);
+        } finally {
+          el.disabled = false;
+        }
+      });
+    });
+    document.querySelectorAll("[data-react]").forEach(el => {
+      el.addEventListener("click", async () => {
+        await reactTo(el.dataset.on, el.dataset.kind, el.dataset.react);
+      });
+    });
+    document.querySelectorAll("[data-add-react]").forEach(el => {
+      el.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        openEmojiPicker(el, async emoji => {
+          await reactTo(el.dataset.addReact, el.dataset.kind, emoji);
+        });
+      });
+    });
+  }
+
+  let activePopover = null;
+  function openEmojiPicker(anchor, onPick) {
+    closeEmojiPicker();
+    const pop = document.createElement("div");
+    pop.className = "wl-emoji-popover";
+    pop.innerHTML = REACTIONS.map(e => `<button>${e}</button>`).join("");
+    document.body.appendChild(pop);
+    const rect = anchor.getBoundingClientRect();
+    pop.style.left = `${Math.max(8, rect.left + window.scrollX)}px`;
+    pop.style.top  = `${rect.bottom + window.scrollY + 4}px`;
+    pop.querySelectorAll("button").forEach(b => {
+      b.addEventListener("click", () => { closeEmojiPicker(); onPick(b.textContent); });
+    });
+    activePopover = pop;
+    setTimeout(() => document.addEventListener("click", closeEmojiPicker, { once: true }), 0);
+  }
+  function closeEmojiPicker() { if (activePopover) { activePopover.remove(); activePopover = null; } }
+
+  async function reactTo(parentId, kind, emoji) {
+    if (!viewerEmail) { showBanner("Sign in via Cloudflare Access first.", true); return; }
+    try {
+      const res = await wallAction("react", { parent_id: parentId, parent_kind: kind, emoji });
+      if (res && res.post_id) {
+        const post = posts.find(p => p.id === res.post_id);
+        if (post && res.target_kind === "post") post.reactions = res.reactions;
+        else if (post && res.target_kind === "comment") {
+          const c = (post.comments || []).find(c => c.id === parentId);
+          if (c) c.reactions = res.reactions;
+        }
+        renderFeed();
+      }
+    } catch (err) {
+      showBanner(err.message || String(err), true);
+    }
+  }
+
+  function renderNotifications() {
+    const events = collectNotifications();
+    const btn = document.getElementById("wlNotifBtn");
+    btn.setAttribute("data-count", String(events.length));
+    const list = document.getElementById("wlNotifList");
+    if (!events.length) {
+      list.innerHTML = `<div class="wl-notif-empty">Nothing new on your posts.</div>`;
+    } else {
+      list.innerHTML = events.slice(0, 30).map(ev => {
+        const name = displayName(ev.actor_email, ev.actor_name);
+        const verb = ev.kind === "react"
+          ? `reacted ${ev.emoji} to your`
+          : (ev.parent_comment_id ? "replied to a comment on your" : "commented on your");
+        return `<a class="wl-notif-item" href="#post-${escapeHtml(ev.post_id)}" data-jump="${escapeHtml(ev.post_id)}">
+          <div><strong>${escapeHtml(name)}</strong> ${verb} post.</div>
+          <div class="wl-notif-item-time">${formatTime(ev.at)}</div>
+        </a>`;
+      }).join("");
+      list.querySelectorAll("[data-jump]").forEach(a => {
+        a.addEventListener("click", () => {
+          const id = a.dataset.jump;
+          openPostIds.add(id);
+          renderFeed();
+        });
+      });
+    }
+    const navLink = document.querySelector('.qb-nav-link[href="wall.html"]');
+    if (navLink) {
+      if (events.length > 0) {
+        navLink.classList.add("wl-has-notif");
+        navLink.setAttribute("data-notif", String(events.length));
+      } else {
+        navLink.classList.remove("wl-has-notif");
+        navLink.removeAttribute("data-notif");
+      }
+    }
+  }
+  function collectNotifications() {
+    if (!viewerEmail) return [];
+    const events = [];
+    for (const post of posts) {
+      if ((post.author_email || "").toLowerCase() !== viewerEmail) continue;
+      const seen = lastSeenByPost[post.id] || "";
+      for (const c of (post.comments || [])) {
+        if ((c.author_email || "").toLowerCase() === viewerEmail) continue;
+        if ((c.created_at || "") <= seen) continue;
+        events.push({
+          kind: "comment",
+          at: c.created_at,
+          post_id: post.id,
+          actor_email: c.author_email,
+          actor_name: c.author_name,
+          parent_comment_id: c.parent_comment_id || null,
+        });
+      }
+    }
+    events.sort((a, b) => (a.at < b.at ? 1 : -1));
+    return events;
+  }
+
+  document.getElementById("wlNotifBtn").addEventListener("click", e => {
+    e.stopPropagation();
+    document.getElementById("wlNotifPanel").classList.toggle("is-open");
+  });
+  document.addEventListener("click", e => {
+    const panel = document.getElementById("wlNotifPanel");
+    if (!panel.contains(e.target) && e.target !== document.getElementById("wlNotifBtn")) {
+      panel.classList.remove("is-open");
+    }
+  });
+  document.getElementById("wlNotifMark").addEventListener("click", async () => {
+    if (!viewerEmail) return;
+    const now = new Date().toISOString();
+    for (const post of posts) {
+      if ((post.author_email || "").toLowerCase() === viewerEmail) {
+        lastSeenByPost[post.id] = now;
+      }
+    }
+    try {
+      await wallAction("mark-seen", { at: now });
+      renderNotifications();
+      showBanner("Marked all as read");
+    } catch (err) {
+      showBanner(err.message || String(err), true);
+    }
+  });
+
+  function wallAction(action, body) {
+    return fetch(`${WALL_API}/${action}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }).then(async res => {
+      let data = null;
+      try { data = await res.json(); } catch (e) {}
+      if (!res.ok || (data && data.ok === false)) {
+        throw new Error((data && data.error) || `HTTP ${res.status}`);
+      }
+      return data;
+    });
+  }
+  function displayName(email, fallback) {
+    if (!email) return fallback || "Unknown";
+    const u = staffByEmail[email.toLowerCase()];
+    return (u && u.name) || fallback || email.split("@")[0];
+  }
+  function photoUrlFor(u) {
+    if (!u || !u.email) return "";
+    const safe = u.email.replace(/[^a-zA-Z0-9._-]/g, "_");
+    return `assets/photos/${safe}.jpg`;
+  }
+  function initials(name) {
+    return (name || "").split(/\s+/).map(p => p.charAt(0).toUpperCase()).slice(0, 2).join("") || "?";
+  }
+  function avatarInner(name, photoUrl) {
+    if (photoUrl) {
+      return `<img src="${escapeHtml(photoUrl)}" alt="" onerror="this.outerHTML='<div>${escapeHtml(initials(name))}</div>'">`;
+    }
+    return `<div>${escapeHtml(initials(name))}</div>`;
+  }
+  function formatTime(iso) {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    const opts = { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" };
+    return d.toLocaleString(undefined, opts);
+  }
+  function escapeHtml(s) {
+    return String(s == null ? "" : s)
+      .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;").replaceAll("'", "&#39;");
+  }
+  function showBanner(msg, isError) {
+    document.querySelectorAll(".wl-banner").forEach(el => el.remove());
+    const b = document.createElement("div");
+    b.className = "wl-banner" + (isError ? " is-error" : "");
+    b.textContent = msg;
+    document.body.appendChild(b);
+    setTimeout(() => b.remove(), 4000);
+  }
+})();
+</script>
 </body>
 </html>
