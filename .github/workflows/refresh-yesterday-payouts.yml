@@ -47,11 +47,23 @@ jobs:
             CURRENT=""
           fi
           echo "expected_target_date=$EXPECTED  current_target_date=$CURRENT"
-          if [ "$CURRENT" = "$EXPECTED" ]; then
-            echo "Already refreshed for $EXPECTED — skipping the rest of the job."
+          # Three guards must ALL be satisfied to skip:
+          #   yesterday-payouts.target_date == EXPECTED (yesterday UTC)
+          #   payouts-week.range.to        == EXPECTED
+          #   payouts-year exists at all (refreshes daily but the rolling
+          #   12-month window only rolls on the 1st of each month — a
+          #   coarse exists-check is fine here.)
+          WEEK_TO=""
+          if [ -f payouts-week.json ]; then
+            WEEK_TO=$(python3 -c "import json; print(((json.load(open('payouts-week.json')).get('range') or {}).get('to') or ''))")
+          fi
+          HAVE_YEAR=$([ -f payouts-year.json ] && echo yes || echo no)
+          echo "week_range_to=$WEEK_TO  have_year=$HAVE_YEAR"
+          if [ "$CURRENT" = "$EXPECTED" ] && [ "$WEEK_TO" = "$EXPECTED" ] && [ "$HAVE_YEAR" = "yes" ]; then
+            echo "Already refreshed for $EXPECTED (yesterday + week + year all current) — skipping."
             echo "skip=true" >> "$GITHUB_OUTPUT"
           else
-            echo "Need to refresh: have '$CURRENT', want '$EXPECTED'."
+            echo "Need to refresh: target=$EXPECTED yesterday=$CURRENT week_to=$WEEK_TO year=$HAVE_YEAR"
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
