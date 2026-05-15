@@ -90,7 +90,7 @@ The site is a flat set of HTML files. **No router, no SPA, no build step.** Each
 
 | Page | URL | What it shows | Data file(s) |
 |---|---|---|---|
-| **Wall** | `/wall.html` | First top-level item. Placeholder for a running feed of what's happening across Central Services + TogetherBook — shape still being worked out. | none (placeholder) |
+| **Wall** | `/wall.html` | First top-level item. Internal social feed (~200 staff): posts up to 10k chars + 10 media; comments + one-level replies; typographic named reactions; SVG-icon action bar; trash-icon deletes (author or admin); notification bell + topbar badge. Photo/video/GIF uploads on posts, comments AND replies. See §11.8. | `wall.json` + `wall-seen.json` + `wall-media/*` |
 | **Home — About our systems** | `/index.html` | Long-scroll storybook in 7 chapters: hero · 8 helpers · 12 robots · 6 screens · 6 outside askers · loan story · 6 ground rules · 15 commandments. Section-parent for Schema + Code sub-pages. | inline (no JSON) |
 | **Payout** | `/yesterday.html` | Three Leaflet maps of US borrowers paid out yesterday (clustered pins · per-state totals · per-state averages) + per-state breakdown tables. (File still `yesterday.html` — only the nav label changed to "Payout" 2026-05-14.) | `yesterday-payouts.json` |
 | **Brandwatch** | `/brandwatch.html` | Public mentions across 10 sources (Trustpilot, BBB, Reddit, Bluesky, Lemmy, Hacker News, CourtListener, Google News, CFPB, YouTube) | `brandwatch.json` |
@@ -1225,6 +1225,131 @@ Total run-time ~17 min for the full pipeline; workflow timeout bumped to **45 mi
 | `customer_state_at_inbound` | `unknown` / `applicant` / `live_loan` / `arrears` / `other` |
 
 The CSV is the auditable ground truth — every classification on the chart is one row here. The page sets the link's `?v=` query to the scan's `updated_at` so the browser never serves a stale CSV after a fresh refresh-comms run.
+
+---
+
+### 11.8 Wall page (`wall.html`)
+
+Internal company social feed for the ~200 Cloudflare-Access-authenticated staff. Anyone signed in can post; reactions, comments, replies, and notifications all flow through the workspace Worker.
+
+#### 11.8.1 Files
+
+| Asset | Purpose |
+|---|---|
+| `wall.html` | the whole page — markup + CSS + JS in one file |
+| `wall.json` | append-only post store (FIFO-trimmed at 2000 posts) |
+| `wall-seen.json` | per-user last-seen-at map (`{ by_user: { email: { posts: { id: at }, last_marked_at } } }`) |
+| `wall-media/` | committed photo + video uploads (one file per attachment) |
+| `worker/workspace-worker.js` | endpoints under `/api/wall/*` (see §11.8.4) |
+
+#### 11.8.2 Storage model
+
+`wall.json` shape:
+
+```jsonc
+{
+  "schema_version": 1,
+  "updated_at": "...",
+  "posts": [
+    {
+      "id": "post_<ts36>_<rand>",
+      "author_email": "...",
+      "author_name": "...",
+      "created_at": "<ISO>",
+      "body": "≤10,000 chars",
+      "photos": ["wall-media/img_xxx.jpg", "https://media.giphy.com/.../giphy.gif"],
+      "channel": null | "channel-name",
+      "reactions": { "👍": ["email1", "email2"], "❤️": [...] },
+      "react_events": [
+        { "actor_email": "...", "emoji": "👍", "target_kind": "post"|"comment",
+          "target_id": "...", "at": "<ISO>", "kind": "added"|"removed" }
+      ],
+      "comments": [
+        {
+          "id": "com_<...>" | "reply_<...>",
+          "parent_comment_id": null | "<comment-id>",
+          "author_email": "...",
+          "author_name": "...",
+          "created_at": "<ISO>",
+          "body": "≤2,000 chars (or empty if media only)",
+          "photos": ["wall-media/...", "https://media.giphy.com/..."],
+          "reactions": { ... }
+        }
+      ]
+    }
+  ]
+}
+```
+
+Reaction storage is emoji-keyed (so legacy data round-trips and historic reactions stay visible) but **display** is typographic per `REACTION_META` in `wall.html`:
+
+| Storage key | Display verb | Past tense (notifications) | Colour token |
+|---|---|---|---|
+| 👍 | Noted     | noted              | `--ink-700`  |
+| ❤️ | Loved     | loved              | `--red-500`  |
+| 😂 | Smiled    | smiled at          | `--brass-600`|
+| 😮 | Surprised | was surprised by   | `--teal-500` |
+| 😢 | Mourned   | mourned            | `--ink-600`  |
+| 🎉 | Celebrated| celebrated         | `--sage-600` |
+
+#### 11.8.3 Feed sorting + comments + notifications
+
+- **Posts** sort by most-recent-activity (max of `created_at` and every `comment.created_at`) descending.
+- **Comments** sort ascending (oldest → newest) under each post. Newest 2 shown by default with a "View N earlier comments" toggle.
+- **Replies** sort ascending under each comment. One level of nesting only (the FB consensus); a "reply-to-reply" attempts get their `parent_comment_id` set to the same top-level comment.
+- **Body truncation** uses CSS `-webkit-line-clamp: 4` (kicks in above ~240 chars) with a `<button class="wl-see-more">See more</button>` toggle below.
+- **Notifications:** for the post author, every new (a) comment, (b) reply, or (c) "added" `react_event` whose `at` is greater than `wall-seen.json → by_user[viewer] → posts[postId]`. Bell badge at top-right + red `(N)` next to the **Wall** topbar link. Mark-all-read calls `/api/wall/mark-seen` which stamps each owned post id with the current timestamp.
+
+#### 11.8.4 Worker endpoints (`/api/wall/*`)
+
+All endpoints require a Cloudflare Access JWT. Identity is the `Cf-Access-Authenticated-User-Email` header. Optional `Cf-Access-Authenticated-User-Name` improves the stored display name; falls back to email local-part.
+
+| Path | Body | Returns |
+|---|---|---|
+| `whoami` (GET-or-POST) | — | `{ email, name }` |
+| `post` | `{ body, photos[], channel? }` | `{ post }` |
+| `comment` | `{ post_id, body, parent_comment_id?, photos[] }` | `{ comment }` |
+| `react` | `{ parent_id, parent_kind: "post"|"comment", emoji }` | `{ post_id, target_kind, reactions }` (toggles) |
+| `mark-seen` | `{ at }` | stamps every post the viewer authored to `at` in `wall-seen.json`; returns `{ marked }` |
+| `upload-media` | `{ data_url, kind: "photo"|"video"|"gif" }` | `{ path, kind, mime }` writes to `wall-media/<id>.<ext>` |
+| `gif-search` | `{ q, limit }` | `{ results: [{id, title, preview, url}] }` proxies GIPHY (was Tenor — Google discontinued the Tenor API for new clients Jan 2026) |
+| `delete` | `{ kind: "post"|"comment", id, post_id? }` | author-or-admin only; cascades to a comment's replies |
+
+Both the wall.json store and wall-seen.json use the shared `updateGhJson` helper with **retry-on-409** so concurrent writers can't lose data. UTF-8 decode on read (atob → `TextDecoder('utf-8')`) so emoji round-trip cleanly.
+
+#### 11.8.5 Worker secrets
+
+- `GITHUB_TOKEN` — Contents API write (same token as `apifk-workspace-worker2`)
+- `GIPHY_API_KEY` — only needed for the GIF picker; everything else still works without it
+
+#### 11.8.6 Cloudflare routing
+
+Two routes hit `apifk-workspace-worker2`:
+- `book.togetherbook.net/api/workspace/*` (existing — Directory actions)
+- `book.togetherbook.net/api/wall/*` (added for Wall)
+
+Worker dispatches based on URL path inside `fetch()`.
+
+#### 11.8.7 Media URL handling
+
+`wall-media/*` paths in the repo are gated by Cloudflare Access on `book.togetherbook.net` (Access redirects bare `<img src>` requests to the login page → broken-image icon). All client-side renderers run paths through `mediaUrl(path)` which either:
+- passes absolute URLs (GIPHY) through, or
+- rewrites repo-relative paths to `https://richmondbot2000-prog.github.io/togetherbook/<path>` (the intentionally-public GitHub Pages mirror).
+
+#### 11.8.8 Quiet Edition design conformance
+
+The Wall went through a senior design review (commit `Wall v4`) to fit Storybook Ledger / Quiet Edition:
+
+- Posts render as hairline-divided rows (no card chrome). Compose is the only true card; brass-500 left rule + italic "a new page" eyebrow.
+- Body in Newsreader (`--font-display`) 16/15 px @ 1.55 line-height — editorial voice consistent with the rest of the site.
+- Timestamps render as italic uppercase overlines (`WED, 15 MAY 2026 · 09:36`) wrapped in `<time datetime>`.
+- Reactions are typographic italic verbs (per the table above), not emoji glyphs. "Is-mine" reaction gets a 1px brass-500 underline.
+- Action bar = thumb-icon **Like** (typographic state label) + comment-icon **Comment**. No Share (internal app; everyone's already on the same site).
+- Empty state: `❦` fleuron + italic "No pages yet. Write the first.".
+- Loading state: italic "Reading the wall…".
+- All modals (confirm, GIF picker, lightbox) drop box-shadow / border-radius and use brass left-rule + italic-button affordances.
+- Avatars carry a 1px brass-300 ring; initials fall back via attached `error` listener (not inline `onerror`).
+- All touch targets ≥44 pt; focus rings pass WCAG 2.2 3:1.
 
 ---
 
