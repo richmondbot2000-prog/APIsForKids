@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Wall</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778837533">
-<link rel="stylesheet" href="quiet.css?v=1778837533">
-<link rel="stylesheet" href="quiet-extras.css?v=1778837533">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778843200">
+<link rel="stylesheet" href="quiet.css?v=1778843200">
+<link rel="stylesheet" href="quiet-extras.css?v=1778843200">
 <style>
   /* 648 px column — sweet spot per editorial line-length research
      (60–75 chars per line at 15 px body). Wider feels marketing-y. */
@@ -467,8 +467,11 @@
     text-align: center; box-sizing: border-box;
   }
 
-  /* Notifications dropdown */
-  .wl-notif-anchor { position: fixed; top: 16px; right: 16px; z-index: 1000; }
+  /* Sit below the topbar (72 / 64 / 56 px tall at the three breakpoints)
+     so the bell never overlaps the brand or nav links. */
+  .wl-notif-anchor { position: fixed; top: 84px; right: 16px; z-index: 1000; }
+  @media (max-width: 960px) { .wl-notif-anchor { top: 76px; } }
+  @media (max-width: 480px) { .wl-notif-anchor { top: 68px; right: 12px; } }
   .wl-notif-btn {
     background: var(--paper-50);
     border: 1px solid var(--paper-300);
@@ -541,7 +544,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778837533" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778843200" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -869,7 +872,7 @@
           <button class="wl-gif-close" aria-label="Close">${icon("close", false)}</button>
         </div>
         <div class="wl-gif-grid" id="wlGifGrid"><div class="wl-loading">Loading…</div></div>
-        <div class="wl-gif-attribution">via Tenor</div>
+        <div class="wl-gif-attribution">Powered by GIPHY</div>
       </div>`;
     document.body.appendChild(root);
     const input = root.querySelector("#wlGifQuery");
@@ -1300,13 +1303,18 @@
         const ok = await confirmDialog("Delete this post?", "The post + all its comments will be permanently removed. This cannot be undone.");
         if (!ok) return;
         try {
-          await wallAction("delete", { kind: "post", id });
+          const res = await wallAction("delete", { kind: "post", id });
+          if (!res || res.ok === false) {
+            throw new Error((res && res.error) || "Delete did not return success");
+          }
           const i = posts.findIndex(p => p.id === id);
           if (i >= 0) posts.splice(i, 1);
+          document.querySelectorAll(`[data-post="${cssAttr(id)}"]`).forEach(n => n.remove());
           renderFeed(); renderNotifications();
-          showBanner("Deleted");
+          showBanner("Post deleted");
         } catch (err) {
-          showBanner(err.message || String(err), true);
+          showBanner("Delete failed: " + (err.message || String(err)), true);
+          console.error("[wall] delete failed", err);
         }
       });
     });
@@ -1315,7 +1323,7 @@
         const [pid, cid] = el.dataset.deleteComment.split("::");
         const post = posts.find(p => p.id === pid);
         const c = post && (post.comments || []).find(x => x.id === cid);
-        const isReply = c && c.parent_comment_id;
+        const isReply = !!(c && c.parent_comment_id);
         const ok = await confirmDialog(
           `Delete this ${isReply ? "reply" : "comment"}?`,
           isReply
@@ -1324,15 +1332,23 @@
         );
         if (!ok) return;
         try {
-          await wallAction("delete", { kind: "comment", post_id: pid, id: cid });
+          const res = await wallAction("delete", { kind: "comment", post_id: pid, id: cid });
+          if (!res || res.ok === false) {
+            throw new Error((res && res.error) || "Delete did not return success");
+          }
           if (post) {
-            // Remove the comment AND any replies to it (one level deep — that's the cap).
+            // Remove the comment AND any replies to it (one-level cap).
             post.comments = (post.comments || []).filter(c => c.id !== cid && c.parent_comment_id !== cid);
           }
+          // Defensive DOM removal — even if some render bug stopped the
+          // post.comments mutation from clearing the visible row, drop the
+          // matching DOM node now.
+          document.querySelectorAll(`[data-comment="${cssAttr(cid)}"]`).forEach(n => n.remove());
           sortPosts(); renderFeed(); renderNotifications();
-          showBanner("Deleted");
+          showBanner(isReply ? "Reply deleted" : "Comment deleted");
         } catch (err) {
-          showBanner(err.message || String(err), true);
+          showBanner("Delete failed: " + (err.message || String(err)), true);
+          console.error("[wall] delete failed", err);
         }
       });
     });

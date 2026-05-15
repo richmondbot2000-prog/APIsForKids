@@ -1436,31 +1436,34 @@ async function wallDelete(env, viewerEmail, body) {
   return { ok: true, kind, id };
 }
 
-// Proxy Tenor v2 /search so the API key stays a Worker secret instead of
-// being exposed to every page load. Caller passes ?q=string&limit=24.
+// Proxy GIPHY v1 /search (or /trending for empty query). Was Tenor in v3
+// but Google announced Tenor API service discontinuation in Jan 2026 —
+// new API clients aren't being accepted, so we moved to GIPHY which still
+// has an open developer-key flow. API key stays a Worker secret.
 async function wallGifSearch(env, body) {
   const q = (body.q || "").toString().trim();
   const limit = Math.min(parseInt(body.limit, 10) || 24, 50);
-  if (!env.TENOR_API_KEY) {
-    throw new Error("TENOR_API_KEY not configured on the worker — add it in Cloudflare Worker secrets");
+  if (!env.GIPHY_API_KEY) {
+    throw new Error("GIPHY_API_KEY not configured on the worker — add it in Cloudflare Worker secrets");
   }
-  const url = new URL("https://tenor.googleapis.com/v2/" + (q ? "search" : "featured"));
-  url.searchParams.set("key", env.TENOR_API_KEY);
-  url.searchParams.set("client_key", "togetherbook-wall");
+  const endpoint = q ? "search" : "trending";
+  const url = new URL(`https://api.giphy.com/v1/gifs/${endpoint}`);
+  url.searchParams.set("api_key", env.GIPHY_API_KEY);
   url.searchParams.set("limit", String(limit));
-  url.searchParams.set("media_filter", "tinygif,gif,mp4");
-  url.searchParams.set("contentfilter", "medium");
+  url.searchParams.set("rating", "pg-13");
   if (q) url.searchParams.set("q", q);
   const res = await fetch(url.toString());
-  if (!res.ok) throw new Error(`Tenor search failed: HTTP ${res.status}`);
+  if (!res.ok) throw new Error(`GIPHY search failed: HTTP ${res.status}`);
   const data = await res.json();
-  const results = (data.results || []).map(r => ({
+  const results = (data.data || []).map(r => ({
     id: r.id,
-    title: r.content_description || r.title || "",
-    preview: r.media_formats?.tinygif?.url || r.media_formats?.gif?.url,
-    url: r.media_formats?.gif?.url || r.media_formats?.tinygif?.url,
-    width: r.media_formats?.gif?.dims?.[0] || 0,
-    height: r.media_formats?.gif?.dims?.[1] || 0,
+    title: r.title || "",
+    // tinygif-equivalent for the picker grid (small, fast):
+    preview: r.images?.fixed_height_small?.url || r.images?.fixed_width_small?.url || r.images?.preview_gif?.url,
+    // Full-size for the actual post:
+    url: r.images?.original?.url || r.images?.downsized?.url,
+    width:  parseInt(r.images?.original?.width  || "0", 10),
+    height: parseInt(r.images?.original?.height || "0", 10),
   })).filter(r => r.preview && r.url);
   return { ok: true, results };
 }
