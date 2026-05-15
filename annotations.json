@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-15T23:04:17.248Z",
+  "updated_at": "2026-05-15T23:04:47.760Z",
   "annotations": {
     "adnan.turken@letme.co.uk": {
       "directory_photo_uploaded_at": "2026-05-14T09:09:07+01:00"
@@ -195,6 +195,9 @@
       "line_manager": "james.benamor@letme.com"
     },
     "alerts@togetherloans.com": {
+      "line_manager": "james.benamor@letme.com"
+    },
+    "autobots@clearloans.com.au": {
       "line_manager": "james.benamor@letme.com"
     }
   }
