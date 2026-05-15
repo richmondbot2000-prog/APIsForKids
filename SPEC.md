@@ -1230,13 +1230,13 @@ The CSV is the auditable ground truth — every classification on the chart is o
 
 ### 11.8 Wall page (`wall.html`)
 
-Internal company social feed for the ~200 Cloudflare-Access-authenticated staff. Anyone signed in can post; reactions, comments, replies, and notifications all flow through the workspace Worker.
+Internal company social feed for the ~200 Cloudflare-Access-authenticated staff. Anyone signed in can post; reactions, comments, replies, link previews, and notifications all flow through the workspace Worker.
 
 #### 11.8.1 Files
 
 | Asset | Purpose |
 |---|---|
-| `wall.html` | the whole page — markup + CSS + JS in one file |
+| `wall.html` | the whole page — markup + CSS + JS in one file (~2,000 lines) |
 | `wall.json` | append-only post store (FIFO-trimmed at 2000 posts) |
 | `wall-seen.json` | per-user last-seen-at map (`{ by_user: { email: { posts: { id: at }, last_marked_at } } }`) |
 | `wall-media/` | committed photo + video uploads (one file per attachment) |
@@ -1281,28 +1281,63 @@ Internal company social feed for the ~200 Cloudflare-Access-authenticated staff.
 }
 ```
 
-Reaction storage is emoji-keyed (so legacy data round-trips and historic reactions stay visible) but **display** is typographic per `REACTION_META` in `wall.html`:
+Reactions are stored and displayed as **real emoji glyphs** (Facebook-style). Each glyph picks up a per-emoji CSS keyframe (`wl-thumb`, `wl-heart`, etc.) when the user hovers a like-button or it sits in a reaction pill. `REACTION_META` in `wall.html`:
 
-| Storage key | Display verb | Past tense (notifications) | Colour token |
+| Storage key | Display label | Past tense (notifications) | Anim key |
 |---|---|---|---|
-| 👍 | Noted     | noted              | `--ink-700`  |
-| ❤️ | Loved     | loved              | `--red-500`  |
-| 😂 | Smiled    | smiled at          | `--brass-600`|
-| 😮 | Surprised | was surprised by   | `--teal-500` |
-| 😢 | Mourned   | mourned            | `--ink-600`  |
-| 🎉 | Celebrated| celebrated         | `--sage-600` |
+| 👍 | Like      | liked              | `thumb` |
+| ❤️ | Love      | loved              | `heart` |
+| 😂 | Haha      | laughed at         | `haha`  |
+| 😮 | Wow       | was wowed by       | `wow`   |
+| 😢 | Sad       | was sad at         | `sad`   |
+| 🎉 | Celebrate | celebrated         | `party` |
 
-#### 11.8.3 Feed sorting + comments + notifications
+Tapping the action-bar Like applies the default 👍; **hovering** the Like button opens the picker (touch long-press is the fallback). Tap the same Like again to remove the reaction; tap a different emoji to switch.
 
-- **Posts** sort by most-recent-activity (max of `created_at` and every `comment.created_at`) descending.
-- **Comments** sort ascending (oldest → newest) under each post. Newest 2 shown by default with a "View N earlier comments" toggle.
-- **Replies** sort ascending under each comment. One level of nesting only (the FB consensus); a "reply-to-reply" attempts get their `parent_comment_id` set to the same top-level comment.
-- **Body truncation** uses CSS `-webkit-line-clamp: 4` (kicks in above ~240 chars) with a `<button class="wl-see-more">See more</button>` toggle below.
-- **Notifications:** for the post author, every new (a) comment, (b) reply, or (c) "added" `react_event` whose `at` is greater than `wall-seen.json → by_user[viewer] → posts[postId]`. Bell badge at top-right + red `(N)` next to the **Wall** topbar link. Mark-all-read calls `/api/wall/mark-seen` which stamps each owned post id with the current timestamp.
+#### 11.8.3 Feed layout — compact tiles, single-expand, pagination
 
-#### 11.8.4 Worker endpoints (`/api/wall/*`)
+The feed defaults to **compact tiles**, with one post fully expanded at a time. Tapping anywhere on a compact tile expands it (and collapses any other expanded post). This is the load-bearing layout decision — without it, a single 10,000-char post + 10 photos can fill the entire viewport.
 
-All endpoints require a Cloudflare Access JWT. Identity is the `Cf-Access-Authenticated-User-Email` header. Optional `Cf-Access-Authenticated-User-Name` improves the stored display name; falls back to email local-part.
+| State    | Renderer                | Content shown |
+|----------|-------------------------|---------------|
+| Compact  | `renderPostCompact`     | head; body teaser capped at 250 chars; photo strip (max 4 thumbnails at 56 px + "+N" overflow); YouTube embed / OG link-preview if any; reaction + comment counts; most recent today-comment teaser (100 chars); action bar |
+| Expanded | `renderPostExpanded`    | head; full body with line-clamp + "See more"; full photo grid; YouTube embed / OG link-preview; reaction pills; action bar; comment composer; all comments with reply composers |
+
+Click-to-expand uses `data-expand-card` on the article + `data-stop-card-click` on action-bar / trash / link descendants. The `keydown` handler accepts Enter/Space when the article itself is focused (role=button + tabindex=0). After expanding, the post is `scrollIntoView({ block: "nearest" })`.
+
+**Pagination:** 20 posts per page (`POSTS_PER_PAGE = 20`). A `<nav class="wl-pagination">` strip at the bottom of the feed renders `← Newer / Page N of M / Older →` italic-Newsreader buttons. Composing a new post resets to page 0 so the author sees their own post. Switching pages clears `expandedPostIds`.
+
+**Sorting and comments:**
+- Posts sort by most-recent-activity (max of `created_at` and every `comment.created_at`) descending.
+- Comments sort ascending (oldest → newest); newest 2 shown by default + "View N earlier comments" toggle in expanded view.
+- Replies sort ascending under each comment. One level of nesting only.
+- Compact teasers use a Unicode `…` ellipsis on word boundaries (no clamp).
+- Expanded full-body uses CSS `-webkit-line-clamp: 4` with a `<button class="wl-see-more">See more</button>` toggle.
+
+**Notifications:** for the post author, every new (a) comment, (b) reply, or (c) "added" `react_event` whose `at` is greater than `wall-seen.json → by_user[viewer] → posts[postId]`. Bell badge at top-right + red `(N)` next to the **Wall** topbar link. Mark-all-read calls `/api/wall/mark-seen` which stamps each owned post id with the current timestamp.
+
+#### 11.8.4 URL handling — linkify, YouTube embed, OG link previews
+
+The Wall renderer treats `http(s)://` URLs inside a post body in three layered ways:
+
+1. **Linkify in body text** — `linkifyBody()` wraps every URL in `<a class="wl-post-link" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();">`. The `stopPropagation` is critical: without it a URL click would bubble to the compact card's expand handler.
+2. **YouTube embed** — `matchYouTube()` recognises `youtu.be/<id>`, `youtube.com/watch?v=<id>`, `/embed/<id>`, and `/shorts/<id>`. Matches render a 16:9 `<iframe>` against `youtube-nocookie.com/embed/<id>` with `loading="lazy"`, `allowfullscreen`, and `referrerpolicy="strict-origin-when-cross-origin"`. Renders in both compact and expanded view.
+3. **OG link-preview card** — non-YouTube URLs render a `<a class="wl-link-preview" data-link-preview="<url>">` card with a 144×96 thumbnail + host overline + 2-line clamped title + 2-line clamped description. `hydrateLinkPreviews()` walks every `[data-link-preview]` after each `renderFeed`, fetches `/api/wall/link-preview` once per URL, caches the response in an in-memory `linkPreviewCache`, and re-paints every mounted card for that URL.
+
+Up to **3 distinct URLs per post** render their own block (deduped). The loading state is a `Loading preview…` italic placeholder.
+
+#### 11.8.5 Share + deep-links
+
+The action bar carries **Like / Comment / Share** on BOTH the compact and expanded views. Share copies `${location.origin}/wall.html#post-<id>` to the clipboard (`navigator.clipboard.writeText` with a `prompt()` fallback for browsers that block clipboard writes). On page load, if `location.hash` matches `#post-<id>`:
+
+1. Find the post in the sorted feed.
+2. Set `currentPage = Math.floor(idx / POSTS_PER_PAGE)`.
+3. Add the post id to `expandedPostIds`.
+4. After the first render, `scrollIntoView({ block: "start" })` on the matching `<article>`.
+
+#### 11.8.6 Worker endpoints (`/api/wall/*`)
+
+All endpoints require a Cloudflare Access JWT. Identity is the `Cf-Access-Authenticated-User-Email` header. Optional `Cf-Access-Authenticated-User-Name` improves the stored display name; falls back to email local-part. Ten endpoints total:
 
 | Path | Body | Returns |
 |---|---|---|
@@ -1314,15 +1349,23 @@ All endpoints require a Cloudflare Access JWT. Identity is the `Cf-Access-Authen
 | `upload-media` | `{ data_url, kind: "photo"|"video"|"gif" }` | `{ path, kind, mime }` writes to `wall-media/<id>.<ext>` |
 | `gif-search` | `{ q, limit }` | `{ results: [{id, title, preview, url}] }` proxies GIPHY (was Tenor — Google discontinued the Tenor API for new clients Jan 2026) |
 | `delete` | `{ kind: "post"|"comment", id, post_id? }` | author-or-admin only; cascades to a comment's replies |
+| `link-preview` | `{ url }` | `{ ok, url, host, title, description, image, site_name }` |
+
+**`link-preview` specifics:**
+- SSRF guard: refuses `localhost`, `127.*`, `10.*`, `192.168.*`, `169.254.*`, `0.0.0.0`.
+- Upstream timeout: 8 s (`AbortController`).
+- Response cap: 1 MB streamed read (OG meta lives in `<head>` so capping is safe).
+- Meta extraction order: `og:title` → `twitter:title` → `<title>`; description from `og:description` → `twitter:description` → `<meta name="description">`; image from `og:image` → `twitter:image`; site name from `og:site_name`.
+- HTML-entity decode handles `&amp; &lt; &gt; &quot; &#39; &#x27; &#NNN;` so titles render cleanly.
 
 Both the wall.json store and wall-seen.json use the shared `updateGhJson` helper with **retry-on-409** so concurrent writers can't lose data. UTF-8 decode on read (atob → `TextDecoder('utf-8')`) so emoji round-trip cleanly.
 
-#### 11.8.5 Worker secrets
+#### 11.8.7 Worker secrets
 
 - `GITHUB_TOKEN` — Contents API write (same token as `apifk-workspace-worker2`)
 - `GIPHY_API_KEY` — only needed for the GIF picker; everything else still works without it
 
-#### 11.8.6 Cloudflare routing
+#### 11.8.8 Cloudflare routing
 
 Two routes hit `apifk-workspace-worker2`:
 - `book.togetherbook.net/api/workspace/*` (existing — Directory actions)
@@ -1330,21 +1373,23 @@ Two routes hit `apifk-workspace-worker2`:
 
 Worker dispatches based on URL path inside `fetch()`.
 
-#### 11.8.7 Media URL handling
+#### 11.8.9 Media URL handling
 
 `wall-media/*` paths in the repo are gated by Cloudflare Access on `book.togetherbook.net` (Access redirects bare `<img src>` requests to the login page → broken-image icon). All client-side renderers run paths through `mediaUrl(path)` which either:
 - passes absolute URLs (GIPHY) through, or
 - rewrites repo-relative paths to `https://richmondbot2000-prog.github.io/togetherbook/<path>` (the intentionally-public GitHub Pages mirror).
 
-#### 11.8.8 Quiet Edition design conformance
+#### 11.8.10 Quiet Edition design conformance
 
 The Wall went through a senior design review (commit `Wall v4`) to fit Storybook Ledger / Quiet Edition:
 
-- Posts render as hairline-divided rows (no card chrome). Compose is the only true card; brass-500 left rule + italic "a new page" eyebrow.
+- Posts render as hairline-divided rows (no card chrome). The compose box is the only true card on the page; brass-500 left rule, no eyebrow (the "a new page" overline was removed 2026-05-15).
+- Compose placeholder reads "Tell the team something they should know" (italic Newsreader, `--ink-500`).
+- Post top/bottom hairlines use `--ink-500` (`#6B7794`, a 50%-luminance grey-blue) — replaced the original `--divider` (12%-opacity ink) which read as light brown against cream paper.
 - Body in Newsreader (`--font-display`) 16/15 px @ 1.55 line-height — editorial voice consistent with the rest of the site.
 - Timestamps render as italic uppercase overlines (`WED, 15 MAY 2026 · 09:36`) wrapped in `<time datetime>`.
-- Reactions are typographic italic verbs (per the table above), not emoji glyphs. "Is-mine" reaction gets a 1px brass-500 underline.
-- Action bar = thumb-icon **Like** (typographic state label) + comment-icon **Comment**. No Share (internal app; everyone's already on the same site).
+- Reactions render as real emoji glyphs (Apple emoji on cream paper). Hovering Like opens a 6-emoji picker via paired show/hide timers + outside-click listener with anchor exclusion.
+- Action bar = `Like` (thumb-icon, switches to the selected emoji when active) + `Comment` (comment-icon) + `Share` (share-icon). Three-column grid above which a hairline `--ink-300` rule sits.
 - Empty state: `❦` fleuron + italic "No pages yet. Write the first.".
 - Loading state: italic "Reading the wall…".
 - All modals (confirm, GIF picker, lightbox) drop box-shadow / border-radius and use brass left-rule + italic-button affordances.
