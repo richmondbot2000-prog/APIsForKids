@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-15T23:04:57.906Z",
+  "updated_at": "2026-05-15T23:05:41.583Z",
   "annotations": {
     "adnan.turken@letme.co.uk": {
       "directory_photo_uploaded_at": "2026-05-14T09:09:07+01:00"
@@ -201,6 +201,9 @@
       "line_manager": "james.benamor@letme.com"
     },
     "medallion@togetherloans.com": {
+      "line_manager": "james.benamor@letme.com"
+    },
+    "azure@letme.com": {
       "line_manager": "james.benamor@letme.com"
     }
   }
