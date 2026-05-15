@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-15T14:24:00.054Z",
+  "updated_at": "2026-05-15T14:24:09.855Z",
   "posts": [
     {
       "id": "post_mp6zxv0t_4pj7yu",
@@ -23,11 +23,7 @@
       "body": "This is a new story, about this You Tube video that I saw\n\nhttps://youtu.be/kGpsSw7pves?si=1ElwVgqoXN6_e_eV",
       "photos": [],
       "channel": null,
-      "reactions": {
-        "👍": [
-          "james.benamor@letme.com"
-        ]
-      },
+      "reactions": {},
       "comments": [
         {
           "id": "com_mp6zp153_1tvntf",
@@ -98,6 +94,14 @@
           "target_id": "post_mp6yfgd5_mbzshy",
           "at": "2026-05-15T14:17:17.323Z",
           "kind": "added"
+        },
+        {
+          "actor_email": "james.benamor@letme.com",
+          "emoji": "👍",
+          "target_kind": "post",
+          "target_id": "post_mp6yfgd5_mbzshy",
+          "at": "2026-05-15T14:24:09.660Z",
+          "kind": "removed"
         }
       ]
     },
