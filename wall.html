@@ -224,13 +224,13 @@
   .wl-post {
     background: transparent;
     border: none;
-    border-bottom: 1px solid var(--divider);
+    border-bottom: 1px solid var(--ink-500);
     border-radius: 0;
     margin: 0;
     padding: 24px 0 20px;
   }
   .wl-section > #wlFeed > .wl-post:first-of-type {
-    border-top: 1px solid var(--ink-300);
+    border-top: 1px solid var(--ink-500);
   }
   .wl-post-head { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
   .wl-post-head .wl-meta { flex: 1 1 auto; }
@@ -527,6 +527,153 @@
   }
   .wl-show-all-comments:hover { text-decoration: underline; color: var(--link-hover); }
 
+  /* Compact post tile (default in the feed). Click to expand. */
+  .wl-post--compact {
+    cursor: pointer;
+    transition: background 120ms ease;
+  }
+  .wl-post--compact:hover { background: var(--paper-100); }
+  .wl-post--compact:focus { outline: 2px solid var(--brass-500); outline-offset: -2px; }
+  .wl-post-body--teaser { margin-bottom: 6px; }
+  .wl-photo-strip {
+    display: flex; gap: 4px;
+    margin: 8px 0 6px;
+    overflow: hidden;
+  }
+  .wl-photo-strip img,
+  .wl-photo-strip .wl-photo-strip-more {
+    width: 56px; height: 56px;
+    object-fit: cover;
+    border: 1px solid var(--paper-300);
+    background: var(--paper-200);
+    flex-shrink: 0;
+  }
+  .wl-photo-strip-more {
+    display: flex; align-items: center; justify-content: center;
+    font: italic 500 12px/1 var(--font-display);
+    color: var(--ink-700);
+  }
+  .wl-compact-meta {
+    display: flex; gap: 14px; align-items: center;
+    margin: 4px 0 0;
+    font: 500 12px/1 var(--font-mono);
+    color: var(--ink-600);
+  }
+  .wl-compact-react { display: inline-flex; align-items: center; gap: 4px; }
+  .wl-compact-react .wl-emoji { font-size: 14px; }
+  .wl-compact-count.has-new { color: var(--red-500); font-weight: 700; }
+  .wl-recent-comment {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: var(--paper-100);
+    border-left: 2px solid var(--brass-300);
+    font: 400 13px/1.45 var(--font-display);
+    color: var(--ink-700);
+  }
+  .wl-recent-comment .wl-recent-name { font-weight: 600; color: var(--ink-900); }
+
+  /* Pagination strip at the bottom of the feed. */
+  .wl-pagination {
+    display: flex; justify-content: center; align-items: center; gap: 24px;
+    padding: 24px 0 8px;
+    font: italic 500 14px/1 var(--font-display);
+    color: var(--ink-700);
+  }
+  .wl-pagination button {
+    background: none; border: none;
+    color: var(--ink-800);
+    font: inherit;
+    cursor: pointer;
+    border-bottom: 1.5px solid var(--brass-300);
+    padding: 6px 4px;
+    min-height: 36px;
+  }
+  .wl-pagination button:hover:not(:disabled) {
+    color: var(--red-500); border-bottom-color: var(--red-500);
+  }
+  .wl-pagination button:disabled {
+    color: var(--ink-300); border-bottom-color: transparent;
+    cursor: default;
+  }
+  .wl-pagination .wl-page-num {
+    color: var(--ink-600);
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+  }
+
+  /* URL inside a post body — italic + brass underline, opens in new tab. */
+  .wl-post-link {
+    color: var(--teal-500);
+    text-decoration: none;
+    border-bottom: 1px solid var(--brass-300);
+    word-break: break-word;
+  }
+  .wl-post-link:hover { color: var(--red-500); border-bottom-color: var(--red-500); }
+
+  /* YouTube embed sits below the body, native 16:9. */
+  .wl-yt-embed {
+    margin: 10px 0 4px;
+    position: relative; width: 100%;
+    aspect-ratio: 16 / 9;
+    background: black;
+    border: 1px solid var(--paper-300);
+    overflow: hidden;
+  }
+  .wl-yt-embed iframe {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%; border: none;
+  }
+
+  /* Link-preview card */
+  .wl-link-preview {
+    display: flex; gap: 12px;
+    margin: 10px 0 4px;
+    padding: 12px 14px;
+    background: var(--paper-50);
+    border: 1px solid var(--paper-300);
+    border-left: 4px solid var(--brass-500);
+    text-decoration: none;
+    color: inherit;
+  }
+  .wl-link-preview:hover { border-color: var(--brass-500); }
+  .wl-link-preview .wl-link-thumb {
+    flex: 0 0 144px; height: 96px;
+    background: var(--paper-200);
+    overflow: hidden;
+    border: 1px solid var(--paper-300);
+  }
+  .wl-link-preview .wl-link-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .wl-link-preview .wl-link-body { flex: 1 1 auto; min-width: 0; }
+  .wl-link-preview .wl-link-host {
+    font: 400 10px/1 var(--font-mono);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-500);
+    margin-bottom: 4px;
+  }
+  .wl-link-preview .wl-link-title {
+    font: 600 15px/1.3 var(--font-display);
+    color: var(--ink-900); margin-bottom: 4px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .wl-link-preview .wl-link-desc {
+    font: 400 13px/1.4 var(--font-display);
+    color: var(--ink-700);
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .wl-link-preview .wl-link-thumb-empty {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font: italic 400 11px/1 var(--font-display);
+    color: var(--ink-500);
+  }
+  @media (max-width: 480px) {
+    .wl-link-preview .wl-link-thumb { flex-basis: 96px; height: 72px; }
+    .wl-link-preview .wl-link-title { font-size: 14px; }
+  }
+
   /* Photo grids — Facebook/LinkedIn pattern. Layout depends on count:
      1 → single image, native ratio, capped height, contain so screenshots
          don't get cropped (paper-200 backdrop fills the gaps).
@@ -726,7 +873,7 @@
       <div class="wl-compose-eyebrow">a new page</div>
       <div class="wl-compose-row">
         <div class="wl-avatar" id="wlMyAvatar">?</div>
-        <textarea id="wlComposeText" placeholder="Tell the rest of the team what's worth a page." maxlength="10000"></textarea>
+        <textarea id="wlComposeText" placeholder="Tell the team something they should know" maxlength="10000"></textarea>
       </div>
       <div class="wl-compose-previews" id="wlComposePreviews"></div>
       <div class="wl-compose-actions">
@@ -1110,38 +1257,82 @@
     return latest;
   }
 
+  // Posts have two states:
+  //   COMPACT (default in the feed) — author header, 250-char body
+  //     teaser, small media row, reaction + comment counts, and the
+  //     most recent today-comment as a 100-char teaser. The whole
+  //     article is clickable to expand.
+  //   EXPANDED — full body, full photo grid, action bar, all comments,
+  //     reply composers. Reached by clicking the compact card.
   function renderPost(post) {
+    const expanded = expandedPostIds.has(post.id);
+    return expanded ? renderPostExpanded(post) : renderPostCompact(post);
+  }
+
+  function renderPostHead(post) {
     const name = displayName(post.author_email, post.author_name);
     const photo = photoUrlFor(staffByEmail[(post.author_email || "").toLowerCase()] || {});
-    const expanded = expandedPostIds.has(post.id);
-    const bodyHtml = renderBody(post.body || "", post.id, expanded);
-    const photos = renderPhotos(post.photos || [], post.id);
-    const reactions = renderReactionPills(post.reactions || {}, post.id, "post");
-    // Channel rendered as italic register-tag (matches the .qb-register-tag
-     // pattern on index.html — italic small-caps in a muted ink/teal/sage).
     const channelTag = post.channel
       ? ` <span class="wl-channel-tag">${escapeHtml(post.channel)}</span>` : "";
+    const canDeletePost = canDelete(post.author_email);
+    return `
+      <div class="wl-post-head">
+        <div class="wl-avatar">${avatarInner(name, photo)}</div>
+        <div class="wl-meta">
+          <div class="wl-post-name">${escapeHtml(name)}${channelTag}</div>
+          <div class="wl-post-time">${formatTime(post.created_at)}</div>
+        </div>
+        ${canDeletePost ? `<div class="wl-post-head-actions"><button class="wl-delete-btn" data-delete-post="${escapeHtml(post.id)}" title="Delete this post" aria-label="Delete post" data-stop-card-click>${icon("trash", false)}</button></div>` : ""}
+      </div>`;
+  }
+
+  function renderPostCompact(post) {
     const comments = post.comments || [];
-    const cmCount = (comments || []).filter(c => !c.parent_comment_id).length;
+    const cmCount = comments.filter(c => !c.parent_comment_id).length;
+    const newCount = unseenCommentCount(post);
+    // Latest comment or reply made today (UTC slice — close enough)
+    const today = new Date().toISOString().slice(0, 10);
+    const recent = comments
+      .filter(c => (c.created_at || "").slice(0, 10) === today)
+      .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0] || null;
+    const myReaction = mineReactionOn(post.reactions || {});
+    const reactCount = Object.values(post.reactions || {}).reduce((n, arr) => n + arr.length, 0);
+    const body250 = bodyTeaser(post.body || "", 250);
+    const photoStrip = renderPhotoStrip(post.photos || [], post.id);
+    const recentLine = recent
+      ? `<div class="wl-recent-comment"><span class="wl-recent-name">${escapeHtml(displayName(recent.author_email, recent.author_name))}</span>: ${escapeHtml(bodyTeaser(recent.body || "(media)", 100))}</div>`
+      : "";
+    return `
+      <article class="wl-post wl-post--compact" data-post="${escapeHtml(post.id)}" id="post-${escapeHtml(post.id)}" data-expand-card="${escapeHtml(post.id)}" role="button" tabindex="0" aria-label="Open post for full view">
+        ${renderPostHead(post)}
+        <div class="wl-post-body wl-post-body--teaser">${linkifyBody(body250)}</div>
+        ${photoStrip}
+        <div class="wl-compact-meta">
+          ${reactCount > 0 ? `<span class="wl-compact-react">${myReaction ? emojiGlyph(myReaction) : emojiGlyph("👍")} ${reactCount}</span>` : ""}
+          ${cmCount > 0 ? `<span class="wl-compact-count ${newCount > 0 ? "has-new" : ""}">${cmCount} ${cmCount === 1 ? "comment" : "comments"}${newCount > 0 ? ` · ${newCount} new` : ""}</span>` : ""}
+        </div>
+        ${recentLine}
+      </article>`;
+  }
+
+  function renderPostExpanded(post) {
+    const bodyText = post.body || "";
+    const bodyHtml = enrichBody(bodyText);
+    const linkBlocks = renderLinkBlocks(bodyText, post.id);
+    const photos = renderPhotos(post.photos || [], post.id);
+    const reactions = renderReactionPills(post.reactions || {}, post.id, "post");
+    const comments = post.comments || [];
+    const cmCount = comments.filter(c => !c.parent_comment_id).length;
     const open = openPostIds.has(post.id);
     const newCount = unseenCommentCount(post);
     const myReaction = mineReactionOn(post.reactions || {});
     const likeActive = !!myReaction;
-    const likeIcon = myReaction || "👍";
-    const canDeletePost = canDelete(post.author_email);
     return `
       <article class="wl-post" data-post="${escapeHtml(post.id)}" id="post-${escapeHtml(post.id)}">
-        <div class="wl-post-head">
-          <div class="wl-avatar">${avatarInner(name, photo)}</div>
-          <div class="wl-meta">
-            <div class="wl-post-name">${escapeHtml(name)}${channelTag}</div>
-            <div class="wl-post-time">${formatTime(post.created_at)}</div>
-          </div>
-          ${canDeletePost ? `<div class="wl-post-head-actions"><button class="wl-delete-btn" data-delete-post="${escapeHtml(post.id)}" title="Delete this post" aria-label="Delete post">${icon("trash", false)}</button></div>` : ""}
-        </div>
-        <div class="wl-post-body${expanded || (post.body || "").length < 240 ? "" : " is-clamped"}" data-post-body="${escapeHtml(post.id)}">${bodyHtml}</div>
-        ${(post.body || "").length >= 240 && !expanded ? `<button type="button" class="wl-see-more" data-expand="${escapeHtml(post.id)}">See more</button>` : ""}
-        ${expanded && (post.body || "").length >= 240 ? `<button type="button" class="wl-see-more" data-expand="${escapeHtml(post.id)}" data-collapse="1">See less</button>` : ""}
+        ${renderPostHead(post)}
+        <div class="wl-post-body">${bodyHtml}</div>
+        ${linkBlocks}
+        <button type="button" class="wl-see-more" data-expand="${escapeHtml(post.id)}" data-collapse="1">Show less</button>
         ${photos}
         <div class="wl-reaction-summary">
           <div>${reactions}</div>
@@ -1150,7 +1341,7 @@
           </span>
         </div>
         <div class="wl-action-bar">
-          <button class="wl-action wl-action-like ${likeActive ? "is-active" : ""}" data-like="${escapeHtml(post.id)}" data-kind="post" title="Tap to ${likeActive ? "remove your reaction" : "Like"}; long-press to pick a different reaction">
+          <button class="wl-action wl-action-like ${likeActive ? "is-active" : ""}" data-like="${escapeHtml(post.id)}" data-kind="post" title="Tap to ${likeActive ? "remove your reaction" : "Like"}; hover to pick a different reaction">
             <span class="wl-action-icon">${likeActive ? emojiGlyph(myReaction) : icon("thumb", false)}</span>
             <span class="wl-action-label">${likeActive ? reactionLabel(myReaction) : "Like"}</span>
           </button>
@@ -1164,8 +1355,72 @@
           <input class="wl-comment-input" type="text" placeholder="Add a comment…" data-add-comment="${escapeHtml(post.id)}" ${viewerEmail ? "" : "disabled"} maxlength="2000">
           ${commentAttachButtons(post.id, "")}
         </div>
-        ${renderComments(post, open)}
+        ${renderComments(post, true)}
       </article>`;
+  }
+
+  function bodyTeaser(s, n) {
+    const t = (s || "").trim().replace(/\s+/g, " ");
+    return t.length <= n ? t : t.slice(0, n - 1) + "…";
+  }
+
+  // URL → clickable link with brass-underline styling. Used in compact
+  // body teasers + the expanded body. Doesn't try to be RFC-perfect —
+  // matches http(s):// URLs up to whitespace.
+  const URL_RX = /\b(https?:\/\/[^\s<>"']+)/g;
+  function linkifyBody(escapedText) {
+    // Caller passes already-escapeHtml'd text.
+    return escapedText.replace(URL_RX, (m) => {
+      const safe = m.replace(/"/g, "&quot;");
+      return `<a class="wl-post-link" href="${safe}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();">${m}</a>`;
+    });
+  }
+  function enrichBody(rawText) {
+    return linkifyBody(escapeHtml(rawText || ""));
+  }
+
+  // Detect YouTube vs other URLs in the body, render the appropriate
+  // block below the body in expanded view.
+  function renderLinkBlocks(rawText, postId) {
+    const urls = (rawText || "").match(URL_RX) || [];
+    if (!urls.length) return "";
+    const seen = new Set();
+    return urls.filter(u => !seen.has(u) && seen.add(u)).slice(0, 3).map(url => {
+      const yt = matchYouTube(url);
+      if (yt) {
+        return `<div class="wl-yt-embed"><iframe src="https://www.youtube-nocookie.com/embed/${escapeHtml(yt)}" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`;
+      }
+      return `<a class="wl-link-preview" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" data-link-preview="${escapeHtml(url)}" data-post="${escapeHtml(postId)}" onclick="event.stopPropagation();">
+                <div class="wl-link-thumb"><div class="wl-link-thumb-empty">Loading preview…</div></div>
+                <div class="wl-link-body">
+                  <div class="wl-link-host">${escapeHtml(safeHost(url))}</div>
+                  <div class="wl-link-title">${escapeHtml(url)}</div>
+                  <div class="wl-link-desc">Loading…</div>
+                </div>
+              </a>`;
+    }).join("");
+  }
+  function matchYouTube(url) {
+    // youtu.be/<id> or youtube.com/watch?v=<id> or /embed/<id> or /shorts/<id>
+    let m = url.match(/youtu\.be\/([\w-]{6,})/);
+    if (m) return m[1];
+    m = url.match(/youtube\.com\/(?:watch\?[^"\s]*?\bv=|embed\/|shorts\/|v\/)([\w-]{6,})/);
+    if (m) return m[1];
+    return null;
+  }
+  function safeHost(url) {
+    try { return new URL(url).host; } catch (e) { return ""; }
+  }
+
+  // Compact-view photo strip — small thumbnails (52 px), max 4 visible.
+  function renderPhotoStrip(photos, postId) {
+    if (!photos || !photos.length) return "";
+    const shown = photos.slice(0, 4);
+    const extra = photos.length - shown.length;
+    return `<div class="wl-photo-strip">` +
+      shown.map(p => `<img class="wl-media-img" src="${escapeHtml(mediaUrl(p))}" alt="" loading="lazy">`).join("") +
+      (extra > 0 ? `<div class="wl-photo-strip-more">+${extra}</div>` : "") +
+      `</div>`;
   }
 
   function canDelete(authorEmail) {

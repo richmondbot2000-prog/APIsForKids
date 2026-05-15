@@ -1344,6 +1344,7 @@ async function handleWall(req, env, url) {
       case "upload-media": return json(await wallUploadMedia(env, viewerEmail, body), 200, req);
       case "gif-search":   return json(await wallGifSearch(env, body), 200, req);
       case "delete":       return json(await wallDelete(env, viewerEmail, body), 200, req);
+      case "link-preview": return json(await wallLinkPreview(env, body), 200, req);
       default:             return json({ error: `unknown wall action: ${action}` }, 404, req);
     }
   } catch (e) {
@@ -1434,6 +1435,97 @@ async function wallDelete(env, viewerEmail, body) {
   }, `Wall: ${kind} ${id} deleted by ${viewerEmail}`);
 
   return { ok: true, kind, id };
+}
+
+// Server-side OpenGraph scraper for the page's link-preview cards. The
+// page can't fetch arbitrary URLs from the browser (CORS), so the Worker
+// pulls the page on its behalf, extracts og:title / og:description /
+// og:image / og:site_name, and returns the structured result. Caps the
+// fetch at 1 MB / 8 s to avoid the Worker hammering big pages.
+async function wallLinkPreview(env, body) {
+  const u = (body.url || "").toString().trim();
+  if (!/^https?:\/\//i.test(u)) throw new Error("url must be http:// or https://");
+  let target;
+  try { target = new URL(u); } catch (e) { throw new Error("malformed url"); }
+  // Cheap SSRF guard — refuse private / metadata ranges.
+  if (/^(localhost|127\.|10\.|192\.168\.|169\.254\.|0\.0\.0\.0)/i.test(target.hostname)) {
+    throw new Error("blocked host");
+  }
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8000);
+  let html = "";
+  try {
+    const res = await fetch(target.toString(), {
+      method: "GET",
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; TogetherBookWall/1.0; +https://book.togetherbook.net)",
+        "Accept": "text/html,application/xhtml+xml",
+        "Accept-Language": "en,en-GB;q=0.9",
+      },
+      signal: ctrl.signal,
+      redirect: "follow",
+    });
+    if (!res.ok) throw new Error(`upstream HTTP ${res.status}`);
+    // Read at most 1 MB. Many sites are >5 MB but OG tags are in <head>.
+    const reader = res.body.getReader();
+    const chunks = [];
+    let total = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.length;
+      chunks.push(value);
+      if (total >= 1024 * 1024) { try { reader.cancel(); } catch (e) {} break; }
+    }
+    html = new TextDecoder("utf-8").decode(concatUint8(chunks));
+  } finally {
+    clearTimeout(timer);
+  }
+
+  // <head> stops at the first <body> tag — restrict scraping there.
+  const headEnd = html.search(/<\/head>|<body[\s>]/i);
+  const head = headEnd > 0 ? html.slice(0, headEnd) : html.slice(0, 50000);
+
+  const meta = (name) => {
+    // Match <meta property="og:foo" content="bar"> OR content-first ordering.
+    const re1 = new RegExp(`<meta[^>]+(?:property|name)\\s*=\\s*["']${name}["'][^>]*content\\s*=\\s*["']([^"']+)["']`, "i");
+    const re2 = new RegExp(`<meta[^>]+content\\s*=\\s*["']([^"']+)["'][^>]*(?:property|name)\\s*=\\s*["']${name}["']`, "i");
+    const m = head.match(re1) || head.match(re2);
+    return m ? m[1].trim() : "";
+  };
+  const stripTags = s => s.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  const decode = s => s
+    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#x27;/gi, "'")
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(parseInt(n, 10)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)));
+
+  let title = decode(meta("og:title") || meta("twitter:title"));
+  if (!title) {
+    const t = head.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+    if (t) title = decode(stripTags(t[1]));
+  }
+  const description = decode(meta("og:description") || meta("twitter:description") || meta("description"));
+  const image = decode(meta("og:image") || meta("twitter:image"));
+  const siteName = decode(meta("og:site_name"));
+
+  return {
+    ok: true,
+    url: target.toString(),
+    host: target.host,
+    title:       title.slice(0, 300),
+    description: description.slice(0, 600),
+    image:       image && image.startsWith("//") ? "https:" + image : image,
+    site_name:   siteName.slice(0, 80),
+  };
+}
+
+function concatUint8(chunks) {
+  let len = 0; for (const c of chunks) len += c.length;
+  const out = new Uint8Array(len);
+  let o = 0;
+  for (const c of chunks) { out.set(c, o); o += c.length; }
+  return out;
 }
 
 // Proxy GIPHY v1 /search (or /trending for empty query). Was Tenor in v3
