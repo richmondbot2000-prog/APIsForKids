@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Wall</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778854436">
-<link rel="stylesheet" href="quiet.css?v=1778854436">
-<link rel="stylesheet" href="quiet-extras.css?v=1778854436">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778854813">
+<link rel="stylesheet" href="quiet.css?v=1778854813">
+<link rel="stylesheet" href="quiet-extras.css?v=1778854813">
 <style>
   /* 648 px column — sweet spot per editorial line-length research
      (60–75 chars per line at 15 px body). Wider feels marketing-y. */
@@ -692,7 +692,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778854436" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778854813" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1603,29 +1603,42 @@
     });
   }
 
-  // Tap a Like button = toggle default reaction. Long-press (450 ms) opens
-  // the 6-emoji picker. Works on both desktop (mouse) and touch.
+  // Like button behaviour:
+  //   - Desktop: hover for ~200 ms → emoji picker fades in. Cursor can
+  //     travel into the picker (the picker's own mouseenter cancels the
+  //     hide timer). Picker hides 220 ms after the cursor leaves both.
+  //   - Touch: long-press 450 ms → picker.
+  //   - Click (either input): toggles the user's current reaction
+  //     (default 👍) without opening the picker.
   function attachLikeButton(el) {
-    let timer = null, longPressFired = false;
-    const start = (ev) => {
+    const openWithCallback = () => openEmojiPicker(el, async emoji => {
+      await reactTo(el.dataset.like, el.dataset.kind, emoji);
+    });
+    // Desktop hover-open / leave-hide
+    el.addEventListener("mouseenter", () => {
+      clearTimeout(pickerHideTimer); pickerHideTimer = null;
+      clearTimeout(pickerShowTimer);
+      pickerShowTimer = setTimeout(openWithCallback, 220);
+    });
+    el.addEventListener("mouseleave", () => {
+      clearTimeout(pickerShowTimer); pickerShowTimer = null;
+      clearTimeout(pickerHideTimer);
+      pickerHideTimer = setTimeout(closeEmojiPicker, 320);
+    });
+    // Touch long-press fallback (no hover on touch devices)
+    let touchTimer = null, longPressFired = false;
+    el.addEventListener("touchstart", () => {
       longPressFired = false;
-      timer = setTimeout(() => {
-        longPressFired = true;
-        openEmojiPicker(el, async emoji => {
-          await reactTo(el.dataset.like, el.dataset.kind, emoji);
-        });
-      }, 450);
-    };
-    const cancel = () => { if (timer) { clearTimeout(timer); timer = null; } };
-    el.addEventListener("mousedown", start);
-    el.addEventListener("touchstart", start, { passive: true });
-    el.addEventListener("mouseup", cancel);
-    el.addEventListener("mouseleave", cancel);
-    el.addEventListener("touchend", cancel);
-    el.addEventListener("touchcancel", cancel);
+      touchTimer = setTimeout(() => { longPressFired = true; openWithCallback(); }, 450);
+    }, { passive: true });
+    const cancelTouch = () => { if (touchTimer) { clearTimeout(touchTimer); touchTimer = null; } };
+    el.addEventListener("touchend", cancelTouch);
+    el.addEventListener("touchcancel", cancelTouch);
+    // Click — toggle current/default reaction. Ignored when the touch
+    // long-press already opened the picker.
     el.addEventListener("click", async (ev) => {
       if (longPressFired) { ev.preventDefault(); return; }
-      // Default reaction: if you already reacted, remove that; otherwise add 👍.
+      clearTimeout(pickerShowTimer); pickerShowTimer = null;
       const post = posts.find(p => p.id === el.dataset.like)
                  || posts.find(p => (p.comments || []).some(c => c.id === el.dataset.like));
       const rx = (el.dataset.kind === "post"
@@ -1675,8 +1688,23 @@
     lightboxState = null;
   }
 
+  // Reaction picker — Facebook-style: appears on hover of the Like
+  // button, persists while the cursor is over either the button or the
+  // popover (a 400ms grace period covers the gap as the cursor travels),
+  // and dismisses when both lose hover or the user clicks anywhere else.
   let activePopover = null;
+  let activeAnchor = null;
+  let activeDocHandler = null;
+  let pickerShowTimer = null;
+  let pickerHideTimer = null;
+  let pickerOnPick = null;
+
   function openEmojiPicker(anchor, onPick) {
+    if (activePopover && activeAnchor === anchor) {
+      // Same anchor already has an open picker — just refresh callback.
+      pickerOnPick = onPick;
+      return;
+    }
     closeEmojiPicker();
     const pop = document.createElement("div");
     pop.className = "wl-emoji-popover";
@@ -1691,12 +1719,56 @@
     pop.style.left = `${Math.max(8, rect.left + window.scrollX)}px`;
     pop.style.top  = `${rect.bottom + window.scrollY + 8}px`;
     pop.querySelectorAll("button").forEach(b => {
-      b.addEventListener("click", () => { closeEmojiPicker(); onPick(b.dataset.emoji); });
+      // mousedown fires BEFORE the document click listener can intercept.
+      b.addEventListener("mousedown", (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const emoji = b.dataset.emoji;
+        const cb = pickerOnPick;
+        closeEmojiPicker();
+        if (cb) cb(emoji);
+      });
+      // Touch / keyboard fallback
+      b.addEventListener("click", (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const emoji = b.dataset.emoji;
+        const cb = pickerOnPick;
+        closeEmojiPicker();
+        if (cb) cb(emoji);
+      });
+    });
+    // Keep the picker alive while the cursor is inside it.
+    pop.addEventListener("mouseenter", () => {
+      clearTimeout(pickerHideTimer); pickerHideTimer = null;
+    });
+    pop.addEventListener("mouseleave", () => {
+      clearTimeout(pickerHideTimer);
+      pickerHideTimer = setTimeout(closeEmojiPicker, 220);
     });
     activePopover = pop;
-    setTimeout(() => document.addEventListener("click", closeEmojiPicker, { once: true }), 0);
+    activeAnchor = anchor;
+    pickerOnPick = onPick;
+    // Outside-click dismissal — ignore clicks inside the picker OR the
+    // anchor (the click that triggered the open shouldn't immediately
+    // close it). Registered with a short delay so the triggering click
+    // doesn't fall through.
+    activeDocHandler = (e) => {
+      if (pop.contains(e.target)) return;
+      if (anchor === e.target || anchor.contains(e.target)) return;
+      closeEmojiPicker();
+    };
+    setTimeout(() => document.addEventListener("click", activeDocHandler), 50);
   }
-  function closeEmojiPicker() { if (activePopover) { activePopover.remove(); activePopover = null; } }
+  function closeEmojiPicker() {
+    clearTimeout(pickerShowTimer); clearTimeout(pickerHideTimer);
+    pickerShowTimer = pickerHideTimer = null;
+    if (activeDocHandler) {
+      document.removeEventListener("click", activeDocHandler);
+      activeDocHandler = null;
+    }
+    if (activePopover) { activePopover.remove(); activePopover = null; }
+    activeAnchor = null;
+    pickerOnPick = null;
+  }
 
   async function reactTo(parentId, kind, emoji) {
     if (!viewerEmail) { showBanner("Sign in via Cloudflare Access first.", true); return; }
