@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778884073">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778884073">
-<link rel="stylesheet" href="quiet.css?v=1778884073">
-<link rel="stylesheet" href="quiet-extras.css?v=1778884073">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778884073">
+<link rel="stylesheet" href="style.css?v=1778885179">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778885179">
+<link rel="stylesheet" href="quiet.css?v=1778885179">
+<link rel="stylesheet" href="quiet-extras.css?v=1778885179">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778885179">
 <style>
   /* ────────────────────────────────────────────────────────────────
      Holidays v2 — Year-at-a-glance ledger.
@@ -431,6 +431,13 @@
     height: 16px;
   }
   .hv2-focus-rail + .hv2-focus-rail .hv2-focus-railday { border-top: 1px solid var(--ink-300); }
+  /* Weekend rails get a hairline brass marker on the label so it's
+     clear at a glance which two rails are Sat/Sun (still editable). */
+  .hv2-focus-rail.is-weekend-rail .hv2-focus-railday {
+    color: var(--brass-600);
+    border-left: 2px solid var(--brass-500);
+    padding-left: 6px;
+  }
   .hv2-focus-rail .hv2-focus-day {
     border-left: 1px solid rgba(0,0,0,0.04);
     cursor: pointer;
@@ -620,7 +627,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778884073" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778885179" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1191,12 +1198,15 @@
     rails.innerHTML = "";
     const months = document.getElementById("hv2FocusMonths");
     months.innerHTML = "";
-    // Compute the full list of work-days, grouped Mon..Fri across weeks
-    const days5 = [[], [], [], [], []]; // index 0=Mon … 4=Fri
+    // Compute the full list of days grouped Mon..Sun across weeks.
+    // The team grid above is Mon-Fri (density); the focus panel below
+    // shows all 7 days so weekend overrides (on-call, weekend sickness)
+    // can still be edited.
+    const days7 = [[], [], [], [], [], [], []]; // index 0=Mon … 6=Sun
     for (const wk of weekStarts) {
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 7; i++) {
         const d = new Date(wk); d.setDate(wk.getDate() + i);
-        days5[i].push(d);
+        days7[i].push(d);
       }
     }
     // Month header
@@ -1223,10 +1233,11 @@
     months.appendChild(monthRow);
 
     const todayIso = isoDate(new Date());
-    const dayLabel = ["Mon","Tue","Wed","Thu","Fri"];
-    for (let di = 0; di < 5; di++) {
+    const dayLabel = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+    for (let di = 0; di < 7; di++) {
+      const isWeekendRow = (di >= 5);
       const rail = document.createElement("div");
-      rail.className = "hv2-focus-rail";
+      rail.className = "hv2-focus-rail" + (isWeekendRow ? " is-weekend-rail" : "");
       const lbl = document.createElement("div");
       lbl.className = "hv2-focus-railday";
       lbl.textContent = dayLabel[di];
@@ -1236,7 +1247,7 @@
       row.style.gridTemplateColumns = `repeat(${weekStarts.length}, 1fr)`;
       let lastM = -1;
       for (let wi = 0; wi < weekStarts.length; wi++) {
-        const d = days5[di][wi];
+        const d = days7[di][wi];
         const inYear = (d >= yearStart && d <= yearEnd);
         const cell = document.createElement("div");
         cell.className = "hv2-focus-day";
@@ -1248,6 +1259,7 @@
           const isBh = UK_BANK_HOLIDAYS.has(iso);
           if (stored) cell.dataset.status = stored;
           else if (isBh) cell.dataset.defaultBh = "1";
+          else if (isWeekendRow) cell.dataset.status = "non-working";
           else cell.dataset.status = "office";
           if (iso === todayIso) cell.classList.add("is-today");
           cell.title = `${user.name || focusEmail} · ${d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}` + (stored ? ` · ${STATUS_LABEL[stored] || stored}` : (isBh ? " · Bank Holiday" : ""));
@@ -1529,6 +1541,6 @@
     a.addEventListener('click', () => document.body.classList.remove('nav-open'))
   );
 </script>
-<script src="nav.js?v=1778884073" defer></script>
+<script src="nav.js?v=1778885179" defer></script>
 </body>
 </html>
