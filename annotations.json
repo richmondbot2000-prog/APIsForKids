@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-14T22:19:52.366Z",
+  "updated_at": "2026-05-15T22:18:40.875Z",
   "annotations": {
     "adnan.turken@letme.co.uk": {
       "directory_photo_uploaded_at": "2026-05-14T09:09:07+01:00"
@@ -188,6 +188,9 @@
     },
     "dan.bennett@clearloans.com.au": {
       "forward_to": "kelly.black@rgroup.co.uk"
+    },
+    "amber.cole@letme.com": {
+      "line_manager": "james.benamor@letme.com"
     }
   }
 }
