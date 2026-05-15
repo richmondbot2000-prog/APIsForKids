@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Wall</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778854813">
-<link rel="stylesheet" href="quiet.css?v=1778854813">
-<link rel="stylesheet" href="quiet-extras.css?v=1778854813">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778855803">
+<link rel="stylesheet" href="quiet.css?v=1778855803">
+<link rel="stylesheet" href="quiet-extras.css?v=1778855803">
 <style>
   /* 648 px column — sweet spot per editorial line-length research
      (60–75 chars per line at 15 px body). Wider feels marketing-y. */
@@ -382,9 +382,11 @@
      6-named-reaction picker. Share dropped — internal company wall;
      everyone's already on the same site behind Cloudflare Access. */
   .wl-action-bar {
-    display: grid; grid-template-columns: 1fr 1fr;
-    border-top: none; border-bottom: none;
-    margin: 6px 0 4px;
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    border-top: 1px solid var(--ink-300);
+    border-bottom: none;
+    margin: 8px 0 4px;
+    padding-top: 4px;
   }
   .wl-action {
     background: none; border: none;
@@ -839,7 +841,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778854813" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778855803" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -918,6 +920,13 @@
   const openPostIds   = new Set();
   const expandedPostIds = new Set();
   const openReplyTo   = new Set();
+  // Pagination: 20 posts per page; one expanded at a time. Reset to 0
+  // when the post list reloads (after compose / delete / sort).
+  const POSTS_PER_PAGE = 20;
+  let currentPage = 0;
+  // Cache of OG link-preview responses keyed by URL — survives the
+  // session (sessionStorage); each entry is { title, description, image, host }.
+  const linkPreviewCache = {};
 
   // Facebook's settled answer: 6 reactions. Larger sets measurably slow
   // decision time (their A/B test). We store as emoji keys (so old data
@@ -1035,8 +1044,27 @@
       lastSeenByPost = seen.by_user[viewerEmail].posts || {};
     }
     sortPosts();
+    // If the URL has a #post-<id> hash (a Share-link), find the post,
+    // jump to the page containing it, and expand it on load.
+    const hash = (location.hash || "").replace(/^#post-/, "");
+    if (hash) {
+      const target = decodeURIComponent(hash);
+      const idx = posts.findIndex(p => p.id === target);
+      if (idx >= 0) {
+        currentPage = Math.floor(idx / POSTS_PER_PAGE);
+        expandedPostIds.clear();
+        expandedPostIds.add(target);
+      }
+    }
     renderFeed();
     renderNotifications();
+    if (hash) {
+      const target = decodeURIComponent(hash);
+      requestAnimationFrame(() => {
+        const el = document.getElementById(`post-${target}`);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
   }).catch(err => {
     document.getElementById("wlFeed").innerHTML =
       `<div class="wl-empty">Wall failed to load: ${escapeHtml(String(err))}</div>`;
@@ -1163,6 +1191,7 @@
       const res = await wallAction("post", { body, photos });
       if (res && res.post) {
         posts.unshift(res.post);
+        currentPage = 0; // jump back to the newest page so the author sees their post
         sortPosts(); renderFeed(); renderNotifications();
       }
       composeText.value = "";
@@ -1242,8 +1271,23 @@
       root.innerHTML = `<div class="wl-empty">No pages yet. Write the first.</div>`;
       return;
     }
-    root.innerHTML = posts.map(renderPost).join("");
+    const total = posts.length;
+    const totalPages = Math.max(1, Math.ceil(total / POSTS_PER_PAGE));
+    if (currentPage >= totalPages) currentPage = totalPages - 1;
+    if (currentPage < 0) currentPage = 0;
+    const start = currentPage * POSTS_PER_PAGE;
+    const slice = posts.slice(start, start + POSTS_PER_PAGE);
+    root.innerHTML = slice.map(renderPost).join("") + renderPagination(currentPage, totalPages);
     wireFeed();
+    hydrateLinkPreviews();
+  }
+  function renderPagination(page, total) {
+    if (total <= 1) return "";
+    return `<nav class="wl-pagination" aria-label="Wall pagination">
+      <button type="button" data-page-prev ${page === 0 ? "disabled" : ""}>← Newer</button>
+      <span class="wl-page-num">Page ${page + 1} of ${total}</span>
+      <button type="button" data-page-next ${page >= total - 1 ? "disabled" : ""}>Older →</button>
+    </nav>`;
   }
   function sortPosts() {
     posts.forEach(p => { p._sortKey = mostRecentActivity(p); });
@@ -1299,19 +1343,36 @@
     const reactCount = Object.values(post.reactions || {}).reduce((n, arr) => n + arr.length, 0);
     const body250 = bodyTeaser(post.body || "", 250);
     const photoStrip = renderPhotoStrip(post.photos || [], post.id);
+    const linkBlocks = renderLinkBlocks(post.body || "", post.id);
     const recentLine = recent
       ? `<div class="wl-recent-comment"><span class="wl-recent-name">${escapeHtml(displayName(recent.author_email, recent.author_name))}</span>: ${escapeHtml(bodyTeaser(recent.body || "(media)", 100))}</div>`
       : "";
+    const likeActive = !!myReaction;
     return `
       <article class="wl-post wl-post--compact" data-post="${escapeHtml(post.id)}" id="post-${escapeHtml(post.id)}" data-expand-card="${escapeHtml(post.id)}" role="button" tabindex="0" aria-label="Open post for full view">
         ${renderPostHead(post)}
         <div class="wl-post-body wl-post-body--teaser">${linkifyBody(body250)}</div>
         ${photoStrip}
+        ${linkBlocks}
         <div class="wl-compact-meta">
           ${reactCount > 0 ? `<span class="wl-compact-react">${myReaction ? emojiGlyph(myReaction) : emojiGlyph("👍")} ${reactCount}</span>` : ""}
           ${cmCount > 0 ? `<span class="wl-compact-count ${newCount > 0 ? "has-new" : ""}">${cmCount} ${cmCount === 1 ? "comment" : "comments"}${newCount > 0 ? ` · ${newCount} new` : ""}</span>` : ""}
         </div>
         ${recentLine}
+        <div class="wl-action-bar" data-stop-card-click>
+          <button class="wl-action wl-action-like ${likeActive ? "is-active" : ""}" data-like="${escapeHtml(post.id)}" data-kind="post" data-stop-card-click title="Tap to ${likeActive ? "remove your reaction" : "Like"}; hover to pick a different reaction">
+            <span class="wl-action-icon">${likeActive ? emojiGlyph(myReaction) : icon("thumb", false)}</span>
+            <span class="wl-action-label">${likeActive ? reactionLabel(myReaction) : "Like"}</span>
+          </button>
+          <button class="wl-action" data-comment-on="${escapeHtml(post.id)}" data-stop-card-click>
+            <span class="wl-action-icon">${icon("comment", false)}</span>
+            <span class="wl-action-label">Comment</span>
+          </button>
+          <button class="wl-action" data-share="${escapeHtml(post.id)}" data-stop-card-click>
+            <span class="wl-action-icon">${icon("share", false)}</span>
+            <span class="wl-action-label">Share</span>
+          </button>
+        </div>
       </article>`;
   }
 
@@ -1348,6 +1409,10 @@
           <button class="wl-action" data-toggle-comments="${escapeHtml(post.id)}">
             <span class="wl-action-icon">${icon("comment", false)}</span>
             <span class="wl-action-label">Comment</span>
+          </button>
+          <button class="wl-action" data-share="${escapeHtml(post.id)}">
+            <span class="wl-action-icon">${icon("share", false)}</span>
+            <span class="wl-action-label">Share</span>
           </button>
         </div>
         <div class="wl-comment-composer">
@@ -1576,6 +1641,78 @@
   }
 
   function wireFeed() {
+    // Click anywhere on a compact post (outside an action/link/control) to
+    // expand it. Single-expand: any previously open post collapses.
+    const expandCard = (id) => {
+      const wasExpanded = expandedPostIds.has(id);
+      expandedPostIds.clear();
+      if (!wasExpanded) expandedPostIds.add(id);
+      renderFeed();
+      if (!wasExpanded) {
+        // Defer scroll until next paint
+        requestAnimationFrame(() => {
+          const el = document.getElementById(`post-${id}`);
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        });
+      }
+    };
+    document.querySelectorAll("[data-expand-card]").forEach(el => {
+      el.addEventListener("click", e => {
+        if (e.target.closest("[data-stop-card-click]")) return;
+        if (e.target.closest("a, input, textarea, label")) return;
+        // The Like-button picker popover is a body-level child so it can't
+        // be a closest() ancestor, but its clicks bubble through document.
+        // We're safe to expand on any click that didn't hit a control.
+        expandCard(el.dataset.expandCard);
+      });
+      el.addEventListener("keydown", e => {
+        if (e.target !== el) return; // ignore inputs inside
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          expandCard(el.dataset.expandCard);
+        }
+      });
+    });
+    document.querySelectorAll("[data-page-prev]").forEach(el => {
+      el.addEventListener("click", () => {
+        currentPage = Math.max(0, currentPage - 1);
+        expandedPostIds.clear();
+        renderFeed();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
+    document.querySelectorAll("[data-page-next]").forEach(el => {
+      el.addEventListener("click", () => {
+        currentPage++;
+        expandedPostIds.clear();
+        renderFeed();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
+    document.querySelectorAll("[data-share]").forEach(el => {
+      el.addEventListener("click", async () => {
+        const id = el.dataset.share;
+        const url = `${location.origin}/wall.html#post-${encodeURIComponent(id)}`;
+        try {
+          await navigator.clipboard.writeText(url);
+          showBanner("Link copied to clipboard");
+        } catch (err) {
+          // Fallback for browsers blocking clipboard write
+          prompt("Copy this link:", url);
+        }
+      });
+    });
+    document.querySelectorAll("[data-comment-on]").forEach(el => {
+      el.addEventListener("click", () => {
+        const id = el.dataset.commentOn;
+        expandedPostIds.clear();
+        expandedPostIds.add(id);
+        openPostIds.add(id);
+        renderFeed();
+        const inp = document.querySelector(`[data-add-comment="${cssAttr(id)}"]`);
+        if (inp) inp.focus();
+      });
+    });
     document.querySelectorAll("[data-expand]").forEach(el => {
       el.addEventListener("click", () => {
         const id = el.dataset.expand;
@@ -2165,6 +2302,47 @@
       }
       return data;
     });
+  }
+  // Lazy-fetch OG previews for every [data-link-preview] currently in the
+  // DOM. Results are cached per-URL for the session so re-renders don't
+  // re-hit the worker. Worker enforces SSRF + 8s timeout + 1MB cap.
+  function hydrateLinkPreviews() {
+    document.querySelectorAll("[data-link-preview]").forEach(el => {
+      if (el.dataset.lpDone === "1") return;
+      const url = el.dataset.linkPreview;
+      const cached = linkPreviewCache[url];
+      if (cached) { paintLinkPreview(el, cached); return; }
+      el.dataset.lpDone = "1";
+      wallAction("link-preview", { url })
+        .then(data => {
+          if (!data) return;
+          linkPreviewCache[url] = data;
+          // Re-paint every currently-mounted instance of the same URL.
+          document.querySelectorAll(`[data-link-preview="${cssAttr(url)}"]`).forEach(node => {
+            paintLinkPreview(node, data);
+          });
+        })
+        .catch(() => { /* silent — leave the loading state in place */ });
+    });
+  }
+  function paintLinkPreview(el, data) {
+    const title = data.title || data.url || "";
+    const desc  = data.description || "";
+    const img   = data.image || "";
+    const host  = data.site_name || data.host || safeHost(el.dataset.linkPreview || "");
+    const thumb = el.querySelector(".wl-link-thumb");
+    const body  = el.querySelector(".wl-link-body");
+    if (thumb) {
+      thumb.innerHTML = img
+        ? `<img src="${escapeHtml(img)}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<div class=&quot;wl-link-thumb-empty&quot;>no preview</div>';">`
+        : `<div class="wl-link-thumb-empty">no preview</div>`;
+    }
+    if (body) {
+      body.innerHTML = `
+        <div class="wl-link-host">${escapeHtml(host || "")}</div>
+        <div class="wl-link-title">${escapeHtml(title)}</div>
+        ${desc ? `<div class="wl-link-desc">${escapeHtml(desc)}</div>` : ""}`;
+    }
   }
   function displayName(email, fallback) {
     if (!email) return fallback || "Unknown";
