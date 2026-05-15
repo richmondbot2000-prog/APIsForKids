@@ -856,11 +856,28 @@ Renders one chart and one table from `topups.json`. Lives under the **Reports** 
 
 **Security alerts band — collapsible lookalike list** (added 2026-05-14). The HIBP / Active-lookalikes / CT-log tile row stays as-is, but the "Active lookalike domains" list directly underneath is now wrapped in a `<details>` disclosure (`▸ Show N active lookalike domains`). The list is long and noisy (~26 DNSTwist permutations); collapsing it by default keeps the security band scannable and the page above-the-fold without dropping any data.
 
-### 11.4 Payout page (`yesterday.html`)
+### 11.4 Payouts page (`yesterday.html`)
 
-**Nav label is "Payout"; file path is still `yesterday.html`** (kept stable so existing bookmarks survive). Renamed in the nav 2026-05-14 as part of the top-level restructure.
+**Nav label is "Payouts"; file path is still `yesterday.html`** (kept stable so existing bookmarks survive). Renamed in the nav 2026-05-14 as part of the top-level restructure; page heading renamed from "Yesterday's payouts" to "Payouts" on 2026-05-15 when the three-range tab control was added.
 
-Three Leaflet maps wrapped with `position: relative; z-index: 0` so Leaflet's internal pane z-indexes (200–800) stay clamped and don't escape over the topbar / mobile drawer. The first map drops a clustered pin per borrower; the second labels each state's centroid with the **total** paid out yesterday; the third (added 2026-05-12) labels each state's centroid with the **average loan amount** for yesterday's paid-out loans (popup shows the loan count + total so the mean is anchored to its denominator). Per-state breakdown tables below.
+**Range tabs.** A row of three italic-Newsreader tab buttons at the top of the page picks the dataset:
+
+| Tab | JSON | Shape | Layout |
+|---|---|---|---|
+| Yesterday  | `yesterday-payouts.json` | per-borrower items[] (single day) | pin map + state-total map + state-avg map + per-state name tables (capped at 200 rows / state) |
+| Last Week  | `payouts-week.json`      | per-borrower items[] (last 7 calendar days incl. today) | same as Yesterday — pin map + maps + tables |
+| Last Year  | `payouts-year.json`      | aggregated (`by_state[]`, `by_month[]`, no items) | state-total map + monthly horizontal-bar chart (12 months, ranked by spend) + state-avg map + per-state summary cards (count + total + avg, no names) |
+
+The active tab carries a manuscript-red rule + bold weight. The page renderer detects the dataset shape (`Array.isArray(data.by_state)`) and switches between the per-borrower layout and the aggregated layout. The Year dataset is intentionally aggregated server-side because a year of per-borrower rows (~50k @ ~150 bytes) would push the JSON over 7 MB and brick mobile Safari with that many DOM rows.
+
+**Scanner + workflow.** Two scripts run from `.github/workflows/refresh-yesterday-payouts.yml` ("Refresh payouts") on the hourly 06:00–23:00 UTC schedule:
+
+- `scripts/scan_yesterday_payouts.py` — single-day per-borrower scan (existing). Falls back to Friday on Sun/Mon.
+- `scripts/scan_payouts_history.py` — week + year scan (added 2026-05-15). The Year query uses `DATEFROMPARTS` to compute the first day of the month 11 months before last month through the last day of last month (rolling 12 completed calendar months). Three result sets in one batch: per-state aggregates, per-month aggregates, and a single-row summary with the actual `MIN/MAX` of the payout dates landed within the window.
+
+The workflow's guard is satisfied only when all three JSONs are current — yesterday-payouts.target_date == yesterday, payouts-week.range.to == yesterday, and payouts-year.json exists. A missing or stale history file forces a re-run, so the rolling 7-day window stays fresh every morning. The history scanner step is `continue-on-error: true` so a failure there can't block the yesterday refresh.
+
+**Three Leaflet maps** wrapped with `position: relative; z-index: 0` so Leaflet's internal pane z-indexes (200–800) stay clamped and don't escape over the topbar / mobile drawer. The pin map drops a clustered pin per borrower (Yesterday + Week only); the state-total map labels each state's centroid with the total paid out; the state-average map (added 2026-05-12) labels each state's centroid with the average loan amount (popup shows the loan count + total so the mean is anchored to its denominator).
 
 **Single-borrower marker** (fix 2026-05-14): the default Leaflet `L.marker()` was rendering as a broken-image + "Mark" alt text on single-borrower locations because Leaflet's image-path auto-detection misses unpkg's URL shape. Replaced with an inline-SVG `L.divIcon` (small green pin droplet matching the cluster palette) so there's no external image dependency. Cluster bubbles were unaffected — they use MarkerCluster's own DivIcon.
 
