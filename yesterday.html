@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778876398">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778876398">
-<link rel="stylesheet" href="quiet.css?v=1778876398">
-<link rel="stylesheet" href="quiet-extras.css?v=1778876398">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778876398">
+<link rel="stylesheet" href="style.css?v=1778877541">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778877541">
+<link rel="stylesheet" href="quiet.css?v=1778877541">
+<link rel="stylesheet" href="quiet-extras.css?v=1778877541">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778877541">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin="">
@@ -225,13 +225,31 @@
   .yp-bar-fill  { position: absolute; inset: 0 auto 0 0; background: var(--accent, #00d4ff); }
   .yp-bar-amt   { text-align: right; color: var(--ink); }
   .yp-bar-amt-meta { color: var(--muted); font-size: 0.7rem; margin-left: 6px; }
+
+  /* Per-capita / total toggle link beside the state-total caption.
+     Year view only. Reads as a brass-underlined italic link so it
+     looks part of the caption row, not a button competing with it. */
+  .yp-map-caption.has-toggle {
+    display: flex; gap: 18px; align-items: baseline; flex-wrap: wrap;
+  }
+  .yp-map-toggle {
+    background: none; border: none;
+    padding: 0;
+    color: var(--accent, #00d4ff);
+    font: italic 500 0.78rem/1 var(--font-display, 'Newsreader', serif);
+    text-transform: none;
+    letter-spacing: 0.02em;
+    border-bottom: 1px solid var(--accent, #00d4ff);
+    cursor: pointer;
+  }
+  .yp-map-toggle:hover { color: var(--red-500); border-bottom-color: var(--red-500); }
 </style>
 </head>
 <body>
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778876398" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778877541" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -276,6 +294,32 @@
 <script>
   const fmtUSD0 = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
   const fmtUSD2 = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+
+  // US state populations — US Census Bureau Vintage 2024 estimates
+  // (released Dec 2024). Used by the Year tab's "$ per person" toggle.
+  // These shift by <1% a year so a hard-coded snapshot is fine for a
+  // dashboard label — recompute against a fresh estimate every couple
+  // of years if it matters.
+  const STATE_POPULATIONS = {
+    AL: 5108468, AK:   733406, AZ: 7497004, AR: 3088354, CA: 39431263,
+    CO: 5957493, CT: 3675069, DE: 1051917, DC:  702250, FL: 23372215,
+    GA:11180878, HI: 1446146, ID: 2001619, IL:12549689, IN: 6924275,
+    IA: 3241488, KS: 2970606, KY: 4588372, LA: 4597740, ME: 1405012,
+    MD: 6263220, MA: 7136171, MI:10140459, MN: 5793151, MS: 2943045,
+    MO: 6245466, MT: 1137233, NE: 2005465, NV: 3267467, NH: 1409032,
+    NJ: 9500851, NM: 2130256, NY:19867248, NC:11046024, ND:  796568,
+    OH:11883304, OK: 4095393, OR: 4272371, PA:13078751, RI: 1112308,
+    SC: 5478831, SD:  924669, TN: 7227750, TX:31290831, UT: 3503613,
+    VT:  648278, VA: 8811195, WA: 7958180, WV: 1769979, WI: 5960975,
+    WY:  587618,
+  };
+
+  // Year-view state-total map can render in two modes. Total = absolute
+  // dollars paid out across the 12-month window. Per-capita = total /
+  // state-population (so the "small states cluster at the top" effect
+  // disappears and the heat is genuinely on the borrowers-per-capita
+  // axis). Defaults to 'total'; the caption row carries the toggle.
+  let yearTotalMode = 'total';
 
   // Geographic centre of each US state (lat, lng) — used to anchor the
   // total-paid-out label on the second map.
@@ -487,9 +531,14 @@
     if (shape === 'agg') {
       // Year view: aggregates only — no per-borrower pin map, no
       // per-borrower tables. The monthly bar chart slot lives between
-      // the state-total map and the state-avg map.
+      // the state-total map and the state-avg map. The state-total
+      // caption carries a toggle link that swaps the map between
+      // absolute dollars and $-per-state-resident.
       content.innerHTML = `
-        <p class="yp-map-caption">Total paid out by state</p>
+        <p class="yp-map-caption has-toggle" id="ypTotalCaption">
+          <span id="ypTotalCaptionText">Total paid out by state</span>
+          <button type="button" class="yp-map-toggle" id="ypTotalToggle">show $ per person of state population</button>
+        </p>
         <div class="yp-map-states" id="ypStateMap"></div>
 
         <p class="yp-map-caption">Monthly payouts (last 12 completed months)</p>
@@ -515,7 +564,10 @@
   }
 
   // Year-shape renderers — take pre-aggregated rows from the JSON
-  // (by_state, by_month) instead of recomputing from items.
+  // (by_state, by_month) instead of recomputing from items. The
+  // state-total renderer supports two modes via `yearTotalMode`:
+  // 'total' (default — absolute dollars) and 'capita' ($-per-state-
+  // resident from the STATE_POPULATIONS table).
   function renderStateMapFromAgg(byState) {
     const mapEl = document.getElementById('ypStateMap');
     if (!mapEl || typeof L === 'undefined') return;
@@ -525,20 +577,38 @@
       maxZoom: 10,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
+    const capita = yearTotalMode === 'capita';
     for (const row of byState || []) {
       const state = (row.state || '').toUpperCase();
       const c = STATE_CENTROIDS[state];
       if (!c) continue;
       const total = row.amount || 0;
+      const pop = STATE_POPULATIONS[state] || 0;
+      const value = capita
+        ? (pop ? total / pop : null)
+        : total;
+      if (value == null) continue; // state has no population entry — skip in capita mode
+      const display = capita
+        ? formatCapita(value)
+        : fmtUSD0.format(value);
+      const popupLine = capita
+        ? `<strong>${state}</strong><br>${formatCapita(value)} per resident<br>${fmtUSD2.format(total)} total · ${pop.toLocaleString('en-US')} residents`
+        : `<strong>${state}</strong><br>${fmtUSD2.format(total)}<br>${(row.borrowers || 0).toLocaleString('en-GB')} loans`;
       const icon = L.divIcon({
         className: 'state-amount-icon',
-        html: `<span class="amount-pill" title="${state}: ${fmtUSD2.format(total)}">${fmtUSD0.format(total)}</span>`,
+        html: `<span class="amount-pill" title="${state}: ${display}">${display}</span>`,
         iconSize: null, iconAnchor: [0, 0],
       });
-      L.marker(c, { icon, interactive: true })
-        .addTo(map)
-        .bindPopup(`<strong>${state}</strong><br>${fmtUSD2.format(total)}<br>${(row.borrowers || 0).toLocaleString('en-GB')} loans`);
+      L.marker(c, { icon, interactive: true }).addTo(map).bindPopup(popupLine);
     }
+  }
+  // $-per-resident is usually < $10 across the 12-month window, so
+  // render at 2-decimal cent precision; under $0.01 show "<$0.01" to
+  // avoid printing $0.00.
+  function formatCapita(v) {
+    if (v == null) return '—';
+    if (v < 0.005) return '< $0.01';
+    return '$' + v.toFixed(2);
   }
   function renderAvgStateMapFromAgg(byState) {
     const mapEl = document.getElementById('ypAvgStateMap');
@@ -618,16 +688,45 @@
       `<div class="yp-range-pending"><strong>Not refreshed yet</strong>${message}</div>`;
   }
 
+  // Stash for re-render when the user toggles total <-> per-capita.
+  let lastYearByState = null;
+
   function paintAggregated(data) {
     const total = (data.totals && data.totals.amount) || 0;
     const n     = (data.totals && data.totals.borrowers) || 0;
     const updated = data.updated_at ? new Date(data.updated_at).toLocaleString('en-GB') : '';
     document.getElementById('ypMeta').textContent =
       `${n.toLocaleString('en-GB')} borrowers · ${fmtUSD0.format(total)} paid out · last refreshed ${updated}`;
+    lastYearByState = data.by_state;
+    yearTotalMode = 'total';
     try { renderStateMapFromAgg(data.by_state); }    catch (e) { console.error('state map (agg) failed', e); }
     try { renderMonthlyBars(data.by_month); }        catch (e) { console.error('monthly bars failed', e); }
     try { renderAvgStateMapFromAgg(data.by_state); } catch (e) { console.error('avg state map (agg) failed', e); }
     try { renderStateCardsFromAgg(data.by_state); }  catch (e) { console.error('state cards (agg) failed', e); }
+    wireYearTotalToggle();
+  }
+  function wireYearTotalToggle() {
+    const btn = document.getElementById('ypTotalToggle');
+    const cap = document.getElementById('ypTotalCaptionText');
+    if (!btn || !cap) return;
+    btn.addEventListener('click', () => {
+      yearTotalMode = (yearTotalMode === 'total') ? 'capita' : 'total';
+      cap.textContent = yearTotalMode === 'capita'
+        ? '$ paid out per resident, by state'
+        : 'Total paid out by state';
+      btn.textContent = yearTotalMode === 'capita'
+        ? 'show absolute dollar totals'
+        : 'show $ per person of state population';
+      // Leaflet's map instance owns the #ypStateMap DIV — destroy it by
+      // re-creating the container, then re-render. Cheap; the dataset
+      // is in memory.
+      const old = document.getElementById('ypStateMap');
+      if (old) {
+        const fresh = old.cloneNode(false);
+        old.parentNode.replaceChild(fresh, old);
+      }
+      try { renderStateMapFromAgg(lastYearByState); } catch (e) { console.error('state map toggle re-render failed', e); }
+    });
   }
 
   function paint(data) {
