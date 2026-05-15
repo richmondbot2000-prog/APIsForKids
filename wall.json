@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-15T15:01:07.147Z",
+  "updated_at": "2026-05-15T15:01:28.144Z",
   "posts": [
     {
       "id": "post_mp6zxv0t_4pj7yu",
@@ -17,7 +17,18 @@
           "james.benamor@letme.com"
         ]
       },
-      "comments": [],
+      "comments": [
+        {
+          "id": "com_mp71p7v8_v3ucjo",
+          "parent_comment_id": null,
+          "author_email": "james.benamor@letme.com",
+          "author_name": "james.benamor",
+          "created_at": "2026-05-15T15:01:27.956Z",
+          "body": "yes! this is just about acceptable. woooo!",
+          "photos": [],
+          "reactions": {}
+        }
+      ],
       "react_events": [
         {
           "actor_email": "james.benamor@letme.com",
