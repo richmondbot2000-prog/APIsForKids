@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Wall</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778854105">
-<link rel="stylesheet" href="quiet.css?v=1778854105">
-<link rel="stylesheet" href="quiet-extras.css?v=1778854105">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778854436">
+<link rel="stylesheet" href="quiet.css?v=1778854436">
+<link rel="stylesheet" href="quiet-extras.css?v=1778854436">
 <style>
   /* 648 px column — sweet spot per editorial line-length research
      (60–75 chars per line at 15 px body). Wider feels marketing-y. */
@@ -276,58 +276,93 @@
   .wl-see-more:hover { text-decoration: underline; color: var(--link-hover); }
   .wl-see-more:focus { outline: 1px solid var(--brass-500); outline-offset: 2px; }
 
-  /* Reaction summary — italic Newsreader verbs as marginalia rather than
-     filled emoji pills. Each verb is coloured by its semantic role
-     (Loved → red, Celebrated → sage, Noted → ink, …). "is-mine" earns a
-     1px brass underline; no background fill — that's a Material pattern
-     the rest of the site rejects. */
+  /* Reaction pills — emoji glyph + count. Pill has a hairline outline
+     so it reads on cream; "is-mine" lights the brass border + background.
+     The emoji itself gets a per-emoji animation on hover, approximating
+     Facebook's animated reaction kinetics (thumb taps, heart pulses,
+     haha wobbles, wow stretches, sad teardrops, party shakes). */
   .wl-reactions {
-    display: flex; flex-wrap: wrap; gap: 0;
-    align-items: baseline; margin: 6px 0 2px;
-    min-height: 24px;
-    font: italic 500 14px/1.4 var(--font-display);
+    display: flex; flex-wrap: wrap; gap: 6px;
+    align-items: center; margin: 6px 0 2px;
+    min-height: 28px;
   }
   .wl-react-pill {
-    display: inline-flex; align-items: baseline; gap: 4px;
-    background: none; border: none;
-    padding: 6px 0;
-    font: inherit;
-    color: var(--ink-700);
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px;
+    background: var(--paper-50);
+    border: 1px solid var(--paper-300);
+    border-radius: 14px;
     cursor: pointer;
-    border-bottom: 1px solid transparent;
+    font: 500 13px/1.2 var(--font-mono);
+    color: var(--ink-700);
+    min-height: 28px;
   }
-  .wl-react-pill + .wl-react-pill::before {
-    content: "·"; font-style: normal;
-    color: var(--brass-300);
-    margin: 0 8px;
-    align-self: baseline;
+  .wl-react-pill .wl-emoji {
+    font-size: 16px; line-height: 1;
+    display: inline-block;
+    transition: transform 180ms ease;
   }
-  .wl-react-pill .wl-react-count { font-style: normal; font-weight: 400; }
+  .wl-react-pill:hover { border-color: var(--brass-500); }
+  .wl-react-pill:hover .wl-emoji { animation: var(--react-anim, wl-bounce) 600ms ease; }
   .wl-react-pill.is-mine {
-    border-bottom-color: var(--brass-500);
-    font-weight: 600;
+    border-color: var(--brass-500);
+    background: var(--brass-50);
+    color: var(--ink-900);
   }
-  .wl-react-pill:hover { color: var(--red-500); }
+  .wl-react-pill.is-mine .wl-emoji { animation: wl-bounce-in 380ms cubic-bezier(.4,.0,.2,1.4); }
+  /* Per-emoji animation personalities — approximations of FB's set. */
+  .wl-emoji[data-anim="thumb"]  { --react-anim: wl-thumb;  }
+  .wl-emoji[data-anim="heart"]  { --react-anim: wl-pulse;  }
+  .wl-emoji[data-anim="haha"]   { --react-anim: wl-wobble; }
+  .wl-emoji[data-anim="wow"]    { --react-anim: wl-stretch; }
+  .wl-emoji[data-anim="sad"]    { --react-anim: wl-shake-down; }
+  .wl-emoji[data-anim="party"]  { --react-anim: wl-shake;  }
+  @keyframes wl-bounce-in   { 0% { transform: scale(0.4); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }
+  @keyframes wl-bounce      { 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.25); } }
+  @keyframes wl-thumb       { 0%,100%{ transform: rotate(0); } 30%{ transform: rotate(-18deg) scale(1.1); } 70%{ transform: rotate(8deg); } }
+  @keyframes wl-pulse       { 0%,100%{ transform: scale(1); } 25%{ transform: scale(1.2); } 50%{ transform: scale(0.95); } 75%{ transform: scale(1.15); } }
+  @keyframes wl-wobble      { 0%,100%{ transform: rotate(0); } 25%{ transform: rotate(-15deg); } 75%{ transform: rotate(15deg); } }
+  @keyframes wl-stretch     { 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.4, 0.9); } }
+  @keyframes wl-shake-down  { 0%{ transform: translateY(0) rotate(0); } 50%{ transform: translateY(3px) rotate(-3deg); } 100%{ transform: translateY(0) rotate(0); } }
+  @keyframes wl-shake       { 0%,100%{ transform: translateX(0) rotate(0); } 25%{ transform: translateX(-3px) rotate(-8deg); } 75%{ transform: translateX(3px) rotate(8deg); } }
 
-  /* Reaction picker — vertical list of italic named verbs, each in its
-     semantic colour. No box-shadow (out of system). */
+  /* Reaction picker — horizontal row of large emoji buttons (Facebook
+     reaction-bar shape). Each emoji animates on hover with its
+     per-emoji keyframe (defined above). */
   .wl-emoji-popover {
     position: absolute; background: var(--paper-50);
-    border: 1px solid var(--paper-300); border-radius: 0;
-    padding: 6px 0;
-    display: flex; flex-direction: column;
-    min-width: 160px; z-index: 100;
+    border: 1px solid var(--paper-300); border-radius: 24px;
+    padding: 6px;
+    display: flex; flex-direction: row; gap: 2px;
+    z-index: 100;
   }
   .wl-emoji-popover button {
     background: transparent; border: none;
-    font: italic 500 15px/1 var(--font-display);
-    padding: 10px 16px;
-    text-align: left;
-    cursor: pointer;
-    color: var(--ink-800);
-    min-height: 40px;
+    font-size: 28px; line-height: 1;
+    width: 44px; height: 44px;
+    cursor: pointer; border-radius: 50%;
+    padding: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: transform 180ms ease, background 180ms ease;
   }
-  .wl-emoji-popover button:hover { background: var(--paper-100); color: var(--red-500); }
+  .wl-emoji-popover button:hover {
+    background: var(--paper-100);
+    transform: scale(1.35) translateY(-2px);
+    animation: var(--react-anim, wl-bounce) 600ms ease infinite;
+  }
+  /* Tooltip below the picker on hover */
+  .wl-emoji-popover button::after {
+    content: attr(data-label);
+    position: absolute; bottom: -22px;
+    font: italic 500 12px/1 var(--font-display);
+    color: var(--ink-700);
+    background: var(--paper-50);
+    padding: 2px 6px; border: 1px solid var(--paper-300);
+    opacity: 0; pointer-events: none;
+    transition: opacity 100ms ease 200ms;
+    white-space: nowrap;
+  }
+  .wl-emoji-popover button:hover::after { opacity: 1; }
 
   /* Reaction + comment summary (above the action bar) */
   .wl-reaction-summary {
@@ -657,7 +692,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778854105" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778854436" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -745,18 +780,25 @@
   // applied on a plain Like tap.
   const REACTIONS = ["👍", "❤️", "😂", "😮", "😢", "🎉"];
   const DEFAULT_REACTION = REACTIONS[0];
-  // Storage key (emoji) → display verb + semantic colour token.
+  // Storage key (emoji) → display label (used in notifications + a11y
+  // tooltip) + the anim key that picks the per-emoji CSS keyframe.
   const REACTION_META = {
-    "👍": { label: "Noted",       past: "noted",       color: "var(--ink-700)" },
-    "❤️": { label: "Loved",       past: "loved",       color: "var(--red-500)" },
-    "😂": { label: "Smiled",      past: "smiled at",   color: "var(--brass-600)" },
-    "😮": { label: "Surprised",   past: "was surprised by", color: "var(--teal-500)" },
-    "😢": { label: "Mourned",     past: "mourned",     color: "var(--ink-600)" },
-    "🎉": { label: "Celebrated",  past: "celebrated",  color: "var(--sage-600)" },
+    "👍": { label: "Like",       past: "liked",          anim: "thumb" },
+    "❤️": { label: "Love",       past: "loved",          anim: "heart" },
+    "😂": { label: "Haha",       past: "laughed at",     anim: "haha"  },
+    "😮": { label: "Wow",        past: "was wowed by",   anim: "wow"   },
+    "😢": { label: "Sad",        past: "was sad at",     anim: "sad"   },
+    "🎉": { label: "Celebrate",  past: "celebrated",     anim: "party" },
   };
   function reactionLabel(emoji) { return (REACTION_META[emoji] || {}).label || emoji; }
   function reactionPast(emoji)  { return (REACTION_META[emoji] || {}).past  || "reacted to"; }
-  function reactionColor(emoji) { return (REACTION_META[emoji] || {}).color || "var(--ink-700)"; }
+  function reactionAnim(emoji)  { return (REACTION_META[emoji] || {}).anim  || ""; }
+  // Wrap an emoji glyph in a span with the right data-anim attribute so
+  // CSS applies the matching per-emoji animation on hover/insert.
+  function emojiGlyph(emoji) {
+    const a = reactionAnim(emoji);
+    return `<span class="wl-emoji" data-anim="${escapeHtml(a)}">${escapeHtml(emoji)}</span>`;
+  }
   const WALL_API = "/api/wall";
 
   // Inline SVG icon set — outline (default) ↔ filled (active/hover).
@@ -1108,9 +1150,9 @@
           </span>
         </div>
         <div class="wl-action-bar">
-          <button class="wl-action wl-action-like ${likeActive ? "is-active" : ""}" data-like="${escapeHtml(post.id)}" data-kind="post" title="Tap to ${likeActive ? "remove your reaction" : "react " + reactionLabel(DEFAULT_REACTION)}; long-press to pick a different reaction" ${likeActive ? `style="color:${reactionColor(myReaction)};"` : ""}>
-            <span class="wl-action-icon">${icon("thumb", likeActive)}</span>
-            <span class="wl-action-label">${likeActive ? reactionLabel(myReaction) : "Note"}</span>
+          <button class="wl-action wl-action-like ${likeActive ? "is-active" : ""}" data-like="${escapeHtml(post.id)}" data-kind="post" title="Tap to ${likeActive ? "remove your reaction" : "Like"}; long-press to pick a different reaction">
+            <span class="wl-action-icon">${likeActive ? emojiGlyph(myReaction) : icon("thumb", false)}</span>
+            <span class="wl-action-label">${likeActive ? reactionLabel(myReaction) : "Like"}</span>
           </button>
           <button class="wl-action" data-toggle-comments="${escapeHtml(post.id)}">
             <span class="wl-action-icon">${icon("comment", false)}</span>
@@ -1200,10 +1242,9 @@
     return `<div class="wl-photos ${cls}">${tiles}</div>`;
   }
 
-  // Render reactions as italic named verbs in the comment's marginalia.
-  // Each verb shows in its semantic colour (red for Loved, sage for
-  // Celebrated, etc.) so the typographic register stays inside the
-  // Quiet Edition system. "Mine" gets a 1px brass underline + bold.
+  // Render reactions as emoji-glyph pills. Each emoji animates per its
+  // per-emoji keyframe on hover (thumb taps, heart pulses, etc.). Tap
+  // mine to remove; tap another to switch.
   function renderReactionPills(rx, parentId, parentKind) {
     const entries = Object.entries(rx || {})
       .filter(([_, emails]) => Array.isArray(emails) && emails.length > 0)
@@ -1211,10 +1252,8 @@
     if (!entries.length) return "";
     const pills = entries.slice(0, 6).map(([emoji, emails]) => {
       const mine = emails.map(e => (e || "").toLowerCase()).includes(viewerEmail);
-      const label = reactionLabel(emoji);
-      const colour = reactionColor(emoji);
       const names = emails.map(e => displayName(e, "")).filter(Boolean).join(", ");
-      return `<button class="wl-react-pill ${mine ? "is-mine" : ""}" data-react="${escapeHtml(emoji)}" data-on="${escapeHtml(parentId)}" data-kind="${escapeHtml(parentKind)}" title="${escapeHtml(names)}" style="color:${colour};">${escapeHtml(label)} <span class="wl-react-count">· ${emails.length}</span></button>`;
+      return `<button class="wl-react-pill ${mine ? "is-mine" : ""}" data-react="${escapeHtml(emoji)}" data-on="${escapeHtml(parentId)}" data-kind="${escapeHtml(parentKind)}" title="${escapeHtml(names)}">${emojiGlyph(emoji)} ${emails.length}</button>`;
     }).join("");
     return `<div class="wl-reactions">${pills}</div>`;
   }
@@ -1260,8 +1299,8 @@
             ${renderReactionPills(comment.reactions || {}, comment.id, "comment")}
           </div>
           <div class="wl-comment-actions">
-            <button class="wl-reply-link wl-comment-like" data-like="${escapeHtml(comment.id)}" data-kind="comment" title="Tap to ${myReaction ? "remove your reaction" : "react " + reactionLabel(DEFAULT_REACTION)}; long-press to pick a different reaction" ${myReaction ? `style="color:${reactionColor(myReaction)};"` : ""}>
-              ${myReaction ? reactionLabel(myReaction) : "Like"}
+            <button class="wl-reply-link wl-comment-like" data-like="${escapeHtml(comment.id)}" data-kind="comment" title="Tap to ${myReaction ? "remove your reaction" : "Like"}; long-press to pick a different reaction">
+              ${myReaction ? `${emojiGlyph(myReaction)} ${reactionLabel(myReaction)}` : "Like"}
             </button>
             <button class="wl-reply-link" data-reply="${escapeHtml(replyKey)}">Reply</button>
           </div>
@@ -1643,12 +1682,14 @@
     pop.className = "wl-emoji-popover";
     pop.innerHTML = REACTIONS.map(e => {
       const meta = REACTION_META[e];
-      return `<button data-emoji="${escapeHtml(e)}" style="color:${meta.color};">${escapeHtml(meta.label)}</button>`;
+      const anim = (meta && meta.anim) || "";
+      const label = (meta && meta.label) || e;
+      return `<button data-emoji="${escapeHtml(e)}" data-label="${escapeHtml(label)}" aria-label="${escapeHtml(label)}" style="--react-anim: wl-${escapeHtml(anim)};"><span class="wl-emoji" data-anim="${escapeHtml(anim)}">${escapeHtml(e)}</span></button>`;
     }).join("");
     document.body.appendChild(pop);
     const rect = anchor.getBoundingClientRect();
     pop.style.left = `${Math.max(8, rect.left + window.scrollX)}px`;
-    pop.style.top  = `${rect.bottom + window.scrollY + 4}px`;
+    pop.style.top  = `${rect.bottom + window.scrollY + 8}px`;
     pop.querySelectorAll("button").forEach(b => {
       b.addEventListener("click", () => { closeEmojiPicker(); onPick(b.dataset.emoji); });
     });
@@ -1691,7 +1732,7 @@
       list.innerHTML = events.slice(0, 30).map(ev => {
         const name = displayName(ev.actor_email, ev.actor_name);
         const verb = ev.kind === "react"
-          ? `${reactionPast(ev.emoji)} your`
+          ? `${emojiGlyph(ev.emoji)} ${reactionPast(ev.emoji)} your`
           : (ev.parent_comment_id ? "replied to a comment on your" : "commented on your");
         return `<a class="wl-notif-item" href="#post-${escapeHtml(ev.post_id)}" data-jump="${escapeHtml(ev.post_id)}">
           <div><strong>${escapeHtml(name)}</strong> ${verb} post.</div>
