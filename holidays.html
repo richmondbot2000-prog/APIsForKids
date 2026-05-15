@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778886482">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778886482">
-<link rel="stylesheet" href="quiet.css?v=1778886482">
-<link rel="stylesheet" href="quiet-extras.css?v=1778886482">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778886482">
+<link rel="stylesheet" href="style.css?v=1778887035">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778887035">
+<link rel="stylesheet" href="quiet.css?v=1778887035">
+<link rel="stylesheet" href="quiet-extras.css?v=1778887035">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778887035">
 <style>
   .hd-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   .hd-section h1 {
@@ -445,7 +445,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778886482" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778887035" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -641,12 +641,17 @@
     });
   }
 
+  let viewTabsWired = false;
   function setupViewTabs() {
     const wrap = document.getElementById("hdViewTabs");
     const count = document.getElementById("hdTeamCount");
-    if (directReports.size === 0) return;
-    wrap.style.display = "flex";
-    count.textContent = String(directReports.size);
+    if (!wrap) return;
+    // Visibility tracks the current direct-report set so the Team tab
+    // can appear / disappear mid-session as managers are reassigned.
+    wrap.style.display = (directReports.size > 0) ? "flex" : "none";
+    if (count) count.textContent = String(directReports.size);
+    if (viewTabsWired) return;
+    viewTabsWired = true;
     wrap.querySelectorAll(".hd-view-tab").forEach(btn => {
       btn.addEventListener("click", async () => {
         currentView = btn.dataset.view;
@@ -657,9 +662,11 @@
         });
         // Switching to Team re-fetches annotations.json from raw GH —
         // so a Line Manager edit made on the Directory page in another
-        // tab shows up here without a hard-refresh.
+        // tab shows up here without a hard-refresh. Toggles tab
+        // visibility too in case the report set just changed.
         if (currentView === "team") {
           await refreshLineManagers();
+          wrap.style.display = (directReports.size > 0) ? "flex" : "none";
           if (count) count.textContent = String(directReports.size);
         }
         renderAll();
@@ -685,10 +692,23 @@
           .filter(([_, mgr]) => mgr === viewerEmail.toLowerCase())
           .map(([emp]) => emp.toLowerCase())
       );
+      // Re-run setupViewTabs so the Team tab can appear / disappear as
+      // the report set changes — without a hard refresh.
+      setupViewTabs();
     } catch (e) {
       console.warn("[holidays] refreshLineManagers failed", e);
     }
   }
+  // Refresh line-manager data when the user returns to the tab (most
+  // common path for "I just set someone as my report on Directory in
+  // another tab and came back"). 30s debounce so a rapid alt-tab
+  // doesn't hammer raw.githubusercontent.com.
+  let lastFocusRefresh = 0;
+  window.addEventListener("focus", () => {
+    if (Date.now() - lastFocusRefresh < 30000) return;
+    lastFocusRefresh = Date.now();
+    refreshLineManagers();
+  });
   function renderAll() {
     document.getElementById("hdOwnView").style.display  = (currentView === "own")  ? "" : "none";
     document.getElementById("hdTeamView").style.display = (currentView === "team") ? "" : "none";
@@ -710,7 +730,7 @@
     const name = u.name || selectedEmail || "—";
     document.getElementById("hdMeta").textContent =
       `${name} · ${formatRangeLabel(yearStart, yearEnd)} · holidays.json updated ${holidaysDoc.updated_at ? new Date(holidaysDoc.updated_at).toLocaleString("en-GB") : "—"}`;
-    document.getElementById("hdHolidayCount").textContent = String(countHolidayDays(selectedEmail));
+    document.getElementById("hdHolidayCount").textContent = formatHolidayCount(countHolidayDays(selectedEmail));
   }
 
   function countHolidayDays(email) {
@@ -722,12 +742,17 @@
       const dow = d.getDay();
       const stored = days[iso];
       const isWeekend = (dow === 0 || dow === 6);
-      // A "holiday day marked" = an explicit 'holiday' or 'maternity'
-      // override, OR a default UK BH on a weekday with no override.
-      if (stored === "holiday" || stored === "maternity") { count += 1; continue; }
+      // A "holiday day marked" = any explicit holiday / maternity /
+      // approved-holiday override (+1) OR a half-day override (+0.5)
+      // OR a default UK BH on a weekday with no override (+1).
+      if (stored === "holiday" || stored === "maternity" || stored === "approved-holiday") { count += 1; continue; }
+      if (stored === "half-am" || stored === "half-pm") { count += 0.5; continue; }
       if (!stored && !isWeekend && UK_BANK_HOLIDAYS.has(iso)) { count += 1; continue; }
     }
     return count;
+  }
+  function formatHolidayCount(n) {
+    return (Math.round(n * 2) === n * 2 && (n * 2) % 2 === 1) ? n.toFixed(1) : String(n);
   }
 
   function renderCalendar() {
@@ -994,6 +1019,9 @@
       saveDayFor(reportEmail, iso, current, next);
       closePicker();
     });
+    const onKey = e => {
+      if (e.key === "Escape") { e.preventDefault(); closePicker(); }
+    };
     setTimeout(() => {
       document.addEventListener("click", function onDoc(e) {
         if (pop.contains(e.target)) {
@@ -1002,10 +1030,9 @@
         }
         closePicker();
       }, { once: true });
-      document.addEventListener("keydown", function onKey(e) {
-        if (e.key === "Escape") { e.preventDefault(); closePicker(); document.removeEventListener("keydown", onKey); }
-      });
+      document.addEventListener("keydown", onKey);
     }, 0);
+    pop._cleanup = () => { document.removeEventListener("keydown", onKey); };
   }
 
   function renderLog() {
