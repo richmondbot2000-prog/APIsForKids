@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-14T21:47:26Z",
+  "updated_at": "2026-05-15T08:33:09Z",
   "totals": {
     "groups": 105,
-    "members": 219
+    "members": 218
   },
   "tenants": [
     "letme.co.uk",
@@ -247,15 +247,8 @@
       "description": "",
       "tenant": "letme.co.uk",
       "aliases": [],
-      "member_count": 1,
-      "members": [
-        {
-          "email": "autobots@rapida.bg",
-          "role": "MEMBER",
-          "type": "USER",
-          "status": "ACTIVE"
-        }
-      ]
+      "member_count": 0,
+      "members": []
     },
     {
       "email": "collectionsteam@clearloans.com.au",
