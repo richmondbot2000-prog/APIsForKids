@@ -6,9 +6,9 @@
 <title>TogetherBOOK — Wall</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778835391">
-<link rel="stylesheet" href="quiet.css?v=1778835391">
-<link rel="stylesheet" href="quiet-extras.css?v=1778835391">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778837533">
+<link rel="stylesheet" href="quiet.css?v=1778837533">
+<link rel="stylesheet" href="quiet-extras.css?v=1778837533">
 <style>
   /* 648 px column — sweet spot per editorial line-length research
      (60–75 chars per line at 15 px body). Wider feels marketing-y. */
@@ -54,27 +54,30 @@
   }
   .wl-btn-post:disabled { opacity: 0.45; cursor: not-allowed; }
   .wl-btn-post:hover:not(:disabled) { background: var(--teal-700); }
-  .wl-btn-photo {
-    background: var(--paper-100);
+  /* Compose attach buttons (Photo / Video / GIF) — flat outline icons + label. */
+  .wl-attach-btn {
+    background: transparent;
     border: 1px solid var(--paper-300);
     color: var(--ink-700);
     border-radius: 4px;
-    padding: 7px 12px;
-    font: 500 13px/1 var(--font-display);
+    padding: 6px 10px;
+    font: 500 12px/1 var(--font-display);
     cursor: pointer;
     display: inline-flex; align-items: center; gap: 6px;
+    min-height: 36px;
   }
-  .wl-btn-photo:hover { background: var(--paper-200); }
-  .wl-compose-previews {
-    display: flex; flex-wrap: wrap; gap: 6px;
-    margin-top: 10px;
-  }
+  .wl-attach-btn:hover { color: var(--ink-900); border-color: var(--brass-500); }
+  .wl-attach-btn .wl-icon { width: 18px; height: 18px; }
+  .wl-attach-btn input[type=file] { display: none; }
+  .wl-compose-previews { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
   .wl-compose-preview {
     position: relative; width: 88px; height: 88px;
     border-radius: 4px; overflow: hidden;
     border: 1px solid var(--paper-300);
+    background: var(--paper-100);
   }
-  .wl-compose-preview img { width: 100%; height: 100%; object-fit: cover; }
+  .wl-compose-preview img,
+  .wl-compose-preview video { width: 100%; height: 100%; object-fit: cover; display: block; }
   .wl-compose-preview .wl-remove {
     position: absolute; top: 2px; right: 2px;
     width: 22px; height: 22px;
@@ -90,6 +93,83 @@
     animation: wl-pulse 1.2s ease-in-out infinite;
   }
   @keyframes wl-pulse { 0%,100%{opacity:0.3} 50%{opacity:0.8} }
+
+  /* Inline icon attach buttons inside a comment / reply composer */
+  .wl-comment-attach {
+    background: none; border: none;
+    color: var(--ink-600);
+    padding: 6px; cursor: pointer;
+    display: inline-flex; align-items: center;
+    min-width: 36px; min-height: 36px;
+    justify-content: center;
+    border-radius: 4px;
+  }
+  .wl-comment-attach:hover { color: var(--ink-900); background: var(--paper-100); }
+  .wl-comment-attach .wl-icon { width: 18px; height: 18px; }
+  .wl-comment-attach input[type=file] { display: none; }
+  .wl-comment-photos { margin-top: 6px; display: grid; gap: 2px; border-radius: 4px; overflow: hidden; max-width: 100%; }
+  .wl-comment-photos.cm-1 { grid-template-columns: 1fr; }
+  .wl-comment-photos.cm-2 { grid-template-columns: 1fr 1fr; }
+  .wl-comment-photos.cm-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .wl-comment-photos.cm-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+  .wl-comment-photos img, .wl-comment-photos video {
+    width: 100%; max-height: 240px; object-fit: cover; cursor: zoom-in;
+    background: var(--paper-200);
+  }
+  .wl-comment-photos.cm-1 img, .wl-comment-photos.cm-1 video {
+    max-height: 320px; object-fit: contain;
+  }
+
+  /* GIF picker */
+  .wl-gif-panel {
+    position: fixed; inset: 0; z-index: 2500;
+    background: rgba(17, 25, 46, 0.5);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .wl-gif-modal {
+    background: var(--paper-50);
+    border: 1px solid var(--paper-300);
+    width: 100%; max-width: 640px; max-height: 80vh;
+    display: flex; flex-direction: column;
+    border-radius: 4px; overflow: hidden;
+  }
+  .wl-gif-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px; border-bottom: 1px solid var(--divider);
+  }
+  .wl-gif-head input {
+    flex: 1 1 auto;
+    border: 1px solid var(--paper-300);
+    border-radius: 4px;
+    padding: 8px 12px;
+    font: 400 14px/1.4 var(--font-body);
+    background: white;
+  }
+  .wl-gif-head input:focus { outline: 2px solid var(--ink-700); border-color: var(--ink-700); }
+  .wl-gif-close { background: none; border: none; cursor: pointer; padding: 6px; color: var(--ink-700); }
+  .wl-gif-close:hover { color: var(--ink-900); }
+  .wl-gif-grid {
+    flex: 1 1 auto; overflow-y: auto;
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px; padding: 10px;
+  }
+  .wl-gif-tile {
+    cursor: pointer; background: var(--paper-100); overflow: hidden;
+    border: 1px solid var(--paper-300);
+    border-radius: 3px; aspect-ratio: 1 / 1;
+  }
+  .wl-gif-tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .wl-gif-tile:hover { border-color: var(--brass-500); }
+  .wl-gif-attribution {
+    padding: 6px 14px;
+    font: 400 10px/1 var(--font-mono);
+    color: var(--ink-500); text-align: right;
+    border-top: 1px solid var(--divider);
+  }
+  @media (max-width: 480px) {
+    .wl-gif-grid { grid-template-columns: 1fr 1fr; }
+  }
 
   /* Avatars */
   .wl-avatar {
@@ -218,15 +298,68 @@
   /* Comment composer */
   .wl-comment-composer { display: flex; gap: 8px; align-items: center; margin: 6px 0 8px; }
   .wl-comment-composer .wl-avatar { width: 32px; height: 32px; font-size: 11px; }
-  .wl-comment-composer input {
-    flex: 1 1 auto;
+  .wl-comment-composer input.wl-comment-input {
+    flex: 1 1 auto; min-width: 0;
     border: 1px solid var(--paper-300);
     border-radius: 16px;
     padding: 8px 14px;
     font: 400 14px/1.4 var(--font-body);
     background: white;
   }
-  .wl-comment-composer input:focus { outline: 1px solid var(--brass-500); }
+  .wl-comment-composer input.wl-comment-input:focus { outline: 1px solid var(--brass-500); }
+
+  /* Delete (trash) icon button shown next to each post/comment/reply when
+     the viewer is the author or an admin. */
+  .wl-delete-btn {
+    background: none; border: none;
+    color: var(--ink-500);
+    padding: 6px; border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 32px; min-height: 32px;
+  }
+  .wl-delete-btn:hover { color: var(--red-500); background: var(--paper-100); }
+  .wl-delete-btn svg { width: 16px; height: 16px; }
+  .wl-post-head-actions { display: flex; align-items: center; gap: 4px; }
+
+  /* Confirm modal — small dialog with ink-900 backdrop */
+  .wl-confirm-panel {
+    position: fixed; inset: 0; z-index: 2700;
+    background: rgba(17,25,46,0.5);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .wl-confirm-modal {
+    background: var(--paper-50);
+    border: 1px solid var(--paper-300);
+    border-radius: 4px;
+    padding: 22px 26px;
+    max-width: 440px; width: 100%;
+  }
+  .wl-confirm-modal h3 {
+    margin: 0 0 8px;
+    font: 600 18px/1.2 var(--font-display);
+    color: var(--ink-900);
+  }
+  .wl-confirm-modal p {
+    margin: 0 0 18px;
+    font: 400 14px/1.45 var(--font-body);
+    color: var(--ink-700);
+  }
+  .wl-confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .wl-confirm-cancel, .wl-confirm-ok {
+    border: 1px solid var(--paper-300);
+    background: var(--paper-100);
+    color: var(--ink-800);
+    padding: 8px 16px; border-radius: 4px; cursor: pointer;
+    font: 500 13px/1 var(--font-display);
+    min-height: 36px;
+  }
+  .wl-confirm-cancel:hover { border-color: var(--brass-500); }
+  .wl-confirm-ok {
+    background: var(--red-500); color: white; border-color: var(--red-500);
+  }
+  .wl-confirm-ok:hover { background: var(--red-600); border-color: var(--red-600); }
 
   /* Comments */
   .wl-comments { margin-top: 4px; }
@@ -341,9 +474,13 @@
     border: 1px solid var(--paper-300);
     width: 40px; height: 40px;
     border-radius: 50%;
-    cursor: pointer; font-size: 18px; position: relative;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    cursor: pointer; position: relative;
+    color: var(--ink-700);
+    display: flex; align-items: center; justify-content: center;
   }
+  .wl-notif-btn:hover { color: var(--ink-900); border-color: var(--brass-500); }
+  .wl-notif-btn .wl-icon { width: 20px; height: 20px; }
+  .wl-icon { display: inline-block; vertical-align: middle; }
   .wl-notif-btn[data-count]:not([data-count="0"])::after {
     content: attr(data-count);
     position: absolute; top: -4px; right: -4px;
@@ -404,7 +541,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778835391" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778837533" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -422,7 +559,7 @@
 <div class="qb-nav-backdrop" onclick="document.body.classList.remove('nav-open')"></div>
 
 <div class="wl-notif-anchor">
-  <button class="wl-notif-btn" id="wlNotifBtn" data-count="0" title="Notifications">🔔</button>
+  <button class="wl-notif-btn" id="wlNotifBtn" data-count="0" title="Notifications" aria-label="Notifications"></button>
   <div class="wl-notif-panel" id="wlNotifPanel">
     <div class="wl-notif-head">
       <span>New since you were last here</span>
@@ -439,9 +576,25 @@
         <div class="wl-avatar" id="wlMyAvatar">?</div>
         <textarea id="wlComposeText" placeholder="What's on your mind?" maxlength="10000"></textarea>
       </div>
+      <div class="wl-compose-previews" id="wlComposePreviews"></div>
       <div class="wl-compose-actions">
-        <span class="wl-char-count" id="wlCharCount">0 / 10,000</span>
-        <button class="wl-btn-post" id="wlPostBtn" disabled>Post</button>
+        <div class="wl-compose-actions-left">
+          <label class="wl-attach-btn" title="Add photos (up to 10)">
+            <input type="file" id="wlComposePhotoInput" accept="image/*" multiple>
+            <span id="wlIconPhoto"></span><span>Photo</span>
+          </label>
+          <label class="wl-attach-btn" title="Add a video">
+            <input type="file" id="wlComposeVideoInput" accept="video/*">
+            <span id="wlIconVideo"></span><span>Video</span>
+          </label>
+          <button type="button" class="wl-attach-btn" id="wlComposeGifBtn" title="Pick a GIF / meme">
+            <span id="wlIconGif"></span><span>GIF</span>
+          </button>
+        </div>
+        <div class="wl-compose-actions-left">
+          <span class="wl-char-count" id="wlCharCount">0 / 10,000</span>
+          <button class="wl-btn-post" id="wlPostBtn" disabled>Post</button>
+        </div>
       </div>
     </div>
 
@@ -461,6 +614,7 @@
   let viewerEmail = "";
   let viewerName  = "";
   let viewerPhoto = "";
+  let viewerIsAdmin = false; // true → can delete anyone's post / comment / reply
   let lastSeenByPost = {};
   const openPostIds   = new Set();
   const expandedPostIds = new Set();
@@ -473,13 +627,70 @@
   const DEFAULT_REACTION = REACTIONS[0];
   const WALL_API = "/api/wall";
 
+  // Inline SVG icon set — outline (default) ↔ filled (active/hover).
+  // Replaces system emoji in the action bar so the page stays on the
+  // Quiet Edition ink palette (no full-colour Apple emoji on cream).
+  const ICONS = {
+    thumb: {
+      outline: `<path d="M7 11v10H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 11l4-8a3 3 0 0 1 3 3v4h5.5a2 2 0 0 1 2 2.4l-1.6 7.2A2 2 0 0 1 17.9 21H7V11z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`,
+      filled:  `<path d="M7 11v10H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h3z" fill="currentColor"/><path d="M7 11l4-8a3 3 0 0 1 3 3v4h5.5a2 2 0 0 1 2 2.4l-1.6 7.2A2 2 0 0 1 17.9 21H7V11z" fill="currentColor"/>`,
+    },
+    bell: {
+      outline: `<path d="M6 9a6 6 0 0 1 12 0c0 5 3 5 3 8H3c0-3 3-3 3-8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 21a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`,
+      filled:  `<path d="M6 9a6 6 0 0 1 12 0c0 5 3 5 3 8H3c0-3 3-3 3-8z" fill="currentColor"/><path d="M10 21a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`,
+    },
+    heart: {
+      outline: `<path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`,
+      filled:  `<path d="M12 21s-7-4.5-9.5-9A5 5 0 0 1 12 6a5 5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z" fill="currentColor"/>`,
+    },
+    share: {
+      outline: `<path d="M4 18c0-7 7-9 11-9V5l6 5-6 5v-4C8 11 5 13 4 18z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`,
+      filled:  `<path d="M4 18c0-7 7-9 11-9V5l6 5-6 5v-4C8 11 5 13 4 18z" fill="currentColor"/>`,
+    },
+    bookmark: {
+      outline: `<path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`,
+      filled:  `<path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z" fill="currentColor"/>`,
+    },
+    comment: {
+      outline: `<path d="M21 12a8 8 0 0 1-11.8 7L4 21l1.8-5A8 8 0 1 1 21 12z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="12" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><circle cx="15" cy="12" r="1.2" fill="currentColor"/>`,
+      filled:  `<path d="M21 12a8 8 0 0 1-11.8 7L4 21l1.8-5A8 8 0 1 1 21 12z" fill="currentColor"/><circle cx="9" cy="12" r="1.2" fill="var(--paper-50)"/><circle cx="12" cy="12" r="1.2" fill="var(--paper-50)"/><circle cx="15" cy="12" r="1.2" fill="var(--paper-50)"/>`,
+    },
+    photo: {
+      outline: `<rect x="3" y="5" width="18" height="14" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8.5" cy="10" r="1.5" fill="currentColor"/><path d="M3 17l5-5 5 5 3-3 5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`,
+      filled:  `<rect x="3" y="5" width="18" height="14" rx="1.5" fill="currentColor"/><circle cx="8.5" cy="10" r="1.5" fill="var(--paper-50)"/><path d="M3 17l5-5 5 5 3-3 5 5" fill="none" stroke="var(--paper-50)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`,
+    },
+    video: {
+      outline: `<rect x="3" y="6" width="13" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M16 10l5-3v10l-5-3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`,
+      filled:  `<rect x="3" y="6" width="13" height="12" rx="1.5" fill="currentColor"/><path d="M16 10l5-3v10l-5-3z" fill="currentColor"/>`,
+    },
+    gif: {
+      outline: `<rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><text x="12" y="15" text-anchor="middle" font-family="Inter, sans-serif" font-size="7" font-weight="700" fill="currentColor" letter-spacing="0.5">GIF</text>`,
+      filled:  `<rect x="2" y="5" width="20" height="14" rx="2" fill="currentColor"/><text x="12" y="15" text-anchor="middle" font-family="Inter, sans-serif" font-size="7" font-weight="700" fill="var(--paper-50)" letter-spacing="0.5">GIF</text>`,
+    },
+    close: {
+      outline: `<path d="M6 6l12 12M18 6l-12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`,
+      filled:  `<path d="M6 6l12 12M18 6l-12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>`,
+    },
+    trash: {
+      outline: `<path d="M9 4h6M10 4v-1a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M4 7h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 11v7M14 11v7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`,
+      filled:  `<path d="M9 4h6M10 4v-1a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M4 7h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 11v7M14 11v7" stroke="var(--paper-50)" stroke-width="1.6" stroke-linecap="round"/>`,
+    },
+  };
+  function icon(name, active) {
+    const i = ICONS[name];
+    if (!i) return "";
+    return `<svg class="wl-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">${active ? i.filled : i.outline}</svg>`;
+  }
+
   Promise.all([
     fetch("wall.json",        { cache: "no-store" }).then(r => r.ok ? r.json() : { posts: [] }).catch(() => ({ posts: [] })),
     fetch("staff.json",       { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch("wall-seen.json",   { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch(`${WALL_API}/whoami`, { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch("annotations.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-  ]).then(([wall, staff, seen, who, annFile]) => {
+    fetch("admins.json",      { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+  ]).then(([wall, staff, seen, who, annFile, adminsFile]) => {
+    const adminEmails = new Set(((adminsFile && adminsFile.admins) || []).map(e => (e || "").toLowerCase()));
     posts = Array.isArray(wall.posts) ? wall.posts : [];
     if (staff && Array.isArray(staff.users)) {
       for (const u of staff.users) {
@@ -495,6 +706,7 @@
       const me = staffByEmail[viewerEmail];
       viewerName  = (me && me.name)  || who.name  || viewerEmail.split("@")[0];
       viewerPhoto = (me && photoUrlFor(me)) || "";
+      viewerIsAdmin = adminEmails.has(viewerEmail);
       document.getElementById("wlMyAvatar").innerHTML = avatarInner(viewerName, viewerPhoto);
       document.getElementById("wlCompose").style.display = "";
     }
@@ -512,23 +724,129 @@
   const composeText = document.getElementById("wlComposeText");
   const charCount = document.getElementById("wlCharCount");
   const postBtn = document.getElementById("wlPostBtn");
-  composeText.addEventListener("input", () => {
+  const previewsEl = document.getElementById("wlComposePreviews");
+  let composeAttachments = [];
+
+  function refreshComposeState() {
     const n = composeText.value.length;
     charCount.textContent = `${n.toLocaleString()} / 10,000`;
     charCount.classList.toggle("over", n > 10000);
-    postBtn.disabled = n === 0 || n > 10000;
+    postBtn.disabled = (n === 0 && composeAttachments.length === 0) || n > 10000;
+  }
+  composeText.addEventListener("input", refreshComposeState);
+
+  function renderComposePreviews() {
+    previewsEl.innerHTML = composeAttachments.map((a, i) => {
+      const inner = a.kind === "video"
+        ? `<video src="${escapeHtml(a.preview)}" muted></video>`
+        : `<img src="${escapeHtml(a.preview)}" alt="">`;
+      return `<div class="wl-compose-preview ${a.uploading ? "is-uploading" : ""}" data-att-idx="${i}">${inner}<button type="button" class="wl-remove" data-remove-att="${i}" aria-label="Remove">×</button></div>`;
+    }).join("");
+    previewsEl.querySelectorAll("[data-remove-att]").forEach(el => {
+      el.addEventListener("click", e => {
+        e.preventDefault();
+        composeAttachments.splice(parseInt(el.dataset.removeAtt, 10), 1);
+        renderComposePreviews(); refreshComposeState();
+      });
+    });
+  }
+
+  // Render attach-button icons at boot.
+  document.getElementById("wlIconPhoto").innerHTML = icon("photo", false);
+  document.getElementById("wlIconVideo").innerHTML = icon("video", false);
+  document.getElementById("wlIconGif").innerHTML   = icon("gif",   false);
+
+  document.getElementById("wlComposePhotoInput").addEventListener("change", e => {
+    handleFilePick(Array.from(e.target.files || []), "photo");
+    e.target.value = "";
   });
+  document.getElementById("wlComposeVideoInput").addEventListener("change", e => {
+    handleFilePick(Array.from(e.target.files || []), "video");
+    e.target.value = "";
+  });
+  document.getElementById("wlComposeGifBtn").addEventListener("click", () => {
+    openGifPicker(gif => {
+      composeAttachments.push({ path: gif.url, kind: "gif", preview: gif.preview });
+      renderComposePreviews(); refreshComposeState();
+    });
+  });
+
+  async function handleFilePick(files, kind) {
+    if (!files.length) return;
+    const take = kind === "video" ? Math.min(files.length, 2) : Math.min(files.length, 10);
+    for (const f of files.slice(0, take)) await ingestFile(f, kind);
+    renderComposePreviews(); refreshComposeState();
+  }
+  async function ingestFile(file, kind) {
+    let dataUrl;
+    try {
+      dataUrl = kind === "photo"
+        ? await resizeImage(file, 1600, 0.85)
+        : await readAsDataUrl(file);
+    } catch (e) { showBanner("Couldn't read file: " + e.message, true); return; }
+    const att = { path: "", kind, preview: dataUrl, uploading: true };
+    composeAttachments.push(att); renderComposePreviews();
+    try {
+      const res = await wallAction("upload-media", { data_url: dataUrl, kind });
+      if (!res || !res.path) throw new Error("upload returned no path");
+      att.path = res.path; att.uploading = false;
+      renderComposePreviews();
+    } catch (err) {
+      const i = composeAttachments.indexOf(att);
+      if (i >= 0) composeAttachments.splice(i, 1);
+      renderComposePreviews();
+      showBanner("Upload failed: " + (err.message || err), true);
+    }
+  }
+  function readAsDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = () => reject(new Error("read failed"));
+      r.readAsDataURL(file);
+    });
+  }
+  function resizeImage(file, maxDim, quality) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const src = await readAsDataUrl(file);
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w >= h) { h = Math.round(h * maxDim / w); w = maxDim; }
+            else        { w = Math.round(w * maxDim / h); h = maxDim; }
+          }
+          const c = document.createElement("canvas");
+          c.width = w; c.height = h;
+          const ctx = c.getContext("2d");
+          ctx.fillStyle = "#FFFFFF"; ctx.fillRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(c.toDataURL("image/jpeg", quality));
+        };
+        img.onerror = () => reject(new Error("image decode failed"));
+        img.src = src;
+      } catch (e) { reject(e); }
+    });
+  }
+
   postBtn.addEventListener("click", async () => {
     const body = composeText.value.trim();
-    if (!body) return;
+    if (!body && composeAttachments.length === 0) return;
+    if (composeAttachments.some(a => a.uploading)) {
+      showBanner("Wait for uploads to finish", true); return;
+    }
     postBtn.disabled = true; postBtn.textContent = "Posting…";
     try {
-      const res = await wallAction("post", { body });
+      const photos = composeAttachments.map(a => a.path).filter(Boolean);
+      const res = await wallAction("post", { body, photos });
       if (res && res.post) {
         posts.unshift(res.post);
         sortPosts(); renderFeed(); renderNotifications();
       }
       composeText.value = "";
+      composeAttachments = [];
+      renderComposePreviews();
       charCount.textContent = "0 / 10,000";
       showBanner("Posted");
     } catch (err) {
@@ -537,6 +855,65 @@
       postBtn.disabled = false; postBtn.textContent = "Post";
     }
   });
+
+  // ── GIF picker (via /api/wall/gif-search → Tenor) ─────────────────
+  let gifPickerState = null;
+  function openGifPicker(onPick) {
+    closeGifPicker();
+    const root = document.createElement("div");
+    root.className = "wl-gif-panel";
+    root.innerHTML = `
+      <div class="wl-gif-modal" role="dialog" aria-label="GIF picker">
+        <div class="wl-gif-head">
+          <input type="search" placeholder="Search GIFs + memes…" id="wlGifQuery" autocomplete="off">
+          <button class="wl-gif-close" aria-label="Close">${icon("close", false)}</button>
+        </div>
+        <div class="wl-gif-grid" id="wlGifGrid"><div class="wl-loading">Loading…</div></div>
+        <div class="wl-gif-attribution">via Tenor</div>
+      </div>`;
+    document.body.appendChild(root);
+    const input = root.querySelector("#wlGifQuery");
+    const grid  = root.querySelector("#wlGifGrid");
+    input.focus();
+    let debounce = null;
+    const load = async (q) => {
+      grid.innerHTML = `<div class="wl-loading">Searching…</div>`;
+      try {
+        const res = await wallAction("gif-search", { q, limit: 24 });
+        const results = (res && res.results) || [];
+        if (!results.length) { grid.innerHTML = `<div class="wl-loading">No results.</div>`; return; }
+        grid.innerHTML = results.map(g =>
+          `<div class="wl-gif-tile" data-gif='${escapeHtml(JSON.stringify({ url: g.url, preview: g.preview }))}'>
+             <img src="${escapeHtml(g.preview)}" alt="${escapeHtml(g.title)}" loading="lazy">
+           </div>`
+        ).join("");
+        grid.querySelectorAll(".wl-gif-tile").forEach(t => {
+          t.addEventListener("click", () => {
+            try { onPick(JSON.parse(t.dataset.gif)); } catch (e) {}
+            closeGifPicker();
+          });
+        });
+      } catch (err) {
+        grid.innerHTML = `<div class="wl-loading">${escapeHtml(err.message || String(err))}</div>`;
+      }
+    };
+    input.addEventListener("input", () => {
+      clearTimeout(debounce);
+      debounce = setTimeout(() => load(input.value.trim()), 250);
+    });
+    root.querySelector(".wl-gif-close").addEventListener("click", closeGifPicker);
+    root.addEventListener("click", e => { if (e.target === root) closeGifPicker(); });
+    const onKey = e => { if (e.key === "Escape") closeGifPicker(); };
+    document.addEventListener("keydown", onKey);
+    gifPickerState = { root, onKey };
+    load("");
+  }
+  function closeGifPicker() {
+    if (!gifPickerState) return;
+    gifPickerState.root.remove();
+    document.removeEventListener("keydown", gifPickerState.onKey);
+    gifPickerState = null;
+  }
 
   function renderFeed() {
     const root = document.getElementById("wlFeed");
@@ -575,6 +952,7 @@
     const myReaction = mineReactionOn(post.reactions || {});
     const likeActive = !!myReaction;
     const likeIcon = myReaction || "👍";
+    const canDeletePost = canDelete(post.author_email);
     return `
       <article class="wl-post" data-post="${escapeHtml(post.id)}" id="post-${escapeHtml(post.id)}">
         <div class="wl-post-head">
@@ -583,6 +961,7 @@
             <div class="wl-post-name">${escapeHtml(name)}${channelTag}</div>
             <div class="wl-post-time">${formatTime(post.created_at)}</div>
           </div>
+          ${canDeletePost ? `<div class="wl-post-head-actions"><button class="wl-delete-btn" data-delete-post="${escapeHtml(post.id)}" title="Delete this post" aria-label="Delete post">${icon("trash", false)}</button></div>` : ""}
         </div>
         <div class="wl-post-body${expanded || (post.body || "").length < 240 ? "" : " is-clamped"}" data-post-body="${escapeHtml(post.id)}">${bodyHtml}</div>
         ${(post.body || "").length >= 240 && !expanded ? `<a class="wl-see-more" data-expand="${escapeHtml(post.id)}">See more</a>` : ""}
@@ -596,24 +975,54 @@
         </div>
         <div class="wl-action-bar">
           <button class="wl-action wl-action-like ${likeActive ? "is-active" : ""}" data-like="${escapeHtml(post.id)}" data-kind="post" title="Tap to ${likeActive ? "remove " + likeIcon : "react " + DEFAULT_REACTION}; long-press for more">
-            <span class="wl-action-icon">${likeActive ? likeIcon : "👍"}</span>
+            <span class="wl-action-icon">${icon("thumb", likeActive)}</span>
             <span class="wl-action-label">${likeActive ? "Reacted" : "Like"}</span>
           </button>
           <button class="wl-action" data-toggle-comments="${escapeHtml(post.id)}">
-            <span class="wl-action-icon">💬</span>
+            <span class="wl-action-icon">${icon("comment", false)}</span>
             <span class="wl-action-label">Comment</span>
           </button>
           <button class="wl-action" data-share="${escapeHtml(post.id)}">
-            <span class="wl-action-icon">↗︎</span>
+            <span class="wl-action-icon">${icon("share", false)}</span>
             <span class="wl-action-label">Share</span>
           </button>
         </div>
         <div class="wl-comment-composer">
           <div class="wl-avatar">${avatarInner(viewerName, viewerPhoto)}</div>
-          <input type="text" placeholder="Add a comment…" data-add-comment="${escapeHtml(post.id)}" ${viewerEmail ? "" : "disabled"} maxlength="2000">
+          <input class="wl-comment-input" type="text" placeholder="Add a comment…" data-add-comment="${escapeHtml(post.id)}" ${viewerEmail ? "" : "disabled"} maxlength="2000">
+          ${commentAttachButtons(post.id, "")}
         </div>
         ${renderComments(post, open)}
       </article>`;
+  }
+
+  function canDelete(authorEmail) {
+    if (!viewerEmail) return false;
+    if (viewerIsAdmin) return true;
+    return (authorEmail || "").toLowerCase() === viewerEmail;
+  }
+  function commentAttachButtons(postId, parentCommentId) {
+    if (!viewerEmail) return "";
+    const key = parentCommentId ? `${postId}::${parentCommentId}` : postId;
+    return `
+      <label class="wl-comment-attach" title="Add photo">
+        <input type="file" accept="image/*" data-cm-photo="${escapeHtml(key)}">
+        ${icon("photo", false)}
+      </label>
+      <button type="button" class="wl-comment-attach" data-cm-gif="${escapeHtml(key)}" title="Add a GIF">
+        ${icon("gif", false)}
+      </button>`;
+  }
+  function renderCommentMedia(photos, commentId) {
+    if (!photos || !photos.length) return "";
+    const n = Math.min(photos.length, 4);
+    const tiles = photos.slice(0, 4).map((p, i) => {
+      const isVideo = /\.(mp4|webm|mov)$/i.test(p);
+      return isVideo
+        ? `<video src="${escapeHtml(p)}" controls playsinline></video>`
+        : `<img src="${escapeHtml(p)}" alt="" loading="lazy" data-cm-open-lightbox="${escapeHtml(commentId)}::${i}">`;
+    }).join("");
+    return `<div class="wl-comment-photos cm-${n}">${tiles}</div>`;
   }
 
   function mineReactionOn(rx) {
@@ -698,28 +1107,34 @@
     const replyKey = `${post.id}::${comment.id}`;
     const replyComposerOpen = openReplyTo.has(replyKey);
     const myReaction = mineReactionOn(comment.reactions || {});
+    const canDel = canDelete(comment.author_email);
     return `
       <div class="wl-comment ${isReply ? "is-reply" : ""}" data-comment="${escapeHtml(comment.id)}">
         <div class="wl-avatar">${avatarInner(name, photo)}</div>
         <div style="flex:1;">
           <div class="wl-comment-body">
-            <div>
-              <span class="wl-comment-name">${escapeHtml(name)}</span>
-              <span class="wl-comment-time">${formatTime(comment.created_at)}</span>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+              <div>
+                <span class="wl-comment-name">${escapeHtml(name)}</span>
+                <span class="wl-comment-time">${formatTime(comment.created_at)}</span>
+              </div>
+              ${canDel ? `<button class="wl-delete-btn" data-delete-comment="${escapeHtml(post.id)}::${escapeHtml(comment.id)}" title="Delete this ${isReply ? "reply" : "comment"}" aria-label="Delete">${icon("trash", false)}</button>` : ""}
             </div>
-            <div class="wl-comment-text">${escapeHtml(comment.body || "")}</div>
+            ${comment.body ? `<div class="wl-comment-text">${escapeHtml(comment.body)}</div>` : ""}
+            ${renderCommentMedia(comment.photos || [], comment.id)}
             ${renderReactionPills(comment.reactions || {}, comment.id, "comment")}
           </div>
           <div class="wl-comment-actions">
             <button class="wl-reply-link wl-comment-like" data-like="${escapeHtml(comment.id)}" data-kind="comment" title="Tap to ${myReaction ? "remove " + myReaction : "react " + DEFAULT_REACTION}; long-press for more">
-              ${myReaction ? myReaction + " Reacted" : "👍 Like"}
+              ${myReaction ? myReaction + " Reacted" : "Like"}
             </button>
             <button class="wl-reply-link" data-reply="${escapeHtml(replyKey)}">Reply</button>
           </div>
           ${replyComposerOpen ? `
             <div class="wl-comment-composer">
               <div class="wl-avatar">${avatarInner(viewerName, viewerPhoto)}</div>
-              <input type="text" placeholder="Reply to ${escapeHtml(name)}…" data-add-reply="${escapeHtml(replyKey)}" maxlength="2000" autofocus>
+              <input class="wl-comment-input" type="text" placeholder="Reply to ${escapeHtml(name)}…" data-add-reply="${escapeHtml(replyKey)}" maxlength="2000" autofocus>
+              ${commentAttachButtons(post.id, comment.id)}
             </div>` : ""}
           ${replies.length ? `<div class="wl-replies">${replies.map(r => renderComment(post, r, true)).join("")}</div>` : ""}
         </div>
@@ -848,6 +1263,143 @@
         );
       });
     });
+
+    // Inline comment / reply media attach
+    document.querySelectorAll("[data-cm-photo]").forEach(el => {
+      el.addEventListener("change", async e => {
+        const file = (e.target.files || [])[0];
+        e.target.value = "";
+        if (!file) return;
+        await submitCommentWithMedia(el.dataset.cmPhoto, file, "photo");
+      });
+    });
+    document.querySelectorAll("[data-cm-gif]").forEach(el => {
+      el.addEventListener("click", () => {
+        const key = el.dataset.cmGif;
+        openGifPicker(async gif => {
+          await submitCommentWithMediaPath(key, gif.url, "gif");
+        });
+      });
+    });
+    document.querySelectorAll("[data-cm-open-lightbox]").forEach(el => {
+      el.addEventListener("click", () => {
+        const [cid, idxStr] = el.dataset.cmOpenLightbox.split("::");
+        let media = [];
+        for (const p of posts) {
+          const c = (p.comments || []).find(x => x.id === cid);
+          if (c) { media = c.photos || []; break; }
+        }
+        openLightbox(media, parseInt(idxStr, 10) || 0);
+      });
+    });
+
+    // Delete affordances
+    document.querySelectorAll("[data-delete-post]").forEach(el => {
+      el.addEventListener("click", async () => {
+        const id = el.dataset.deletePost;
+        const ok = await confirmDialog("Delete this post?", "The post + all its comments will be permanently removed. This cannot be undone.");
+        if (!ok) return;
+        try {
+          await wallAction("delete", { kind: "post", id });
+          const i = posts.findIndex(p => p.id === id);
+          if (i >= 0) posts.splice(i, 1);
+          renderFeed(); renderNotifications();
+          showBanner("Deleted");
+        } catch (err) {
+          showBanner(err.message || String(err), true);
+        }
+      });
+    });
+    document.querySelectorAll("[data-delete-comment]").forEach(el => {
+      el.addEventListener("click", async () => {
+        const [pid, cid] = el.dataset.deleteComment.split("::");
+        const post = posts.find(p => p.id === pid);
+        const c = post && (post.comments || []).find(x => x.id === cid);
+        const isReply = c && c.parent_comment_id;
+        const ok = await confirmDialog(
+          `Delete this ${isReply ? "reply" : "comment"}?`,
+          isReply
+            ? "The reply will be permanently removed."
+            : "The comment and any replies underneath it will be permanently removed.",
+        );
+        if (!ok) return;
+        try {
+          await wallAction("delete", { kind: "comment", post_id: pid, id: cid });
+          if (post) {
+            // Remove the comment AND any replies to it (one level deep — that's the cap).
+            post.comments = (post.comments || []).filter(c => c.id !== cid && c.parent_comment_id !== cid);
+          }
+          sortPosts(); renderFeed(); renderNotifications();
+          showBanner("Deleted");
+        } catch (err) {
+          showBanner(err.message || String(err), true);
+        }
+      });
+    });
+  }
+
+  async function submitCommentWithMedia(key, file, kind) {
+    let dataUrl;
+    try { dataUrl = kind === "photo" ? await resizeImage(file, 1600, 0.85) : await readAsDataUrl(file); }
+    catch (e) { showBanner("Couldn't read file: " + e.message, true); return; }
+    let res;
+    try { res = await wallAction("upload-media", { data_url: dataUrl, kind }); }
+    catch (e) { showBanner("Upload failed: " + e.message, true); return; }
+    if (!res || !res.path) return;
+    await submitCommentWithMediaPath(key, res.path, kind);
+  }
+  async function submitCommentWithMediaPath(key, path, kind) {
+    const [pid, parent] = key.includes("::") ? key.split("::") : [key, null];
+    const inp = parent
+      ? document.querySelector(`[data-add-reply="${cssAttr(key)}"]`)
+      : document.querySelector(`[data-add-comment="${cssAttr(pid)}"]`);
+    const text = inp ? inp.value.trim() : "";
+    try {
+      const payload = { post_id: pid, body: text, photos: [path] };
+      if (parent) payload.parent_comment_id = parent;
+      const res = await wallAction("comment", payload);
+      if (res && res.comment) {
+        const post = posts.find(p => p.id === pid);
+        if (post) { post.comments = post.comments || []; post.comments.push(res.comment); }
+        if (parent) openReplyTo.delete(key);
+        openPostIds.add(pid);
+        sortPosts(); renderFeed();
+      }
+    } catch (err) {
+      showBanner(err.message || String(err), true);
+    }
+  }
+
+  // Generic confirm dialog — returns Promise<bool>. Used for deletes.
+  function confirmDialog(title, body) {
+    return new Promise(resolve => {
+      const root = document.createElement("div");
+      root.className = "wl-confirm-panel";
+      root.innerHTML = `
+        <div class="wl-confirm-modal" role="dialog" aria-modal="true">
+          <h3>${escapeHtml(title)}</h3>
+          <p>${escapeHtml(body)}</p>
+          <div class="wl-confirm-actions">
+            <button class="wl-confirm-cancel" type="button">Cancel</button>
+            <button class="wl-confirm-ok" type="button">Delete</button>
+          </div>
+        </div>`;
+      document.body.appendChild(root);
+      const close = (ans) => {
+        document.removeEventListener("keydown", onKey);
+        root.remove();
+        resolve(ans);
+      };
+      const onKey = e => {
+        if (e.key === "Escape") close(false);
+        else if (e.key === "Enter") close(true);
+      };
+      document.addEventListener("keydown", onKey);
+      root.addEventListener("click", e => { if (e.target === root) close(false); });
+      root.querySelector(".wl-confirm-cancel").addEventListener("click", () => close(false));
+      root.querySelector(".wl-confirm-ok").addEventListener("click", () => close(true));
+      root.querySelector(".wl-confirm-ok").focus();
+    });
   }
 
   // Tap a Like button = toggle default reaction. Long-press (450 ms) opens
@@ -962,6 +1514,11 @@
     const events = collectNotifications();
     const btn = document.getElementById("wlNotifBtn");
     btn.setAttribute("data-count", String(events.length));
+    if (!btn.querySelector(".wl-icon")) {
+      btn.insertAdjacentHTML("afterbegin", icon("bell", events.length > 0));
+    } else {
+      btn.querySelector(".wl-icon").outerHTML = icon("bell", events.length > 0);
+    }
     const list = document.getElementById("wlNotifList");
     if (!events.length) {
       list.innerHTML = `<div class="wl-notif-empty">Nothing new on your posts.</div>`;

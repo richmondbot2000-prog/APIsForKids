@@ -1337,15 +1337,132 @@ async function handleWall(req, env, url) {
 
   try {
     switch (action) {
-      case "post":      return json(await wallPost(env, viewerEmail, viewerName, body), 200, req);
-      case "comment":   return json(await wallComment(env, viewerEmail, viewerName, body), 200, req);
-      case "react":     return json(await wallReact(env, viewerEmail, body), 200, req);
-      case "mark-seen": return json(await wallMarkSeen(env, viewerEmail, body), 200, req);
-      default:          return json({ error: `unknown wall action: ${action}` }, 404, req);
+      case "post":         return json(await wallPost(env, viewerEmail, viewerName, body), 200, req);
+      case "comment":      return json(await wallComment(env, viewerEmail, viewerName, body), 200, req);
+      case "react":        return json(await wallReact(env, viewerEmail, body), 200, req);
+      case "mark-seen":    return json(await wallMarkSeen(env, viewerEmail, body), 200, req);
+      case "upload-media": return json(await wallUploadMedia(env, viewerEmail, body), 200, req);
+      case "gif-search":   return json(await wallGifSearch(env, body), 200, req);
+      case "delete":       return json(await wallDelete(env, viewerEmail, body), 200, req);
+      default:             return json({ error: `unknown wall action: ${action}` }, 404, req);
     }
   } catch (e) {
     return json({ ok: false, error: e.message || String(e) }, 500, req);
   }
+}
+
+// Accept a base64-encoded blob + content-type, write to wall-media/ via
+// GitHub Contents API, return the public path. Caller is responsible for
+// client-side resize / format normalisation — Worker just stores bytes.
+async function wallUploadMedia(env, viewerEmail, body) {
+  if (!viewerEmail) throw new Error("not authenticated");
+  const dataUrl = (body.data_url || "").toString();
+  const kind = (body.kind || "photo").toString();
+  if (!dataUrl.startsWith("data:")) throw new Error("data_url must be a data: URL");
+  const m = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
+  if (!m) throw new Error("data_url not in 'data:<mime>;base64,<bytes>' form");
+  const mime = m[1];
+  const b64  = m[2];
+  // 25 MB hard cap on the base64 string (≈ 18 MB binary).
+  if (b64.length > 25 * 1024 * 1024) throw new Error("media too large (max ~18 MB)");
+  const extByMime = {
+    "image/jpeg": "jpg", "image/jpg": "jpg", "image/png": "png", "image/webp": "webp",
+    "image/gif": "gif", "image/svg+xml": "svg",
+    "video/mp4": "mp4", "video/webm": "webm", "video/quicktime": "mov",
+  };
+  const ext = extByMime[mime];
+  if (!ext) throw new Error(`unsupported media type: ${mime}`);
+  if (!env.GITHUB_TOKEN) throw new Error("GITHUB_TOKEN not configured on the worker");
+
+  const id = wallId(kind === "video" ? "vid" : "img");
+  const path = `wall-media/${id}.${ext}`;
+  const ghHeaders = {
+    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "apifk-workspace-worker",
+  };
+  const putRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+    method: "PUT",
+    headers: { ...ghHeaders, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: `Wall: media upload by ${viewerEmail}`,
+      content: b64,
+      branch: BRANCH,
+    }),
+  });
+  if (!putRes.ok) {
+    const detail = (await putRes.text()).slice(0, 200);
+    throw new Error(`media upload failed: HTTP ${putRes.status} ${detail}`);
+  }
+  return { ok: true, path, kind, mime };
+}
+
+// Delete a post or comment. Authorisation: the caller must be the author
+// of the target, OR a TogetherBook admin (admins.json membership).
+async function wallDelete(env, viewerEmail, body) {
+  if (!viewerEmail) throw new Error("not authenticated");
+  const kind = body.kind === "comment" ? "comment" : "post";
+  const id = (body.id || "").toString();
+  if (!id) throw new Error("missing id");
+
+  const admins = await fetchAdmins();
+  const isAdmin = admins.includes(viewerEmail);
+
+  await updateWallJson(env, doc => {
+    if (kind === "post") {
+      const posts = doc.posts || [];
+      const idx = posts.findIndex(p => p.id === id);
+      if (idx < 0) throw new Error("post not found");
+      const post = posts[idx];
+      if (!isAdmin && (post.author_email || "").toLowerCase() !== viewerEmail) {
+        throw new Error("not allowed — you can only delete your own posts");
+      }
+      posts.splice(idx, 1);
+    } else {
+      const pid = (body.post_id || "").toString();
+      const post = (doc.posts || []).find(p => p.id === pid);
+      if (!post) throw new Error("post not found");
+      const idx = (post.comments || []).findIndex(c => c.id === id);
+      if (idx < 0) throw new Error("comment not found");
+      const comment = post.comments[idx];
+      if (!isAdmin && (comment.author_email || "").toLowerCase() !== viewerEmail) {
+        throw new Error("not allowed — you can only delete your own comments");
+      }
+      // Drop the comment AND any replies to it (one level only).
+      post.comments = post.comments.filter(c => c.id !== id && c.parent_comment_id !== id);
+    }
+  }, `Wall: ${kind} ${id} deleted by ${viewerEmail}`);
+
+  return { ok: true, kind, id };
+}
+
+// Proxy Tenor v2 /search so the API key stays a Worker secret instead of
+// being exposed to every page load. Caller passes ?q=string&limit=24.
+async function wallGifSearch(env, body) {
+  const q = (body.q || "").toString().trim();
+  const limit = Math.min(parseInt(body.limit, 10) || 24, 50);
+  if (!env.TENOR_API_KEY) {
+    throw new Error("TENOR_API_KEY not configured on the worker — add it in Cloudflare Worker secrets");
+  }
+  const url = new URL("https://tenor.googleapis.com/v2/" + (q ? "search" : "featured"));
+  url.searchParams.set("key", env.TENOR_API_KEY);
+  url.searchParams.set("client_key", "togetherbook-wall");
+  url.searchParams.set("limit", String(limit));
+  url.searchParams.set("media_filter", "tinygif,gif,mp4");
+  url.searchParams.set("contentfilter", "medium");
+  if (q) url.searchParams.set("q", q);
+  const res = await fetch(url.toString());
+  if (!res.ok) throw new Error(`Tenor search failed: HTTP ${res.status}`);
+  const data = await res.json();
+  const results = (data.results || []).map(r => ({
+    id: r.id,
+    title: r.content_description || r.title || "",
+    preview: r.media_formats?.tinygif?.url || r.media_formats?.gif?.url,
+    url: r.media_formats?.gif?.url || r.media_formats?.tinygif?.url,
+    width: r.media_formats?.gif?.dims?.[0] || 0,
+    height: r.media_formats?.gif?.dims?.[1] || 0,
+  })).filter(r => r.preview && r.url);
+  return { ok: true, results };
 }
 
 function wallId(prefix) {
@@ -1392,7 +1509,8 @@ async function wallComment(env, viewerEmail, viewerName, body) {
   const text = (body.body || "").trim();
   const parent = body.parent_comment_id ? body.parent_comment_id.toString() : null;
   if (!pid)  throw new Error("missing post_id");
-  if (!text) throw new Error("empty body");
+  const photos = Array.isArray(body.photos) ? body.photos.slice(0, 4) : [];
+  if (!text && !photos.length) throw new Error("empty comment");
   if (text.length > 2000) throw new Error("body exceeds 2,000 chars");
 
   const newComment = {
@@ -1402,6 +1520,7 @@ async function wallComment(env, viewerEmail, viewerName, body) {
     author_name:  viewerName || viewerEmail.split("@")[0],
     created_at:   new Date().toISOString(),
     body:         text,
+    photos,
     reactions:    {},
   };
 
