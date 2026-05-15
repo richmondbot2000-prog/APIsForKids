@@ -461,7 +461,9 @@ A second, equally important purpose: **per-seat billing visibility for leavers**
 The hourly `process-pending-transfers.yml` workflow runs `scripts/process_pending_transfers.py` which:
 
 1. Walks every Gmail message in the source mailbox via the Gmail API (`messages.list` + `messages.get` format=raw + `messages.insert` on the target with `internalDateSource=dateHeader` so timestamps survive).
-2. Calls Admin SDK `users.delete` on the source once the Gmail migration is complete.
+2. **Finishes the leaver flow** — branches on `convert_to_group_forward_to` on the pending entry:
+   - If unset: plain Admin SDK `users.delete` on the source (the "Delete account (no forwarding)" path).
+   - If set: rename source to `<localpart>.parked.<unix>@<domain>`, delete by immutable id, AND write a `pending_conversion` annotation to `annotations.json` so the existing daily `finalise_pending_conversions.py` cron creates the forwarding Group at the original address once Google's 20-day reuse lockout expires (the "Delete account and forward mail" path).
 3. Removes the entry from `pending-transfers.json` (commits the change so the page badge clears).
 
 Required scopes (must be added to **Domain-wide delegation** in admin.google.com → Security → API controls):
@@ -827,17 +829,20 @@ Full setup walkthroughs:
 
 ### 11.2 TopUps page (`topups.html`)
 
-Renders one chart and one table from `topups.json`.
+Renders one chart and one table from `topups.json`. Lives under the **Reports** section in the nav.
 
 **Definitions** (used in queries inside `scan_topups.py`):
 - **Live loan** = LoanHistory snapshot where `(DateInArrearsUTC IS NULL OR DATEDIFF(day, DateInArrearsUTC, DateTimeUTC) < 90) AND CurrentBalance > 10`. The snapshot's own date is used so DIA-as-of-snapshot is correct for back-dated rows.
 - **Primary loan** = a loan where `LoanAtInception.TopUpAmountAtInception IS NULL`. The customer's first loan.
 - **Top-up loan** = `TopUpAmountAtInception IS NOT NULL`. The customer already had a live loan that was settled at this loan's payout.
 - **Top-up eligible** (`TueStatus = 1` on a snapshot) = the live loan met the lender's TUE thresholds at the time the snapshot was written. Recalculated nightly by Daily Update + on every transaction by Mini Update + on every Whitebox run.
+- **Top-up eligible AND logged into app** (added 2026-05-14) = subset of the above where the borrower's LoanbookId appears in `dbo.AppLoginSuccesses` at least once in the same month. The TL app is the only place a borrower can actually request a top-up, so this is the real on-ramp signal — the gap between the red and blue lines is latent revenue.
 
 **Lender filter:** `LENDER_ID = 6` — Transform Credit / Together Loans (USA). Hardcoded in `scan_topups.py`. The script auto-discovers which warehouse table holds both `LoanbookId` AND `LenderId` columns (currently `Loan`) and uses it in a CTE pre-filter.
 
-**Chart:** stacked SVG bars (ink-300 primary on the bottom, brass-300 top-up on top) plus a manuscript-red line tracking the TUE-eligible count. Hand-rolled SVG, no chart-lib dependency. ~5KB inline.
+**Chart:** stacked SVG bars (ink-300 primary on the bottom, brass-300 top-up on top) plus a manuscript-red line tracking the TUE-eligible count plus a dashed ink-blue line tracking the TUE-eligible-AND-logged-into-app count. Hand-rolled SVG, no chart-lib dependency. ~5KB inline. Sample post-launch numbers (May 2026): ~16k TUE-eligible/month, ~10k of those logged in — ~60-65% on-ramp rate.
+
+**Column-discovery quirk:** `AppLoginSuccesses` uses **`LoanBookId`** (capital B), while `Loan_History` uses **`LoanbookId`** (lower b). The scanner picks the column case-insensitively and aliases it inside the CTE so the outer JOIN stays clean. If the warehouse vintage doesn't have `AppLoginSuccesses` at all, the new series silently falls back to all zeros and the chart's blue line collapses onto the x-axis.
 
 **Last-refreshed badge:** prominent cream paper plate near the top of the page, showing the snapshot timestamp in friendly format. Goes red if the snapshot is more than 36 hours old (allows a single missed overnight run).
 
@@ -849,9 +854,15 @@ Renders one chart and one table from `topups.json`.
 
 **Brand precision filter:** every brand has a `precision_terms` allowlist; mentions must contain at least one to survive. `transform_credit` is intentionally strict (`transformcredit` and `transformcredit.com` only) because the two-word "Transform Credit" verb-phrase pollutes Google News results — fintech writing about "transforming credit agreement onboarding" passes any reasonable contextual gate.
 
-### 11.4 Yesterday page (`yesterday.html`)
+**Security alerts band — collapsible lookalike list** (added 2026-05-14). The HIBP / Active-lookalikes / CT-log tile row stays as-is, but the "Active lookalike domains" list directly underneath is now wrapped in a `<details>` disclosure (`▸ Show N active lookalike domains`). The list is long and noisy (~26 DNSTwist permutations); collapsing it by default keeps the security band scannable and the page above-the-fold without dropping any data.
+
+### 11.4 Payout page (`yesterday.html`)
+
+**Nav label is "Payout"; file path is still `yesterday.html`** (kept stable so existing bookmarks survive). Renamed in the nav 2026-05-14 as part of the top-level restructure.
 
 Three Leaflet maps wrapped with `position: relative; z-index: 0` so Leaflet's internal pane z-indexes (200–800) stay clamped and don't escape over the topbar / mobile drawer. The first map drops a clustered pin per borrower; the second labels each state's centroid with the **total** paid out yesterday; the third (added 2026-05-12) labels each state's centroid with the **average loan amount** for yesterday's paid-out loans (popup shows the loan count + total so the mean is anchored to its denominator). Per-state breakdown tables below.
+
+**Single-borrower marker** (fix 2026-05-14): the default Leaflet `L.marker()` was rendering as a broken-image + "Mark" alt text on single-borrower locations because Leaflet's image-path auto-detection misses unpkg's URL shape. Replaced with an inline-SVG `L.divIcon` (small green pin droplet matching the cluster palette) so there's no external image dependency. Cluster bubbles were unaffected — they use MarkerCluster's own DivIcon.
 
 ### 11.5 Brokers page + Source-quality analysis (`brokers.html`)
 
@@ -1091,9 +1102,37 @@ For the three deferred items: each needs either a new data source or a substanti
 
 ### 11.6 Pipeline page (`pipeline.html`)
 
-March-cohort application-pipeline analysis with two d3-sankey diagrams (Lead funnel + Application progression). Powered by `scan_pipeline.py` + `scan_pipeline_samples.py`.
+March-cohort application-pipeline analysis with two d3-sankey diagrams (Lead funnel + Application progression). Powered by `scan_pipeline.py` + `scan_pipeline_samples.py`. Lives under the **Reports** section in the nav.
 
-Per dead-end endpoint, the samples scanner pulls 25 random ARefs with their full interaction timeline (Tasks, Events, Messages, ESignatures). Identity-links by `(FirstName, Surname, DOB)` so the timeline spans every application the same person made. **All PII masked server-side** — ARefs to last-5, surnames to `******`, DOB to `****-**-**`, addresses to state only, plus email/phone/SSN/card redaction in message bodies.
+Per dead-end endpoint, the samples scanner pulls 25 random ARefs with their full interaction timeline (Tasks, Events, Messages, ESignatures, LeadOutcomes). Identity-links by `(FirstName, Surname, DOB)` so the timeline spans every application the same person made. **All PII masked server-side** — ARefs to last-5, surnames to `******`, DOB to `****-**-**`, addresses to state only, plus email/phone/SSN/card redaction in message bodies.
+
+#### 11.6.1 Timeline event sources (per ARef)
+
+| Event kind | Source | Notes |
+|---|---|---|
+| `application_started` | `dbo.Applications` | Label rewritten to `"Application started — sold to us by <Broker>"` once the Leads block resolves Lead → Campaign → Source → Broker friendly name. Falls back to `"(direct via website)"` for non-lead applications and `"(from purchased lead #N)"` only if the broker can't be resolved. |
+| `task_completed` | `dbo.Tasks` (every completed task) | `who="BRW"` when `GtRef IS NULL`, `who="GT"` otherwise. Same-minute clusters of ≥4 tasks collapse into one `task_cluster` pseudo-event. |
+| `signature` | `dbo.ESignatures` joined via `Applications.BrwEsignatureId / GtEsignatureId` | Labels `"BRW signed contract"` / `"GT signed contract"`. |
+| `web_visit` | `dbo.WebBehaviours` | Body label via `format_web_event`. |
+| `lead_presented` | `dbo.Leads` joined via `Applications.LeadId` | Label uses the resolved broker friendly name when available: `"Lead presented by <Broker>"`. Details include the lead's PII (name / DOB / address / amount / term / purpose / broker / campaign / result code). |
+| `milestone` (added 2026-05-14) | `dbo.LeadOutcomes` joined via `LeadId` | Canonical Whitebox-driven funnel log (confirmed authoritative with Kelly Black 2026-05-12 — see CLAUDE.md §5). Type → label: `1` Apply 1 · `4` BRW signed (GT invited) · `5` GT accepted (passed credit/bank/ID) · `6` GT VC completed · `8` Paid out · others labelled by id. Rendered sage-green with a left-border on the page so funnel signposts pop out of the message stream. Pulled in addition to Tasks/ESignatures so GT-side milestones still appear when those tables miss attribution. |
+| `message_in` / `message_out` | `dbo.Messages` | **Two-pass query** (added 2026-05-14): pass 1 filters by `ARef IN (...)` (catches every outbound + the small minority of inbounds with ARef set); pass 2 filters by `ExternalAddress IN (...)` against the family's phone/email map built from `Customers.Telephones` + `.Emails`. Without pass 2, ~98% of inbound messages disappear from the timeline. Dedup by `MessageId`. |
+
+#### 11.6.2 Endpoint buckets
+
+`furthest_endpoint(aref)` reads the per-ARef set of `(TaskTypeId, who)` pairs from `dbo.Tasks` (where `TaskTypeId IN (41, 48, 54, 62, 146)` and only completed):
+
+| Stage check | True if |
+|---|---|
+| `has_apply1`   | `(41, BRW)` completed |
+| `has_brw_sign` | `(48, BRW)` completed |
+| `has_gt_pass`  | `(54, GT)` completed |
+| `has_gt_vc`    | `(62, GT)` OR `(146, GT)` completed |
+| `is_paid_out`  | `Applications.ApplicationStatusTypeId = 5` |
+
+Bucket cascade (first-match-wins, paid_out → vc_ready → no_vc_reached → no_accepted_guarantor → dropped_before_brw_signed → abandoned_before_page1).
+
+> Heads-up: the Tasks-driven bucket and the LeadOutcomes-driven timeline can disagree in edge cases (Whitebox writes the milestone but no matching Task row, or vice versa). LeadOutcomes is canonical for funnel attribution per the warehouse owner; the bucket logic still uses Tasks for now because that's what `scan_pipeline.py` aggregates on. Worth a follow-up to align both on LeadOutcomes.
 
 ### 11.7 Comms response time (`comms.html`)
 
@@ -1164,9 +1203,12 @@ Beyond 14 days is treated as "no reply".
 3. `ReportingLoanbook` — `dbo.Loan_History` for point-in-time loan state, chunked by LoanbookId.
 4. `ReportingCommunications` again — sample bodies (one query for inbound bodies, 100×4×2 sequential reply lookups).
 
-Total run-time ~10–14 min. The scanner's main performance trap (pulled out 2026-05-14) was re-fetching ExternalAddress per ARef-less message in chunks of 1500 — that took 26 minutes and busted the 30-min workflow timeout. Now ExternalAddress is in the first SELECT.
+Total run-time ~17 min for the full pipeline; workflow timeout bumped to **45 min** on 2026-05-14 to absorb the new CSV-export tail. Two perf traps killed earlier runs that day, both fixed:
 
-**Audit-trail CSV (`comms-full.csv`).** Linked from the page as the **Download full list CSV** button. One row per inbound (no aggregation), PII-redacted to the same level as the on-page samples. Columns:
+1. Re-fetching `ExternalAddress` per ARef-less message in chunks of 1500 took 26 min and busted the original 30-min timeout. Now `ExternalAddress` is in the first SELECT, no second pass.
+2. `fetch_names_by_aref` was running 385 sequential 1500-element IN-clause queries to pull names for ~576k unique ARefs — ~13 min on the warehouse round-trip overhead. Replaced with one bulk `SELECT ARef, FirstName, Surname FROM Customers WHERE ARef IS NOT NULL` (~50 s); filter happens in Python.
+
+**Audit-trail CSV (`comms-full.csv.gz`).** Linked from the page as the **Download full list CSV** button. The artefact on the server is **gzipped** (~77 MB; raw CSV is ~350 MB, well over GitHub's 100 MB file limit). The button click runs a `fetch + DecompressionStream("gzip") + Blob` pipeline so the user still gets a plain `.csv` save — no manual gunzip step. One row per inbound (no aggregation), PII-redacted to the same level as the on-page samples. Columns:
 
 | Column | Notes |
 |---|---|
