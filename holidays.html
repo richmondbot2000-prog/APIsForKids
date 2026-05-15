@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778881418">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778881418">
-<link rel="stylesheet" href="quiet.css?v=1778881418">
-<link rel="stylesheet" href="quiet-extras.css?v=1778881418">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778881418">
+<link rel="stylesheet" href="style.css?v=1778883109">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778883109">
+<link rel="stylesheet" href="quiet.css?v=1778883109">
+<link rel="stylesheet" href="quiet-extras.css?v=1778883109">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778883109">
 <style>
   .hd-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   .hd-section h1 {
@@ -159,6 +159,10 @@
   .hd-day[data-status="half-pm"]     { background: linear-gradient(180deg, #c7e7b8 0 50%, #e4f1cc 50% 100%); }
   .hd-day[data-status="sick"]        { background: #f5b5b5; }
   .hd-day[data-status="maternity"]   { background: #f3d97a; }
+  .hd-day[data-status="approved-holiday"] {
+    background: #f3d97a;
+    box-shadow: inset 0 0 0 1px #b08a18;
+  }
   .hd-day[data-default-bh="1"]       { background: #f3d97a; }
 
   /* Status picker — small popover anchored to the clicked day. */
@@ -199,6 +203,111 @@
   }
   .hd-pop-clear { color: var(--red-500, #b14040); font-style: italic; }
   .hd-pop-clear:disabled { color: var(--ink-500); }
+
+  /* View-mode toggle (only rendered when viewer is a line manager) */
+  .hd-view-tabs {
+    display: flex; gap: 24px;
+    margin: 0 0 18px;
+    border-bottom: 1px solid var(--ink-300);
+  }
+  .hd-view-tab {
+    background: none; border: none;
+    padding: 8px 2px;
+    margin-bottom: -1px;
+    font: italic 500 16px/1 var(--font-display, 'Newsreader', serif);
+    color: var(--ink-600);
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+  }
+  .hd-view-tab.is-active {
+    color: var(--red-500, #b14040);
+    font-weight: 700;
+    border-bottom-color: var(--red-500, #b14040);
+  }
+
+  /* Team view — one thin row per direct report, year stretched across.
+     Cells are tiny so a full 365-day year fits in a single horizontal
+     strip. The strip scrolls horizontally on narrow viewports.
+
+     Cell width: 10px so 365 cells = 3650px (scrolls).
+     Cell height: 16px (about a 10pt line height). */
+  .hd-team {
+    margin: 0 0 24px;
+    overflow-x: auto;
+    overflow-y: visible;
+    border-top: 1px solid var(--ink-300);
+    border-bottom: 1px solid var(--ink-300);
+    background: var(--paper-50, white);
+  }
+  .hd-team-month-strip {
+    display: grid; grid-auto-flow: column; grid-auto-columns: 10px;
+    margin-left: 160px;
+    height: 16px;
+    font: 600 8px/1 var(--font-mono, 'JetBrains Mono', monospace);
+    color: var(--ink-500);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .hd-team-month-strip > span {
+    border-left: 1px solid var(--ink-300);
+    padding-left: 3px;
+    align-self: end;
+    white-space: nowrap;
+  }
+  .hd-team-row {
+    display: flex;
+    align-items: stretch;
+    border-top: 1px solid var(--ink-300);
+  }
+  .hd-team-row:first-of-type { border-top: none; }
+  .hd-team-name {
+    flex: 0 0 160px;
+    position: sticky; left: 0; z-index: 2;
+    background: var(--paper-50, white);
+    padding: 4px 10px;
+    border-right: 1px solid var(--ink-500);
+    display: flex; flex-direction: column; justify-content: center;
+    font: 500 11px/1.15 var(--font-display, 'Newsreader', serif);
+    color: var(--ink-900);
+  }
+  .hd-team-name .hd-team-count {
+    font: 400 9px/1 var(--font-mono, 'JetBrains Mono', monospace);
+    color: var(--ink-600);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .hd-team-strip {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 10px;
+    height: 16px;
+  }
+  .hd-team-cell {
+    border-right: 1px solid rgba(0,0,0,0.04);
+    cursor: pointer;
+    position: relative;
+  }
+  .hd-team-cell:hover { outline: 1px solid var(--brass-500); outline-offset: -1px; z-index: 1; }
+  .hd-team-cell[data-status="office"]      { background: #c7e7b8; }
+  .hd-team-cell[data-status="wfh"]         { background: #b7dfc9; }
+  .hd-team-cell[data-status="non-working"] { background: #d8d8df; }
+  .hd-team-cell[data-status="holiday"]     { background: #f3d97a; }
+  .hd-team-cell[data-status="half-am"]     { background: linear-gradient(180deg,#e4f1cc 0 50%,#c7e7b8 50% 100%); }
+  .hd-team-cell[data-status="half-pm"]     { background: linear-gradient(180deg,#c7e7b8 0 50%,#e4f1cc 50% 100%); }
+  .hd-team-cell[data-status="sick"]        { background: #f5b5b5; }
+  .hd-team-cell[data-status="maternity"]   { background: #f3d97a; }
+  .hd-team-cell[data-status="approved-holiday"] {
+    background: #f3d97a;
+    box-shadow: inset 0 0 0 1px #b08a18;
+  }
+  .hd-team-cell[data-default-bh="1"]       { background: #f3d97a; }
+  .hd-team-cell.is-today { box-shadow: inset 0 0 0 1px var(--red-500, #b14040); }
+  .hd-team-empty {
+    padding: 18px 24px;
+    color: var(--ink-500);
+    font: italic 400 14px/1.4 var(--font-display, 'Newsreader', serif);
+  }
 
   /* Audit log */
   .hd-log-section { margin-top: 36px; }
@@ -278,7 +387,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778881418" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778883109" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -310,6 +419,11 @@
       </div>
     </div>
 
+    <nav class="hd-view-tabs" id="hdViewTabs" style="display:none;" role="tablist" aria-label="Holidays view">
+      <button type="button" class="hd-view-tab is-active" data-view="own"  role="tab" aria-selected="true">My calendar</button>
+      <button type="button" class="hd-view-tab"           data-view="team" role="tab" aria-selected="false">Team — <span id="hdTeamCount">0</span></button>
+    </nav>
+
     <div class="hd-legend" aria-label="Status colour legend">
       <span class="hd-legend-item"><span class="hd-legend-sw" style="background:#c7e7b8"></span>Worked at Office</span>
       <span class="hd-legend-item"><span class="hd-legend-sw" style="background:#b7dfc9"></span>Worked From Home</span>
@@ -320,11 +434,16 @@
       <span class="hd-legend-item"><span class="hd-legend-sw" style="background:#f5b5b5"></span>Sickness</span>
     </div>
 
-    <div class="hd-cal-headers" aria-hidden="true">
-      <div>Week of</div>
-      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+    <div id="hdOwnView">
+      <div class="hd-cal-headers" aria-hidden="true">
+        <div>Week of</div>
+        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+      </div>
+      <div class="hd-cal" id="hdCal" role="grid" aria-label="Holiday calendar grid"></div>
     </div>
-    <div class="hd-cal" id="hdCal" role="grid" aria-label="Holiday calendar grid"></div>
+    <div id="hdTeamView" style="display:none;">
+      <div class="hd-team" id="hdTeam" role="grid" aria-label="Team calendar strip"></div>
+    </div>
 
     <div class="hd-log-section">
       <h2>Change log</h2>
@@ -352,11 +471,17 @@
     { key: "half-am",     label: "Half Day – Morning",   swatch: "linear-gradient(180deg,#e4f1cc 0 50%,#c7e7b8 50% 100%)" },
     { key: "half-pm",     label: "Half Day – Afternoon", swatch: "linear-gradient(180deg,#c7e7b8 0 50%,#e4f1cc 50% 100%)" },
     { key: "holiday",     label: "Paid Holiday",      swatch: "#f3d97a" },
+    // "approved-holiday" is appended dynamically when the viewer is a
+    // line manager / admin acting on a direct report's day. Visually
+    // yellow, but borders are darker to differentiate from "holiday".
     { key: "sick",        label: "Sickness",          swatch: "#f5b5b5" },
     { key: "maternity",   label: "Maternity",         swatch: "#f3d97a" },
     { key: "non-working", label: "Non-Working",       swatch: "#d8d8df" },
   ];
-  const STATUS_LABEL = Object.fromEntries(STATUSES.map(s => [s.key, s.label]));
+  const APPROVED_HOLIDAY = { key: "approved-holiday", label: "Approved Holiday", swatch: "#f3d97a", managerOnly: true };
+  const STATUS_LABEL = Object.fromEntries(
+    [...STATUSES, APPROVED_HOLIDAY].map(s => [s.key, s.label])
+  );
 
   // UK Bank Holidays for the 2026-04-01 → 2027-03-31 fiscal window.
   // Boxing Day 2026 falls on a Saturday → substitute Monday 28 Dec.
@@ -381,6 +506,14 @@
   let staff = [];        // [{ email, name, suspended, ... }]
   let staffByEmail = {};
   let selectedEmail = ""; // whose calendar we're showing
+  // Map of email → line_manager email, sourced from annotations.json.
+  // Empty string means "no manager set".
+  let lineManagerByEmail = {};
+  // Set of emails whose line_manager is the viewer — populated after
+  // staff + annotations load. Drives whether the Team tab appears, and
+  // whether the manager view's edit popover offers "Approved Holiday".
+  let directReports = new Set();
+  let currentView = "own"; // "own" | "team"
 
   let holidaysDoc = null; // full holidays.json
   let yearStart = new Date(2026, 3, 1);  // 1 Apr 2026 — overwritten from doc
@@ -392,13 +525,17 @@
   // save would take a minute to become visible after a page reload.
   // staff.json + admins.json change rarely; the small lag there is fine.
   const HOLIDAYS_RAW_URL = "https://raw.githubusercontent.com/richmondbot2000-prog/togetherbook/main/holidays.json";
+  // annotations.json is also read from raw to bypass the GH Pages lag.
+  const ANNOTATIONS_RAW_URL = "https://raw.githubusercontent.com/richmondbot2000-prog/togetherbook/main/annotations.json";
   Promise.all([
     fetch(`${HD_API}/whoami`, { cache: "no-store" }).then(r => r.ok ? r.json() : Promise.reject("not signed in")),
     fetch("staff.json",       { cache: "no-store" }).then(r => r.ok ? r.json() : Promise.reject("staff.json missing")),
     fetch("admins.json",      { cache: "no-store" }).then(r => r.ok ? r.json() : ({ admins: [] })),
     fetch(`${HOLIDAYS_RAW_URL}?ts=${Date.now()}`, { cache: "no-store" })
       .then(r => r.ok ? r.json() : ({ by_user: {}, log: [] })),
-  ]).then(([who, s, ad, hd]) => {
+    fetch(`${ANNOTATIONS_RAW_URL}?ts=${Date.now()}`, { cache: "no-store" })
+      .then(r => r.ok ? r.json() : ({ annotations: {} })).catch(() => ({ annotations: {} })),
+  ]).then(([who, s, ad, hd, an]) => {
     viewerEmail = (who && who.email) || "";
     viewerName  = (who && who.name)  || "";
     adminEmails = new Set((ad.admins || []).map(e => (e || "").toLowerCase()));
@@ -408,8 +545,21 @@
     holidaysDoc = hd;
     if (hd.year_start) yearStart = parseISO(hd.year_start);
     if (hd.year_end)   yearEnd   = parseISO(hd.year_end);
+    // Build the manager-of map from annotations.
+    const anns = (an && an.annotations) || {};
+    lineManagerByEmail = {};
+    for (const [k, v] of Object.entries(anns)) {
+      const mgr = (v && v.line_manager) ? String(v.line_manager).toLowerCase() : "";
+      if (mgr) lineManagerByEmail[k.toLowerCase()] = mgr;
+    }
+    directReports = new Set(
+      Object.entries(lineManagerByEmail)
+        .filter(([_, mgr]) => mgr === viewerEmail.toLowerCase())
+        .map(([emp]) => emp.toLowerCase())
+    );
     selectedEmail = viewerEmail.toLowerCase();
     setupPicker();
+    setupViewTabs();
     renderAll();
   }).catch(err => {
     document.getElementById("hdMeta").textContent = "Could not load: " + (err.message || err);
@@ -434,10 +584,38 @@
     });
   }
 
+  function setupViewTabs() {
+    const wrap = document.getElementById("hdViewTabs");
+    const count = document.getElementById("hdTeamCount");
+    if (directReports.size === 0) return;
+    wrap.style.display = "flex";
+    count.textContent = String(directReports.size);
+    wrap.querySelectorAll(".hd-view-tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        currentView = btn.dataset.view;
+        wrap.querySelectorAll(".hd-view-tab").forEach(b => {
+          const on = (b === btn);
+          b.classList.toggle("is-active", on);
+          b.setAttribute("aria-selected", String(on));
+        });
+        renderAll();
+      });
+    });
+  }
   function renderAll() {
-    renderHeader();
-    renderCalendar();
-    renderLog();
+    document.getElementById("hdOwnView").style.display  = (currentView === "own")  ? "" : "none";
+    document.getElementById("hdTeamView").style.display = (currentView === "team") ? "" : "none";
+    if (currentView === "team") {
+      // In team view the header still tallies the viewer's own holiday days,
+      // but the meta line reflects what's on screen.
+      renderHeader();
+      renderTeam();
+      renderLog();
+    } else {
+      renderHeader();
+      renderCalendar();
+      renderLog();
+    }
   }
 
   function renderHeader() {
@@ -564,9 +742,165 @@
     return ""; // no label on plain office defaults — keeps rows clean
   }
 
+  // ── Team (manager) view ───────────────────────────────────────────
+  // For each direct report, render a single horizontal strip: 10px wide
+  // cells × however many days are in the visible fiscal year. The strip
+  // scrolls horizontally; a sticky name column on the left keeps the
+  // report identifiable while panning.
+  function renderTeam() {
+    const root = document.getElementById("hdTeam");
+    root.innerHTML = "";
+    if (directReports.size === 0) {
+      root.innerHTML = `<div class="hd-team-empty">You have no direct reports on file. Have admins set you as someone's line manager on the Directory page.</div>`;
+      return;
+    }
+    // Enumerate all days in the fiscal year (yearStart..yearEnd).
+    const days = [];
+    for (const d of iterDates(yearStart, yearEnd)) days.push(d);
+    // Header strip — month labels at the start of each month.
+    const monthStrip = document.createElement("div");
+    monthStrip.className = "hd-team-month-strip";
+    monthStrip.style.gridAutoColumns = "10px";
+    monthStrip.style.gridTemplateColumns = `repeat(${days.length}, 10px)`;
+    for (let i = 0; i < days.length; i++) {
+      const cell = document.createElement("span");
+      const isFirst = (days[i].getDate() === 1) || (i === 0);
+      cell.textContent = isFirst ? days[i].toLocaleDateString("en-GB", { month: "short" }).toUpperCase() : "";
+      if (!isFirst) cell.style.borderLeft = "none";
+      monthStrip.appendChild(cell);
+    }
+    root.appendChild(monthStrip);
+
+    // Sort reports by full name from staff.json.
+    const reports = [...directReports]
+      .map(e => ({ email: e, user: staffByEmail[e] || { email: e, name: e } }))
+      .sort((a, b) => (a.user.name || a.email).localeCompare(b.user.name || b.email));
+
+    const todayIso = isoDate(new Date());
+
+    for (const r of reports) {
+      const row = document.createElement("div");
+      row.className = "hd-team-row";
+      row.dataset.email = r.email;
+
+      const nameCell = document.createElement("div");
+      nameCell.className = "hd-team-name";
+      const hcount = countHolidayDays(r.email);
+      nameCell.innerHTML = `
+        <span>${escapeHtml(r.user.name || r.email)}</span>
+        <span class="hd-team-count">${hcount} holiday day${hcount === 1 ? "" : "s"}</span>`;
+      row.appendChild(nameCell);
+
+      const strip = document.createElement("div");
+      strip.className = "hd-team-strip";
+      strip.style.gridTemplateColumns = `repeat(${days.length}, 10px)`;
+      const dayMap = ((holidaysDoc.by_user || {})[r.email] || {}).days || {};
+      for (const d of days) {
+        const iso = isoDate(d);
+        const cell = document.createElement("div");
+        cell.className = "hd-team-cell";
+        cell.dataset.date = iso;
+        cell.title = `${r.user.name || r.email} · ${d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}`;
+        const stored = dayMap[iso];
+        const dow = d.getDay();
+        const isWeekend = (dow === 0 || dow === 6);
+        const isBh = UK_BANK_HOLIDAYS.has(iso);
+        if (stored) {
+          cell.dataset.status = stored;
+          cell.title += ` · ${STATUS_LABEL[stored] || stored}`;
+        } else if (isWeekend) {
+          cell.dataset.status = "non-working";
+        } else if (isBh) {
+          cell.dataset.defaultBh = "1";
+          cell.title += " · Bank Holiday";
+        } else {
+          cell.dataset.status = "office";
+        }
+        if (iso === todayIso) cell.classList.add("is-today");
+        cell.addEventListener("click", e => {
+          e.stopPropagation();
+          openTeamPicker(cell, d, r.email);
+        });
+        strip.appendChild(cell);
+      }
+      row.appendChild(strip);
+      root.appendChild(row);
+    }
+  }
+
+  function openTeamPicker(anchor, d, reportEmail) {
+    closePicker();
+    if (!canEditOnBehalf(reportEmail)) {
+      banner("You can't edit this calendar.", true);
+      return;
+    }
+    const iso = anchor.dataset.date;
+    const dayMap = ((holidaysDoc.by_user || {})[reportEmail] || {}).days || {};
+    const current = dayMap[iso] || null;
+    const dow = d.getDay();
+    const isWeekend = (dow === 0 || dow === 6);
+    const isBh = UK_BANK_HOLIDAYS.has(iso);
+    const defaultStatus = isWeekend ? "non-working" : (isBh ? "holiday" : "office");
+    const showApproved = (viewerIsAdmin || directReports.has(reportEmail));
+    const opts = showApproved ? [...STATUSES, APPROVED_HOLIDAY] : STATUSES.slice();
+    const pop = document.createElement("div");
+    pop.className = "hd-pop";
+    const who = (staffByEmail[reportEmail] || {}).name || reportEmail;
+    const dateLabel = d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short", year: "numeric" });
+    pop.innerHTML = `
+      <div class="hd-pop-head">${escapeHtml(who)}<br>${escapeHtml(dateLabel)}${isBh ? " · UK Bank Holiday" : ""}</div>
+      ${opts.map(s => `
+        <button type="button" class="hd-pop-opt" data-status="${s.key}" ${current === s.key ? "disabled" : ""}>
+          <span class="hd-pop-sw" style="background:${s.swatch}"></span>${s.label}${current === s.key ? "  · current" : ""}
+        </button>
+      `).join("")}
+      <button type="button" class="hd-pop-opt hd-pop-clear" data-clear ${current ? "" : "disabled"}>
+        Reset to default (${STATUS_LABEL[defaultStatus]})
+      </button>`;
+    document.body.appendChild(pop);
+    positionPop(pop, anchor);
+    openPopEl = pop;
+    pop.addEventListener("click", e => {
+      const btn = e.target.closest("button");
+      if (!btn || btn.disabled) return;
+      const next = btn.dataset.clear ? null : btn.dataset.status;
+      saveDayFor(reportEmail, iso, current, next);
+      closePicker();
+    });
+    setTimeout(() => {
+      document.addEventListener("click", function onDoc(e) {
+        if (pop.contains(e.target)) {
+          document.addEventListener("click", onDoc, { once: true });
+          return;
+        }
+        closePicker();
+      }, { once: true });
+      document.addEventListener("keydown", function onKey(e) {
+        if (e.key === "Escape") { e.preventDefault(); closePicker(); document.removeEventListener("keydown", onKey); }
+      });
+    }, 0);
+  }
+
   function renderLog() {
     const root = document.getElementById("hdLog");
-    const entries = (holidaysDoc.log || []).filter(e => (e.user_email || "").toLowerCase() === selectedEmail);
+    const all = (holidaysDoc.log || []);
+    // In Team view, the manager sees the union of (their own changes) +
+    // (changes they made to any direct report). In My-calendar view, we
+    // show changes for whoever is selected (own + any manager-made
+    // changes on that person's days, since both share user_email).
+    let entries;
+    if (currentView === "team") {
+      const me = viewerEmail.toLowerCase();
+      entries = all.filter(e => {
+        const u = (e.user_email || "").toLowerCase();
+        const by = (e.changed_by || "").toLowerCase();
+        if (u === me) return true;                                 // my own days
+        if (by === me && directReports.has(u)) return true;        // changes I made to a report
+        return false;
+      });
+    } else {
+      entries = all.filter(e => (e.user_email || "").toLowerCase() === selectedEmail);
+    }
     if (!entries.length) {
       root.innerHTML = `<li class="hd-log-empty">No changes recorded yet.</li>`;
       return;
@@ -578,9 +912,15 @@
       const day = e.date ? new Date(e.date).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" }) : "";
       const from = STATUS_LABEL[e.from] || e.from || "default";
       const to   = STATUS_LABEL[e.to]   || e.to   || "default";
-      const who  = (e.changed_by || "").toLowerCase() === selectedEmail
-        ? "by themself"
-        : `by ${escapeHtml(displayName(e.changed_by))}`;
+      const me = viewerEmail.toLowerCase();
+      const userIsMe = (e.user_email || "").toLowerCase() === me;
+      const byIsMe   = (e.changed_by || "").toLowerCase() === me;
+      let who;
+      if (userIsMe && byIsMe) who = "by you";
+      else if (currentView === "team" && byIsMe) who = `${escapeHtml(displayName(e.user_email))} — by you`;
+      else if (byIsMe) who = "by you";
+      else if (userIsMe) who = `by ${escapeHtml(displayName(e.changed_by))}`;
+      else who = `${escapeHtml(displayName(e.user_email))} — by ${escapeHtml(displayName(e.changed_by))}`;
       return `
         <li>
           <time>${escapeHtml(at)}</time>
@@ -608,12 +948,17 @@
     const isWeekend = (dow === 0 || dow === 6);
     const isBh = UK_BANK_HOLIDAYS.has(iso);
     const defaultStatus = isWeekend ? "non-working" : (isBh ? "holiday" : "office");
+    // Editing someone else's day (you must be admin or their line
+    // manager to land in this branch) → offer "Approved Holiday" too.
+    const editingOther = selectedEmail !== viewerEmail.toLowerCase();
+    const showApproved = editingOther && (viewerIsAdmin || directReports.has(selectedEmail));
+    const opts = showApproved ? [...STATUSES, APPROVED_HOLIDAY] : STATUSES.slice();
     const pop = document.createElement("div");
     pop.className = "hd-pop";
     const dateLabel = d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short", year: "numeric" });
     pop.innerHTML = `
       <div class="hd-pop-head">${escapeHtml(dateLabel)}${isBh ? " · UK Bank Holiday" : ""}</div>
-      ${STATUSES.map(s => `
+      ${opts.map(s => `
         <button type="button" class="hd-pop-opt" data-status="${s.key}" ${current === s.key ? "disabled" : ""}>
           <span class="hd-pop-sw" style="background:${s.swatch}"></span>${s.label}${current === s.key ? "  · current" : ""}
         </button>
@@ -628,7 +973,7 @@
       const btn = e.target.closest("button");
       if (!btn || btn.disabled) return;
       const next = btn.dataset.clear ? null : btn.dataset.status;
-      saveDay(iso, current, next);
+      saveDayFor(selectedEmail, iso, current, next);
       closePicker();
     });
     // Close on outside click / Escape
@@ -668,48 +1013,88 @@
   }
 
   function canEditOnBehalf(email) {
-    return viewerIsAdmin || (email === viewerEmail.toLowerCase());
+    const e = (email || "").toLowerCase();
+    if (e === viewerEmail.toLowerCase()) return true;
+    if (viewerIsAdmin) return true;
+    if (directReports.has(e)) return true;
+    return false;
   }
 
-  async function saveDay(iso, fromStatus, toStatus) {
-    // Optimistic UI: paint the new value immediately, roll back on error.
-    const map = ensureUserMap(selectedEmail);
+  // saveDayFor lets either the own-view or the team-view call with the
+  // explicit target email — own-view passes selectedEmail; team-view
+  // passes the report's email.
+  async function saveDayFor(targetEmail, iso, fromStatus, toStatus) {
+    const target = (targetEmail || "").toLowerCase();
+    const map = ensureUserMap(target);
     const prev = map.days[iso] || null;
     if (toStatus === null) {
       delete map.days[iso];
     } else {
       map.days[iso] = toStatus;
     }
-    const cell = document.querySelector(`.hd-day[data-date="${iso}"]`);
-    if (cell) repaintCell(cell);
-    renderHeader(); // count may have changed
+    // Optimistic repaint: in own view there's a hd-day cell; in team
+    // view it's a hd-team-cell within a row keyed by email.
+    const ownCell = (target === selectedEmail) ? document.querySelector(`.hd-day[data-date="${iso}"]`) : null;
+    const teamCell = document.querySelector(`.hd-team-row[data-email="${target}"] .hd-team-cell[data-date="${iso}"]`);
+    if (ownCell) repaintCell(ownCell);
+    if (teamCell) repaintTeamCell(teamCell, target);
+    renderHeader();
 
     try {
       const res = await fetch(`${HD_API}/set`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: selectedEmail, date: iso, status: toStatus }),
+        body: JSON.stringify({ email: target, date: iso, status: toStatus }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || (data && data.ok === false)) {
         throw new Error((data && data.error) || `HTTP ${res.status}`);
       }
-      // Append the server's log entry so the UI matches what landed.
       if (data && data.log_entry) {
         holidaysDoc.log = (holidaysDoc.log || []);
         holidaysDoc.log.push(data.log_entry);
         renderLog();
       }
       holidaysDoc.updated_at = data && data.updated_at || holidaysDoc.updated_at;
+      // Team view's name column shows holiday count — re-render that
+      // row's count label optimistically (the strip itself is already
+      // repainted above).
+      if (currentView === "team") {
+        const row = document.querySelector(`.hd-team-row[data-email="${target}"] .hd-team-count`);
+        if (row) {
+          const n = countHolidayDays(target);
+          row.textContent = `${n} holiday day${n === 1 ? "" : "s"}`;
+        }
+      }
       banner("Saved");
     } catch (err) {
-      // Roll back
       if (prev === null) delete map.days[iso]; else map.days[iso] = prev;
-      if (cell) repaintCell(cell);
+      if (ownCell) repaintCell(ownCell);
+      if (teamCell) repaintTeamCell(teamCell, target);
       renderHeader();
       banner("Save failed: " + (err.message || err), true);
       console.error("[holidays] save failed", err);
     }
+  }
+  // Back-compat shim — older call sites used saveDay(iso, from, to)
+  // with implicit selectedEmail; keep that working.
+  function saveDay(iso, fromStatus, toStatus) {
+    return saveDayFor(selectedEmail, iso, fromStatus, toStatus);
+  }
+  function repaintTeamCell(cell, email) {
+    const iso = cell.dataset.date;
+    const d = parseISO(iso);
+    const dayMap = ((holidaysDoc.by_user || {})[email] || {}).days || {};
+    const stored = dayMap[iso];
+    const dow = d.getDay();
+    const isWeekend = (dow === 0 || dow === 6);
+    const isBh = UK_BANK_HOLIDAYS.has(iso);
+    cell.removeAttribute("data-status");
+    cell.removeAttribute("data-default-bh");
+    if (stored) cell.dataset.status = stored;
+    else if (isWeekend) cell.dataset.status = "non-working";
+    else if (isBh) cell.dataset.defaultBh = "1";
+    else cell.dataset.status = "office";
   }
   function ensureUserMap(email) {
     holidaysDoc.by_user = holidaysDoc.by_user || {};

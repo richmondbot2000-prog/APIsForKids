@@ -39,7 +39,7 @@ export default {
     let body;
     try { body = await req.json(); }
     catch { return json({ error: "invalid JSON body" }, 400, req); }
-    const { key, phone, start_date, address, payroll_match, forward_to, rename_decay, directory_photo_uploaded_at } = body || {};
+    const { key, phone, start_date, address, payroll_match, forward_to, rename_decay, directory_photo_uploaded_at, line_manager } = body || {};
     if (!key || typeof key !== "string") {
       return json({ error: "missing 'key' (email or username)" }, 400, req);
     }
@@ -93,6 +93,10 @@ export default {
     // Cache-bust for the Directory profile photo. Set to an ISO timestamp when
     // a new upload commits to assets/photos/, or to "" to clear when removed.
     setScalar("directory_photo_uploaded_at", directory_photo_uploaded_at);
+    // The user's identified line manager — email of another staff member.
+    // Used by the Holidays page to build the manager view + by the workspace
+    // worker's holidays handler to authorise manager edits.
+    setScalar("line_manager", (line_manager || "").toLowerCase());
 
     // payroll_match is an object (not a string) — handle separately.
     if (has("payroll_match")) {

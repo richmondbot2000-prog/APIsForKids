@@ -1827,7 +1827,35 @@ const HOLIDAY_LOG_MAX = 5000;
 const HOLIDAY_STATUSES = new Set([
   "office", "wfh", "non-working", "holiday",
   "half-am", "half-pm", "sick", "maternity",
+  // approved-holiday is manager-only (enforced below). Storage-side it
+  // looks identical to any other override.
+  "approved-holiday",
 ]);
+const MANAGER_ONLY_STATUSES = new Set(["approved-holiday"]);
+
+// Reads annotations.json from raw.githubusercontent.com and returns the
+// map of email → line_manager email (lowercased). Used by the holidays
+// handler to decide whether a non-admin viewer can edit a particular
+// target's day.
+async function fetchLineManagers() {
+  const url = "https://raw.githubusercontent.com/richmondbot2000-prog/togetherbook/main/annotations.json";
+  try {
+    const res = await fetch(`${url}?ts=${Date.now()}`, {
+      headers: { "User-Agent": "apifk-workspace-worker" },
+      cf: { cacheTtl: 0, cacheEverything: false },
+    });
+    if (!res.ok) return {};
+    const doc = await res.json();
+    const out = {};
+    for (const [k, v] of Object.entries((doc && doc.annotations) || {})) {
+      const mgr = (v && v.line_manager) ? String(v.line_manager).toLowerCase() : "";
+      if (mgr) out[k.toLowerCase()] = mgr;
+    }
+    return out;
+  } catch (e) {
+    return {};
+  }
+}
 
 async function handleHolidays(req, env, url) {
   if (req.method === "OPTIONS") {
@@ -1878,8 +1906,20 @@ async function holidaysSet(env, viewerEmail, body) {
 
   const admins = await fetchAdmins();
   const isAdmin = admins.includes(viewerEmail);
+  let isManagerOfTarget = false;
   if (target !== viewerEmail && !isAdmin) {
-    throw new Error("not allowed — only admins can edit another user's calendar");
+    const lineManagers = await fetchLineManagers();
+    isManagerOfTarget = (lineManagers[target] || "") === viewerEmail;
+    if (!isManagerOfTarget) {
+      throw new Error("not allowed — you must be the user's line manager or an admin");
+    }
+  }
+  // Manager-only statuses can only be set by admin / a line manager.
+  if (status && MANAGER_ONLY_STATUSES.has(status)) {
+    if (target === viewerEmail) {
+      throw new Error("'approved-holiday' can only be set by a line manager or an admin");
+    }
+    // (target !== viewerEmail) — we already verified admin OR manager above.
   }
 
   let logEntry = null;

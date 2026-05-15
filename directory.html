@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778762651">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778791697">
-<link rel="stylesheet" href="quiet.css?v=1778791697">
-<link rel="stylesheet" href="quiet-extras.css?v=1778792419">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778791697">
+<link rel="stylesheet" href="style.css?v=1778883109">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778883109">
+<link rel="stylesheet" href="quiet.css?v=1778883109">
+<link rel="stylesheet" href="quiet-extras.css?v=1778883109">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778883109">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -1171,7 +1171,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778791697" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778883109" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1938,7 +1938,7 @@
     const isDeleted = !!u.deletion_time;
     const tenantTag = (u.tenant || "").toLowerCase();
     const liveGws = !u.suspended && !isDeleted
-      ? `<img class="dir-gws-icon" data-tenant="${escapeHtml(tenantTag)}" src="assets/google-workspace-icon.svg?v=1" alt="Google Workspace account active" title="Google Workspace${tenantTag === "togetherloans" ? " (Together Loans)" : ""} account active">`
+      ? `<img class="dir-gws-icon" data-tenant="${escapeHtml(tenantTag)}" src="assets/google-workspace-icon.svg?v=1778883109" alt="Google Workspace account active" title="Google Workspace${tenantTag === "togetherloans" ? " (Together Loans)" : ""} account active">`
       : "";
 
     // Visual states (most-severe-wins):
@@ -2054,6 +2054,31 @@
   function entryKey(entry) {
     return entry.type === "staff" ? (entry.user.email || "") : (entry.activity.username || "");
   }
+  // Render "<Name> · <email>" for the stored Line Manager email, or fall
+  // back to the bare email if we have no staff record. Used by the Edit
+  // Card's display row + the datalist's labels.
+  function lineManagerName(email) {
+    if (!email) return "";
+    const e = email.toLowerCase();
+    const u = (allEntries || [])
+      .filter(en => en.type === "staff" && en.user)
+      .map(en => en.user)
+      .find(x => (x.email || "").toLowerCase() === e);
+    if (u && u.name) return `${u.name} · ${e}`;
+    return e;
+  }
+  // Build a <datalist> of candidate line managers — every non-suspended
+  // staff member except the user being edited (no self-management).
+  function lineManagerOptions(entry) {
+    const self = (entryKey(entry) || "").toLowerCase();
+    return (allEntries || [])
+      .filter(en => en.type === "staff" && en.user && !en.user.suspended && !en.user.deletion_time)
+      .map(en => en.user)
+      .filter(u => (u.email || "").toLowerCase() !== self)
+      .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
+      .map(u => `<option value="${escapeHtml((u.email || "").toLowerCase())}">${escapeHtml(u.name || "")}</option>`)
+      .join("");
+  }
 
   // Directory-only profile photo lookup. If an admin has uploaded a photo
   // for this user, it lives at `assets/photos/<email-safe>.jpg` and the
@@ -2153,6 +2178,9 @@
     if (opts && Object.prototype.hasOwnProperty.call(opts, "directory_photo_uploaded_at")) {
       payload.directory_photo_uploaded_at = opts.directory_photo_uploaded_at;
     }
+    if (opts && Object.prototype.hasOwnProperty.call(opts, "line_manager")) {
+      payload.line_manager = opts.line_manager;
+    }
     const res = await fetch(ANNOTATIONS_API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -2230,8 +2258,10 @@
     // anything actually changed before writing back to annotations.json.
     const phoneInput = modal.querySelector('input[name="phone"]');
     const addressInput = modal.querySelector('textarea[name="address"]');
+    const lineManagerInput = modal.querySelector('input[name="line_manager"]');
     if (phoneInput) phoneInput.dataset.initialValue = phoneInput.value;
     if (addressInput) addressInput.dataset.initialValue = addressInput.value;
+    if (lineManagerInput) lineManagerInput.dataset.initialValue = lineManagerInput.value;
     modal.dataset.notesKey = key;
 
     // Reveal the input box below the value when the user clicks [Edit].
@@ -2263,13 +2293,19 @@
     if (!key) return;
     const phoneInput = modal.querySelector('input[name="phone"]');
     const addressInput = modal.querySelector('textarea[name="address"]');
-    if (!phoneInput && !addressInput) return;
+    const lineManagerInput = modal.querySelector('input[name="line_manager"]');
+    if (!phoneInput && !addressInput && !lineManagerInput) return;
     const phone = phoneInput ? (phoneInput.value || "").trim() : "";
     const address = addressInput ? (addressInput.value || "").trim() : "";
+    const lineManager = lineManagerInput ? (lineManagerInput.value || "").trim().toLowerCase() : "";
     const phoneChanged = phoneInput && phone !== (phoneInput.dataset.initialValue || "").trim();
     const addressChanged = addressInput && address !== (addressInput.dataset.initialValue || "").trim();
-    if (!phoneChanged && !addressChanged) return;
-    saveAnnotationRemote(key, phone, "", { address })
+    const lineManagerChanged = lineManagerInput && lineManager !== (lineManagerInput.dataset.initialValue || "").trim().toLowerCase();
+    if (!phoneChanged && !addressChanged && !lineManagerChanged) return;
+    const opts = {};
+    if (addressChanged) opts.address = address;
+    if (lineManagerChanged) opts.line_manager = lineManager;
+    saveAnnotationRemote(key, phoneChanged ? phone : undefined, "", opts)
       .then(() => renderGrid())
       .catch(err => console.warn("annotation auto-save failed", err));
   }
@@ -2556,7 +2592,7 @@
     ` : "";
 
     const liveGwsWordmark = (u && !u.suspended)
-      ? `<img class="dir-modal-gws-wordmark" data-tenant="${escapeHtml((u.tenant || "").toLowerCase())}" src="assets/google-workspace-wordmark.svg?v=1" alt="Google Workspace${(u.tenant || "").toLowerCase() === "togetherloans" ? " (Together Loans)" : ""} account active">`
+      ? `<img class="dir-modal-gws-wordmark" data-tenant="${escapeHtml((u.tenant || "").toLowerCase())}" src="assets/google-workspace-wordmark.svg?v=1778883109" alt="Google Workspace${(u.tenant || "").toLowerCase() === "togetherloans" ? " (Together Loans)" : ""} account active">`
       : "";
     const suspendedBadge = (u && u.suspended)
       ? `<span class="dir-suspended-badge" title="This Workspace account is currently suspended — no email/Drive access, no billing on Flex plan">Workspace account suspended</span>`
@@ -2607,6 +2643,20 @@
               <button type="button" class="dir-link-btn" data-edit-toggle="address" style="margin-left:8px;">Edit</button>
               <div data-edit-input-wrap="address" hidden style="margin-top:6px;">
                 <textarea id="dirAddress" name="address" rows="2" placeholder="${escapeHtml(addrVal || "Home address")}">${escapeHtml(ann.address || "")}</textarea>
+              </div>
+            </dd>
+            <dt>Line Manager</dt>
+            <dd>
+              <span>${escapeHtml(lineManagerName(ann.line_manager)) || "—"}</span>
+              <button type="button" class="dir-link-btn" data-edit-toggle="line_manager" style="margin-left:8px;">Edit</button>
+              <div data-edit-input-wrap="line_manager" hidden style="margin-top:6px;">
+                <input id="dirLineManager" name="line_manager" type="email" list="dirLineManagerOptions" autocomplete="off"
+                       value="${escapeHtml(ann.line_manager || "")}"
+                       placeholder="manager.email@…">
+                <datalist id="dirLineManagerOptions">
+                  ${lineManagerOptions(entry)}
+                </datalist>
+                <p class="dir-modal-saved-hint" style="text-align:left;margin:6px 0 0;">Pick a colleague from the list. This person can see + edit their direct reports' calendars on the Holidays page.</p>
               </div>
             </dd>
           </dl>
@@ -4438,7 +4488,7 @@
     return `
       <button class="dir-modal-close" type="button" data-close aria-label="Close">×</button>
       <div class="dir-modal-head">
-        <img class="dir-modal-gws-wordmark" src="assets/google-workspace-wordmark.svg?v=1" alt="Google Workspace" style="height:28px;margin:0;">
+        <img class="dir-modal-gws-wordmark" src="assets/google-workspace-wordmark.svg?v=1778883109" alt="Google Workspace" style="height:28px;margin:0;">
         <div>
           <h2 class="dir-modal-name" id="dirModalName">Create new user</h2>
           <p class="dir-modal-title">Adds a Google Workspace account immediately.</p>
