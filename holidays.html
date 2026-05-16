@@ -649,6 +649,20 @@
   .hd-act-items-pill.is-email { border-color: var(--ink-blue, #1f3a6b);  color: var(--ink-blue, #1f3a6b); }
   .hd-act-items-pill.is-call  { border-color: var(--brass-600, #8b6f2a); color: var(--brass-600, #8b6f2a); }
   .hd-act-items-pill.is-auto  { border-color: var(--ink-500); color: var(--ink-500); }
+  .hd-act-src-count {
+    color: var(--ink-500);
+    font: 400 11px/1 var(--font-mono, 'JetBrains Mono', monospace);
+    margin-left: 4px;
+  }
+  .hd-act-items-section { margin: 6px 0; }
+  .hd-act-items-section + .hd-act-items-section { border-top: 1px solid var(--ink-300); padding-top: 6px; }
+  .hd-act-items-section-head {
+    font: 600 10px/1 var(--font-mono, 'JetBrains Mono', monospace);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-500);
+    padding: 2px 0 4px;
+  }
   .hd-act-detail-tag {
     display: inline-block;
     margin-left: 6px;
@@ -1530,26 +1544,43 @@
       if (!events.length) {
         panel.innerHTML = head + `<div class="hd-act-detail-empty">No detail events captured for this day.</div>`;
       } else {
-        events.sort((a, b) => (a.bucket || 0) - (b.bucket || 0));
-        const rows = events.map((e, i) => {
-          const from = bucketTime(e.bucket || 0);
-          const to   = bucketTime((e.bucket || 0) + 1);
-          const src  = e.src || "?";
-          const writes = e.writes || 0;
-          const kind = e.kind === "login" ? `<span class="hd-act-detail-tag">login</span>` : "";
-          const bid = e.bucket || 0;
+        // Group events by 15-min bucket. The warehouse emits one
+        // event row per (bucket, source) but an agent typically works
+        // across several tables in the same 15 minutes, so the row
+        // shown to the manager must collapse those source-shards into
+        // ONE row per bucket with the source list + total writes.
+        const byBucket = new Map();
+        for (const e of events) {
+          const b = e.bucket || 0;
+          let g = byBucket.get(b);
+          if (!g) { g = { bucket: b, sources: [], total: 0, kinds: new Set() }; byBucket.set(b, g); }
+          g.sources.push({ src: e.src || "?", writes: e.writes || 0 });
+          g.total += e.writes || 0;
+          if (e.kind) g.kinds.add(e.kind);
+        }
+        const grouped = [...byBucket.values()].sort((a, b) => a.bucket - b.bucket);
+        const rows = grouped.map((g, i) => {
+          const from = bucketTime(g.bucket);
+          const to   = bucketTime(g.bucket + 1);
+          // Sources by writes desc, "name (N)" each.
+          g.sources.sort((a, b) => b.writes - a.writes);
+          const srcLabel = g.sources.map(s =>
+            g.sources.length > 1 ? `${escapeHtml(s.src)} <span class="hd-act-src-count">(${s.writes})</span>`
+                                 : escapeHtml(s.src)
+          ).join(" · ");
+          const kind = g.kinds.has("login") ? `<span class="hd-act-detail-tag">login</span>` : "";
           return `
-            <tr class="slot-row" data-slot="${i}" data-email="${escapeHtml(activityFocus.email)}" data-iso="${escapeHtml(activityFocus.iso)}" data-bucket="${bid}" data-src="${escapeHtml(src)}">
+            <tr class="slot-row" data-slot="${i}" data-email="${escapeHtml(activityFocus.email)}" data-iso="${escapeHtml(activityFocus.iso)}" data-bucket="${g.bucket}">
               <td class="num">${escapeHtml(from)}–${escapeHtml(to)}</td>
-              <td class="hd-act-detail-source">${escapeHtml(src)}${kind}</td>
-              <td class="num">${writes.toLocaleString("en-GB")}</td>
+              <td class="hd-act-detail-source">${srcLabel}${kind}</td>
+              <td class="num">${g.total.toLocaleString("en-GB")}</td>
             </tr>
             <tr class="slot-expand" data-slot-expand="${i}" hidden><td colspan="3"></td></tr>`;
         }).join("");
         panel.innerHTML = head + `
           <table>
             <thead>
-              <tr><th>Window (UTC)</th><th>Source</th><th style="text-align:right;">Writes</th></tr>
+              <tr><th>Window (UTC)</th><th>Source(s)</th><th style="text-align:right;">Writes</th></tr>
             </thead>
             <tbody>${rows}</tbody>
           </table>`;
@@ -1585,7 +1616,6 @@
       email:  tr.dataset.email,
       date:   tr.dataset.iso,
       bucket: tr.dataset.bucket,
-      src:    tr.dataset.src,
     });
     try {
       const r = await fetch(`/api/workspace/activity-items?${params}`, { cache: "no-store" });
@@ -1594,41 +1624,60 @@
         throw new Error((j && j.error) || `HTTP ${r.status}`);
       }
       const data = await r.json();
-      cell.innerHTML = renderActivityItems(data.items || [], tr.dataset.src);
+      cell.innerHTML = renderActivityItems(data.items || []);
     } catch (err) {
       cell.innerHTML = `<div class="hd-act-items hd-act-items-empty">Couldn't load detail: ${escapeHtml(err.message || String(err))}</div>`;
     }
   }
 
-  function renderActivityItems(items, src) {
-    if (!items.length) {
-      return `<div class="hd-act-items hd-act-items-empty">No per-item detail captured yet for <code>${escapeHtml(src)}</code>. Comm sources are seeded on the next daily refresh; other sources show aggregate writes only.</div>`;
+  // Render the per-message detail returned by /api/workspace/activity-items.
+  // Items are grouped by source so a manager sees the comm rows, the
+  // application rows, the loanbook rows, etc. in clearly-separated
+  // sections. Comm rows carry body excerpt + ComType pill + meta;
+  // other rows currently fall back to "captured-as-aggregate-only".
+  function renderActivityItems(items) {
+    const bySrc = new Map();
+    for (const it of items) {
+      const s = it.src || "?";
+      if (!bySrc.has(s)) bySrc.set(s, []);
+      bySrc.get(s).push(it);
     }
-    const parts = items.map(it => {
-      const t = (it.occurred_at || "").slice(11, 19) || "—";
-      const commType = (it.comm_type || "").toString();
-      const ct = commType.toLowerCase();
-      const pill = commType
-        ? `<span class="hd-act-items-pill is-${escapeHtml(ct)}">${escapeHtml(commType)}</span>`
-        : "";
-      const auto = it.auto_processed
-        ? `<span class="hd-act-items-pill is-auto">Auto</span>` : "";
-      const fields = [];
-      if (it.client_type)     fields.push(`<span>ClientType <b>${escapeHtml(it.client_type)}</b></span>`);
-      if (it.client_username) fields.push(`<span>Client <b>${escapeHtml(it.client_username)}</b></span>`);
-      if (it.campaign_name)   fields.push(`<span>Campaign <b>${escapeHtml(it.campaign_name)}</b></span>`);
-      const body = it.body_excerpt
-        ? `<div class="hd-act-items-body">${escapeHtml(it.body_excerpt)}</div>`
-        : "";
-      return `<div class="hd-act-items-item">
-        <div class="hd-act-items-meta">
-          <span><b>${escapeHtml(t)}</b> UTC</span>
-          ${pill}${auto}${fields.join("")}
-        </div>
-        ${body}
-      </div>`;
-    });
-    return `<div class="hd-act-items">${parts.join("")}</div>`;
+    const sections = [];
+    for (const [src, list] of bySrc) {
+      const blocks = list.map(it => {
+        const t = (it.occurred_at || "").slice(11, 19) || "—";
+        const commType = (it.comm_type || "").toString();
+        const ct = commType.toLowerCase();
+        const pill = commType
+          ? `<span class="hd-act-items-pill is-${escapeHtml(ct)}">${escapeHtml(commType)}</span>`
+          : "";
+        const auto = it.auto_processed
+          ? `<span class="hd-act-items-pill is-auto">Auto</span>` : "";
+        const fields = [];
+        if (it.client_type)     fields.push(`<span>ClientType <b>${escapeHtml(it.client_type)}</b></span>`);
+        if (it.client_username) fields.push(`<span>Client <b>${escapeHtml(it.client_username)}</b></span>`);
+        if (it.campaign_name)   fields.push(`<span>Campaign <b>${escapeHtml(it.campaign_name)}</b></span>`);
+        const recId = it.record_id ? `<span class="hd-act-src-count">#${escapeHtml(it.record_id)}</span>` : "";
+        const body = it.body_excerpt
+          ? `<div class="hd-act-items-body">${escapeHtml(it.body_excerpt)}</div>`
+          : "";
+        return `<div class="hd-act-items-item">
+          <div class="hd-act-items-meta">
+            <span><b>${escapeHtml(t)}</b> UTC</span>
+            ${pill}${auto}${fields.join("")}${recId}
+          </div>
+          ${body}
+        </div>`;
+      }).join("");
+      sections.push(`<div class="hd-act-items-section">
+        <div class="hd-act-items-section-head">${escapeHtml(src)} · ${list.length} item${list.length === 1 ? "" : "s"}</div>
+        ${blocks}
+      </div>`);
+    }
+    if (!sections.length) {
+      return `<div class="hd-act-items hd-act-items-empty">Aggregate-only for these sources — per-row detail isn't captured yet outside comm tables. Today's comms are seeding now; click again in a few minutes.</div>`;
+    }
+    return `<div class="hd-act-items">${sections.join("")}</div>`;
   }
   function bucketTime(bucket) {
     const h = Math.floor(bucket / 4);
