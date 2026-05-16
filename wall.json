@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-16T22:08:02.251Z",
+  "updated_at": "2026-05-16T22:54:17.078Z",
   "posts": [
     {
       "id": "post_mp8t9vc4_9jhkrf",
@@ -34,11 +34,12 @@
           "author_email": "james.benamor@letme.com",
           "author_name": "james.benamor",
           "created_at": "2026-05-16T21:24:16.646Z",
-          "body": "Honestly I am on the $200/month plan and it's incredible. i've been on Claude Code keeping it running 12 hours a day or more for the last week and a half and I've never",
+          "body": "Honestly I am on the $200/month plan and it's incredible. i've been on Claude Code keeping it running 12 hours a day or more for the last week and a half and I've never come near to using 10% of the limit.",
           "photos": [
             "wall-media/img_mp8utcm9_poy80t.jpg"
           ],
-          "reactions": {}
+          "reactions": {},
+          "edited_at": "2026-05-16T22:54:16.923Z"
         },
         {
           "id": "reply_mp8uzu34_6m0ibg",
