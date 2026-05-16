@@ -1,15 +1,15 @@
 {
-  "snapshot_at": "2026-05-15T09:52:01.602355+00:00",
-  "snapshot_date": "2026-05-15",
+  "snapshot_at": "2026-05-16T00:11:23.270479+00:00",
+  "snapshot_date": "2026-05-16",
   "window_days": 60,
-  "cutoff_utc": "2026-03-16T09:52:01.602355+00:00",
-  "active_count": 94,
-  "external_count": 57,
+  "cutoff_utc": "2026-03-17T00:11:23.270479+00:00",
+  "active_count": 95,
+  "external_count": 55,
   "active_users": [
     {
       "email": "jack.bassilious@togetherloans.com",
-      "writes_60d": 475275,
-      "last_active_utc": "2026-05-15T09:36:59.670798",
+      "writes_60d": 478416,
+      "last_active_utc": "2026-05-16T00:09:07.525068",
       "tenants": [
         "transform"
       ],
@@ -18,8 +18,8 @@
     },
     {
       "email": "james.webster@letme.co.uk",
-      "writes_60d": 98927,
-      "last_active_utc": "2026-05-15T09:34:24.651543",
+      "writes_60d": 99962,
+      "last_active_utc": "2026-05-16T00:09:07.537451",
       "tenants": [
         "transform"
       ],
@@ -28,8 +28,8 @@
     },
     {
       "email": "joseph.shabazz@togetherloans.com",
-      "writes_60d": 14824,
-      "last_active_utc": "2026-05-15T01:02:28.571833",
+      "writes_60d": 14793,
+      "last_active_utc": "2026-05-16T00:08:13.810424",
       "tenants": [
         "transform"
       ],
@@ -38,8 +38,8 @@
     },
     {
       "email": "johnathon.ausborn@togetherloans.com",
-      "writes_60d": 13708,
-      "last_active_utc": "2026-05-14T21:01:29.108954",
+      "writes_60d": 14022,
+      "last_active_utc": "2026-05-15T21:01:40.231615",
       "tenants": [
         "transform"
       ],
@@ -48,8 +48,8 @@
     },
     {
       "email": "jaimi.struble@togetherloans.com",
-      "writes_60d": 11250,
-      "last_active_utc": "2026-05-15T00:59:44.345165",
+      "writes_60d": 11637,
+      "last_active_utc": "2026-05-15T22:02:52.415050",
       "tenants": [
         "transform"
       ],
@@ -58,8 +58,8 @@
     },
     {
       "email": "adedayo.adebowale@togetherloans.com",
-      "writes_60d": 11095,
-      "last_active_utc": "2026-05-15T00:54:59.687673",
+      "writes_60d": 11129,
+      "last_active_utc": "2026-05-16T00:08:03.959977",
       "tenants": [
         "transform"
       ],
@@ -68,7 +68,7 @@
     },
     {
       "email": "john.christie@togetherloans.com",
-      "writes_60d": 10784,
+      "writes_60d": 10392,
       "last_active_utc": "2026-05-08T22:56:39.291549",
       "tenants": [
         "transform"
@@ -78,7 +78,7 @@
     },
     {
       "email": "lucas.bishop@togetherloans.com",
-      "writes_60d": 9594,
+      "writes_60d": 9469,
       "last_active_utc": "2026-05-14T15:58:58.577036",
       "tenants": [
         "transform"
@@ -88,8 +88,8 @@
     },
     {
       "email": "david.dimmick@togetherloans.com",
-      "writes_60d": 9446,
-      "last_active_utc": "2026-05-15T06:07:32.685941",
+      "writes_60d": 9331,
+      "last_active_utc": "2026-05-15T19:56:13.753720",
       "tenants": [
         "transform"
       ],
@@ -98,8 +98,8 @@
     },
     {
       "email": "ceera.gillette@togetherloans.com",
-      "writes_60d": 8833,
-      "last_active_utc": "2026-05-15T00:13:52.370904",
+      "writes_60d": 8802,
+      "last_active_utc": "2026-05-15T21:53:14.908608",
       "tenants": [
         "transform"
       ],
@@ -108,8 +108,8 @@
     },
     {
       "email": "tyla.woods@togetherloans.com",
-      "writes_60d": 8472,
-      "last_active_utc": "2026-05-15T01:13:13.875470",
+      "writes_60d": 8694,
+      "last_active_utc": "2026-05-15T23:27:21.720857",
       "tenants": [
         "transform"
       ],
@@ -118,7 +118,7 @@
     },
     {
       "email": "jennifer.taylor@togetherloans.com",
-      "writes_60d": 8448,
+      "writes_60d": 8445,
       "last_active_utc": "2026-05-11T21:35:43.600608",
       "tenants": [
         "transform"
@@ -128,8 +128,8 @@
     },
     {
       "email": "kenishia.cotner@togetherloans.com",
-      "writes_60d": 8177,
-      "last_active_utc": "2026-05-14T20:58:52.045720",
+      "writes_60d": 8255,
+      "last_active_utc": "2026-05-15T17:00:45.102248",
       "tenants": [
         "transform"
       ],
@@ -138,18 +138,8 @@
     },
     {
       "email": "bryony.leach@togetherloans.com",
-      "writes_60d": 8084,
-      "last_active_utc": "2026-05-15T09:41:32.707777",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "loanbook"
-    },
-    {
-      "email": "shakeeda.taylor@togetherloans.com",
-      "writes_60d": 7962,
-      "last_active_utc": "2026-05-15T00:23:31.453420",
+      "writes_60d": 8255,
+      "last_active_utc": "2026-05-15T15:15:27.112294",
       "tenants": [
         "transform"
       ],
@@ -158,18 +148,8 @@
     },
     {
       "email": "tatiana.rodriguez@togetherloans.com",
-      "writes_60d": 7946,
-      "last_active_utc": "2026-05-15T00:16:53.917814",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "loanbook"
-    },
-    {
-      "email": "candi.holland@togetherloans.com",
-      "writes_60d": 7906,
-      "last_active_utc": "2026-05-15T06:41:59.637553",
+      "writes_60d": 7877,
+      "last_active_utc": "2026-05-15T23:53:00.687049",
       "tenants": [
         "transform"
       ],
@@ -178,8 +158,8 @@
     },
     {
       "email": "bushra.tabassum@togetherloans.com",
-      "writes_60d": 7879,
-      "last_active_utc": "2026-05-15T09:13:42.801733",
+      "writes_60d": 7850,
+      "last_active_utc": "2026-05-15T23:29:07.664682",
       "tenants": [
         "transform"
       ],
@@ -187,9 +167,29 @@
       "top_warehouse": "applications"
     },
     {
+      "email": "shakeeda.taylor@togetherloans.com",
+      "writes_60d": 7740,
+      "last_active_utc": "2026-05-15T00:23:31.453420",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "loanbook"
+    },
+    {
+      "email": "candi.holland@togetherloans.com",
+      "writes_60d": 7679,
+      "last_active_utc": "2026-05-15T06:41:59.637553",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "loanbook"
+    },
+    {
       "email": "chelsea.concini@togetherloans.com",
-      "writes_60d": 7529,
-      "last_active_utc": "2026-05-14T20:18:13.407595",
+      "writes_60d": 7505,
+      "last_active_utc": "2026-05-15T15:32:40.471753",
       "tenants": [
         "transform"
       ],
@@ -198,18 +198,8 @@
     },
     {
       "email": "eden.oxley@togetherloans.com",
-      "writes_60d": 6776,
-      "last_active_utc": "2026-05-15T00:10:34.763620",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "applications"
-    },
-    {
-      "email": "sophie.james@togetherloans.com",
-      "writes_60d": 6774,
-      "last_active_utc": "2026-05-05T06:31:51.925091",
+      "writes_60d": 6896,
+      "last_active_utc": "2026-05-15T20:48:15.348400",
       "tenants": [
         "transform"
       ],
@@ -218,8 +208,18 @@
     },
     {
       "email": "courtnie.raine@togetherloans.com",
-      "writes_60d": 6722,
-      "last_active_utc": "2026-05-15T06:30:57.274295",
+      "writes_60d": 6740,
+      "last_active_utc": "2026-05-16T00:10:21.724859",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "applications"
+    },
+    {
+      "email": "sophie.james@togetherloans.com",
+      "writes_60d": 6632,
+      "last_active_utc": "2026-05-05T06:31:51.925091",
       "tenants": [
         "transform"
       ],
@@ -228,7 +228,7 @@
     },
     {
       "email": "aldrine.sejour@togetherloans.com",
-      "writes_60d": 6231,
+      "writes_60d": 6195,
       "last_active_utc": "2026-05-14T20:59:06.544678",
       "tenants": [
         "transform"
@@ -238,8 +238,8 @@
     },
     {
       "email": "aerona.sheikh@togetherloans.com",
-      "writes_60d": 5910,
-      "last_active_utc": "2026-05-15T08:53:41.904116",
+      "writes_60d": 6033,
+      "last_active_utc": "2026-05-15T13:34:34.353659",
       "tenants": [
         "transform"
       ],
@@ -248,8 +248,8 @@
     },
     {
       "email": "oliver.holmes@togetherloans.com",
-      "writes_60d": 5737,
-      "last_active_utc": "2026-05-14T19:00:48.018253",
+      "writes_60d": 5787,
+      "last_active_utc": "2026-05-15T19:06:06.437064",
       "tenants": [
         "transform"
       ],
@@ -258,8 +258,8 @@
     },
     {
       "email": "joe.cortez@togetherloans.com",
-      "writes_60d": 4664,
-      "last_active_utc": "2026-05-14T15:39:11.907195",
+      "writes_60d": 4850,
+      "last_active_utc": "2026-05-15T20:00:42.365784",
       "tenants": [
         "transform"
       ],
@@ -267,9 +267,9 @@
       "top_warehouse": "loanbook"
     },
     {
-      "email": "grainne.cranna@togetherloans.com",
-      "writes_60d": 4176,
-      "last_active_utc": "2026-05-15T09:47:24.379293",
+      "email": "laurine.beaubrun@togetherloans.com",
+      "writes_60d": 4210,
+      "last_active_utc": "2026-05-15T20:27:06.314790",
       "tenants": [
         "transform"
       ],
@@ -277,9 +277,9 @@
       "top_warehouse": "applications"
     },
     {
-      "email": "laurine.beaubrun@togetherloans.com",
-      "writes_60d": 4155,
-      "last_active_utc": "2026-05-14T23:46:31.420460",
+      "email": "grainne.cranna@togetherloans.com",
+      "writes_60d": 4097,
+      "last_active_utc": "2026-05-15T18:02:34.669609",
       "tenants": [
         "transform"
       ],
@@ -288,8 +288,8 @@
     },
     {
       "email": "ashwin.john@togetherloans.com",
-      "writes_60d": 3836,
-      "last_active_utc": "2026-05-15T09:28:39.149406",
+      "writes_60d": 3872,
+      "last_active_utc": "2026-05-15T17:23:14.454822",
       "tenants": [
         "transform"
       ],
@@ -298,28 +298,8 @@
     },
     {
       "email": "maisey.lapskas@togetherloans.com",
-      "writes_60d": 3677,
-      "last_active_utc": "2026-05-15T09:40:00.238579",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "applications"
-    },
-    {
-      "email": "christian.joseph@togetherloans.com",
-      "writes_60d": 3491,
-      "last_active_utc": "2026-05-15T09:48:59.957227",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "applications"
-    },
-    {
-      "email": "sophia.ugwunne@letme.com",
-      "writes_60d": 3407,
-      "last_active_utc": "2026-05-12T20:58:34.670474",
+      "writes_60d": 3690,
+      "last_active_utc": "2026-05-15T16:58:55.439552",
       "tenants": [
         "transform"
       ],
@@ -328,8 +308,28 @@
     },
     {
       "email": "james.harlow@togetherloans.com",
-      "writes_60d": 3386,
-      "last_active_utc": "2026-05-14T19:01:08.984065",
+      "writes_60d": 3459,
+      "last_active_utc": "2026-05-15T18:57:36.144956",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "applications"
+    },
+    {
+      "email": "christian.joseph@togetherloans.com",
+      "writes_60d": 3437,
+      "last_active_utc": "2026-05-15T16:59:42.562417",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "applications"
+    },
+    {
+      "email": "sophia.ugwunne@letme.com",
+      "writes_60d": 3306,
+      "last_active_utc": "2026-05-12T20:58:34.670474",
       "tenants": [
         "transform"
       ],
@@ -338,8 +338,18 @@
     },
     {
       "email": "axel.horsfall@togetherloans.com",
-      "writes_60d": 3301,
-      "last_active_utc": "2026-05-15T08:27:10.751311",
+      "writes_60d": 3264,
+      "last_active_utc": "2026-05-15T16:41:49.625646",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "applications"
+    },
+    {
+      "email": "annette.rodriguez@togetherloans.com",
+      "writes_60d": 2979,
+      "last_active_utc": "2026-05-16T00:05:40.578722",
       "tenants": [
         "transform"
       ],
@@ -348,8 +358,8 @@
     },
     {
       "email": "berginie.botero@togetherloans.com",
-      "writes_60d": 2980,
-      "last_active_utc": "2026-05-15T05:03:12.259829",
+      "writes_60d": 2945,
+      "last_active_utc": "2026-05-15T13:31:29.381353",
       "tenants": [
         "lendingmate",
         "transform"
@@ -358,9 +368,9 @@
       "top_warehouse": "loanbook"
     },
     {
-      "email": "annette.rodriguez@togetherloans.com",
-      "writes_60d": 2872,
-      "last_active_utc": "2026-05-15T02:09:05.621780",
+      "email": "grace.campbell@togetherloans.com",
+      "writes_60d": 2932,
+      "last_active_utc": "2026-05-16T00:05:37.262151",
       "tenants": [
         "transform"
       ],
@@ -369,7 +379,7 @@
     },
     {
       "email": "saoirse-brooke.polywka@togetherloans.com",
-      "writes_60d": 2850,
+      "writes_60d": 2826,
       "last_active_utc": "2026-05-13T16:52:33.955299",
       "tenants": [
         "transform"
@@ -378,19 +388,9 @@
       "top_warehouse": "applications"
     },
     {
-      "email": "grace.campbell@togetherloans.com",
-      "writes_60d": 2823,
-      "last_active_utc": "2026-05-15T00:47:17.258179",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "applications"
-    },
-    {
       "email": "sophie.polychronopulos@togetherloans.com",
-      "writes_60d": 2664,
-      "last_active_utc": "2026-05-15T09:38:11.421752",
+      "writes_60d": 2546,
+      "last_active_utc": "2026-05-15T13:01:04.264244",
       "tenants": [
         "transform"
       ],
@@ -399,8 +399,8 @@
     },
     {
       "email": "thomas.holloway@togetherloans.com",
-      "writes_60d": 2430,
-      "last_active_utc": "2026-05-14T16:26:58.224359",
+      "writes_60d": 2412,
+      "last_active_utc": "2026-05-15T22:29:50.532165",
       "tenants": [
         "transform"
       ],
@@ -418,9 +418,19 @@
       "top_warehouse": "applications"
     },
     {
+      "email": "josue.tejada@togetherloans.com",
+      "writes_60d": 2173,
+      "last_active_utc": "2026-05-15T22:53:44.177359",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "applications"
+    },
+    {
       "email": "josh.carless@togetherloans.com",
-      "writes_60d": 2077,
-      "last_active_utc": "2026-05-15T09:42:13.421758",
+      "writes_60d": 2153,
+      "last_active_utc": "2026-05-15T21:29:02.674214",
       "tenants": [
         "transform"
       ],
@@ -429,28 +439,8 @@
     },
     {
       "email": "morgan.smith@letme.com",
-      "writes_60d": 2061,
-      "last_active_utc": "2026-05-15T09:11:04.823651",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "applications"
-    },
-    {
-      "email": "josue.tejada@togetherloans.com",
-      "writes_60d": 2045,
-      "last_active_utc": "2026-05-14T23:52:14.077395",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "applications"
-    },
-    {
-      "email": "timothy.torres@togetherloans.com",
-      "writes_60d": 1816,
-      "last_active_utc": "2026-05-15T03:50:35.314927",
+      "writes_60d": 2075,
+      "last_active_utc": "2026-05-15T16:24:46.454777",
       "tenants": [
         "transform"
       ],
@@ -459,8 +449,8 @@
     },
     {
       "email": "alishia.kasdorf@togetherloans.com",
-      "writes_60d": 1780,
-      "last_active_utc": "2026-05-15T03:21:48.513404",
+      "writes_60d": 1843,
+      "last_active_utc": "2026-05-15T20:21:30.690606",
       "tenants": [
         "transform"
       ],
@@ -468,9 +458,9 @@
       "top_warehouse": "loanbook"
     },
     {
-      "email": "marta.gallardo@togetherloans.com",
-      "writes_60d": 1543,
-      "last_active_utc": "2026-05-15T09:02:03.245260",
+      "email": "timothy.torres@togetherloans.com",
+      "writes_60d": 1754,
+      "last_active_utc": "2026-05-15T22:43:42.265963",
       "tenants": [
         "transform"
       ],
@@ -479,8 +469,8 @@
     },
     {
       "email": "yikyu.chan@togetherloans.com",
-      "writes_60d": 1525,
-      "last_active_utc": "2026-05-15T08:08:09.992415",
+      "writes_60d": 1595,
+      "last_active_utc": "2026-05-15T17:01:57.227878",
       "tenants": [
         "transform"
       ],
@@ -488,9 +478,9 @@
       "top_warehouse": "applications"
     },
     {
-      "email": "rebekah.dewaard@togetherloans.com",
-      "writes_60d": 1390,
-      "last_active_utc": "2026-05-07T22:45:34.032874",
+      "email": "marta.gallardo@togetherloans.com",
+      "writes_60d": 1518,
+      "last_active_utc": "2026-05-15T17:19:21.332412",
       "tenants": [
         "transform"
       ],
@@ -499,8 +489,8 @@
     },
     {
       "email": "srujana.paspuleti@togetherloans.com",
-      "writes_60d": 1386,
-      "last_active_utc": "2026-05-15T09:43:50.715234",
+      "writes_60d": 1422,
+      "last_active_utc": "2026-05-15T13:37:42.459937",
       "tenants": [
         "transform"
       ],
@@ -509,8 +499,8 @@
     },
     {
       "email": "abigail.lee@togetherloans.com",
-      "writes_60d": 1350,
-      "last_active_utc": "2026-05-14T22:22:33.947728",
+      "writes_60d": 1418,
+      "last_active_utc": "2026-05-16T00:08:43.274723",
       "tenants": [
         "transform"
       ],
@@ -518,9 +508,9 @@
       "top_warehouse": "applications"
     },
     {
-      "email": "mourad.malki@clearloans.com.au",
-      "writes_60d": 1149,
-      "last_active_utc": "2026-05-14T20:43:17.846085",
+      "email": "rebekah.dewaard@togetherloans.com",
+      "writes_60d": 1346,
+      "last_active_utc": "2026-05-07T22:45:34.032874",
       "tenants": [
         "transform"
       ],
@@ -529,8 +519,18 @@
     },
     {
       "email": "dejon.johnson@togetherloans.com",
-      "writes_60d": 1116,
-      "last_active_utc": "2026-05-15T01:01:10.099765",
+      "writes_60d": 1170,
+      "last_active_utc": "2026-05-15T20:06:19.503547",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "applications"
+    },
+    {
+      "email": "mourad.malki@clearloans.com.au",
+      "writes_60d": 1144,
+      "last_active_utc": "2026-05-14T20:43:17.846085",
       "tenants": [
         "transform"
       ],
@@ -539,8 +539,8 @@
     },
     {
       "email": "diana.rogel@togetherloans.com",
-      "writes_60d": 1002,
-      "last_active_utc": "2026-05-14T21:45:38.673500",
+      "writes_60d": 1078,
+      "last_active_utc": "2026-05-15T22:01:17.228040",
       "tenants": [
         "transform"
       ],
@@ -549,18 +549,8 @@
     },
     {
       "email": "gabriella.debacci@togetherloans.com",
-      "writes_60d": 977,
-      "last_active_utc": "2026-05-15T09:47:32.052953",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "applications"
-    },
-    {
-      "email": "kellee.brown@togetherloans.com",
-      "writes_60d": 825,
-      "last_active_utc": "2026-05-13T19:33:56.238674",
+      "writes_60d": 1037,
+      "last_active_utc": "2026-05-15T17:00:58.084584",
       "tenants": [
         "transform"
       ],
@@ -569,8 +559,8 @@
     },
     {
       "email": "dawna.smith@togetherloans.com",
-      "writes_60d": 812,
-      "last_active_utc": "2026-05-14T20:57:47.940155",
+      "writes_60d": 902,
+      "last_active_utc": "2026-05-15T23:36:32.070502",
       "tenants": [
         "transform"
       ],
@@ -579,7 +569,7 @@
     },
     {
       "email": "ben.gardner@letme.com",
-      "writes_60d": 804,
+      "writes_60d": 790,
       "last_active_utc": "2026-05-14T17:39:52.282591",
       "tenants": [
         "transform"
@@ -588,9 +578,19 @@
       "top_warehouse": "applications"
     },
     {
+      "email": "kellee.brown@togetherloans.com",
+      "writes_60d": 753,
+      "last_active_utc": "2026-05-13T19:33:56.238674",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "applications"
+    },
+    {
       "email": "laura.chadbourne@letme.co.uk",
-      "writes_60d": 695,
-      "last_active_utc": "2026-05-15T09:22:03.365013",
+      "writes_60d": 696,
+      "last_active_utc": "2026-05-15T17:33:53.939102",
       "tenants": [
         "transform"
       ],
@@ -618,6 +618,16 @@
       "top_warehouse": "loanbook"
     },
     {
+      "email": "claire.stratford@togetherloans.com",
+      "writes_60d": 275,
+      "last_active_utc": "2026-05-15T10:53:09.785309",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "applications"
+    },
+    {
       "email": "kandi.vaughn@togetherloans.com",
       "writes_60d": 273,
       "last_active_utc": "2026-04-29T07:13:06.764704",
@@ -626,16 +636,6 @@
       ],
       "primary_tenant": "transform",
       "top_warehouse": "loanbook"
-    },
-    {
-      "email": "claire.stratford@togetherloans.com",
-      "writes_60d": 269,
-      "last_active_utc": "2026-05-08T16:42:15.830890",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "applications"
     },
     {
       "email": "amiela.martin@togetherloans.com",
@@ -649,18 +649,8 @@
     },
     {
       "email": "kelly.black@letme.com",
-      "writes_60d": 232,
-      "last_active_utc": "2026-05-14T20:35:03.218211",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "applications"
-    },
-    {
-      "email": "lucian.teodoroiu@letme.co.uk",
-      "writes_60d": 209,
-      "last_active_utc": "2026-05-15T09:14:12.075859",
+      "writes_60d": 235,
+      "last_active_utc": "2026-05-15T17:51:22.436181",
       "tenants": [
         "transform"
       ],
@@ -676,6 +666,26 @@
       ],
       "primary_tenant": "transform",
       "top_warehouse": "loanbook"
+    },
+    {
+      "email": "lucian.teodoroiu@letme.co.uk",
+      "writes_60d": 204,
+      "last_active_utc": "2026-05-15T17:35:17.176895",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "applications"
+    },
+    {
+      "email": "raveeha.ejaz@letme.com",
+      "writes_60d": 200,
+      "last_active_utc": "2026-05-15T16:08:13.357137",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "applications"
     },
     {
       "email": "matt.brunet@togetherloans.com",
@@ -696,16 +706,6 @@
       ],
       "primary_tenant": "transform",
       "top_warehouse": "loanbook"
-    },
-    {
-      "email": "raveeha.ejaz@letme.com",
-      "writes_60d": 191,
-      "last_active_utc": "2026-05-15T03:19:24.869927",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "applications"
     },
     {
       "email": "clementia.dsouza@letme.com",
@@ -729,8 +729,8 @@
     },
     {
       "email": "marcos.gallegos@togetherloans.com",
-      "writes_60d": 150,
-      "last_active_utc": "2026-05-14T18:31:07.382236",
+      "writes_60d": 174,
+      "last_active_utc": "2026-05-15T17:18:45.466347",
       "tenants": [
         "transform"
       ],
@@ -768,6 +768,16 @@
       "top_warehouse": "applications"
     },
     {
+      "email": "irlendz.arne@togetherloans.com",
+      "writes_60d": 86,
+      "last_active_utc": "2026-05-15T21:28:47.229292",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "applications"
+    },
+    {
       "email": "guillermo.aguirre@togetherloans.com",
       "writes_60d": 73,
       "last_active_utc": "2026-04-23T22:08:25.322715",
@@ -778,19 +788,9 @@
       "top_warehouse": "applications"
     },
     {
-      "email": "irlendz.arne@togetherloans.com",
-      "writes_60d": 65,
-      "last_active_utc": "2026-05-14T18:54:34.460196",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "applications"
-    },
-    {
       "email": "paulo.cesar@togetherloans.com",
-      "writes_60d": 64,
-      "last_active_utc": "2026-05-14T18:21:24.461785",
+      "writes_60d": 65,
+      "last_active_utc": "2026-05-15T20:59:09.328070",
       "tenants": [
         "transform"
       ],
@@ -798,8 +798,18 @@
       "top_warehouse": "loanbook"
     },
     {
+      "email": "krysha.thorp@togetherloans.com",
+      "writes_60d": 58,
+      "last_active_utc": "2026-05-15T20:25:44.264713",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "applications"
+    },
+    {
       "email": "ekrem.yurtman@letme.com",
-      "writes_60d": 61,
+      "writes_60d": 57,
       "last_active_utc": "2026-05-14T13:37:53.160703",
       "tenants": [
         "transform"
@@ -809,7 +819,7 @@
     },
     {
       "email": "dan.meineck@togetherloans.com",
-      "writes_60d": 53,
+      "writes_60d": 51,
       "last_active_utc": "2026-04-30T07:56:44.896011",
       "tenants": [
         "transform"
@@ -818,8 +828,18 @@
       "top_warehouse": "applications"
     },
     {
+      "email": "amber.shoun@togetherloans.com",
+      "writes_60d": 41,
+      "last_active_utc": "2026-05-15T18:06:47.710307",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "loanbook"
+    },
+    {
       "email": "stan.majerski@togetherloans.com",
-      "writes_60d": 40,
+      "writes_60d": 38,
       "last_active_utc": "2026-05-11T15:14:42.540026",
       "tenants": [
         "transform"
@@ -836,16 +856,6 @@
       ],
       "primary_tenant": "transform",
       "top_warehouse": "loanbook"
-    },
-    {
-      "email": "krysha.thorp@togetherloans.com",
-      "writes_60d": 13,
-      "last_active_utc": "2026-05-14T17:44:42.209870",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "applications"
     },
     {
       "email": "bernardo.fonseca@togetherloans.com",
@@ -879,7 +889,7 @@
     },
     {
       "email": "igor.kravcov@letme.com",
-      "writes_60d": 505,
+      "writes_60d": 482,
       "last_active_utc": "2026-05-15T08:58:16.626528",
       "tenants": [
         "rgroup"
@@ -889,28 +899,28 @@
     },
     {
       "email": "kamran.kamaei@letme.com",
-      "writes_60d": 205,
-      "last_active_utc": "2026-05-14T11:05:54.380822",
+      "writes_60d": 216,
+      "last_active_utc": "2026-05-15T09:47:59.383631",
       "tenants": [
         "rgroup"
       ],
       "primary_tenant": "rgroup",
-      "top_warehouse": "applications"
+      "top_warehouse": "loanbook"
     },
     {
       "email": "adnan.turken@togetherloans.com",
-      "writes_60d": 159,
-      "last_active_utc": "2026-05-13T02:27:55.038642",
+      "writes_60d": 154,
+      "last_active_utc": "2026-05-15T05:20:17.930589",
       "tenants": [
         "rgroup"
       ],
       "primary_tenant": "rgroup",
-      "top_warehouse": "applications"
+      "top_warehouse": "loanbook"
     },
     {
       "email": "dorota.kazmierczyk@letme.com",
-      "writes_60d": 3876,
-      "last_active_utc": "2026-05-15T09:05:03.086957",
+      "writes_60d": 3830,
+      "last_active_utc": "2026-05-15T23:26:42.909140",
       "tenants": [
         "fianceo",
         "rapida"
@@ -952,7 +962,7 @@
   "external_users": [
     {
       "username": "irvin.lopez@transformcredit.com",
-      "writes_60d": 4014,
+      "writes_60d": 3961,
       "last_active_utc": "2026-05-15T00:54:36.141553",
       "tenants": [
         "transform"
@@ -962,8 +972,8 @@
     },
     {
       "username": "jose.rodriguez@transformcredit.com",
-      "writes_60d": 3763,
-      "last_active_utc": "2026-05-15T00:17:54.252606",
+      "writes_60d": 3818,
+      "last_active_utc": "2026-05-16T00:08:38.170815",
       "tenants": [
         "transform"
       ],
@@ -972,8 +982,8 @@
     },
     {
       "username": "ronny.cardona@transformcredit.com",
-      "writes_60d": 3432,
-      "last_active_utc": "2026-05-14T22:32:00.641819",
+      "writes_60d": 3434,
+      "last_active_utc": "2026-05-15T21:57:47.362799",
       "tenants": [
         "transform"
       ],
@@ -982,8 +992,8 @@
     },
     {
       "username": "javier.esquivel@transformcredit.com",
-      "writes_60d": 3377,
-      "last_active_utc": "2026-05-14T23:46:16.568193",
+      "writes_60d": 3317,
+      "last_active_utc": "2026-05-15T20:01:46.174746",
       "tenants": [
         "transform"
       ],
@@ -992,7 +1002,7 @@
     },
     {
       "username": "aaron.munson@togetherloans.com",
-      "writes_60d": 3181,
+      "writes_60d": 3004,
       "last_active_utc": "2026-04-10T13:09:46.673152",
       "tenants": [
         "transform"
@@ -1001,8 +1011,18 @@
       "top_warehouse": "applications"
     },
     {
+      "username": "auto.approverv2@transformcredit.com",
+      "writes_60d": 2460,
+      "last_active_utc": "2026-05-15T23:57:50.699265",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "applications"
+    },
+    {
       "username": "jocobo.garay@transformcredit.com",
-      "writes_60d": 2537,
+      "writes_60d": 2447,
       "last_active_utc": "2026-04-27T21:59:34.976638",
       "tenants": [
         "transform"
@@ -1011,19 +1031,9 @@
       "top_warehouse": "applications"
     },
     {
-      "username": "auto.approverv2@transformcredit.com",
-      "writes_60d": 2433,
-      "last_active_utc": "2026-05-15T04:06:40.712485",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "applications"
-    },
-    {
       "username": "shennell.fennell@transformcredit.com",
-      "writes_60d": 2013,
-      "last_active_utc": "2026-05-15T00:50:19.581356",
+      "writes_60d": 2022,
+      "last_active_utc": "2026-05-15T19:07:01.221231",
       "tenants": [
         "transform"
       ],
@@ -1042,8 +1052,8 @@
     },
     {
       "username": "elijah.wilson@transformcredit.com",
-      "writes_60d": 1766,
-      "last_active_utc": "2026-05-14T00:56:26.506659",
+      "writes_60d": 1784,
+      "last_active_utc": "2026-05-16T00:07:35.391065",
       "tenants": [
         "transform"
       ],
@@ -1062,8 +1072,8 @@
     },
     {
       "username": "glenae.ford@transformcredit.com",
-      "writes_60d": 1469,
-      "last_active_utc": "2026-05-15T00:55:14.785483",
+      "writes_60d": 1474,
+      "last_active_utc": "2026-05-15T14:05:44.650359",
       "tenants": [
         "transform"
       ],
@@ -1072,7 +1082,7 @@
     },
     {
       "username": "cathren.sumner@transformcredit.com",
-      "writes_60d": 1295,
+      "writes_60d": 1042,
       "last_active_utc": "2026-03-23T13:17:35.143695",
       "tenants": [
         "transform"
@@ -1082,7 +1092,7 @@
     },
     {
       "username": "jowayne.harrison@transformcredit.com",
-      "writes_60d": 1097,
+      "writes_60d": 1031,
       "last_active_utc": "2026-04-30T00:57:10.481220",
       "tenants": [
         "transform"
@@ -1111,8 +1121,18 @@
       "top_warehouse": "applications"
     },
     {
+      "username": "alex.arias@transformcredit.com",
+      "writes_60d": 715,
+      "last_active_utc": "2026-05-16T00:02:01.236742",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "applications"
+    },
+    {
       "username": "jess.cracknell@togetherloans.com",
-      "writes_60d": 751,
+      "writes_60d": 675,
       "last_active_utc": "2026-03-25T17:39:55.962780",
       "tenants": [
         "transform"
@@ -1121,29 +1141,9 @@
       "top_warehouse": "applications"
     },
     {
-      "username": "alex.arias@transformcredit.com",
-      "writes_60d": 706,
-      "last_active_utc": "2026-05-12T22:44:14.826109",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "applications"
-    },
-    {
       "username": "shanay.robinson@transformcredit.com",
-      "writes_60d": 274,
+      "writes_60d": 238,
       "last_active_utc": "2026-03-27T00:22:21.481303",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "applications"
-    },
-    {
-      "username": "lori.hagaman@transformcredit.com",
-      "writes_60d": 240,
-      "last_active_utc": "2026-03-17T00:57:39.664717",
       "tenants": [
         "transform"
       ],
@@ -1162,7 +1162,7 @@
     },
     {
       "username": "natani.wright@togetherloans.com",
-      "writes_60d": 173,
+      "writes_60d": 120,
       "last_active_utc": "2026-03-20T00:49:28.450691",
       "tenants": [
         "transform"
@@ -1172,7 +1172,7 @@
     },
     {
       "username": "diego.quijada@togetherloans.com",
-      "writes_60d": 122,
+      "writes_60d": 92,
       "last_active_utc": "2026-03-20T20:02:35.352688",
       "tenants": [
         "transform"
@@ -1201,9 +1201,19 @@
       "top_warehouse": "centralcrm"
     },
     {
-      "username": "reginald.smith@togetherloans.com",
-      "writes_60d": 46,
-      "last_active_utc": "2026-03-16T19:50:51.340910",
+      "username": "sara.james@togetherloans.com",
+      "writes_60d": 23,
+      "last_active_utc": "2026-04-09T15:04:32.481401",
+      "tenants": [
+        "transform"
+      ],
+      "primary_tenant": "transform",
+      "top_warehouse": "applications"
+    },
+    {
+      "username": "lori.hagaman@transformcredit.com",
+      "writes_60d": 16,
+      "last_active_utc": "2026-03-17T00:57:39.664717",
       "tenants": [
         "transform"
       ],
@@ -1212,7 +1222,7 @@
     },
     {
       "username": "victor.brito@togetherloans.com",
-      "writes_60d": 44,
+      "writes_60d": 12,
       "last_active_utc": "2026-03-17T21:47:22.666911",
       "tenants": [
         "transform"
@@ -1222,18 +1232,8 @@
     },
     {
       "username": "kadjae.bridgemohan@transformcredit.com",
-      "writes_60d": 26,
+      "writes_60d": 10,
       "last_active_utc": "2026-03-24T00:38:07.412115",
-      "tenants": [
-        "transform"
-      ],
-      "primary_tenant": "transform",
-      "top_warehouse": "applications"
-    },
-    {
-      "username": "sara.james@togetherloans.com",
-      "writes_60d": 23,
-      "last_active_utc": "2026-04-09T15:04:32.481401",
       "tenants": [
         "transform"
       ],
@@ -1342,7 +1342,7 @@
     },
     {
       "username": "marek.golab@letme.com",
-      "writes_60d": 16,
+      "writes_60d": 15,
       "last_active_utc": "2026-05-14T23:18:57.476004",
       "tenants": [
         "letme"
@@ -1352,7 +1352,7 @@
     },
     {
       "username": "victor.igbaifua@rgdc.com",
-      "writes_60d": 12,
+      "writes_60d": 11,
       "last_active_utc": "2026-05-05T15:52:30.073501",
       "tenants": [
         "rgdc"
@@ -1361,19 +1361,9 @@
       "top_warehouse": "loanbook"
     },
     {
-      "username": "saskia.hedley@rgroup.co.uk",
-      "writes_60d": 1,
-      "last_active_utc": "2026-03-17T00:00:00",
-      "tenants": [
-        "rgroup"
-      ],
-      "primary_tenant": "rgroup",
-      "top_warehouse": "centralcrm"
-    },
-    {
       "username": "internalbaddebtproject@rapidamoney.pl",
-      "writes_60d": 1896,
-      "last_active_utc": "2026-05-14T23:11:58.286048",
+      "writes_60d": 1825,
+      "last_active_utc": "2026-05-15T23:18:27.111905",
       "tenants": [
         "rapida"
       ],
@@ -1382,8 +1372,8 @@
     },
     {
       "username": "marek.internalproject@rapidamoney.pl",
-      "writes_60d": 1086,
-      "last_active_utc": "2026-05-14T15:35:37.104618",
+      "writes_60d": 1094,
+      "last_active_utc": "2026-05-15T23:25:24.302141",
       "tenants": [
         "rapida"
       ],
@@ -1392,7 +1382,7 @@
     },
     {
       "username": "ruben@fianceo.com",
-      "writes_60d": 1058,
+      "writes_60d": 1045,
       "last_active_utc": "2026-05-15T10:02:25.584461",
       "tenants": [
         "fianceo"
@@ -1402,8 +1392,8 @@
     },
     {
       "username": "karina@tandolan.dk",
-      "writes_60d": 551,
-      "last_active_utc": "2026-05-14T08:24:55.975268",
+      "writes_60d": 552,
+      "last_active_utc": "2026-05-15T23:32:41.792902",
       "tenants": [
         "tandolan"
       ],
@@ -1412,8 +1402,8 @@
     },
     {
       "username": "karina@tandolan.se",
-      "writes_60d": 439,
-      "last_active_utc": "2026-05-15T10:28:31.651791",
+      "writes_60d": 440,
+      "last_active_utc": "2026-05-15T23:37:28.196645",
       "tenants": [
         "tandolan"
       ],
@@ -1422,8 +1412,8 @@
     },
     {
       "username": "patryk.mordarski@rapidamoney.pl",
-      "writes_60d": 51,
-      "last_active_utc": "2026-05-12T23:19:04.052479",
+      "writes_60d": 56,
+      "last_active_utc": "2026-05-15T23:23:56.834234",
       "tenants": [
         "rapida"
       ],
@@ -1452,8 +1442,8 @@
     },
     {
       "username": "pawel.mazur@rapidamoney.pl",
-      "writes_60d": 11,
-      "last_active_utc": "2026-05-10T23:23:22.184254",
+      "writes_60d": 14,
+      "last_active_utc": "2026-05-15T23:21:32.132333",
       "tenants": [
         "rapida"
       ],
