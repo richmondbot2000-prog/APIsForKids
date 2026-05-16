@@ -477,9 +477,14 @@
     outline: none;
   }
   .wl-edit-input:focus { border-color: var(--ink-700); }
+  /* In a comment / reply, the inline edit textarea should match the
+     sans-serif body. Posts keep the serif on theirs. */
+  .wl-comment .wl-edit-input {
+    font: 400 16px/1.45 var(--font-body, 'Inter', sans-serif);
+  }
   /* "(edited)" suffix on the timestamp — same style as the date overline. */
   .wl-edited-tag {
-    font: italic 400 11px/1 var(--font-display);
+    font: italic 400 11px/1 var(--font-body);
     color: var(--ink-500);
     margin-left: 6px;
   }
@@ -553,20 +558,24 @@
   .wl-comment:first-child { border-top: none; }
   .wl-comment .wl-avatar { width: 28px; height: 28px; font-size: 10px; }
   .wl-comment-body { flex: 1 1 auto; background: none; border-radius: 0; padding: 0; min-width: 0; }
-  .wl-comment-name { font: 600 13px/1.25 var(--font-display); color: var(--ink-900); }
+  /* Comments + replies use Inter (font-body) instead of Newsreader serif.
+     The editorial serif feels right on posts where the date carries the
+     headline; in dense chat-style threads sans-serif reads cleaner at
+     small sizes. Posts above keep the serif. */
+  .wl-comment-name { font: 600 13px/1.25 var(--font-body); color: var(--ink-900); }
   /* Compact inline timestamp ("12h" / "Yesterday" / "16 May"). Mixed case,
      no letter-spacing, no middot — fits next to the name on one line so
      no header ever wraps. The full ISO is on the <time title="…"> for
      hover. */
   .wl-comment-time {
-    font: 400 12px/1.25 var(--font-display);
+    font: 400 12px/1.25 var(--font-body);
     color: var(--ink-500);
     margin-left: 6px;
     text-transform: none;
     letter-spacing: 0;
   }
   .wl-comment-text {
-    font: 400 14px/1.45 var(--font-display); color: var(--ink-800);
+    font: 400 14px/1.45 var(--font-body); color: var(--ink-800);
     margin-top: 2px; white-space: pre-wrap; word-wrap: break-word;
     overflow-wrap: anywhere;
     min-width: 0;
@@ -575,7 +584,7 @@
   .wl-comment-actions .wl-react-pill { font-size: 11px; padding: 1px 7px; }
   .wl-reply-link {
     color: var(--ink-600); cursor: pointer;
-    font: 600 12px/1 var(--font-display);
+    font: 600 12px/1 var(--font-body);
     background: none; border: none;
     padding: 4px 0;
     min-height: 24px;
@@ -632,7 +641,7 @@
     display: inline-block;
     margin-right: 6px;
     color: var(--brass-600, #A47829);
-    font: italic 500 13px/1.4 var(--font-display);
+    font: italic 500 13px/1.4 var(--font-body);
   }
   .wl-reply-target a {
     color: #2c6cb8;
@@ -963,7 +972,7 @@
     max-height: 220px;
     overflow-y: auto;
     padding: 4px;
-    font: 500 13px/1.3 var(--font-display, 'Newsreader', serif);
+    font: 500 13px/1.3 var(--font-body, 'Inter', sans-serif);
     min-width: 240px;
   }
   .wl-mention-item {
