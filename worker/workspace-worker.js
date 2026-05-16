@@ -1409,6 +1409,7 @@ async function handleWall(req, env, url) {
       case "upload-media": return json(await wallUploadMedia(env, viewerEmail, body), 200, req);
       case "gif-search":   return json(await wallGifSearch(env, body), 200, req);
       case "delete":       return json(await wallDelete(env, viewerEmail, body), 200, req);
+      case "edit":         return json(await wallEdit(env, viewerEmail, body), 200, req);
       case "link-preview": return json(await wallLinkPreview(env, body), 200, req);
       default:             return json({ error: `unknown wall action: ${action}` }, 404, req);
     }
@@ -1500,6 +1501,53 @@ async function wallDelete(env, viewerEmail, body) {
   }, `Wall: ${kind} ${id} deleted by ${viewerEmail}`);
 
   return { ok: true, kind, id };
+}
+
+// Edit a post or comment body in place. Same author-or-admin gate as
+// wallDelete; rejects an empty body when there's no media to fall back to.
+// Stamps edited_at so the UI can show an "(edited)" tag on the timestamp.
+async function wallEdit(env, viewerEmail, body) {
+  if (!viewerEmail) throw new Error("not authenticated");
+  const kind = body.kind === "comment" ? "comment" : "post";
+  const id = (body.id || "").toString();
+  const newBody = (body.body == null ? "" : String(body.body));
+  if (!id) throw new Error("missing id");
+  if (newBody.length > 10000) throw new Error("body too long");
+
+  const admins = await fetchAdmins();
+  const isAdmin = admins.includes(viewerEmail);
+  const editedAt = new Date().toISOString();
+
+  await updateWallJson(env, doc => {
+    if (kind === "post") {
+      const post = (doc.posts || []).find(p => p.id === id);
+      if (!post) throw new Error("post not found");
+      if (!isAdmin && (post.author_email || "").toLowerCase() !== viewerEmail) {
+        throw new Error("not allowed — you can only edit your own posts");
+      }
+      if (!newBody.trim() && (!post.photos || !post.photos.length)) {
+        throw new Error("a post needs either text or a photo");
+      }
+      post.body = newBody;
+      post.edited_at = editedAt;
+    } else {
+      const pid = (body.post_id || "").toString();
+      const post = (doc.posts || []).find(p => p.id === pid);
+      if (!post) throw new Error("post not found");
+      const c = (post.comments || []).find(x => x.id === id);
+      if (!c) throw new Error("comment not found");
+      if (!isAdmin && (c.author_email || "").toLowerCase() !== viewerEmail) {
+        throw new Error("not allowed — you can only edit your own comments");
+      }
+      if (!newBody.trim() && (!c.photos || !c.photos.length)) {
+        throw new Error("a comment needs either text or a photo");
+      }
+      c.body = newBody;
+      c.edited_at = editedAt;
+    }
+  }, `Wall: ${kind} ${id} edited by ${viewerEmail}`);
+
+  return { ok: true, kind, id, edited_at: editedAt };
 }
 
 // Server-side OpenGraph scraper for the page's link-preview cards. The

@@ -440,6 +440,42 @@
   .wl-delete-btn:hover { color: var(--red-500); background: var(--paper-100); }
   .wl-delete-btn svg { width: 16px; height: 16px; }
   .wl-post-head-actions { display: flex; align-items: center; gap: 4px; }
+  /* Edit button — same shape + size as the trash button so they line up;
+     hover-colour is brass so the affordance reads as "modify" rather than
+     "destroy". */
+  .wl-edit-btn {
+    background: none; border: none;
+    color: var(--ink-500);
+    padding: 6px; border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 32px; min-height: 32px;
+  }
+  .wl-edit-btn:hover { color: var(--brass-600, #A47829); background: var(--paper-100); }
+  .wl-edit-btn svg { width: 16px; height: 16px; }
+  /* Inline edit input — replaces the body text while editing. Carries 16 px
+     min font-size so iOS Safari doesn't auto-zoom on focus. */
+  .wl-edit-input {
+    width: 100%; box-sizing: border-box;
+    border: 1px solid var(--brass-500, #C8973F);
+    background: var(--paper-50, white);
+    padding: 8px 10px;
+    font: 400 16px/1.5 var(--font-display, 'Newsreader', serif);
+    color: var(--ink-900);
+    resize: vertical;
+    min-height: 60px;
+    outline: none;
+  }
+  .wl-edit-input:focus { border-color: var(--ink-700); }
+  /* "(edited)" suffix on the timestamp — same style as the date overline. */
+  .wl-edited-tag {
+    font: 400 10px/1 var(--font-body);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-500);
+    margin-left: 8px;
+    font-style: italic;
+  }
 
   /* Confirm modal — small dialog with ink-900 backdrop */
   .wl-confirm-panel {
@@ -1041,6 +1077,10 @@
   // by_user[viewer].seen_events in wall-seen.json. Independent of the
   // post-level lastSeenByPost timestamp — that's the "mark all read" path.
   let seenEvents = new Set();
+  // Which item is currently being edited inline. Format: "post:<id>" or
+  // "comment:<postId>::<commentId>". Only one at a time; clicking edit on
+  // another item flips the state. Re-rendered on each renderFeed().
+  let editingKey = null;
   const openPostIds   = new Set();
   const expandedPostIds = new Set();
   const openReplyTo   = new Set();
@@ -1128,6 +1168,12 @@
     trash: {
       outline: `<path d="M9 4h6M10 4v-1a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M4 7h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 11v7M14 11v7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`,
       filled:  `<path d="M9 4h6M10 4v-1a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M4 7h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 11v7M14 11v7" stroke="var(--paper-50)" stroke-width="1.6" stroke-linecap="round"/>`,
+    },
+    edit: {
+      // Square with a broken top-right corner + a pencil entering it — matches the
+      // reference screenshot. Outline-only; same stroke weight as trash.
+      outline: `<path d="M4 8v12h14V14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 8h8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M14 4l6 6-9 9H5v-6l9-9z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`,
+      filled:  `<path d="M4 8v12h14V14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 8h8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M14 4l6 6-9 9H5v-6l9-9z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`,
     },
   };
   function icon(name, active) {
@@ -1477,14 +1523,18 @@
     const channelTag = post.channel
       ? ` <span class="wl-channel-tag">${escapeHtml(post.channel)}</span>` : "";
     const canDeletePost = canDelete(post.author_email);
+    const editedTag = post.edited_at ? ` <span class="wl-edited-tag">edited</span>` : "";
     return `
       <div class="wl-post-head">
         <div class="wl-avatar">${avatarInner(name, photo)}</div>
         <div class="wl-meta">
           <div class="wl-post-name">${escapeHtml(name)}${channelTag}</div>
-          <div class="wl-post-time">${formatTime(post.created_at)}</div>
+          <div class="wl-post-time">${formatTime(post.created_at)}${editedTag}</div>
         </div>
-        ${canDeletePost ? `<div class="wl-post-head-actions"><button class="wl-delete-btn" data-delete-post="${escapeHtml(post.id)}" title="Delete this post" aria-label="Delete post" data-stop-card-click>${icon("trash", false)}</button></div>` : ""}
+        ${canDeletePost ? `<div class="wl-post-head-actions">
+          <button class="wl-edit-btn" data-edit-post="${escapeHtml(post.id)}" title="Edit this post" aria-label="Edit post" data-stop-card-click>${icon("edit", false)}</button>
+          <button class="wl-delete-btn" data-delete-post="${escapeHtml(post.id)}" title="Delete this post" aria-label="Delete post" data-stop-card-click>${icon("trash", false)}</button>
+        </div>` : ""}
       </div>`;
   }
 
@@ -1509,7 +1559,9 @@
     return `
       <article class="wl-post wl-post--compact" data-post="${escapeHtml(post.id)}" id="post-${escapeHtml(post.id)}" data-expand-card="${escapeHtml(post.id)}" role="button" tabindex="0" aria-label="Open post for full view">
         ${renderPostHead(post)}
-        <div class="wl-post-body wl-post-body--teaser">${enrichBody(body250)}</div>
+        ${editingKey === `post:${post.id}`
+          ? `<textarea class="wl-edit-input" data-edit-save="post:${escapeHtml(post.id)}" maxlength="10000" data-stop-card-click>${escapeHtml(post.body || "")}</textarea>`
+          : `<div class="wl-post-body wl-post-body--teaser">${enrichBody(body250)}</div>`}
         ${photoStrip}
         ${linkBlocks}
         <div class="wl-compact-meta">
@@ -1549,7 +1601,9 @@
     return `
       <article class="wl-post" data-post="${escapeHtml(post.id)}" id="post-${escapeHtml(post.id)}">
         ${renderPostHead(post)}
-        <div class="wl-post-body">${bodyHtml}</div>
+        ${editingKey === `post:${post.id}`
+          ? `<textarea class="wl-edit-input" data-edit-save="post:${escapeHtml(post.id)}" maxlength="10000">${escapeHtml(bodyText)}</textarea>`
+          : `<div class="wl-post-body">${bodyHtml}</div>`}
         ${linkBlocks}
         <button type="button" class="wl-see-more" data-expand="${escapeHtml(post.id)}" data-collapse="1">Show less</button>
         ${photos}
@@ -1972,11 +2026,16 @@
             <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
               <div>
                 <span class="wl-comment-name">${escapeHtml(name)}</span>
-                <span class="wl-comment-time">${formatTime(comment.created_at)}</span>
+                <span class="wl-comment-time">${formatTime(comment.created_at)}${comment.edited_at ? ` <span class="wl-edited-tag">edited</span>` : ""}</span>
               </div>
-              ${canDel ? `<button class="wl-delete-btn" data-delete-comment="${escapeHtml(post.id)}::${escapeHtml(comment.id)}" title="Delete this ${isReply ? "reply" : "comment"}" aria-label="Delete">${icon("trash", false)}</button>` : ""}
+              ${canDel ? `<div style="display:flex;gap:2px;align-items:center;">
+                <button class="wl-edit-btn" data-edit-comment="${escapeHtml(post.id)}::${escapeHtml(comment.id)}" title="Edit this ${isReply ? "reply" : "comment"}" aria-label="Edit">${icon("edit", false)}</button>
+                <button class="wl-delete-btn" data-delete-comment="${escapeHtml(post.id)}::${escapeHtml(comment.id)}" title="Delete this ${isReply ? "reply" : "comment"}" aria-label="Delete">${icon("trash", false)}</button>
+              </div>` : ""}
             </div>
-            ${hasVisibleBody ? `<div class="wl-comment-text">${bodyPrefix}${enrichBody(comment.body || "")}</div>` : ""}
+            ${editingKey === `comment:${post.id}::${comment.id}`
+              ? `<textarea class="wl-edit-input" data-edit-save="comment:${escapeHtml(post.id)}::${escapeHtml(comment.id)}" maxlength="2000">${escapeHtml(comment.body || "")}</textarea>`
+              : (hasVisibleBody ? `<div class="wl-comment-text">${bodyPrefix}${enrichBody(comment.body || "")}</div>` : "")}
             ${renderCommentMedia(comment.photos || [], comment.id)}
             ${renderReactionPills(comment.reactions || {}, comment.id, "comment")}
           </div>
@@ -2270,6 +2329,40 @@
     });
 
     // Delete affordances
+    // Edit-mode entry: click the pencil → flip editingKey, re-render so the
+    // body region swaps to a textarea. Posts also auto-expand so the user
+    // sees the full body, not just the compact teaser.
+    document.querySelectorAll("[data-edit-post]").forEach(el => {
+      el.addEventListener("click", e => {
+        e.stopPropagation();
+        const id = el.dataset.editPost;
+        editingKey = `post:${id}`;
+        expandedPostIds.clear(); expandedPostIds.add(id);
+        openPostIds.add(id);
+        renderFeed();
+      });
+    });
+    document.querySelectorAll("[data-edit-comment]").forEach(el => {
+      el.addEventListener("click", e => {
+        e.stopPropagation();
+        editingKey = `comment:${el.dataset.editComment}`;
+        renderFeed();
+      });
+    });
+    // Inline edit input: focus + grow + commit on blur. Escape cancels
+    // without saving. Enter without shift also commits.
+    document.querySelectorAll(".wl-edit-input").forEach(t => {
+      const fit = () => { t.style.height = "auto"; t.style.height = Math.max(60, t.scrollHeight) + "px"; };
+      fit();
+      requestAnimationFrame(() => { t.focus(); t.setSelectionRange(t.value.length, t.value.length); });
+      t.addEventListener("input", fit);
+      t.addEventListener("blur", () => commitEdit(t));
+      t.addEventListener("keydown", e => {
+        if (e.key === "Escape") { e.preventDefault(); editingKey = null; renderFeed(); }
+        else if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); t.blur(); }
+      });
+    });
+
     document.querySelectorAll("[data-delete-post]").forEach(el => {
       el.addEventListener("click", async () => {
         const id = el.dataset.deletePost;
@@ -2580,6 +2673,62 @@
   // update + worker persist. On worker failure we keep the local mark — the
   // worker call will resync on next load; preserving the click-feeling is
   // worth a tiny chance of "the bell came back" after a reload.
+  // Inline-edit commit on blur. Reads the textarea value, diffs against
+  // the stored body, calls the worker if changed, applies the new body
+  // to the local cache and re-renders. On worker failure we leave the
+  // editing state so the user can retry without losing what they typed.
+  async function commitEdit(t) {
+    const key = t.dataset.editSave || editingKey;
+    if (!key) return;
+    const nextBody = (t.value || "").trim();
+    const [kind, rest] = key.split(":");
+    if (kind === "post") {
+      const id = rest;
+      const post = posts.find(p => p.id === id);
+      if (!post) { editingKey = null; renderFeed(); return; }
+      const prev = (post.body || "").trim();
+      if (nextBody === prev) { editingKey = null; renderFeed(); return; }
+      if (!nextBody && (!post.photos || !post.photos.length)) {
+        showBanner("A post needs either text or a photo.", true);
+        return;
+      }
+      try {
+        const res = await wallAction("edit", { kind: "post", id, body: nextBody });
+        post.body = nextBody;
+        if (res && res.edited_at) post.edited_at = res.edited_at;
+        editingKey = null;
+        renderFeed();
+        showBanner("Post edited");
+      } catch (err) {
+        showBanner("Edit failed: " + (err.message || String(err)), true);
+      }
+    } else if (kind === "comment") {
+      const [pid, cid] = rest.split("::");
+      const post = posts.find(p => p.id === pid);
+      const c = post && (post.comments || []).find(x => x.id === cid);
+      if (!c) { editingKey = null; renderFeed(); return; }
+      const prev = (c.body || "").trim();
+      if (nextBody === prev) { editingKey = null; renderFeed(); return; }
+      if (!nextBody && (!c.photos || !c.photos.length)) {
+        showBanner("A comment needs either text or a photo.", true);
+        return;
+      }
+      try {
+        const res = await wallAction("edit", { kind: "comment", id: cid, post_id: pid, body: nextBody });
+        c.body = nextBody;
+        if (res && res.edited_at) c.edited_at = res.edited_at;
+        editingKey = null;
+        renderFeed();
+        showBanner("Edited");
+      } catch (err) {
+        showBanner("Edit failed: " + (err.message || String(err)), true);
+      }
+    } else {
+      editingKey = null;
+      renderFeed();
+    }
+  }
+
   async function markEventSeen(evId) {
     if (!evId || !viewerEmail) return;
     if (seenEvents.has(evId)) return;
