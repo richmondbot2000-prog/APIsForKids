@@ -516,11 +516,76 @@
     min-height: 28px;
   }
   .wl-reply-link:hover { color: var(--teal-500); }
-  /* Replies indent: 36 px gutter, brass-300 left rule (marginal commentary
-     pattern; matches qb-bubble's quote rule). */
-  .wl-replies { margin-left: 36px; border-left: 1px solid var(--brass-300); padding-left: 12px; }
+  /* Replies: cap nesting at ONE visual level. All descendants of a top-level
+     comment render in a single flat list inside .wl-replies. A brass curved
+     tie-line in the indent gutter (drawn via ::before / ::after on each
+     reply) signals the parent → child link without indenting further.
+     Mirrors Facebook's pattern; survives narrow mobile viewports. */
+  .wl-replies {
+    position: relative;
+    padding-left: 40px;
+    margin-left: 0;
+    border-left: none;
+  }
+  .wl-comment.is-reply {
+    position: relative;
+    padding: 10px 0;
+    border-top: none;
+  }
   .wl-comment.is-reply .wl-avatar { width: 28px; height: 28px; font-size: 10px; }
-  .wl-comment.is-reply { padding: 10px 0; }
+  /* Elbow: vertical drop from the top of this reply row into the avatar,
+     then a curved 12 px corner reaching ~20 px right toward the avatar.
+     Total elbow occupies the first ~22 px of the row vertically. */
+  .wl-comment.is-reply::before {
+    content: "";
+    position: absolute;
+    left: -28px;
+    top: 0;
+    width: 20px;
+    height: 22px;
+    border-left: 1px solid var(--brass-300);
+    border-bottom: 1px solid var(--brass-300);
+    border-bottom-left-radius: 12px;
+    pointer-events: none;
+  }
+  /* For replies that aren't the last sibling, extend the trunk vertically
+     so the line is unbroken between this elbow and the next reply's elbow. */
+  .wl-comment.is-reply:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: -28px;
+    top: 22px;
+    bottom: 0;
+    width: 1px;
+    background: var(--brass-300);
+    pointer-events: none;
+  }
+  /* "Replying to @Parent" prefix — shown on a reply whose parent is itself
+     a reply, so the conversational flow is clear without nested indent. */
+  .wl-reply-target {
+    display: inline-block;
+    margin-right: 6px;
+    color: var(--brass-600, #A47829);
+    font: italic 500 13px/1.4 var(--font-display);
+  }
+  .wl-reply-target a {
+    color: #2c6cb8;
+    text-decoration: none;
+    font-style: normal;
+    font-weight: 600;
+  }
+  .wl-reply-target a:hover { text-decoration: underline; }
+  @media (max-width: 480px) {
+    .wl-replies { padding-left: 28px; }
+    .wl-comment.is-reply::before {
+      left: -20px; width: 14px; height: 18px;
+      border-bottom-left-radius: 8px;
+    }
+    .wl-comment.is-reply:not(:last-child)::after {
+      left: -20px; top: 18px;
+    }
+    .wl-comment.is-reply .wl-avatar { width: 24px; height: 24px; font-size: 9px; }
+  }
   .wl-show-all-comments {
     color: var(--teal-500); cursor: pointer;
     font: 600 13px/1.2 var(--font-display);
@@ -1803,18 +1868,70 @@
       : (allOpen && topLevel.length > 2
           ? `<button class="wl-show-all-comments" data-show-all="${escapeHtml(post.id)}" data-collapse="1">Show only most recent</button>`
           : "");
-    return `<div class="wl-comments">${headerLink}${showList.map(c => renderComment(post, c, false)).join("")}</div>`;
+    return `<div class="wl-comments">${headerLink}${showList.map(c => renderComment(post, c)).join("")}</div>`;
   }
-  function renderComment(post, comment, isReply) {
+  // Collect every descendant of a top-level comment (replies, replies-to-
+  // replies, etc.) and return them flat, sorted chronologically. Used by
+  // renderComment to render the whole reply thread at one indent level.
+  function gatherCommentDescendants(allComments, rootId) {
+    const out = [];
+    const seen = new Set();
+    const stack = [rootId];
+    while (stack.length) {
+      const pid = stack.shift();
+      for (const c of allComments) {
+        if (c.parent_comment_id === pid && !seen.has(c.id)) {
+          seen.add(c.id);
+          out.push(c);
+          stack.push(c.id);
+        }
+      }
+    }
+    return out.sort((a, b) => (a.created_at < b.created_at ? -1 : 1));
+  }
+  function renderComment(post, comment, opts) {
+    const isReply = !!(opts && opts.isReply);
+    const parentForPrefix = (opts && opts.parentForPrefix) || null;
     const name = displayName(comment.author_email, comment.author_name);
     const photo = photoUrlFor(staffByEmail[(comment.author_email || "").toLowerCase()] || {});
-    const replies = (post.comments || [])
-      .filter(c => c.parent_comment_id === comment.id)
-      .sort((a, b) => (a.created_at < b.created_at ? -1 : 1));
     const replyKey = `${post.id}::${comment.id}`;
     const replyComposerOpen = openReplyTo.has(replyKey);
     const myReaction = mineReactionOn(comment.reactions || {});
     const canDel = canDelete(comment.author_email);
+
+    // Render-time "↳ ParentName" prefix on replies whose parent is itself a
+    // reply (i.e. depth ≥ 2 in the data tree). Suppressed if the body
+    // already begins with the parent's @-mention — author has disambiguated
+    // explicitly. Keeps the thread readable even though everything below a
+    // top-level comment renders at the same visual indent.
+    let bodyPrefix = "";
+    if (parentForPrefix) {
+      const parentLocal = ((parentForPrefix.author_email || "").split("@")[0] || "").toLowerCase();
+      const parentName = displayName(parentForPrefix.author_email, parentForPrefix.author_name);
+      const parentEmail = (parentForPrefix.author_email || "").toLowerCase();
+      const bodyTrim = (comment.body || "").trimStart().toLowerCase();
+      const alreadyMentioned = parentLocal && bodyTrim.startsWith(`@${parentLocal}`);
+      if (parentName && !alreadyMentioned) {
+        bodyPrefix = `<span class="wl-reply-target">↳ <a href="user.html?email=${escapeHtml(parentEmail)}" onclick="event.stopPropagation();">${escapeHtml(parentName)}</a></span>`;
+      }
+    }
+    const hasVisibleBody = bodyPrefix || (comment.body && comment.body.length);
+
+    // Flatten descendants for the top-level render. Replies themselves never
+    // recurse — every descendant ends up in this one .wl-replies block.
+    let repliesHtml = "";
+    if (!isReply) {
+      const all = post.comments || [];
+      const descendants = gatherCommentDescendants(all, comment.id);
+      if (descendants.length) {
+        repliesHtml = `<div class="wl-replies">${descendants.map(d => {
+          const parent = all.find(x => x.id === d.parent_comment_id);
+          const pfp = (parent && parent.id !== comment.id) ? parent : null;
+          return renderComment(post, d, { isReply: true, parentForPrefix: pfp });
+        }).join("")}</div>`;
+      }
+    }
+
     return `
       <div class="wl-comment ${isReply ? "is-reply" : ""}" data-comment="${escapeHtml(comment.id)}">
         <div class="wl-avatar">${avatarInner(name, photo)}</div>
@@ -1827,7 +1944,7 @@
               </div>
               ${canDel ? `<button class="wl-delete-btn" data-delete-comment="${escapeHtml(post.id)}::${escapeHtml(comment.id)}" title="Delete this ${isReply ? "reply" : "comment"}" aria-label="Delete">${icon("trash", false)}</button>` : ""}
             </div>
-            ${comment.body ? `<div class="wl-comment-text">${enrichBody(comment.body)}</div>` : ""}
+            ${hasVisibleBody ? `<div class="wl-comment-text">${bodyPrefix}${enrichBody(comment.body || "")}</div>` : ""}
             ${renderCommentMedia(comment.photos || [], comment.id)}
             ${renderReactionPills(comment.reactions || {}, comment.id, "comment")}
           </div>
@@ -1843,7 +1960,7 @@
               <input class="wl-comment-input" type="text" placeholder="Reply to ${escapeHtml(name)}…" data-add-reply="${escapeHtml(replyKey)}" maxlength="2000" autofocus>
               ${commentAttachButtons(post.id, comment.id)}
             </div>` : ""}
-          ${replies.length ? `<div class="wl-replies">${replies.map(r => renderComment(post, r, true)).join("")}</div>` : ""}
+          ${repliesHtml}
         </div>
       </div>`;
   }
