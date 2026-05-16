@@ -132,7 +132,7 @@ def main() -> None:
              CAST(UTCTime AS DATE) AS dt,
              (DATEPART(HOUR, UTCTime)*4 + DATEPART(MINUTE, UTCTime)/15) AS bucket,
              CONVERT(VARCHAR(33), UTCTime, 126) AS occurred_at,
-             CAST([Id] AS NVARCHAR(64)) AS record_id,
+             CAST([MessageId] AS NVARCHAR(64)) AS record_id,
              [Description] AS desc_enum,
              ClientType,
              ExternalAddress,
