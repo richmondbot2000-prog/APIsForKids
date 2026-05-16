@@ -2881,11 +2881,18 @@
   function dirPhotoKey(email) {
     return (email || "").toString().trim().toLowerCase().replace(/@/g, "_at_");
   }
-  // Always serve wall-media via the public github.io mirror — Cloudflare
-  // Access gates book.togetherbook.net/wall-media/*, and `<img>` tags
-  // can't follow the 302 redirect to the login page. GIPHY URLs come
-  // through as absolute https:// already; pass those untouched.
-  const MEDIA_BASE = "https://richmondbot2000-prog.github.io/togetherbook/";
+  // Serve wall-media via a relative URL so the browser fetches it from the
+  // same origin the page is on (always book.togetherbook.net — the github.io
+  // URL 301-redirects the HTML to the custom domain too). The earlier
+  // implementation used an absolute github.io URL, but with the CNAME set
+  // GitHub Pages 301s wall-media/* to http://book.togetherbook.net/... (no
+  // HTTPS — GitHub doesn't manage a cert for the custom domain), and
+  // browsers block that mixed-content step on the HTTPS wall page, so
+  // images permanently showed the "still publishing" fallback. Same-origin
+  // relative URLs carry the Cloudflare Access cookie automatically, so the
+  // image request succeeds without bouncing through the login page. GIPHY
+  // URLs come through as absolute https:// already; pass those untouched.
+  const MEDIA_BASE = "";
   function mediaUrl(path) {
     if (!path) return "";
     if (/^https?:/i.test(path)) return path;
