@@ -47,7 +47,9 @@
   }
   .wl-compose textarea {
     width: 100%; box-sizing: border-box;
-    min-height: 80px; max-height: 320px;
+    min-height: 80px;
+    /* No max-height — fitCompose() auto-grows the box on input so long
+       posts push the page down rather than showing an inner scrollbar. */
     border: 0;
     border-radius: 0;
     padding: 6px 0 4px;
@@ -57,6 +59,7 @@
     resize: none;
     display: block;
     outline: none;
+    overflow: hidden;
   }
   .wl-compose textarea::placeholder { color: var(--ink-500); font-style: normal; }
   .wl-compose textarea:focus { outline: none; }
@@ -1309,7 +1312,17 @@
     charCount.classList.toggle("over", n > 10000);
     postBtn.disabled = (n === 0 && composeAttachments.length === 0) || n > 10000;
   }
-  composeText.addEventListener("input", refreshComposeState);
+  // Auto-grow the textarea down the page as the user types. Lower bound
+  // is the CSS min-height so the empty state stays compact; no upper
+  // bound — long posts just push the rest of the page down rather than
+  // showing an inner scrollbar.
+  function fitCompose() {
+    composeText.style.height = "auto";
+    composeText.style.height = composeText.scrollHeight + "px";
+  }
+  composeText.addEventListener("input", () => { refreshComposeState(); fitCompose(); });
+  // First-paint sizing (in case the user resumes a draft).
+  requestAnimationFrame(fitCompose);
 
   function renderComposePreviews() {
     previewsEl.innerHTML = composeAttachments.map((a, i) => {
@@ -1422,6 +1435,7 @@
         sortPosts(); renderFeed(); renderNotifications();
       }
       composeText.value = "";
+      fitCompose();
       composeAttachments = [];
       renderComposePreviews();
       charCount.textContent = "0 / 10,000";
