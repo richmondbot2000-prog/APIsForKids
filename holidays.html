@@ -1325,19 +1325,22 @@
   // 24-hour bar; thin horizontal ticks at active 15-min positions.
   // Click a day → drill-down panel below the grid listing every
   // detail event the warehouse captured for that user-day.
-  let activityData = null;     // staff-activity-buckets.json, lazy-loaded
+  let activityData = null;     // D1-backed via /api/workspace/activity
   let activityFocus = null;    // { email, iso } currently expanded
-
-  const ACTIVITY_RAW_URL = "https://raw.githubusercontent.com/richmondbot2000-prog/togetherbook/main/staff-activity-buckets.json";
 
   async function ensureActivityData() {
     if (activityData !== null) return activityData;
+    const today = new Date();
+    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+    const from = isoDate(monthStart);
+    const to   = isoDate(today);
+    const emails = Array.from(new Set([viewerEmail, ...directReports])).filter(Boolean).join(",");
     try {
-      const r = await fetch(`${ACTIVITY_RAW_URL}?ts=${Date.now()}`, { cache: "no-store" });
+      const r = await fetch(`/api/workspace/activity?from=${from}&to=${to}&emails=${encodeURIComponent(emails)}`, { cache: "no-store" });
       if (!r.ok) throw new Error("HTTP " + r.status);
       activityData = await r.json();
     } catch (e) {
-      activityData = { by_email: {}, window_days: 14, missing: true };
+      activityData = { by_email: {}, missing: true };
     }
     return activityData;
   }

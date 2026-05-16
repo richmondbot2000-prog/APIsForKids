@@ -130,6 +130,16 @@ export default {
           return json({ error: "PAYROLL_KV 'current' is not valid JSON: " + e.message }, 500, req);
         }
       }
+      // GET /api/activity — returns the 15-min bucket + detail-event
+      // slice for the requested emails + date range. Replaces the
+      // page's old "fetch the whole staff-activity-buckets.json from
+      // raw GitHub" path; reads from the D1 binding ACTIVITY_DB.
+      // Query string: ?from=YYYY-MM-DD&to=YYYY-MM-DD&emails=a@x,b@y
+      // Authorisation: viewer can always read their own row;
+      // line managers can read their direct reports; admins anyone.
+      if (url.pathname.replace(/\/$/, "").endsWith("/activity")) {
+        return await handleActivityRead(req, env, url);
+      }
       return json({ error: "unknown GET endpoint" }, 404, req);
     }
 
@@ -1935,6 +1945,75 @@ async function fetchLineManagers() {
   } catch (e) {
     return {};
   }
+}
+
+// GET /api/workspace/activity — D1-backed replacement for the
+// raw-GitHub staff-activity-buckets.json fetch. Returns the same
+// { by_email, pulled, last_pull_at } shape the page already reads.
+async function handleActivityRead(req, env, url) {
+  if (!env.ACTIVITY_DB) {
+    return json({ error: "ACTIVITY_DB binding not configured on this worker" }, 503, req);
+  }
+  const viewer = (req.headers.get("Cf-Access-Authenticated-User-Email") || "").toLowerCase();
+  if (!viewer) return json({ error: "not authenticated" }, 401, req);
+
+  const fromIso = (url.searchParams.get("from") || "").slice(0, 10);
+  const toIso   = (url.searchParams.get("to")   || "").slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fromIso) || !/^\d{4}-\d{2}-\d{2}$/.test(toIso)) {
+    return json({ error: "from/to must be YYYY-MM-DD" }, 400, req);
+  }
+  const requested = (url.searchParams.get("emails") || viewer)
+    .split(",").map(e => e.trim().toLowerCase()).filter(Boolean);
+
+  const admins = await fetchAdmins();
+  const isAdmin = admins.includes(viewer);
+  let emails = [];
+  if (isAdmin) {
+    emails = requested;
+  } else {
+    const lms = await fetchLineManagers();
+    emails = requested.filter(e => e === viewer || lms[e] === viewer);
+  }
+  if (!emails.length) return json({ by_email: {}, pulled: {}, last_pull_at: null }, 200, req);
+
+  const emailPh = emails.map(() => "?").join(",");
+  const bucketsRes = await env.ACTIVITY_DB
+    .prepare(`SELECT email, iso_date, bucket FROM activity_buckets
+              WHERE email IN (${emailPh}) AND iso_date BETWEEN ? AND ?`)
+    .bind(...emails, fromIso, toIso).all();
+  const eventsRes = await env.ACTIVITY_DB
+    .prepare(`SELECT email, iso_date, bucket, src, writes, first_at, last_at, kind
+              FROM activity_events
+              WHERE email IN (${emailPh}) AND iso_date BETWEEN ? AND ?`)
+    .bind(...emails, fromIso, toIso).all();
+  const pulledRes = await env.ACTIVITY_DB
+    .prepare(`SELECT iso_date, pulled_at FROM activity_pulled
+              WHERE iso_date BETWEEN ? AND ?`)
+    .bind(fromIso, toIso).all();
+
+  const by_email = {};
+  for (const e of emails) by_email[e] = { buckets: {}, events: {} };
+  for (const r of bucketsRes.results || []) {
+    const slot = by_email[r.email]; if (!slot) continue;
+    (slot.buckets[r.iso_date] ||= []).push(r.bucket);
+  }
+  for (const slot of Object.values(by_email)) {
+    for (const d of Object.keys(slot.buckets)) slot.buckets[d].sort((a, b) => a - b);
+  }
+  for (const r of eventsRes.results || []) {
+    const slot = by_email[r.email]; if (!slot) continue;
+    (slot.events[r.iso_date] ||= []).push({
+      bucket: r.bucket, src: r.src, writes: r.writes,
+      first_at: r.first_at, last_at: r.last_at, kind: r.kind || undefined,
+    });
+  }
+  const pulled = {};
+  let last_pull_at = null;
+  for (const r of pulledRes.results || []) {
+    pulled[r.iso_date] = r.pulled_at;
+    if (!last_pull_at || r.pulled_at > last_pull_at) last_pull_at = r.pulled_at;
+  }
+  return json({ by_email, pulled, last_pull_at }, 200, req);
 }
 
 async function handleHolidays(req, env, url) {
