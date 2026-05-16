@@ -84,6 +84,22 @@ jobs:
         continue-on-error: true
         run: python scripts/scan_staff_activity_buckets.py
 
+      - name: Install Google API deps (for Workspace activity merge)
+        if: steps.guard.outputs.skip != 'true'
+        run: pip install --quiet google-api-python-client==2.* google-auth==2.*
+
+      - name: Merge Google Workspace activity (login / gmail / drive / meet / chat / calendar / admin)
+        if: steps.guard.outputs.skip != 'true'
+        env:
+          WORKSPACE_SERVICE_ACCOUNT_JSON: ${{ secrets.WORKSPACE_SERVICE_ACCOUNT_JSON }}
+          WORKSPACE_DELEGATE_USER:        ${{ secrets.WORKSPACE_DELEGATE_USER }}
+        # No-ops cleanly if the SA doesn't have the
+        # admin.reports.audit.readonly scope yet — logs the 403 and
+        # leaves staff-activity-buckets.json as the warehouse scanner
+        # produced it.
+        continue-on-error: true
+        run: python scripts/scan_google_workspace_activity.py
+
       - name: Commit if staff-activity*.json changed
         if: steps.guard.outputs.skip != 'true'
         run: |
