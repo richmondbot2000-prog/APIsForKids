@@ -1,15 +1,15 @@
 {
   "schema_version": 1,
   "snapshot_date": "2026-05-16",
-  "updated_at": "2026-05-16T00:04:54Z",
+  "updated_at": "2026-05-16T17:19:32Z",
   "brands": [
     "Together Loans",
     "TransformCredit"
   ],
   "totals": {
-    "all": 310,
+    "all": 324,
     "by_source": {
-      "trustpilot": 281,
+      "trustpilot": 295,
       "bbb": 16,
       "reddit": 0,
       "bluesky": 0,
@@ -21,15 +21,15 @@
       "youtube": 7
     },
     "by_brand": {
-      "together_loans": 302,
+      "together_loans": 316,
       "transform_credit": 8
     }
   },
   "source_status": {
     "trustpilot": {
-      "ok": false,
-      "fetched": 0,
-      "error": "HTTPError: 403 Client Error: Forbidden for url: https://api.scraperapi.com/?<redacted>"
+      "ok": true,
+      "fetched": 14,
+      "error": null
     },
     "bbb": {
       "ok": false,
@@ -78,6 +78,104 @@
     }
   },
   "mentions": [
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a07ffd763a4aa9538f19a44",
+      "title": "The application process was very easy…",
+      "snippet": "The application process was very easy for both me and my cosigner it was fast not complicated",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a07ffd763a4aa9538f19a44",
+      "date": "2026-05-15",
+      "author": "Mercy H.",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a07b563caf0282e742ad674",
+      "title": "Quick",
+      "snippet": "Quick, easy , great customer service",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a07b563caf0282e742ad674",
+      "date": "2026-05-15",
+      "author": "customer",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a07a938a4e109ef7b3d0cba",
+      "title": "Once you have a cosigner you have no…",
+      "snippet": "Once you have a cosigner you have no problem with Togetherloans.Fast approval. I literally have the worst credit in America but still get my money 💰 plus the interest is reasonable for extremely bad credit.",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a07a938a4e109ef7b3d0cba",
+      "date": "2026-05-15",
+      "author": "customer",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a07a378a3d90aee08dcf024",
+      "title": "Everyone was very helpful and the…",
+      "snippet": "Everyone was very helpful and the process was very swift",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a07a378a3d90aee08dcf024",
+      "date": "2026-05-15",
+      "author": "Carolyn ",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a079c28b0a6a9e585ef6a1e",
+      "title": "The process was a breeze!",
+      "snippet": "The process was a breeze!",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a079c28b0a6a9e585ef6a1e",
+      "date": "2026-05-15",
+      "author": "Chandra",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a079b967b423270a3e28c76",
+      "title": "This is a trick because they dont check…",
+      "snippet": "This is a trick because they dont check credit scores or anything they want folks to.ha e a co signer nah uh uh nobody co signs anymore because of scams and alot of tricky stuff going on so asking to have a co signer is not good for people its just causing more disappointment an…",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a079b967b423270a3e28c76",
+      "date": "2026-05-15",
+      "author": "Customer bobby harris",
+      "score": 1,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a07880f631260537ee006e9",
+      "title": "They supposedly closed my account at my…",
+      "snippet": "They supposedly closed my account at my request, even credited back some of the withdrawals, yet they continue to take out payments. Customer service does not exist with these people. Stay away from them. They WILL scam you.",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a07880f631260537ee006e9",
+      "date": "2026-05-15",
+      "author": "Me",
+      "score": 1,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
     {
       "source": "trustpilot",
       "brand": "together_loans",
@@ -158,6 +256,48 @@
       "date": "2026-05-14",
       "author": "Juanita",
       "score": 4,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a07ccddba7eefd4bdd33ba2",
+      "title": "Highly recommended",
+      "snippet": "Highly recommended!",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a07ccddba7eefd4bdd33ba2",
+      "date": "2026-05-14",
+      "author": "Danny",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a07ada9ff1bb3b293d4c459",
+      "title": "They were so nice and understanding.i…",
+      "snippet": "They were so kind, patient, and understanding throughout the entire process. Even though my credit score wasn’t high, I was able to have my nephew co-sign, and they never once made me feel judged or undeserving. Together Loan truly gave me a fresh start and helped give me my lif…",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a07ada9ff1bb3b293d4c459",
+      "date": "2026-05-14",
+      "author": "Pam",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a0764dfd5f97e6252e3f5a1",
+      "title": "They were fast",
+      "snippet": "They were very courteous n helpful all the time",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a0764dfd5f97e6252e3f5a1",
+      "date": "2026-05-14",
+      "author": "DEARMENT, AIMEE",
+      "score": 5,
       "score_max": 5,
       "site_name": "Trustpilot",
       "site_domain": "trustpilot.com"
@@ -297,6 +437,20 @@
       "url": "https://www.trustpilot.com/review/transformcredit.com#6a04f8a4520390869f9bea5e",
       "date": "2026-05-13",
       "author": "Sabrina Briehof",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a0795daa58b8c901055c862",
+      "title": "Easy to apply.",
+      "snippet": "Easy to apply.",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a0795daa58b8c901055c862",
+      "date": "2026-05-13",
+      "author": "customer",
       "score": 5,
       "score_max": 5,
       "site_name": "Trustpilot",
@@ -942,6 +1096,34 @@
       "date": "2026-05-08",
       "author": "customer",
       "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a079bf96eb3bc221bdf1187",
+      "title": "Great job",
+      "snippet": "Great customer service they go above and beyond to get you the money you neec",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a079bf96eb3bc221bdf1187",
+      "date": "2026-05-08",
+      "author": "Kassandra",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a07776eb20c4d58ffe31192",
+      "title": "So far so good",
+      "snippet": "So far so good. Felt communicatuon could have been better during signing of forms. There was no acknowledgment email or copy of what was signed sent to us afterwards. Felt a little sketchy for a bit, but rebounded nicely. Recommend",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a07776eb20c4d58ffe31192",
+      "date": "2026-05-08",
+      "author": "Customer D",
+      "score": 4,
       "score_max": 5,
       "site_name": "Trustpilot",
       "site_domain": "trustpilot.com"
@@ -2565,6 +2747,20 @@
       "url": "https://www.trustpilot.com/review/transformcredit.com#69ebf888c1f0337a233ad397",
       "date": "2026-04-24",
       "author": "Lenisha",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a0785c488c15d83db831302",
+      "title": "Awesome customer service",
+      "snippet": "Awesome customer service . Very helpful and honest.",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a0785c488c15d83db831302",
+      "date": "2026-04-24",
+      "author": "Michael Alexander",
       "score": 5,
       "score_max": 5,
       "site_name": "Trustpilot",
