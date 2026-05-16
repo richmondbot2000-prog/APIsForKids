@@ -1,0 +1,68 @@
+name: Probe activity-author columns
+
+# Manual-only discovery probe. Scans every column in the seven
+# Reporting* DBs that looks like it could carry a per-row author /
+# viewer identifier (CreatedBy, ModifiedBy, SentBy, ViewedBy, etc.)
+# and cross-checks the sampled values against staff.json. Output:
+# staff-activity-probe.json + a sorted summary in the log.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: probe-activity-columns
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Microsoft ODBC Driver 18
+        run: |
+          set -euo pipefail
+          source /etc/os-release
+          curl -fsSL "https://packages.microsoft.com/config/ubuntu/${VERSION_ID}/packages-microsoft-prod.deb" -o /tmp/packages-microsoft-prod.deb
+          sudo dpkg -i /tmp/packages-microsoft-prod.deb
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python deps
+        run: pip install --quiet pyodbc==5.*
+
+      - name: Run probe
+        env:
+          FABRIC_SQL_ENDPOINT: d76gbn5gtayeppltcrsxsvkluq-ruqkpz7fkwpelmnjh4kbg2lqpi.datawarehouse.fabric.microsoft.com
+          FABRIC_TENANT_ID:    b760fc1f-98a6-4730-bd73-146579554ba4
+          FABRIC_CLIENT_ID:    b8fb2709-6e42-4a1e-91e6-8a3807a9884d
+          FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
+        run: python scripts/probe_activity_columns.py
+
+      - name: Commit staff-activity-probe.json
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -f staff-activity-probe.json ]; then
+            git add staff-activity-probe.json
+            if ! git diff --cached --quiet; then
+              git commit -m "Probe activity-author columns: refresh candidate-list snapshot"
+              for attempt in 1 2 3; do
+                if git push; then break; fi
+                if [ "$attempt" -eq 3 ]; then echo "::error::push failed"; exit 1; fi
+                git fetch origin main; git rebase origin/main
+              done
+            fi
+          fi
