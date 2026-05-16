@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-16T21:53:36.794Z",
+  "updated_at": "2026-05-16T22:08:02.251Z",
   "posts": [
     {
       "id": "post_mp8t9vc4_9jhkrf",
@@ -70,13 +70,14 @@
           "author_email": "james.benamor@letme.com",
           "author_name": "james.benamor",
           "created_at": "2026-05-16T21:48:46.081Z",
-          "body": "@mourad.malki edit button now live. That’s what $200/month buys you.",
+          "body": "@mourad.malki edit button now live. That’s what $200/month buys you. 💰💰💰",
           "photos": [],
           "reactions": {
             "❤️": [
               "mourad.malki@letme.com"
             ]
-          }
+          },
+          "edited_at": "2026-05-16T22:08:01.797Z"
         },
         {
           "id": "reply_mp8vv3aa_9f4c7e",
