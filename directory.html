@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778923602">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778923602">
-<link rel="stylesheet" href="quiet.css?v=1778923602">
-<link rel="stylesheet" href="quiet-extras.css?v=1778923602">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778923602">
+<link rel="stylesheet" href="style.css?v=1778924246">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778924246">
+<link rel="stylesheet" href="quiet.css?v=1778924246">
+<link rel="stylesheet" href="quiet-extras.css?v=1778924246">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778924246">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -41,7 +41,7 @@
     padding: 12px 16px;
     background: var(--paper-200, #F5ECD4);
     border: 1px solid var(--brass-300, #E2BF74);
-    border-left: 4px solid var(--manuscript-red, #B23A48);
+    border-left: 4px solid var(--red-500);
     border-radius: 6px;
     display: flex;
     flex-direction: column;
@@ -62,7 +62,7 @@
   .dir-health-row .dir-health-count {
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
-    color: var(--manuscript-red, #B23A48);
+    color: var(--red-500);
     min-width: 32px;
     text-align: right;
   }
@@ -382,18 +382,18 @@
     opacity: 0.45;
     background: transparent;
   }
-  .dir-row--deleted .dir-name { color: var(--manuscript-red, #B23A48); }
+  .dir-row--deleted .dir-name { color: var(--red-500); }
   .dir-row--deleted .dir-email {
     text-decoration: line-through;
-    text-decoration-color: var(--manuscript-red, #B23A48);
+    text-decoration-color: var(--red-500);
     text-decoration-thickness: 1.5px;
   }
   .dir-deleted-chip {
     display: inline-block;
     font: 600 11px/1.4 var(--font-mono, "JetBrains Mono", ui-monospace, monospace);
-    color: var(--manuscript-red, #B23A48);
+    color: var(--red-500);
     background: #FBE3E5;
-    border: 1px solid var(--manuscript-red, #B23A48);
+    border: 1px solid var(--red-500);
     padding: 1px 6px;
     border-radius: 3px;
     text-transform: uppercase;
@@ -401,7 +401,7 @@
   }
   .dir-email--suspended {
     text-decoration: line-through;
-    text-decoration-color: var(--manuscript-red, #B23A48);
+    text-decoration-color: var(--red-500);
     text-decoration-thickness: 1.5px;
   }
   .dir-forward-chip {
@@ -418,9 +418,9 @@
   .dir-pending-chip {
     display: inline-block;
     font: 500 11px/1.4 var(--font-mono, "JetBrains Mono", ui-monospace, monospace);
-    color: var(--manuscript-red, #B23A48);
+    color: var(--red-500);
     background: #FFF6E5;
-    border: 1px solid var(--manuscript-red, #B23A48);
+    border: 1px solid var(--red-500);
     padding: 1px 6px;
     border-radius: 3px;
     animation: dir-pending-pulse 2s ease-in-out infinite;
@@ -633,7 +633,7 @@
   }
   .dir-modal-count {
     font-weight: 400;
-    color: var(--manuscript-red, #B23A48);
+    color: var(--red-500);
     margin-left: 6px;
   }
   .dir-modal-subhead {
@@ -642,7 +642,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--manuscript-red, #B23A48);
+    color: var(--red-500);
     margin: 18px 0 8px;
   }
   .dir-detail-grid {
@@ -701,7 +701,7 @@
   }
   .dir-form-row input.dir-input-invalid,
   .dir-form-row textarea.dir-input-invalid {
-    border-color: var(--manuscript-red, #B23A48);
+    border-color: var(--red-500);
     box-shadow: 0 0 0 2px rgba(178, 58, 72, 0.25);
   }
   .dir-modal-banner {
@@ -720,7 +720,7 @@
   .dir-modal-banner--error {
     background: #FBE3E5;
     color: #7A1F2A;
-    border-left-color: var(--manuscript-red, #B23A48);
+    border-left-color: var(--red-500);
   }
   .dir-modal-banner--fade { opacity: 0; }
   .dir-payroll-link-row {
@@ -976,14 +976,14 @@
   .dir-group-member-list button {
     background: transparent;
     border: 1px solid var(--border);
-    color: var(--manuscript-red, #B23A48);
+    color: var(--red-500);
     padding: 2px 8px;
     border-radius: 4px;
     cursor: pointer;
     font: 500 0.75rem 'Inter', sans-serif;
   }
   .dir-group-member-list button:hover {
-    background: var(--manuscript-red, #B23A48);
+    background: var(--red-500);
     color: #fff;
   }
   .dir-modal-actions {
@@ -1061,8 +1061,8 @@
   }
   .dir-manage-actions button:hover { opacity: 0.85; }
   .dir-manage-actions button.danger {
-    background: var(--manuscript-red, #B23A48);
-    border-color: var(--manuscript-red, #B23A48);
+    background: var(--red-500);
+    border-color: var(--red-500);
     color: #fff;
   }
   .dir-manage-actions button.danger:hover { opacity: 0.85; }
@@ -1171,7 +1171,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778923602" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778924246" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1938,7 +1938,7 @@
     const isDeleted = !!u.deletion_time;
     const tenantTag = (u.tenant || "").toLowerCase();
     const liveGws = !u.suspended && !isDeleted
-      ? `<img class="dir-gws-icon" data-tenant="${escapeHtml(tenantTag)}" src="assets/google-workspace-icon.svg?v=1778923602" alt="Google Workspace account active" title="Google Workspace${tenantTag === "togetherloans" ? " (Together Loans)" : ""} account active">`
+      ? `<img class="dir-gws-icon" data-tenant="${escapeHtml(tenantTag)}" src="assets/google-workspace-icon.svg?v=1778924246" alt="Google Workspace account active" title="Google Workspace${tenantTag === "togetherloans" ? " (Together Loans)" : ""} account active">`
       : "";
 
     // Visual states (most-severe-wins):
@@ -2533,7 +2533,7 @@
       const daysGone = Math.floor(ms / 86400000);
       const daysLeft = 21 - daysGone;
       if (daysLeft > 0) {
-        renameDecayLine = `<p class="dir-modal-saved-hint" style="text-align:left;margin:6px 0 0;color:var(--manuscript-red);"><strong>Rename in flight.</strong> Mail to <code>${escapeHtml(decay.old_address)}</code> still routes here for ${daysLeft} more day${daysLeft === 1 ? "" : "s"}, then stops.</p>`;
+        renameDecayLine = `<p class="dir-modal-saved-hint" style="text-align:left;margin:6px 0 0;color:var(--red-500);"><strong>Rename in flight.</strong> Mail to <code>${escapeHtml(decay.old_address)}</code> still routes here for ${daysLeft} more day${daysLeft === 1 ? "" : "s"}, then stops.</p>`;
       }
     }
 
@@ -2595,7 +2595,7 @@
     ` : "";
 
     const liveGwsWordmark = (u && !u.suspended)
-      ? `<img class="dir-modal-gws-wordmark" data-tenant="${escapeHtml((u.tenant || "").toLowerCase())}" src="assets/google-workspace-wordmark.svg?v=1778923602" alt="Google Workspace${(u.tenant || "").toLowerCase() === "togetherloans" ? " (Together Loans)" : ""} account active">`
+      ? `<img class="dir-modal-gws-wordmark" data-tenant="${escapeHtml((u.tenant || "").toLowerCase())}" src="assets/google-workspace-wordmark.svg?v=1778924246" alt="Google Workspace${(u.tenant || "").toLowerCase() === "togetherloans" ? " (Together Loans)" : ""} account active">`
       : "";
     const suspendedBadge = (u && u.suspended)
       ? `<span class="dir-suspended-badge" title="This Workspace account is currently suspended — no email/Drive access, no billing on Flex plan">Workspace account suspended</span>`
@@ -2705,7 +2705,7 @@
                </div>
                <p class="dir-modal-saved-hint">Cancel keeps the account suspended but stops forwarding — mail to <code>${escapeHtml(u.email)}</code> will go nowhere.</p>`
             : u.suspended
-            ? `<p class="dir-modal-saved-hint" style="text-align:left;margin:0 0 10px;"><strong style="color:var(--manuscript-red);">Black hole.</strong> Account is suspended and no forwarding is set — mail to this address is going nowhere.</p>
+            ? `<p class="dir-modal-saved-hint" style="text-align:left;margin:0 0 10px;"><strong style="color:var(--red-500);">Black hole.</strong> Account is suspended and no forwarding is set — mail to this address is going nowhere.</p>
                <div class="dir-form-row">
                  <label for="dirRouteTo">Forward mail to</label>
                  <input id="dirRouteTo" name="route_to" type="email" placeholder="Type a colleague's email" list="dirRouteOptions" autocomplete="off">
@@ -4157,7 +4157,7 @@
     let pendingChip = "";
     if (isPending) {
       const days = Math.max(0, Math.ceil((new Date(g._pending_conversion.scheduled_for).getTime() - Date.now()) / 86400000));
-      pendingChip = `<span class="dir-defunct-chip" style="color:var(--manuscript-red);border-color:var(--manuscript-red);" title="User has been deleted. Google's 20-day address-reuse lockout is in effect. Forwarding group will be created on ${escapeHtml(g._pending_conversion.scheduled_for.slice(0, 10))}.">pending · ${days}d left</span>`;
+      pendingChip = `<span class="dir-defunct-chip" style="color:var(--red-500);border-color:var(--red-500);" title="User has been deleted. Google's 20-day address-reuse lockout is in effect. Forwarding group will be created on ${escapeHtml(g._pending_conversion.scheduled_for.slice(0, 10))}.">pending · ${days}d left</span>`;
     }
     const classes = `dir-row dir-row--group${isPending || isDead ? " dir-row--defunct" : ""}`;
     return `
@@ -4483,7 +4483,7 @@
     return `
       <button class="dir-modal-close" type="button" data-close aria-label="Close">×</button>
       <div class="dir-modal-head">
-        <img class="dir-modal-gws-wordmark" src="assets/google-workspace-wordmark.svg?v=1778923602" alt="Google Workspace" style="height:28px;margin:0;">
+        <img class="dir-modal-gws-wordmark" src="assets/google-workspace-wordmark.svg?v=1778924246" alt="Google Workspace" style="height:28px;margin:0;">
         <div>
           <h2 class="dir-modal-name" id="dirModalName">Create new user</h2>
           <p class="dir-modal-title">Adds a Google Workspace account immediately.</p>
@@ -4631,6 +4631,6 @@
     a.addEventListener('click', () => document.body.classList.remove('nav-open'))
   );
 </script>
-<script src="nav.js?v=1778923602" defer></script>
+<script src="nav.js?v=1778924246" defer></script>
 </body>
 </html>

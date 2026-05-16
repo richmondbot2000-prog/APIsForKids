@@ -67,6 +67,12 @@ All severity-HIGH and most severity-MED findings have now been fixed and pushed.
 - Cross-cutting: `apis.html` missing `quiet-legacy.css`.
 - Cross-cutting: `brokers.html` has a `?bust=` query on top of `cache: no-store` — redundant noise.
 
+## Round 5 — verification + final cleanup
+
+A sixth agent re-checked all 20 round 1-3 fixes against the live code. **All 20 verified clean.**
+
+Single informational note: `directory.html` had ~20 references to the never-defined `--manuscript-red` token. They rendered correctly via inline `, #B23A48` fallback so they were cosmetically fine, but the token name was dead. Swept every reference to `var(--red-500)`. No remaining `--manuscript-red` anywhere in the repo.
+
 ## Worker redeploys pending (user must do manually)
 
 Two worker files changed. Both need a paste-and-deploy in Cloudflare:
