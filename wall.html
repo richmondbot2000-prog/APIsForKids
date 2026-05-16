@@ -870,6 +870,15 @@
   .wl-notif-item-time { font: 500 11px/1 var(--font-mono); color: var(--ink-500); margin-top: 2px; }
   .wl-notif-empty { padding: 24px 14px; text-align: center; color: var(--ink-500); font-style: italic; }
 
+  /* Brief brass-paper flash on the comment/post that a notification just
+     jumped to. Fades back to transparent over ~2 s so the eye is drawn
+     without a permanent state change. */
+  @keyframes wl-just-jumped-flash {
+    0%   { background-color: var(--paper-300, #ECDFB6); }
+    100% { background-color: transparent; }
+  }
+  .wl-just-jumped { animation: wl-just-jumped-flash 2200ms ease-out; }
+
   /* @-mention chip inside a post / comment / reply body. Blue, links to
      user.html?email=<addr>. The chip survives bodyTeaser truncation
      because mention rendering runs on the truncated escaped text. */
@@ -1374,10 +1383,12 @@
   }
 
   // Navigate to a specific post: jump to the page that contains it,
-  // expand it, scroll it into view. Used by:
+  // expand it, scroll it into view. Closes every other expanded/open post
+  // first so the viewer's screen lands on exactly one thing. Used by:
   //   - initial page load (#post-<id> hash)
   //   - hashchange (user clicked a link with #post-<id>)
-  //   - notification bell entries (data-jump handler)
+  //   - notification bell entries (data-jump handler — may also pass a
+  //     commentId so we scroll to + briefly highlight the specific comment)
   //   - Share — copies a #post-<id> URL that lands here on the recipient
   function jumpToPost(postId, opts) {
     if (!postId) return;
@@ -1386,12 +1397,25 @@
     currentPage = Math.floor(idx / POSTS_PER_PAGE);
     expandedPostIds.clear();
     expandedPostIds.add(postId);
+    openPostIds.clear();
     openPostIds.add(postId);
     renderFeed();
     if (opts && opts.skipScroll) return;
     requestAnimationFrame(() => {
-      const el = document.getElementById(`post-${postId}`);
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      const commentId = opts && opts.commentId;
+      let target = null;
+      if (commentId) {
+        // CSS attribute selector — comment IDs are alphanumeric+underscore,
+        // safe to interpolate directly. Add the brief flash to mark it.
+        target = document.querySelector(`[data-comment="${commentId}"]`);
+      }
+      if (!target) target = document.getElementById(`post-${postId}`);
+      if (!target) return;
+      target.scrollIntoView({ behavior: "smooth", block: commentId ? "center" : "start" });
+      if (commentId) {
+        target.classList.add("wl-just-jumped");
+        setTimeout(() => target.classList.remove("wl-just-jumped"), 2400);
+      }
     });
   }
   window.addEventListener("hashchange", () => {
@@ -2593,7 +2617,8 @@
           const verb = ev.parent_comment_id ? "replied to a comment on your" : "commented on your";
           line = `<strong>${escapeHtml(name)}</strong> ${verb} post.`;
         }
-        return `<a class="wl-notif-item" href="#post-${escapeHtml(ev.post_id)}" data-jump="${escapeHtml(ev.post_id)}" data-event-id="${escapeHtml(eventIdFor(ev))}">
+        const commentAttr = ev.comment_id ? ` data-comment-jump="${escapeHtml(ev.comment_id)}"` : "";
+        return `<a class="wl-notif-item" href="#post-${escapeHtml(ev.post_id)}" data-jump="${escapeHtml(ev.post_id)}" data-event-id="${escapeHtml(eventIdFor(ev))}"${commentAttr}>
           <div>${line}</div>
           <div class="wl-notif-item-time">${formatTime(ev.at)}</div>
         </a>`;
@@ -2603,8 +2628,12 @@
           e.preventDefault();
           const id = a.dataset.jump;
           const evId = a.dataset.eventId;
+          const commentId = a.dataset.commentJump || null;
           if (evId) markEventSeen(evId);
-          jumpToPost(id);
+          // Close the notification panel — the click counts as "I'm done
+          // with the menu, take me to the thing".
+          document.getElementById("wlNotifPanel").classList.remove("is-open");
+          jumpToPost(id, { commentId });
         });
       });
     }
