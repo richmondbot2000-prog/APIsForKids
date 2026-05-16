@@ -420,7 +420,9 @@
     border: 1px solid var(--paper-300);
     border-radius: 16px;
     padding: 8px 14px;
-    font: 400 14px/1.4 var(--font-body);
+    /* 16 px minimum — anything smaller and iOS Safari auto-zooms the whole
+       page when the input takes focus, dramatically reshuffling the layout. */
+    font: 400 16px/1.4 var(--font-body);
     background: white;
   }
   .wl-comment-composer input.wl-comment-input:focus { outline: 1px solid var(--brass-500); }
