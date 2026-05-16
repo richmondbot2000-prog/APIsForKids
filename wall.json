@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-16T19:44:12.655Z",
+  "updated_at": "2026-05-16T19:44:13.536Z",
   "posts": [
     {
       "id": "post_mp76cgvu_z1f6a5",
@@ -111,11 +111,7 @@
           "created_at": "2026-05-16T19:21:03.731Z",
           "body": "Ah tagging. Nice I forgot about that. I did get a notification because you replied to me, but tagging would be good too",
           "photos": [],
-          "reactions": {
-            "👍": [
-              "mourad.malki@letme.com"
-            ]
-          }
+          "reactions": {}
         }
       ],
       "react_events": [
@@ -166,6 +162,14 @@
           "target_id": "reply_mp8qewvn_6z8zuy",
           "at": "2026-05-16T19:44:12.383Z",
           "kind": "added"
+        },
+        {
+          "actor_email": "mourad.malki@letme.com",
+          "emoji": "👍",
+          "target_kind": "comment",
+          "target_id": "reply_mp8qewvn_6z8zuy",
+          "at": "2026-05-16T19:44:13.303Z",
+          "kind": "removed"
         }
       ]
     },
