@@ -377,7 +377,8 @@
     padding: 5px 0 3px;
   }
   .hd-team-month-dow .is-weekend-dow { color: var(--brass-600, #A47829); }
-  /* Top-left cell carries the month name. */
+  /* Top-left cell carries the month name. Always clickable — the
+     caret toggles is-collapsed on the parent .hd-team-month block. */
   .hd-team-month-label {
     background: var(--paper-50, white);
     padding: 5px 10px !important;
@@ -388,6 +389,26 @@
     letter-spacing: 0 !important;
     grid-row: span 2;
     display: flex; align-items: center;
+    cursor: pointer;
+    user-select: none;
+  }
+  .hd-team-month-label::before {
+    content: "▾";
+    color: var(--brass-600, #A47829);
+    margin-right: 8px;
+    font-size: 10px;
+    line-height: 1;
+  }
+  .hd-team-month.is-collapsed .hd-team-month-label::before { content: "▸"; }
+  /* Collapsed state: hide the DOW cells, dates row, and person rows.
+     The label spans the full width on its own row. */
+  .hd-team-month.is-collapsed .hd-team-month-dow {
+    grid-template-columns: 1fr;
+  }
+  .hd-team-month.is-collapsed .hd-team-month-dow > *:not(.hd-team-month-label),
+  .hd-team-month.is-collapsed .hd-team-month-dates,
+  .hd-team-month.is-collapsed .hd-team-month-person {
+    display: none;
   }
   .hd-team-month-dates {
     font: 600 11px/1 var(--font-mono, 'JetBrains Mono', monospace);
@@ -1249,7 +1270,9 @@
       }
     }
 
-    const todayIso = isoDate(new Date());
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayIso = isoDate(today);
     const DOW_INITIALS = ["S","M","T","W","T","F","S"];
     const COLS = 42; // 6 weeks × 7 days — fits every month with room to spare.
 
@@ -1259,6 +1282,9 @@
       const daysInMonth = new Date(y, m + 1, 0).getDate();
       const lead = new Date(y, m, 1).getDay(); // 0=Sun
       const monthLabel = new Date(y, m, 1).toLocaleDateString("en-GB", { month: "long", year: "numeric" });
+      // Past months collapse by default — header still visible, grid hidden until clicked.
+      const monthEnd = new Date(y, m, daysInMonth);
+      if (monthEnd < today) block.classList.add("is-collapsed");
 
       // dayNumForCol: returns the calendar day-of-month at column index
       // i (0..COLS-1), or 0 if the cell is a leading/trailing pad.
@@ -1274,6 +1300,7 @@
       const lab = document.createElement("div");
       lab.className = "hd-team-month-label";
       lab.textContent = monthLabel;
+      lab.addEventListener("click", () => block.classList.toggle("is-collapsed"));
       dowRow.appendChild(lab);
       for (let i = 0; i < COLS; i++) {
         const cell = document.createElement("div");
