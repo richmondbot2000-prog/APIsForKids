@@ -1861,7 +1861,11 @@ const HOLIDAYS_PATH = "holidays.json";
 const HOLIDAY_LOG_MAX = 5000;
 const HOLIDAY_STATUSES = new Set([
   "office", "wfh", "non-working", "holiday",
-  "half-am", "half-pm", "sick", "maternity",
+  // Legacy half-am / half-pm kept for old records; new part-* statuses
+  // replace them in the picker.
+  "half-am", "half-pm",
+  "part-paid-unpaid", "part-holiday-paid",
+  "sick", "maternity",
   // approved-holiday is manager-only (enforced below). Storage-side it
   // looks identical to any other override.
   "approved-holiday",
@@ -1960,17 +1964,30 @@ async function holidaysSet(env, viewerEmail, body) {
   let logEntry = null;
   let updatedAt = null;
 
+  // Optional note. Only meaningful when status is one of the part-*
+  // variants but the worker doesn't enforce that — it just stores
+  // what the page sends (empty string clears).
+  const noteRaw = (body.note === undefined || body.note === null) ? undefined : String(body.note);
+  const note = noteRaw !== undefined ? noteRaw.slice(0, 100) : undefined;
+
   await updateGhJson(env, HOLIDAYS_PATH, doc => {
     doc.schema_version = doc.schema_version || 1;
     doc.by_user = doc.by_user || {};
     doc.by_user[target] = doc.by_user[target] || {};
     doc.by_user[target].days = doc.by_user[target].days || {};
-    const days = doc.by_user[target].days;
+    doc.by_user[target].notes = doc.by_user[target].notes || {};
+    const days  = doc.by_user[target].days;
+    const notes = doc.by_user[target].notes;
     const prev = days[date] || null;
     if (status === null) {
       delete days[date];
+      delete notes[date];
     } else {
       days[date] = status;
+    }
+    if (note !== undefined) {
+      if (note) notes[date] = note;
+      else delete notes[date];
     }
     updatedAt = new Date().toISOString();
     doc.updated_at = updatedAt;

@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778927147">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778927147">
-<link rel="stylesheet" href="quiet.css?v=1778927147">
-<link rel="stylesheet" href="quiet-extras.css?v=1778927147">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778927147">
+<link rel="stylesheet" href="style.css?v=1778930132">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778930132">
+<link rel="stylesheet" href="quiet.css?v=1778930132">
+<link rel="stylesheet" href="quiet-extras.css?v=1778930132">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778930132">
 <style>
   .hd-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   .hd-section h1 {
@@ -87,6 +87,12 @@
     width: 14px; height: 14px;
     border: 1px solid var(--ink-700);
     display: inline-block;
+  }
+  .hd-legend-sw.hd-legend-letter {
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    font: 700 10px/1 var(--font-mono, 'JetBrains Mono', monospace);
+    color: var(--ink-900);
   }
 
   /* Calendar grid */
@@ -165,17 +171,53 @@
   .hd-day[data-status="wfh"]         { background: #2F8F87; color: #fff; }
   .hd-day[data-status="non-working"] { background: #8B95A6; color: #fff; }
   .hd-day[data-status="holiday"]     { background: #E8A82A; color: #fff; }
-  /* Half-day gradients: the YELLOW half is the off half. */
+  /* Part-day gradients. The bottom half carries the variant — Part
+     Paid/Unpaid is green top / grey bottom; Part Holiday/Paid is
+     yellow top / green bottom. */
+  .hd-day[data-status="part-paid-unpaid"]  { background: linear-gradient(180deg, #6FA94A 0 50%, #8B95A6 50% 100%); color: #fff; }
+  .hd-day[data-status="part-holiday-paid"] { background: linear-gradient(180deg, #E8A82A 0 50%, #6FA94A 50% 100%); color: #fff; }
+  /* Legacy half-* statuses — kept so old records still render, even
+     though the picker no longer offers them. */
   .hd-day[data-status="half-am"]     { background: linear-gradient(180deg, #E8A82A 0 50%, #6FA94A 50% 100%); color: #fff; }
   .hd-day[data-status="half-pm"]     { background: linear-gradient(180deg, #6FA94A 0 50%, #E8A82A 50% 100%); color: #fff; }
   .hd-day[data-status="sick"]        { background: #C0392B; color: #fff; }
-  .hd-day[data-status="maternity"]   { background: #A95C8E; color: #fff; }
-  .hd-day[data-status="approved-holiday"] {
-    background: #B07820;
-    color: #fff;
-    box-shadow: inset 0 0 0 1px #6E4A12;
+  /* Maternity + Approved Holiday share the holiday-yellow base. They
+     are distinguished by a single ink-700 letter centred on the cell. */
+  .hd-day[data-status="maternity"]   { background: #E8A82A; color: #fff; }
+  .hd-day[data-status="approved-holiday"] { background: #E8A82A; color: #fff; }
+  .hd-day[data-status="maternity"]::after,
+  .hd-day[data-status="approved-holiday"]::after {
+    content: attr(data-mark);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 700 24px/1 var(--font-mono, 'JetBrains Mono', monospace);
+    color: var(--ink-900);
+    pointer-events: none;
+    letter-spacing: 0;
   }
   .hd-day[data-default-bh="1"]       { background: #E8A82A; color: #fff; }
+  /* Note-present indicator: a small brass dot in the top-right corner. */
+  .hd-day.has-note::before {
+    content: "";
+    position: absolute;
+    top: 4px; right: 4px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--ink-900, #11192E);
+    box-shadow: 0 0 0 1px rgba(253,251,244,0.75);
+  }
+  /* Greyed-out for users with no payroll record. */
+  .hd-day.is-not-on-payroll {
+    background: #C8CCD3 !important;
+    cursor: not-allowed;
+  }
+  .hd-day.is-not-on-payroll[data-status]::after,
+  .hd-day.is-not-on-payroll .hd-day-label,
+  .hd-day.is-not-on-payroll .hd-day-num,
+  .hd-day.is-not-on-payroll .hd-day-month { color: var(--ink-500) !important; }
   /* On the saturated backgrounds the dark ink-900 day-number is hard
      to read; flip both number and label to paper. */
   .hd-day[data-status] .hd-day-num,
@@ -223,6 +265,36 @@
   }
   .hd-pop-clear { color: var(--red-500, #b14040); font-style: italic; }
   .hd-pop-clear:disabled { color: var(--ink-500); }
+  .hd-pop-note {
+    padding: 8px 14px 10px;
+    border-top: 1px solid var(--ink-300);
+    background: var(--paper-50, #fff);
+  }
+  .hd-pop-note-label {
+    display: block;
+    font: italic 500 11px/1 var(--font-display, 'Newsreader', serif);
+    color: var(--ink-700);
+    margin-bottom: 4px;
+  }
+  .hd-pop-note-hint {
+    color: var(--ink-500);
+    font-style: normal;
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-size: 9px;
+    margin-left: 6px;
+  }
+  .hd-pop-note-input {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--ink-500);
+    background: white;
+    padding: 6px 8px;
+    font: 400 12px/1.35 var(--font-display, 'Newsreader', serif);
+    color: var(--ink-900);
+    resize: vertical;
+    min-height: 38px;
+  }
+  .hd-pop-note-input:focus { outline: 2px solid var(--brass-500); outline-offset: -2px; }
 
   /* View-mode toggle (only rendered when viewer is a line manager) */
   .hd-view-tabs {
@@ -348,22 +420,54 @@
   .hd-team-cell:hover:not(.is-empty) {
     outline: 2px solid var(--ink-900, #11192E); outline-offset: -2px; z-index: 1;
   }
-  .hd-team-cell[data-status="office"]      { background: #6FA94A; }
-  .hd-team-cell[data-status="wfh"]         { background: #2F8F87; }
-  .hd-team-cell[data-status="non-working"] { background: #8B95A6; }
-  .hd-team-cell[data-status="holiday"]     { background: #E8A82A; }
-  .hd-team-cell[data-status="half-am"]     { background: linear-gradient(180deg,#E8A82A 0 50%,#6FA94A 50% 100%); }
-  .hd-team-cell[data-status="half-pm"]     { background: linear-gradient(180deg,#6FA94A 0 50%,#E8A82A 50% 100%); }
-  .hd-team-cell[data-status="sick"]        { background: #C0392B; }
-  .hd-team-cell[data-status="maternity"]   { background: #A95C8E; }
-  .hd-team-cell[data-status="approved-holiday"] {
-    background: #B07820;
-    box-shadow: inset 0 0 0 1px #6E4A12;
+  .hd-team-cell[data-status="office"]            { background: #6FA94A; }
+  .hd-team-cell[data-status="wfh"]               { background: #2F8F87; }
+  .hd-team-cell[data-status="non-working"]       { background: #8B95A6; }
+  .hd-team-cell[data-status="holiday"]           { background: #E8A82A; }
+  .hd-team-cell[data-status="part-paid-unpaid"]  { background: linear-gradient(180deg,#6FA94A 0 50%,#8B95A6 50% 100%); }
+  .hd-team-cell[data-status="part-holiday-paid"] { background: linear-gradient(180deg,#E8A82A 0 50%,#6FA94A 50% 100%); }
+  /* Legacy half-* statuses kept for old records. */
+  .hd-team-cell[data-status="half-am"]           { background: linear-gradient(180deg,#E8A82A 0 50%,#6FA94A 50% 100%); }
+  .hd-team-cell[data-status="half-pm"]           { background: linear-gradient(180deg,#6FA94A 0 50%,#E8A82A 50% 100%); }
+  .hd-team-cell[data-status="sick"]              { background: #C0392B; }
+  /* Maternity + Approved Holiday → yellow base + centred letter. */
+  .hd-team-cell[data-status="maternity"]         { background: #E8A82A; }
+  .hd-team-cell[data-status="approved-holiday"]  { background: #E8A82A; }
+  .hd-team-cell[data-status="maternity"]::after,
+  .hd-team-cell[data-status="approved-holiday"]::after {
+    content: attr(data-mark);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 700 12px/1 var(--font-mono, 'JetBrains Mono', monospace);
+    color: var(--ink-900);
+    pointer-events: none;
   }
   .hd-team-cell[data-default-bh="1"]       { background: #E8A82A; }
   .hd-team-cell.is-today { box-shadow: inset 0 0 0 2px var(--ink-900, #11192E); }
   .hd-team-cell.is-weekend-default { background: #8B95A6; opacity: 0.7; }
   .hd-team-cell.is-bh-default      { background: #E8A82A; opacity: 0.9; }
+  .hd-team-cell.has-note::before {
+    content: "";
+    position: absolute;
+    top: 2px; right: 2px;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--ink-900, #11192E);
+  }
+  /* Non-payroll user row — all cells locked to neutral grey. */
+  .hd-team-cell.is-not-on-payroll,
+  .hd-team-month-person.is-not-on-payroll .hd-team-cell {
+    background: #C8CCD3 !important;
+    cursor: not-allowed;
+  }
+  .hd-team-month-person.is-not-on-payroll .hd-team-cell::after { content: none !important; }
+  .hd-team-month-person.is-not-on-payroll .hd-team-month-name {
+    color: var(--ink-500);
+    font-style: italic;
+  }
   .hd-team-empty {
     padding: 18px 24px;
     color: var(--ink-500);
@@ -448,7 +552,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778927147" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778930132" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -488,11 +592,11 @@
     <div class="hd-legend" aria-label="Status colour legend">
       <span class="hd-legend-item"><span class="hd-legend-sw" style="background:#6FA94A"></span>Worked at Office</span>
       <span class="hd-legend-item"><span class="hd-legend-sw" style="background:#2F8F87"></span>Worked From Home</span>
-      <span class="hd-legend-item"><span class="hd-legend-sw" style="background:linear-gradient(180deg,#E8A82A 0 50%,#6FA94A 50% 100%)"></span>Half Day AM</span>
-      <span class="hd-legend-item"><span class="hd-legend-sw" style="background:linear-gradient(180deg,#6FA94A 0 50%,#E8A82A 50% 100%)"></span>Half Day PM</span>
+      <span class="hd-legend-item"><span class="hd-legend-sw" style="background:linear-gradient(180deg,#6FA94A 0 50%,#8B95A6 50% 100%)"></span>Part Paid / Unpaid</span>
+      <span class="hd-legend-item"><span class="hd-legend-sw" style="background:linear-gradient(180deg,#E8A82A 0 50%,#6FA94A 50% 100%)"></span>Part Holiday / Paid</span>
       <span class="hd-legend-item"><span class="hd-legend-sw" style="background:#E8A82A"></span>Paid Holiday</span>
-      <span class="hd-legend-item"><span class="hd-legend-sw" style="background:#B07820;box-shadow:inset 0 0 0 1px #6E4A12"></span>Approved Holiday</span>
-      <span class="hd-legend-item"><span class="hd-legend-sw" style="background:#A95C8E"></span>Maternity</span>
+      <span class="hd-legend-item"><span class="hd-legend-sw hd-legend-letter" style="background:#E8A82A">A</span>Approved Holiday</span>
+      <span class="hd-legend-item"><span class="hd-legend-sw hd-legend-letter" style="background:#E8A82A">M</span>Maternity</span>
       <span class="hd-legend-item"><span class="hd-legend-sw" style="background:#8B95A6"></span>Non-working</span>
       <span class="hd-legend-item"><span class="hd-legend-sw" style="background:#C0392B"></span>Sickness</span>
     </div>
@@ -529,18 +633,27 @@
   // Status table. Stored under data-status; popover uses the same keys.
   // The order here is the order they appear in the popover.
   const STATUSES = [
-    { key: "office",      label: "Worked at Office",     swatch: "#6FA94A" },
-    { key: "wfh",         label: "Worked from Home",     swatch: "#2F8F87" },
-    { key: "half-am",     label: "Half Day – Morning",   swatch: "linear-gradient(180deg,#E8A82A 0 50%,#6FA94A 50% 100%)" },
-    { key: "half-pm",     label: "Half Day – Afternoon", swatch: "linear-gradient(180deg,#6FA94A 0 50%,#E8A82A 50% 100%)" },
-    { key: "holiday",     label: "Paid Holiday",         swatch: "#E8A82A" },
-    { key: "sick",        label: "Sickness",             swatch: "#C0392B" },
-    { key: "maternity",   label: "Maternity",            swatch: "#A95C8E" },
-    { key: "non-working", label: "Non-Working",          swatch: "#8B95A6" },
+    { key: "office",             label: "Worked at Office",     swatch: "#6FA94A" },
+    { key: "wfh",                label: "Worked from Home",     swatch: "#2F8F87" },
+    { key: "part-paid-unpaid",   label: "Part Paid / Unpaid",   swatch: "linear-gradient(180deg,#6FA94A 0 50%,#8B95A6 50% 100%)", hasNote: true },
+    { key: "part-holiday-paid",  label: "Part Holiday / Paid",  swatch: "linear-gradient(180deg,#E8A82A 0 50%,#6FA94A 50% 100%)", hasNote: true },
+    { key: "holiday",            label: "Paid Holiday",         swatch: "#E8A82A" },
+    { key: "sick",               label: "Sickness",             swatch: "#C0392B" },
+    { key: "maternity",          label: "Maternity",            swatch: "#E8A82A", mark: "M" },
+    { key: "non-working",        label: "Non-Working",          swatch: "#8B95A6" },
   ];
-  const APPROVED_HOLIDAY = { key: "approved-holiday", label: "Approved Holiday", swatch: "#B07820", managerOnly: true };
+  const APPROVED_HOLIDAY = { key: "approved-holiday", label: "Approved Holiday", swatch: "#E8A82A", mark: "A", managerOnly: true };
+  // Statuses-by-key map carries labels for ALL keys (live + legacy
+  // half-am/half-pm so old records render correctly in the log).
   const STATUS_LABEL = Object.fromEntries(
-    [...STATUSES, APPROVED_HOLIDAY].map(s => [s.key, s.label])
+    [...STATUSES, APPROVED_HOLIDAY,
+      { key: "half-am", label: "Half Day – Morning" },
+      { key: "half-pm", label: "Half Day – Afternoon" },
+    ].map(s => [s.key, s.label])
+  );
+  const STATUS_HAS_NOTE = new Set(STATUSES.filter(s => s.hasNote).map(s => s.key));
+  const STATUS_MARK = Object.fromEntries(
+    [...STATUSES, APPROVED_HOLIDAY].filter(s => s.mark).map(s => [s.key, s.mark])
   );
 
   // UK Bank Holidays for the 2026-04-01 → 2027-03-31 fiscal window.
@@ -578,6 +691,13 @@
   let holidaysDoc = null; // full holidays.json
   let yearStart = new Date(2026, 3, 1);  // 1 Apr 2026 — overwritten from doc
   let yearEnd   = new Date(2027, 2, 31); // 31 Mar 2027 — overwritten from doc
+  // Payroll snapshot — null until /api/workspace/payroll returns. Used
+  // only to gate calendars: a user with no payroll record sees a grey
+  // calendar and can't edit. Same gating applied on their manager's
+  // view.
+  let payrollData = null;
+  let payrollByEmailLc = new Map();
+  let payrollByNameNorm = new Map();
 
   // ── Boot ──────────────────────────────────────────────────────────
   // holidays.json is read straight from raw.githubusercontent.com so it
@@ -595,7 +715,22 @@
       .then(r => r.ok ? r.json() : ({ by_user: {}, log: [] })),
     fetch(`${ANNOTATIONS_RAW_URL}?ts=${Date.now()}`, { cache: "no-store" })
       .then(r => r.ok ? r.json() : ({ annotations: {} })).catch(() => ({ annotations: {} })),
-  ]).then(([who, s, ad, hd, an]) => {
+    fetch("/api/workspace/payroll", { cache: "no-store" })
+      .then(r => r.ok ? r.json() : null).catch(() => null),
+  ]).then(([who, s, ad, hd, an, pr]) => {
+    payrollData = pr;
+    payrollByEmailLc = new Map();
+    payrollByNameNorm = new Map();
+    if (pr) {
+      const stash = (map, k, list) => {
+        if (!k) return;
+        const cur = map.get(k) || [];
+        for (const item of (list || [])) cur.push(item);
+        map.set(k, cur);
+      };
+      for (const [k, list] of Object.entries(pr.by_email || {})) stash(payrollByEmailLc, k.toLowerCase(), list);
+      for (const [k, list] of Object.entries(pr.by_name || {}))  stash(payrollByNameNorm, normaliseName(k), list);
+    }
     viewerEmail = (who && who.email) || "";
     viewerName  = (who && who.name)  || "";
     adminEmails = new Set((ad.admins || []).map(e => (e || "").toLowerCase()));
@@ -750,6 +885,9 @@
       // OR a default UK BH on a weekday with no override (+1).
       if (stored === "holiday" || stored === "maternity" || stored === "approved-holiday") { count += 1; continue; }
       if (stored === "half-am" || stored === "half-pm") { count += 0.5; continue; }
+      // part-holiday-paid = the holiday half counts. part-paid-unpaid =
+      // worker / unpaid split, doesn't count as holiday.
+      if (stored === "part-holiday-paid") { count += 0.5; continue; }
       if (!stored && !isWeekend && UK_BANK_HOLIDAYS.has(iso)) { count += 1; continue; }
     }
     return count;
@@ -818,6 +956,7 @@
 
     if (stored) {
       cell.dataset.status = stored;
+      if (STATUS_MARK[stored]) cell.dataset.mark = STATUS_MARK[stored];
     } else if (inYear) {
       if (isWeekend) {
         cell.dataset.status = "non-working";
@@ -830,6 +969,10 @@
       }
     }
     if (iso === todayIso) cell.classList.add("hd-day-today");
+    // Note indicator dot (small ink dot in top-right).
+    const noteMap = ((holidaysDoc.by_user || {})[selectedEmail] || {}).notes || {};
+    if (noteMap[iso]) cell.classList.add("has-note");
+    if (!isOnPayroll(selectedEmail)) cell.classList.add("is-not-on-payroll");
 
     // Day number; show month label on the 1st and on yearStart.
     const dayNum = d.getDate();
@@ -962,12 +1105,17 @@
         const row = document.createElement("div");
         row.className = "hd-team-month-person";
         row.dataset.email = r.email;
+        const onPayroll = isOnPayroll(r.email);
+        if (!onPayroll) row.classList.add("is-not-on-payroll");
         const name = document.createElement("div");
         name.className = "hd-team-month-name";
         name.textContent = r.user.name || r.email;
+        if (!onPayroll) name.title = "Not on payroll — calendar disabled";
         row.appendChild(name);
 
-        const dayMap = ((holidaysDoc.by_user || {})[r.email] || {}).days || {};
+        const userMap = (holidaysDoc.by_user || {})[r.email] || {};
+        const dayMap = userMap.days || {};
+        const noteMap = userMap.notes || {};
         for (let i = 0; i < COLS; i++) {
           const cell = document.createElement("div");
           cell.className = "hd-team-cell";
@@ -992,6 +1140,7 @@
           cell.dataset.date = iso;
           if (stored) {
             cell.dataset.status = stored;
+            if (STATUS_MARK[stored]) cell.dataset.mark = STATUS_MARK[stored];
           } else if (isWeekend) {
             cell.classList.add("is-weekend-default");
           } else if (isBh) {
@@ -1000,16 +1149,20 @@
           } else {
             cell.dataset.status = "office";
           }
+          if (noteMap[iso]) cell.classList.add("has-note");
           if (iso === todayIso) cell.classList.add("is-today");
           const human = d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
           cell.title = `${r.user.name || r.email} · ${human}` +
             (stored ? ` · ${STATUS_LABEL[stored] || stored}` :
               (isBh ? " · UK Bank Holiday" :
-                (isWeekend ? " · Weekend" : "")));
-          cell.addEventListener("click", e => {
-            e.stopPropagation();
-            openTeamPicker(cell, d, r.email);
-          });
+                (isWeekend ? " · Weekend" : ""))) +
+            (noteMap[iso] ? `\nNote: ${noteMap[iso]}` : "");
+          if (onPayroll) {
+            cell.addEventListener("click", e => {
+              e.stopPropagation();
+              openTeamPicker(cell, d, r.email);
+            });
+          }
           row.appendChild(cell);
         }
         block.appendChild(row);
@@ -1025,9 +1178,16 @@
       banner("You can't edit this calendar.", true);
       return;
     }
+    if (!isOnPayroll(reportEmail)) {
+      banner("This report isn't on the payroll list — calendar is read-only.", true);
+      return;
+    }
     const iso = anchor.dataset.date;
-    const dayMap = ((holidaysDoc.by_user || {})[reportEmail] || {}).days || {};
+    const userMap = (holidaysDoc.by_user || {})[reportEmail] || {};
+    const dayMap = userMap.days || {};
+    const noteMap = userMap.notes || {};
     const current = dayMap[iso] || null;
+    const currentNote = noteMap[iso] || "";
     const dow = d.getDay();
     const isWeekend = (dow === 0 || dow === 6);
     const isBh = UK_BANK_HOLIDAYS.has(iso);
@@ -1038,6 +1198,7 @@
     pop.className = "hd-pop";
     const who = (staffByEmail[reportEmail] || {}).name || reportEmail;
     const dateLabel = d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short", year: "numeric" });
+    const noteVisible = STATUS_HAS_NOTE.has(current);
     pop.innerHTML = `
       <div class="hd-pop-head">${escapeHtml(who)}<br>${escapeHtml(dateLabel)}${isBh ? " · UK Bank Holiday" : ""}</div>
       ${opts.map(s => `
@@ -1047,17 +1208,32 @@
       `).join("")}
       <button type="button" class="hd-pop-opt hd-pop-clear" data-clear ${current ? "" : "disabled"}>
         Reset to default (${STATUS_LABEL[defaultStatus]})
-      </button>`;
+      </button>
+      <div class="hd-pop-note" style="display:${noteVisible ? "block" : "none"};">
+        <label class="hd-pop-note-label">Note <span class="hd-pop-note-hint">(≤100 chars · part-day only)</span></label>
+        <textarea class="hd-pop-note-input" maxlength="100" rows="2" placeholder="e.g. half day off — back from 1pm">${escapeHtml(currentNote)}</textarea>
+      </div>`;
     document.body.appendChild(pop);
     positionPop(pop, anchor);
     openPopEl = pop;
+    const noteWrap = pop.querySelector(".hd-pop-note");
+    const noteInput = pop.querySelector(".hd-pop-note-input");
     pop.addEventListener("click", e => {
       const btn = e.target.closest("button");
       if (!btn || btn.disabled) return;
       const next = btn.dataset.clear ? null : btn.dataset.status;
-      saveDayFor(reportEmail, iso, current, next);
+      const note = noteInput ? noteInput.value.trim() : "";
+      const nextNote = (next && STATUS_HAS_NOTE.has(next)) ? note : "";
+      saveDayFor(reportEmail, iso, current, next, nextNote);
       closePicker();
     });
+    pop.querySelectorAll("[data-status]").forEach(b => {
+      b.addEventListener("mouseenter", () => {
+        const k = b.dataset.status;
+        if (noteWrap) noteWrap.style.display = STATUS_HAS_NOTE.has(k) ? "block" : "none";
+      });
+    });
+    if (noteVisible && noteInput) setTimeout(() => noteInput.focus(), 0);
     const onKey = e => {
       if (e.key === "Escape") { e.preventDefault(); closePicker(); }
     };
@@ -1134,21 +1310,27 @@
       banner("You can only edit your own calendar.", true);
       return;
     }
+    if (!isOnPayroll(selectedEmail)) {
+      banner("This user isn't on the payroll list — their calendar is read-only.", true);
+      return;
+    }
     const iso = anchor.dataset.date;
-    const dayMap = ((holidaysDoc.by_user || {})[selectedEmail] || {}).days || {};
+    const userMap = (holidaysDoc.by_user || {})[selectedEmail] || {};
+    const dayMap = userMap.days || {};
+    const noteMap = userMap.notes || {};
     const current = dayMap[iso] || null;
+    const currentNote = noteMap[iso] || "";
     const dow = d.getDay();
     const isWeekend = (dow === 0 || dow === 6);
     const isBh = UK_BANK_HOLIDAYS.has(iso);
     const defaultStatus = isWeekend ? "non-working" : (isBh ? "holiday" : "office");
-    // Editing someone else's day (you must be admin or their line
-    // manager to land in this branch) → offer "Approved Holiday" too.
     const editingOther = selectedEmail !== viewerEmail.toLowerCase();
     const showApproved = editingOther && (viewerIsAdmin || directReports.has(selectedEmail));
     const opts = showApproved ? [...STATUSES, APPROVED_HOLIDAY] : STATUSES.slice();
     const pop = document.createElement("div");
     pop.className = "hd-pop";
     const dateLabel = d.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short", year: "numeric" });
+    const noteVisible = STATUS_HAS_NOTE.has(current);
     pop.innerHTML = `
       <div class="hd-pop-head">${escapeHtml(dateLabel)}${isBh ? " · UK Bank Holiday" : ""}</div>
       ${opts.map(s => `
@@ -1158,17 +1340,35 @@
       `).join("")}
       <button type="button" class="hd-pop-opt hd-pop-clear" data-clear ${current ? "" : "disabled"}>
         Reset to default (${STATUS_LABEL[defaultStatus]})
-      </button>`;
+      </button>
+      <div class="hd-pop-note" style="display:${noteVisible ? "block" : "none"};">
+        <label class="hd-pop-note-label" for="hdPopNote">Note <span class="hd-pop-note-hint">(≤100 chars · part-day only)</span></label>
+        <textarea id="hdPopNote" class="hd-pop-note-input" maxlength="100" rows="2" placeholder="e.g. half day off — back from 1pm">${escapeHtml(currentNote)}</textarea>
+      </div>`;
     document.body.appendChild(pop);
     positionPop(pop, anchor);
     openPopEl = pop;
+    const noteWrap = pop.querySelector(".hd-pop-note");
+    const noteInput = pop.querySelector("#hdPopNote");
     pop.addEventListener("click", e => {
       const btn = e.target.closest("button");
       if (!btn || btn.disabled) return;
       const next = btn.dataset.clear ? null : btn.dataset.status;
-      saveDayFor(selectedEmail, iso, current, next);
+      const note = noteInput ? noteInput.value.trim() : "";
+      const nextNote = (next && STATUS_HAS_NOTE.has(next)) ? note : "";
+      saveDayFor(selectedEmail, iso, current, next, nextNote);
       closePicker();
     });
+    // Toggle note input visibility as user mouses over the status
+    // options — gives them a preview of which options carry a note.
+    pop.querySelectorAll("[data-status]").forEach(b => {
+      b.addEventListener("mouseenter", () => {
+        const k = b.dataset.status;
+        if (noteWrap) noteWrap.style.display = STATUS_HAS_NOTE.has(k) ? "block" : "none";
+      });
+    });
+    // Autofocus the note input when shown.
+    if (noteVisible && noteInput) setTimeout(() => noteInput.focus(), 0);
     // Close on outside click / Escape
     setTimeout(() => {
       document.addEventListener("click", outsideClose, { once: true });
@@ -1216,15 +1416,23 @@
   // saveDayFor lets either the own-view or the team-view call with the
   // explicit target email — own-view passes selectedEmail; team-view
   // passes the report's email.
-  async function saveDayFor(targetEmail, iso, fromStatus, toStatus) {
+  async function saveDayFor(targetEmail, iso, fromStatus, toStatus, note) {
     const target = (targetEmail || "").toLowerCase();
     const map = ensureUserMap(target);
     const prev = map.days[iso] || null;
+    const prevNote = map.notes[iso] || "";
     if (toStatus === null) {
       delete map.days[iso];
     } else {
       map.days[iso] = toStatus;
     }
+    // Notes are tied to part-* statuses. If the new status doesn't
+    // carry a note, clear any existing one. Otherwise store the
+    // trimmed value (may be empty string for "no note set yet").
+    const wantsNote = toStatus !== null && STATUS_HAS_NOTE.has(toStatus);
+    const nextNote = wantsNote ? (note || "") : "";
+    if (nextNote) map.notes[iso] = nextNote.slice(0, 100);
+    else delete map.notes[iso];
     // Optimistic repaint: in own view there's a hd-day cell; in team
     // view it's a hd-team-cell within a row keyed by email.
     const ownCell = (target === selectedEmail) ? document.querySelector(`.hd-day[data-date="${iso}"]`) : null;
@@ -1237,7 +1445,7 @@
       const res = await fetch(`${HD_API}/set`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: target, date: iso, status: toStatus }),
+        body: JSON.stringify({ email: target, date: iso, status: toStatus, note: wantsNote ? nextNote : "" }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || (data && data.ok === false)) {
@@ -1252,6 +1460,7 @@
       banner("Saved");
     } catch (err) {
       if (prev === null) delete map.days[iso]; else map.days[iso] = prev;
+      if (prevNote) map.notes[iso] = prevNote; else delete map.notes[iso];
       if (ownCell) repaintCell(ownCell);
       if (teamCell) repaintTeamCell(teamCell, target);
       renderHeader();
@@ -1259,24 +1468,27 @@
       console.error("[holidays] save failed", err);
     }
   }
-  // Back-compat shim — older call sites used saveDay(iso, from, to)
-  // with implicit selectedEmail; keep that working.
-  function saveDay(iso, fromStatus, toStatus) {
-    return saveDayFor(selectedEmail, iso, fromStatus, toStatus);
+  // Back-compat shim.
+  function saveDay(iso, fromStatus, toStatus, note) {
+    return saveDayFor(selectedEmail, iso, fromStatus, toStatus, note);
   }
   function repaintTeamCell(cell, email) {
     const iso = cell.dataset.date;
     const d = parseISO(iso);
-    const dayMap = ((holidaysDoc.by_user || {})[email] || {}).days || {};
+    const userMap = (holidaysDoc.by_user || {})[email] || {};
+    const dayMap = userMap.days || {};
+    const noteMap = userMap.notes || {};
     const stored = dayMap[iso];
     const dow = d.getDay();
     const isWeekend = (dow === 0 || dow === 6);
     const isBh = UK_BANK_HOLIDAYS.has(iso);
     cell.removeAttribute("data-status");
     cell.removeAttribute("data-default-bh");
-    cell.classList.remove("is-weekend-default", "is-bh-default");
+    cell.removeAttribute("data-mark");
+    cell.classList.remove("is-weekend-default", "is-bh-default", "has-note");
     if (stored) {
       cell.dataset.status = stored;
+      if (STATUS_MARK[stored]) cell.dataset.mark = STATUS_MARK[stored];
     } else if (isWeekend) {
       cell.classList.add("is-weekend-default");
     } else if (isBh) {
@@ -1285,16 +1497,20 @@
     } else {
       cell.dataset.status = "office";
     }
+    if (noteMap[iso]) cell.classList.add("has-note");
   }
   function ensureUserMap(email) {
     holidaysDoc.by_user = holidaysDoc.by_user || {};
     holidaysDoc.by_user[email] = holidaysDoc.by_user[email] || {};
     holidaysDoc.by_user[email].days = holidaysDoc.by_user[email].days || {};
+    holidaysDoc.by_user[email].notes = holidaysDoc.by_user[email].notes || {};
     return holidaysDoc.by_user[email];
   }
   function repaintCell(cell) {
     const iso = cell.dataset.date;
-    const dayMap = ((holidaysDoc.by_user || {})[selectedEmail] || {}).days || {};
+    const userMap = (holidaysDoc.by_user || {})[selectedEmail] || {};
+    const dayMap = userMap.days || {};
+    const noteMap = userMap.notes || {};
     const stored = dayMap[iso];
     const d = parseISO(iso);
     const dow = d.getDay();
@@ -1303,13 +1519,17 @@
     cell.removeAttribute("data-status");
     cell.removeAttribute("data-default-bh");
     cell.removeAttribute("data-defaulted");
+    cell.removeAttribute("data-mark");
+    cell.classList.remove("has-note");
     if (stored) {
       cell.dataset.status = stored;
+      if (STATUS_MARK[stored]) cell.dataset.mark = STATUS_MARK[stored];
     } else {
       if (isWeekend) cell.dataset.status = "non-working";
       else if (isBh) cell.dataset.defaultBh = "1";
       else { cell.dataset.status = "office"; cell.dataset.defaulted = "1"; }
     }
+    if (noteMap[iso]) cell.classList.add("has-note");
     // Update the label
     const label = labelFor(stored, isWeekend, isBh);
     const labelDiv = cell.querySelector(".hd-day-label");
@@ -1348,6 +1568,28 @@
     const t = to.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
     return `${f} → ${t}`;
   }
+  // Treat a user as "on payroll" if any of the following matches:
+  //   - admin set annotations[email].payroll_match (manual override)
+  //   - payrollData.by_email contains their email
+  //   - payrollData.by_name contains a normalised match of their name
+  // No payrollData yet → assume on (don't grey-out the page before
+  // /api/workspace/payroll has answered).
+  function isOnPayroll(email) {
+    if (!email) return true;
+    if (!payrollData) return true;
+    const lc = (email || "").toLowerCase();
+    if (payrollByEmailLc.has(lc)) return true;
+    const u = staffByEmail[lc];
+    if (u && u.name) {
+      const n = normaliseName(u.name);
+      if (payrollByNameNorm.has(n)) return true;
+    }
+    return false;
+  }
+  function normaliseName(s) {
+    return String(s || "").toLowerCase().replace(/[^a-z]/g, "");
+  }
+
   function displayName(email) {
     if (!email) return "Unknown";
     const u = staffByEmail[(email || "").toLowerCase()];
@@ -1375,6 +1617,6 @@
     a.addEventListener('click', () => document.body.classList.remove('nav-open'))
   );
 </script>
-<script src="nav.js?v=1778927147" defer></script>
+<script src="nav.js?v=1778930132" defer></script>
 </body>
 </html>
