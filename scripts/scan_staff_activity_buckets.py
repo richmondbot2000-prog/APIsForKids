@@ -39,7 +39,11 @@ import datetime
 import json
 import os
 import sys
+import time
+import urllib.error
+import urllib.request
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import pyodbc
@@ -168,6 +172,22 @@ def scan_database(database: str, start: datetime.datetime, end_exclusive: dateti
             # are stored as bare local-parts (no @<domain>), so the
             # original @-only filter was silently dropping every comm
             # sent by an employee.
+            #
+            # Extra Messages-only clause: also require ClientType LIKE '%CRM%'.
+            # Without it, bot-sent messages tagged with a human's username
+            # (MessageFactory, Whitebox, RobotResponder, AiResponder,
+            # LoanbookMonitorRobotV2, UIVR, ApplyWebsite1, …) get credited
+            # to that human's activity bar. The CRM tag is the canonical
+            # human-agent signal — it also covers TogetherLoansCRM_Dialler,
+            # RapidaCRM, LendingMateCRM, MoneymasCRM. Other warehouse tables
+            # don't have this confusion (no bots write loanbook.Events under
+            # a person's name) so we leave them untouched.
+            is_comm_messages = (
+                database == "ReportingCommunications"
+                and schema.lower() == "dbo"
+                and table == "Messages"
+            )
+            extra_where = " AND ClientType LIKE '%CRM%' " if is_comm_messages else ""
             q = (
                 f"SELECT LOWER(ClientUsername) AS un, "
                 f"       CAST([{ts}] AS DATE) AS dt, "
@@ -179,6 +199,7 @@ def scan_database(database: str, start: datetime.datetime, end_exclusive: dateti
                 f"WHERE [{ts}] >= ? AND [{ts}] < ? "
                 f"  AND ClientUsername IS NOT NULL "
                 f"  AND (ClientUsername LIKE '%@%' OR ClientUsername LIKE '%.%') "
+                f"{extra_where}"
                 f"GROUP BY LOWER(ClientUsername), CAST([{ts}] AS DATE), "
                 f"         (DATEPART(HOUR, [{ts}]) * 4 + DATEPART(MINUTE, [{ts}]) / 15)"
             )
@@ -342,6 +363,102 @@ def main() -> None:
 
     out_path.write_text(json.dumps(existing, indent=2))
     print(f"# wrote {out_path} — merged {len(rolled_buckets)} users across {len(dates_in_window)} day(s)", flush=True)
+
+    # Mirror the fresh window into D1 so the worker's GET /api/workspace/activity
+    # — which reads from activity_buckets + activity_events — actually reflects
+    # what the JSON now says. Until this step existed, the bucket scanner only
+    # wrote to JSON and the D1 tables drifted (silently serving old data,
+    # including the bot-vs-human filter applied here).
+    cf_account = os.environ.get("CLOUDFLARE_ACCOUNT_ID")
+    cf_token   = os.environ.get("CLOUDFLARE_API_TOKEN")
+    cf_db      = os.environ.get("D1_ACTIVITY_DB_ID")
+    if cf_account and cf_token and cf_db:
+        sync_to_d1(cf_account, cf_token, cf_db, rolled_buckets, rolled_events, dates_in_window)
+    else:
+        print("# CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID / D1_ACTIVITY_DB_ID not set — skipping D1 sync", flush=True)
+
+
+def _d1_query(account, token, db_id, sql, params=None):
+    url = f"https://api.cloudflare.com/client/v4/accounts/{account}/d1/database/{db_id}/query"
+    body = json.dumps({"sql": sql, "params": params or []}).encode()
+    req = urllib.request.Request(url, data=body, method="POST")
+    req.add_header("Authorization", f"Bearer {token}")
+    req.add_header("Content-Type", "application/json")
+    try:
+        with urllib.request.urlopen(req, timeout=120) as r:
+            return json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        return json.loads(e.read())
+
+
+def sync_to_d1(account, token, db_id, rolled_buckets, rolled_events, dates_in_window):
+    """Idempotent DELETE-then-INSERT of the window into D1's activity_buckets +
+    activity_events. D1 caps each statement at 100 SQL variables; the two-col
+    bucket rows fit ~40/batch, three+col event rows fit ~14/batch. Parallelised
+    with a small thread pool, same pattern as scan_comm_items.py."""
+    print(f"# D1 sync: {len(dates_in_window)} day(s) × buckets={sum(len(v) for v in rolled_buckets.values())} events={sum(len(d) for v in rolled_events.values() for d in v.values())}", flush=True)
+    t0 = time.time()
+
+    # Step 1 — wipe the window. One DELETE per (table, date) so the row scan
+    # stays bounded even if a wide range is being refreshed.
+    for iso in dates_in_window:
+        for tbl in ("activity_buckets", "activity_events"):
+            out = _d1_query(account, token, db_id,
+                            f"DELETE FROM {tbl} WHERE iso_date = ?", [iso])
+            if not out.get("success"):
+                print(f"  ! delete {tbl} {iso} failed: {out.get('errors')}", flush=True)
+                return
+
+    # Step 2 — build the row lists, then INSERT in batches.
+    bucket_rows = []   # (email, iso, bucket)
+    for email, dates in rolled_buckets.items():
+        for iso, bset in dates.items():
+            if iso not in set(dates_in_window):
+                continue
+            for b in bset:
+                bucket_rows.append((email, iso, int(b)))
+    event_rows = []    # (email, iso, bucket, src, writes, first_at, last_at, kind)
+    for email, dates in rolled_events.items():
+        for iso, evs in dates.items():
+            if iso not in set(dates_in_window):
+                continue
+            for ev in evs:
+                event_rows.append((
+                    email, iso, int(ev["bucket"]), ev["src"],
+                    int(ev.get("writes") or 0),
+                    ev.get("first_at"), ev.get("last_at"),
+                    ev.get("kind") or "warehouse",
+                ))
+
+    def _batch_insert(table, cols, rows, batch_n):
+        if not rows:
+            return
+        sql_head = f"INSERT OR REPLACE INTO {table} ({','.join(cols)}) VALUES "
+        batches = [rows[i:i+batch_n] for i in range(0, len(rows), batch_n)]
+        print(f"  · {table}: {len(rows):,} rows in {len(batches):,} batches × {batch_n}", flush=True)
+        ok = 0; failed = []
+        with ThreadPoolExecutor(max_workers=8) as ex:
+            futs = {}
+            for chunk in batches:
+                ph = ",".join(["(" + ",".join(["?"]*len(cols)) + ")"] * len(chunk))
+                params = [v for row in chunk for v in row]
+                futs[ex.submit(_d1_query, account, token, db_id, sql_head + ph, params)] = len(chunk)
+            for f in as_completed(futs):
+                n = futs[f]
+                out = f.result()
+                if not out.get("success"):
+                    failed.append(out.get("errors"))
+                else:
+                    ok += n
+        if failed:
+            print(f"    ! {len(failed)} batch(es) failed; first error: {json.dumps(failed[0])[:300]}", flush=True)
+        print(f"    {ok:,}/{len(rows):,} rows inserted into {table}", flush=True)
+
+    # Bucket table is 3 columns → 33 rows/batch (≤ 99 vars). Event table is
+    # 8 columns → 12 rows/batch.
+    _batch_insert("activity_buckets", ["email","iso_date","bucket"], bucket_rows, 33)
+    _batch_insert("activity_events",  ["email","iso_date","bucket","src","writes","first_at","last_at","kind"], event_rows, 12)
+    print(f"# D1 sync done in {time.time()-t0:.1f}s", flush=True)
 
 
 if __name__ == "__main__":

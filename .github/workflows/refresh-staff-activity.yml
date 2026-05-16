@@ -102,6 +102,12 @@ jobs:
           FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
           ACTIVITY_START_DATE: ${{ inputs.start_date }}
           ACTIVITY_END_DATE:   ${{ inputs.end_date }}
+          # Pass D1 creds so the scanner also mirrors fresh buckets + events
+          # into the activity_buckets / activity_events tables that the
+          # worker reads from.
+          CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          D1_ACTIVITY_DB_ID:     ${{ secrets.D1_ACTIVITY_DB_ID }}
         continue-on-error: true
         run: python scripts/scan_staff_activity_buckets.py
 
