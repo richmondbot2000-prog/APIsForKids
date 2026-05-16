@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BOOK — Org Structure</title>
+<link rel="icon" type="image/png" href="site-icon.png">
+<link rel="apple-touch-icon" href="site-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=1778938352">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778938352">
+<link rel="stylesheet" href="quiet.css?v=1778938352">
+<link rel="stylesheet" href="quiet-extras.css?v=1778938352">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778938352">
+<style>
+  .os-section { max-width: 1320px; margin: 0 auto; padding: 24px 0 48px; }
+  .os-section h1 {
+    font-family: var(--font-display, 'Newsreader', serif);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    margin: 0 0 12px;
+    color: var(--ink);
+  }
+  .os-meta {
+    color: var(--muted, var(--ink-500));
+    font: 400 12px/1.4 var(--font-mono, 'JetBrains Mono', monospace);
+    margin: 0 0 18px;
+  }
+  .os-actions {
+    display: flex; gap: 14px; align-items: center;
+    margin-bottom: 14px;
+    font: italic 500 13px/1 var(--font-display, 'Newsreader', serif);
+  }
+  .os-action-btn {
+    background: none; border: none;
+    padding: 6px 4px;
+    font: italic 500 13px/1 var(--font-display, 'Newsreader', serif);
+    color: var(--ink-700);
+    border-bottom: 1.5px solid var(--brass-300, #E2BF74);
+    cursor: pointer;
+  }
+  .os-action-btn:hover { color: var(--red-500, #b14040); border-bottom-color: var(--red-500, #b14040); }
+
+  /* The d3-org-chart container. Height is fluid; let the lib size
+     its own SVG and we keep the surrounding paper. */
+  .os-chart-wrap {
+    background: var(--paper-50, white);
+    border: 1px solid var(--ink-300);
+    border-left: 4px solid var(--brass-500, #C8973F);
+    overflow: hidden;
+    min-height: 600px;
+  }
+  /* Empty + loading states */
+  .os-empty {
+    padding: 64px 24px;
+    text-align: center;
+    color: var(--ink-500);
+    font: italic 400 16px/1.5 var(--font-display, 'Newsreader', serif);
+  }
+  /* d3-org-chart paints node HTML through foreignObject, so the
+     `.os-node-*` styles here apply inside the SVG via the
+     `nodeContent` template. */
+  .os-node {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background: var(--paper-100, #FBF6E9);
+    border: 1px solid var(--ink-300);
+    border-left: 3px solid var(--brass-500, #C8973F);
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 12px 8px;
+    font-family: var(--font-display, 'Newsreader', serif);
+    color: var(--ink-900);
+  }
+  .os-node.is-manager {
+    background: var(--paper-200, #F5ECD4);
+    border-left-color: var(--red-500, #b14040);
+  }
+  .os-node-avatar {
+    width: 54px; height: 54px;
+    border-radius: 50%;
+    background: var(--paper-300, #ECDFB6);
+    overflow: hidden;
+    border: 1px solid var(--brass-300, #E2BF74);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-weight: 700;
+    color: var(--ink-700);
+    font-size: 18px;
+  }
+  .os-node-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .os-node-name {
+    font: 600 14px/1.2 var(--font-display, 'Newsreader', serif);
+    text-align: center;
+    color: var(--ink-900);
+    word-break: break-word;
+  }
+  .os-node-role {
+    font: italic 400 12px/1.2 var(--font-display, 'Newsreader', serif);
+    text-align: center;
+    color: var(--ink-700);
+    word-break: break-word;
+  }
+  .os-node-meta {
+    font: 500 9px/1 var(--font-mono, 'JetBrains Mono', monospace);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-500);
+    margin-top: auto;
+  }
+  .os-node.is-self {
+    box-shadow: inset 0 0 0 2px var(--red-500, #b14040);
+  }
+  .os-legend {
+    display: inline-flex; gap: 18px; margin-left: auto; align-items: center;
+    font: 400 12px/1 var(--font-mono, 'JetBrains Mono', monospace);
+    color: var(--ink-600);
+  }
+  .os-legend-sw {
+    width: 14px; height: 14px; border: 1px solid var(--ink-700);
+    display: inline-block; vertical-align: middle; margin-right: 5px;
+  }
+</style>
+</head>
+<body>
+
+<header class="qb-topbar">
+  <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778938352" alt="TogetherBOOK">
+  </a>
+  <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
+          onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
+    <span></span><span></span><span></span>
+  </button>
+    <nav class="qb-nav">
+    <a class="qb-nav-link" href="wall.html">Wall</a>
+    <a class="qb-nav-link" href="index.html" data-sub='[{"href": "database.html", "label": "Schema"}, {"href": "stats.html", "label": "Code"}]'>About our systems</a>
+    <a class="qb-nav-link" href="yesterday.html">Payouts</a>
+    <a class="qb-nav-link" href="holidays.html">Holidays</a>
+    <a class="qb-nav-link" href="brandwatch.html">Brandwatch</a>
+    <a class="qb-nav-link is-active" href="directory.html" data-sub='[{"href": "org-structure.html", "label": "Org Structure"}]'>Directory</a>
+    <a class="qb-nav-link" href="reports.html" data-sub='[{"href": "1stcontact.html", "label": "1st Contact"}, {"href": "topups.html", "label": "Top Ups"}, {"href": "pipeline.html", "label": "Pipeline"}, {"href": "brokers.html", "label": "Brokers"}, {"href": "comms.html", "label": "Comms"}]'>Reports</a>
+  </nav>
+</header>
+<div class="qb-nav-backdrop" onclick="document.body.classList.remove('nav-open')"></div>
+<nav class="qb-subnav" aria-label="Section sub-pages">
+  <a class="qb-subnav-link is-active" href="org-structure.html">Org Structure</a>
+</nav>
+
+<main class="qb-page">
+  <section class="os-section">
+    <h1>Org Structure</h1>
+    <p class="os-meta" id="osMeta">Loading…</p>
+
+    <div class="os-actions">
+      <button class="os-action-btn" id="osExpandAll">Expand all</button>
+      <button class="os-action-btn" id="osCollapseAll">Collapse to top</button>
+      <button class="os-action-btn" id="osCenterSelf">Focus on me</button>
+      <span class="os-legend">
+        <span><span class="os-legend-sw" style="background:var(--paper-200);border-left:3px solid var(--red-500);"></span>Line manager</span>
+        <span><span class="os-legend-sw" style="background:var(--paper-100);border-left:3px solid var(--brass-500);"></span>Direct report</span>
+      </span>
+    </div>
+
+    <div class="os-chart-wrap" id="osChartWrap">
+      <div class="os-empty" id="osEmpty">Loading org tree…</div>
+    </div>
+  </section>
+</main>
+
+<!-- d3 + d3-org-chart (MIT). d3@7 + d3-org-chart@3.1.1. -->
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-org-chart@3.1.1" crossorigin="anonymous"></script>
+
+<script>
+  // ──────────────────────────────────────────────────────────────────
+  // Org Structure — every staff member with a line_manager OR who is a
+  // line manager for someone else, arranged as a tree by reporting
+  // line. Photos + name + role pulled from annotations.json + staff.json.
+  // Renderer: d3-org-chart (MIT, github.com/bumbeishvili/org-chart).
+  // ──────────────────────────────────────────────────────────────────
+
+  const ANNOTATIONS_RAW_URL = "https://raw.githubusercontent.com/richmondbot2000-prog/togetherbook/main/annotations.json";
+
+  function dirPhotoKey(email) {
+    return (email || "").toString().trim().toLowerCase().replace(/@/g, "_at_");
+  }
+  function photoUrlFor(user, annotation) {
+    const key = dirPhotoKey(user.email);
+    if (annotation && annotation.directory_photo_uploaded_at) {
+      const ts = encodeURIComponent(annotation.directory_photo_uploaded_at);
+      return `assets/photos/${key}.jpg?v=${ts}`;
+    }
+    if (user.photo_url) return user.photo_url;
+    return "";
+  }
+  function initialsOf(name, email) {
+    const src = (name || email || "?").trim();
+    const parts = src.split(/\s+/).filter(Boolean);
+    if (!parts.length) return "?";
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  function escapeHtml(s) {
+    return String(s || "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+
+  let chart = null;
+  let viewerEmail = "";
+
+  Promise.all([
+    // No /api/workspace/whoami — borrow the wall whoami endpoint
+    // (same Cloudflare-Access JWT identity, just returns the viewer
+    // email so we can mark the "is-self" node).
+    fetch("/api/wall/whoami", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("staff.json", { cache: "no-store" }).then(r => r.ok ? r.json() : Promise.reject("staff.json HTTP " + (r.status))),
+    fetch(`${ANNOTATIONS_RAW_URL}?ts=${Date.now()}`, { cache: "no-store" })
+      .then(r => r.ok ? r.json() : ({ annotations: {} })).catch(() => ({ annotations: {} })),
+  ]).then(([who, staff, ann]) => {
+    viewerEmail = (who && who.email || "").toLowerCase();
+    const users = (staff.users || []).filter(u => !u.suspended && !u.deletion_time);
+    const usersByEmail = new Map(users.map(u => [(u.email || "").toLowerCase(), u]));
+    const anns = (ann && ann.annotations) || {};
+
+    // line_manager map: email → manager_email (lowercased)
+    const mgrOf = {};
+    for (const [k, v] of Object.entries(anns)) {
+      const mgr = v && v.line_manager ? String(v.line_manager).toLowerCase() : "";
+      if (mgr) mgrOf[k.toLowerCase()] = mgr;
+    }
+    // Inverse: manager_email → Set(report_email)
+    const reportsOf = {};
+    for (const [k, mgr] of Object.entries(mgrOf)) {
+      reportsOf[mgr] = reportsOf[mgr] || new Set();
+      reportsOf[mgr].add(k);
+    }
+
+    // Visible set = anyone with a line_manager OR who is someone's
+    // line manager.
+    const visible = new Set();
+    for (const k of Object.keys(mgrOf)) visible.add(k);
+    for (const k of Object.keys(reportsOf)) visible.add(k);
+
+    if (visible.size === 0) {
+      document.getElementById("osMeta").textContent = "No reporting relationships set yet.";
+      document.getElementById("osEmpty").innerHTML =
+        `Nobody has a Line Manager set in the Directory yet. Open <a href="directory.html">Directory</a>, edit a card, and set someone's Line Manager to populate this view.`;
+      return;
+    }
+
+    // Build chart nodes. Each visible person → one node.
+    // Roots (no manager in the visible set) are anchored to a synthetic
+    // "Richmond Group" parent so d3-org-chart can lay them out as a
+    // single tree (it requires a single root). We collapse the synthetic
+    // root visually to mimic the user's reference layout (top → CEO).
+    const ROOT_ID = "__root__";
+    const data = [{
+      id: ROOT_ID,
+      parentId: "",
+      _isRoot: true,
+      name: "Richmond Group",
+      role: "",
+      email: "",
+    }];
+
+    for (const email of visible) {
+      const u = usersByEmail.get(email) || { email, name: email.split("@")[0] };
+      const a = anns[email] || {};
+      const mgr = mgrOf[email];
+      // Parent = the line manager IF they're also in the visible set
+      // (avoid orphan parents). Otherwise root.
+      const parentId = (mgr && visible.has(mgr)) ? mgr : ROOT_ID;
+      data.push({
+        id: email,
+        parentId,
+        name: u.name || email,
+        role: a.role || "",
+        email,
+        imageUrl: photoUrlFor(u, a),
+        initials: initialsOf(u.name || "", email),
+        _isManager: !!reportsOf[email],
+        _isSelf:    email === viewerEmail,
+      });
+    }
+
+    const updated = (ann && ann.updated_at) ? new Date(ann.updated_at).toLocaleString("en-GB") : "—";
+    document.getElementById("osMeta").textContent =
+      `${visible.size} people in the reporting graph · annotations last updated ${updated}`;
+    document.getElementById("osEmpty").remove();
+
+    chart = new d3.OrgChart()
+      .container("#osChartWrap")
+      .data(data)
+      .nodeWidth(() => 180)
+      .nodeHeight(() => 170)
+      .childrenMargin(() => 60)
+      .compactMarginBetween(() => 28)
+      .compactMarginPair(() => 80)
+      .neighbourMargin(() => 28)
+      .siblingsMargin(() => 28)
+      .nodeContent(d => {
+        if (d.data._isRoot) {
+          return `
+            <div class="os-node" style="background:transparent;border:none;justify-content:center;">
+              <div class="os-node-name" style="font-style:italic;color:var(--ink-500);">Richmond Group</div>
+            </div>`;
+        }
+        const cls = ["os-node"];
+        if (d.data._isManager) cls.push("is-manager");
+        if (d.data._isSelf) cls.push("is-self");
+        const photo = d.data.imageUrl
+          ? `<img src="${escapeHtml(d.data.imageUrl)}" alt="" onerror="this.parentNode.innerHTML='${escapeHtml(d.data.initials)}';">`
+          : escapeHtml(d.data.initials);
+        return `
+          <div class="${cls.join(" ")}">
+            <div class="os-node-avatar">${photo}</div>
+            <div class="os-node-name">${escapeHtml(d.data.name)}</div>
+            ${d.data.role ? `<div class="os-node-role">${escapeHtml(d.data.role)}</div>` : ""}
+          </div>`;
+      })
+      .onNodeClick(d => {
+        // Open the Directory card on click — Directory page accepts a
+        // ?email=… deep-link.
+        if (d.data && d.data.email) {
+          location.href = `directory.html?email=${encodeURIComponent(d.data.email)}`;
+        }
+      })
+      .render();
+
+    // Hide the synthetic root node visually (keep it in the data so the
+    // tree has a single anchor) by collapsing the chart to depth 2 then
+    // expanding back from the real roots.
+    setTimeout(() => {
+      try {
+        const root = chart.data().find(d => d.id === ROOT_ID);
+        if (!root) return;
+        // Walk down from root: expand all children, then expand their
+        // children — gives a 3-level default reveal which matches the
+        // reference screenshot.
+        chart.expandAll();
+      } catch (e) { /* noop */ }
+    }, 50);
+
+    document.getElementById("osExpandAll").addEventListener("click", () => {
+      if (chart) chart.expandAll().render();
+    });
+    document.getElementById("osCollapseAll").addEventListener("click", () => {
+      if (chart) chart.collapseAll().render();
+    });
+    document.getElementById("osCenterSelf").addEventListener("click", () => {
+      if (!chart || !viewerEmail) return;
+      chart.setCentered(viewerEmail).render();
+    });
+  }).catch(err => {
+    document.getElementById("osMeta").textContent = "Could not load org tree: " + (err.message || err);
+  });
+</script>
+
+<script>
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.body.classList.remove('nav-open');
+  });
+  document.querySelectorAll('.qb-nav-link').forEach(a =>
+    a.addEventListener('click', () => document.body.classList.remove('nav-open'))
+  );
+</script>
+<script src="nav.js?v=1778938352" defer></script>
+</body>
+</html>

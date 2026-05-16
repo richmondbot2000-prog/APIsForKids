@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778924246">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778924246">
-<link rel="stylesheet" href="quiet.css?v=1778924246">
-<link rel="stylesheet" href="quiet-extras.css?v=1778924246">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778924246">
+<link rel="stylesheet" href="style.css?v=1778938352">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778938352">
+<link rel="stylesheet" href="quiet.css?v=1778938352">
+<link rel="stylesheet" href="quiet-extras.css?v=1778938352">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778938352">
 <style>
   .dir-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   @media (max-width: 800px) { .dir-section { padding: 2px 0 32px; } }
@@ -1171,7 +1171,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778924246" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778938352" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1183,11 +1183,14 @@
     <a class="qb-nav-link" href="yesterday.html">Payouts</a>
     <a class="qb-nav-link" href="holidays.html">Holidays</a>
     <a class="qb-nav-link" href="brandwatch.html">Brandwatch</a>
-    <a class="qb-nav-link is-active" href="directory.html">Directory</a>
+    <a class="qb-nav-link is-active" href="directory.html" data-sub='[{"href": "org-structure.html", "label": "Org Structure"}]'>Directory</a>
     <a class="qb-nav-link" href="reports.html" data-sub='[{"href": "1stcontact.html", "label": "1st Contact"}, {"href": "topups.html", "label": "Top Ups"}, {"href": "pipeline.html", "label": "Pipeline"}, {"href": "brokers.html", "label": "Brokers"}, {"href": "comms.html", "label": "Comms"}]'>Reports</a>
   </nav>
 </header>
 <div class="qb-nav-backdrop" onclick="document.body.classList.remove('nav-open')"></div>
+<nav class="qb-subnav" aria-label="Section sub-pages">
+  <a class="qb-subnav-link" href="org-structure.html">Org Structure</a>
+</nav>
 <main class="qb-page">
     <section class="dir-section">
       <h1>Directory</h1>
@@ -1543,6 +1546,17 @@
       renderHealth();
       document.getElementById("dirControls").hidden = allEntries.length === 0;
       renderGrid();
+      // ?email=<addr> deep-link — auto-opens the matching staff card.
+      // Used by the Org Structure page to jump from a node to the
+      // person's full Directory record.
+      try {
+        const qs = new URLSearchParams(location.search || "");
+        const deepEmail = (qs.get("email") || "").toLowerCase().trim();
+        if (deepEmail) {
+          const hit = allEntries.find(e => (e.type === "staff" && (e.user.email || "").toLowerCase() === deepEmail));
+          if (hit) openCard(entryKey(hit));
+        }
+      } catch (e) { /* noop */ }
 
       // Groups section
       allGroups = (groupsFile && Array.isArray(groupsFile.groups)) ? groupsFile.groups : [];
@@ -1938,7 +1952,7 @@
     const isDeleted = !!u.deletion_time;
     const tenantTag = (u.tenant || "").toLowerCase();
     const liveGws = !u.suspended && !isDeleted
-      ? `<img class="dir-gws-icon" data-tenant="${escapeHtml(tenantTag)}" src="assets/google-workspace-icon.svg?v=1778924246" alt="Google Workspace account active" title="Google Workspace${tenantTag === "togetherloans" ? " (Together Loans)" : ""} account active">`
+      ? `<img class="dir-gws-icon" data-tenant="${escapeHtml(tenantTag)}" src="assets/google-workspace-icon.svg?v=1778938352" alt="Google Workspace account active" title="Google Workspace${tenantTag === "togetherloans" ? " (Together Loans)" : ""} account active">`
       : "";
 
     // Visual states (most-severe-wins):
@@ -2184,6 +2198,9 @@
     if (opts && Object.prototype.hasOwnProperty.call(opts, "pending_conversion")) {
       payload.pending_conversion = opts.pending_conversion;
     }
+    if (opts && Object.prototype.hasOwnProperty.call(opts, "role")) {
+      payload.role = opts.role;
+    }
     const res = await fetch(ANNOTATIONS_API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -2262,9 +2279,11 @@
     const phoneInput = modal.querySelector('input[name="phone"]');
     const addressInput = modal.querySelector('textarea[name="address"]');
     const lineManagerInput = modal.querySelector('input[name="line_manager"]');
+    const roleInput = modal.querySelector('input[name="role"]');
     if (phoneInput) phoneInput.dataset.initialValue = phoneInput.value;
     if (addressInput) addressInput.dataset.initialValue = addressInput.value;
     if (lineManagerInput) lineManagerInput.dataset.initialValue = lineManagerInput.value;
+    if (roleInput) roleInput.dataset.initialValue = roleInput.value;
     modal.dataset.notesKey = key;
 
     // Reveal the input box below the value when the user clicks [Edit].
@@ -2297,17 +2316,21 @@
     const phoneInput = modal.querySelector('input[name="phone"]');
     const addressInput = modal.querySelector('textarea[name="address"]');
     const lineManagerInput = modal.querySelector('input[name="line_manager"]');
-    if (!phoneInput && !addressInput && !lineManagerInput) return;
+    const roleInput = modal.querySelector('input[name="role"]');
+    if (!phoneInput && !addressInput && !lineManagerInput && !roleInput) return;
     const phone = phoneInput ? (phoneInput.value || "").trim() : "";
     const address = addressInput ? (addressInput.value || "").trim() : "";
     const lineManager = lineManagerInput ? (lineManagerInput.value || "").trim().toLowerCase() : "";
+    const role = roleInput ? (roleInput.value || "").trim() : "";
     const phoneChanged = phoneInput && phone !== (phoneInput.dataset.initialValue || "").trim();
     const addressChanged = addressInput && address !== (addressInput.dataset.initialValue || "").trim();
     const lineManagerChanged = lineManagerInput && lineManager !== (lineManagerInput.dataset.initialValue || "").trim().toLowerCase();
-    if (!phoneChanged && !addressChanged && !lineManagerChanged) return;
+    const roleChanged = roleInput && role !== (roleInput.dataset.initialValue || "").trim();
+    if (!phoneChanged && !addressChanged && !lineManagerChanged && !roleChanged) return;
     const opts = {};
     if (addressChanged) opts.address = address;
     if (lineManagerChanged) opts.line_manager = lineManager;
+    if (roleChanged) opts.role = role;
     saveAnnotationRemote(key, phoneChanged ? phone : undefined, "", opts)
       .then(() => renderGrid())
       .catch(err => console.warn("annotation auto-save failed", err));
@@ -2595,7 +2618,7 @@
     ` : "";
 
     const liveGwsWordmark = (u && !u.suspended)
-      ? `<img class="dir-modal-gws-wordmark" data-tenant="${escapeHtml((u.tenant || "").toLowerCase())}" src="assets/google-workspace-wordmark.svg?v=1778924246" alt="Google Workspace${(u.tenant || "").toLowerCase() === "togetherloans" ? " (Together Loans)" : ""} account active">`
+      ? `<img class="dir-modal-gws-wordmark" data-tenant="${escapeHtml((u.tenant || "").toLowerCase())}" src="assets/google-workspace-wordmark.svg?v=1778938352" alt="Google Workspace${(u.tenant || "").toLowerCase() === "togetherloans" ? " (Together Loans)" : ""} account active">`
       : "";
     const suspendedBadge = (u && u.suspended)
       ? `<span class="dir-suspended-badge" title="This Workspace account is currently suspended — no email/Drive access, no billing on Flex plan">Workspace account suspended</span>`
@@ -2660,6 +2683,17 @@
                   ${lineManagerOptions(entry)}
                 </datalist>
                 <p class="dir-modal-saved-hint" style="text-align:left;margin:6px 0 0;">Pick a colleague from the list. This person can see + edit their direct reports' calendars on the Holidays page.</p>
+              </div>
+            </dd>
+            <dt>Role</dt>
+            <dd>
+              <span>${escapeHtml(ann.role || "") || "—"}</span>
+              <button type="button" class="dir-link-btn" data-edit-toggle="role" style="margin-left:8px;">Edit</button>
+              <div data-edit-input-wrap="role" hidden style="margin-top:6px;">
+                <input id="dirRole" name="role" type="text" maxlength="80"
+                       value="${escapeHtml(ann.role || "")}"
+                       placeholder="e.g. Communications Director">
+                <p class="dir-modal-saved-hint" style="text-align:left;margin:6px 0 0;">Free-text job title. Used as the node subtitle on the Org Structure page.</p>
               </div>
             </dd>
           </dl>
@@ -4483,7 +4517,7 @@
     return `
       <button class="dir-modal-close" type="button" data-close aria-label="Close">×</button>
       <div class="dir-modal-head">
-        <img class="dir-modal-gws-wordmark" src="assets/google-workspace-wordmark.svg?v=1778924246" alt="Google Workspace" style="height:28px;margin:0;">
+        <img class="dir-modal-gws-wordmark" src="assets/google-workspace-wordmark.svg?v=1778938352" alt="Google Workspace" style="height:28px;margin:0;">
         <div>
           <h2 class="dir-modal-name" id="dirModalName">Create new user</h2>
           <p class="dir-modal-title">Adds a Google Workspace account immediately.</p>
@@ -4631,6 +4665,6 @@
     a.addEventListener('click', () => document.body.classList.remove('nav-open'))
   );
 </script>
-<script src="nav.js?v=1778924246" defer></script>
+<script src="nav.js?v=1778938352" defer></script>
 </body>
 </html>

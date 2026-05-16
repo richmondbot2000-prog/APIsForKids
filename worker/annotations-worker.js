@@ -39,7 +39,7 @@ export default {
     let body;
     try { body = await req.json(); }
     catch { return json({ error: "invalid JSON body" }, 400, req); }
-    const { key, phone, start_date, address, payroll_match, forward_to, rename_decay, directory_photo_uploaded_at, line_manager, pending_conversion } = body || {};
+    const { key, phone, start_date, address, payroll_match, forward_to, rename_decay, directory_photo_uploaded_at, line_manager, pending_conversion, role } = body || {};
     if (!key || typeof key !== "string") {
       return json({ error: "missing 'key' (email or username)" }, 400, req);
     }
@@ -101,6 +101,10 @@ export default {
       setScalar("forward_to", forward_to);
       setScalar("directory_photo_uploaded_at", directory_photo_uploaded_at);
       setScalar("line_manager", (line_manager || "").toLowerCase());
+      // Free-text job role / title. Shown on the Org Structure node
+      // and editable from the Directory Edit Card. Free-text so we
+      // can avoid an enum + admin friction; 80-char cap.
+      setScalar("role", (role || "").slice(0, 80));
 
       if (has("payroll_match")) {
         const m = (payroll_match && typeof payroll_match === "object") ? payroll_match : null;
