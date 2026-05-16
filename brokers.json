@@ -1,11 +1,11 @@
 {
-  "snapshot_at": "2026-05-15T08:24:15.700637+00:00",
-  "snapshot_date": "2026-05-15",
+  "snapshot_at": "2026-05-16T00:14:09.010981+00:00",
+  "snapshot_date": "2026-05-16",
   "lender_id": 6,
   "lender_label": "Transform Credit (LenderId 6, USA)",
   "window_days": 90,
-  "window_start": "2026-02-14",
-  "window_end": "2026-05-15",
+  "window_start": "2026-02-15",
+  "window_end": "2026-05-16",
   "stages": [
     "leads_presented",
     "leads_purchased",
@@ -28,18 +28,18 @@
   },
   "totals": {
     "sources": 51,
-    "leads_presented": 117793985,
-    "leads_purchased": 4482502,
-    "applications": 2435072,
-    "apply1": 1668494,
-    "brw_signed": 1246469,
-    "gt_accepted": 382264,
-    "vc_ready": 10866,
-    "paid_out": 6010,
-    "paid_out_loan_total": 27568250.0,
-    "purchase_rate": 0.038053742727185945,
-    "lead_to_paid_rate": 5.102128092533757e-05,
-    "paid_out_rate": 0.0024680995058873004
+    "leads_presented": 118675872,
+    "leads_purchased": 4510000,
+    "applications": 2449246,
+    "apply1": 1678972,
+    "brw_signed": 1254687,
+    "gt_accepted": 384360,
+    "vc_ready": 10971,
+    "paid_out": 6103,
+    "paid_out_loan_total": 27970250.0,
+    "purchase_rate": 0.038002669995127566,
+    "lead_to_paid_rate": 5.142578602666598e-05,
+    "paid_out_rate": 0.0024917872684083182
   },
   "sources": [
     {
@@ -55,64 +55,64 @@
         441,
         440
       ],
-      "leads_presented": 20708059,
-      "leads_purchased": 348686,
-      "applications": 212267,
-      "apply1": 141053,
-      "brw_signed": 89482,
-      "gt_accepted": 23144,
-      "vc_ready": 744,
-      "paid_out": 502,
-      "paid_out_loan_total": 2311000.0,
-      "flag_declines": 36762,
-      "last_lead_at": "2026-05-15T08:22:40.091060",
-      "avg_loan_amount": 4199.843593210438,
-      "purchase_rate": 0.016838178797925967,
-      "app_rate": 0.6087626116333894,
-      "apply1_rate": 0.6645074363890761,
-      "brw_signed_rate": 0.4215539862531623,
-      "gt_accepted_rate": 0.10903249209721719,
-      "vc_ready_rate": 0.0035050196215144136,
-      "paid_out_rate": 0.002364946034946553,
-      "lead_to_paid_rate": 2.4241769834632982e-05,
+      "leads_presented": 20892142,
+      "leads_purchased": 350469,
+      "applications": 213377,
+      "apply1": 141984,
+      "brw_signed": 90044,
+      "gt_accepted": 23256,
+      "vc_ready": 752,
+      "paid_out": 517,
+      "paid_out_loan_total": 2375500.0,
+      "flag_declines": 36943,
+      "last_lead_at": "2026-05-16T00:10:50.143314",
+      "avg_loan_amount": 4201.022368858874,
+      "purchase_rate": 0.016775158813299277,
+      "app_rate": 0.6088327355629172,
+      "apply1_rate": 0.6654137981131987,
+      "brw_signed_rate": 0.42199487292444826,
+      "gt_accepted_rate": 0.10899019107026531,
+      "vc_ready_rate": 0.0035242786242191053,
+      "paid_out_rate": 0.0024229415541506347,
+      "lead_to_paid_rate": 2.474614618261737e-05,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 11394888
+          "count": 11456344
         },
         {
           "label": "Source excluded",
           "code": -1,
-          "count": 5325256
+          "count": 5416313
         },
         {
           "label": "Rejected for lead score",
           "code": 20,
-          "count": 1699148
+          "count": 1716220
         }
       ],
-      "flag_decline_rate": 0.10543010043420155,
+      "flag_decline_rate": 0.10541017893166015,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 20955
+          "count": 21079
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 7116
+          "count": 7176
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 3984
+          "count": 3983
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 1496
+          "count": 1506
         },
         {
           "flag_type": "Decline",
@@ -121,10 +121,10 @@
         }
       ],
       "declines_by_type": {
-        "Decline": 15330,
-        "DNL": 194,
-        "FraudRisk": 274,
-        "Cancelled": 20964
+        "Decline": 15405,
+        "FraudRisk": 264,
+        "DNL": 186,
+        "Cancelled": 21088
       }
     },
     {
@@ -143,76 +143,76 @@
         628,
         794
       ],
-      "leads_presented": 18265748,
-      "leads_purchased": 2179726,
-      "applications": 840217,
-      "apply1": 570216,
-      "brw_signed": 431819,
-      "gt_accepted": 135917,
-      "vc_ready": 3102,
-      "paid_out": 1588,
-      "paid_out_loan_total": 7127000.0,
-      "flag_declines": 124551,
-      "last_lead_at": "2026-05-15T08:22:39.397395",
-      "avg_loan_amount": 3854.0126538739396,
-      "purchase_rate": 0.11933406723885602,
-      "app_rate": 0.3854690910692445,
-      "apply1_rate": 0.6786532526716312,
-      "brw_signed_rate": 0.5139374709152517,
-      "gt_accepted_rate": 0.1617641633054318,
-      "vc_ready_rate": 0.0036919034011451803,
-      "paid_out_rate": 0.001889987943590763,
-      "lead_to_paid_rate": 8.69386788868433e-05,
+      "leads_presented": 18379007,
+      "leads_purchased": 2197571,
+      "applications": 847740,
+      "apply1": 575706,
+      "brw_signed": 436118,
+      "gt_accepted": 137180,
+      "vc_ready": 3129,
+      "paid_out": 1614,
+      "paid_out_loan_total": 7244500.0,
+      "flag_declines": 125748,
+      "last_lead_at": "2026-05-16T00:10:49.180718",
+      "avg_loan_amount": 3853.964599995282,
+      "purchase_rate": 0.11956962636773576,
+      "app_rate": 0.3857622802630723,
+      "apply1_rate": 0.6791068016137023,
+      "brw_signed_rate": 0.514447825984382,
+      "gt_accepted_rate": 0.16181848208177035,
+      "vc_ready_rate": 0.0036909901620779955,
+      "paid_out_rate": 0.0019038856253096469,
+      "lead_to_paid_rate": 8.781758448647416e-05,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 7169368
+          "count": 7220840
         },
         {
           "label": "Source excluded",
           "code": -1,
-          "count": 4882647
+          "count": 4889039
         },
         {
           "label": "Rejected with counteroffer",
           "code": 21,
-          "count": 2099403
+          "count": 2116329
         }
       ],
-      "flag_decline_rate": 0.05714066813902298,
+      "flag_decline_rate": 0.05722135940090218,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 62444
+          "count": 63051
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 29072
+          "count": 29347
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 13984
+          "count": 14077
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 6067
+          "count": 6123
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
-          "count": 2564
+          "count": 2592
         }
       ],
       "declines_by_type": {
-        "FraudRisk": 910,
-        "Decline": 60596,
-        "DNL": 580,
-        "Cancelled": 62465
+        "Decline": 61171,
+        "FraudRisk": 919,
+        "Cancelled": 63072,
+        "DNL": 586
       }
     },
     {
@@ -224,79 +224,79 @@
       "phone": "818-445-4888",
       "email": null,
       "campaign_ids": [
-        759,
-        786
+        786,
+        759
       ],
-      "leads_presented": 7962535,
-      "leads_purchased": 79873,
-      "applications": 73900,
-      "apply1": 51915,
-      "brw_signed": 39842,
-      "gt_accepted": 13268,
+      "leads_presented": 8048528,
+      "leads_purchased": 79910,
+      "applications": 73930,
+      "apply1": 51855,
+      "brw_signed": 39825,
+      "gt_accepted": 13244,
       "vc_ready": 392,
-      "paid_out": 140,
-      "paid_out_loan_total": 592500.0,
-      "flag_declines": 11963,
-      "last_lead_at": "2026-05-15T08:22:39.418677",
-      "avg_loan_amount": 3686.102841677943,
-      "purchase_rate": 0.01003110190410466,
-      "app_rate": 0.9252187848209031,
-      "apply1_rate": 0.7025033829499323,
-      "brw_signed_rate": 0.5391339648173207,
-      "gt_accepted_rate": 0.17953991880920162,
-      "vc_ready_rate": 0.0053044654939106905,
-      "paid_out_rate": 0.0018944519621109607,
-      "lead_to_paid_rate": 1.7582340297405288e-05,
+      "paid_out": 141,
+      "paid_out_loan_total": 599500.0,
+      "flag_declines": 11997,
+      "last_lead_at": "2026-05-16T00:10:48.941198",
+      "avg_loan_amount": 3688.8678479642904,
+      "purchase_rate": 0.009928523575988056,
+      "app_rate": 0.9251658115379803,
+      "apply1_rate": 0.7014067361017179,
+      "brw_signed_rate": 0.5386852427972406,
+      "gt_accepted_rate": 0.17914243203029892,
+      "vc_ready_rate": 0.005302312998782632,
+      "paid_out_rate": 0.001907209522521304,
+      "lead_to_paid_rate": 1.751873137547636e-05,
       "top_rejections": [
         {
           "label": "Source excluded",
           "code": -1,
-          "count": 2779512
+          "count": 2832335
         },
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 2410760
+          "count": 2414033
         },
         {
           "label": "Rejected with counteroffer",
           "code": 21,
-          "count": 2109116
+          "count": 2121449
         }
       ],
-      "flag_decline_rate": 0.14977526823832835,
+      "flag_decline_rate": 0.15013139782255036,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 5359
+          "count": 5379
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 2828
+          "count": 2824
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 1858
+          "count": 1859
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 641
+          "count": 646
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
-          "count": 232
+          "count": 234
         }
       ],
       "declines_by_type": {
-        "Decline": 6367,
-        "FraudRisk": 138,
-        "Cancelled": 5361,
-        "DNL": 97
+        "Decline": 6377,
+        "FraudRisk": 140,
+        "Cancelled": 5381,
+        "DNL": 99
       }
     },
     {
@@ -308,81 +308,81 @@
       "phone": "818.844.3900",
       "email": "david.z@dot818.com",
       "campaign_ids": [
-        758,
         798,
         702,
-        728
+        728,
+        758
       ],
-      "leads_presented": 7756793,
-      "leads_purchased": 323745,
-      "applications": 247001,
-      "apply1": 169263,
-      "brw_signed": 130948,
-      "gt_accepted": 41108,
-      "vc_ready": 726,
-      "paid_out": 374,
-      "paid_out_loan_total": 1505500.0,
-      "flag_declines": 34008,
-      "last_lead_at": "2026-05-15T08:22:37.734102",
-      "avg_loan_amount": 3345.7277500900805,
-      "purchase_rate": 0.04173696526386614,
-      "app_rate": 0.762949234737216,
-      "apply1_rate": 0.6852725292610151,
-      "brw_signed_rate": 0.5301516997906891,
-      "gt_accepted_rate": 0.1664284759980729,
-      "vc_ready_rate": 0.0029392593552252824,
-      "paid_out_rate": 0.0015141639102675697,
-      "lead_to_paid_rate": 4.8215802587486865e-05,
+      "leads_presented": 7755706,
+      "leads_purchased": 323128,
+      "applications": 246387,
+      "apply1": 168986,
+      "brw_signed": 130793,
+      "gt_accepted": 40971,
+      "vc_ready": 729,
+      "paid_out": 372,
+      "paid_out_loan_total": 1510000.0,
+      "flag_declines": 33989,
+      "last_lead_at": "2026-05-16T00:10:50.166444",
+      "avg_loan_amount": 3346.3610093064976,
+      "purchase_rate": 0.04166326057228059,
+      "app_rate": 0.7625058800227773,
+      "apply1_rate": 0.6858559907787343,
+      "brw_signed_rate": 0.5308437539318227,
+      "gt_accepted_rate": 0.1662871823594589,
+      "vc_ready_rate": 0.002958759999512961,
+      "paid_out_rate": 0.0015098199174469432,
+      "lead_to_paid_rate": 4.796468561340515e-05,
       "top_rejections": [
         {
           "label": "Source excluded",
           "code": -1,
-          "count": 3781762
+          "count": 3776726
         },
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 2315749
+          "count": 2311055
         },
         {
           "label": "Rejected with counteroffer",
           "code": 21,
-          "count": 1075083
+          "count": 1083809
         }
       ],
-      "flag_decline_rate": 0.10504563777046749,
+      "flag_decline_rate": 0.105187417989156,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 17954
+          "count": 17912
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 7930
+          "count": 7924
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 3453
+          "count": 3455
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 1541
+          "count": 1546
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
-          "count": 644
+          "count": 649
         }
       ],
       "declines_by_type": {
-        "Decline": 15704,
-        "FraudRisk": 212,
-        "DNL": 133,
-        "Cancelled": 17959
+        "Decline": 15727,
+        "FraudRisk": 214,
+        "DNL": 131,
+        "Cancelled": 17917
       }
     },
     {
@@ -394,81 +394,81 @@
       "phone": "n/a",
       "email": "olga@leadsgate.com",
       "campaign_ids": [
-        518,
         519,
         517,
-        639
+        639,
+        518
       ],
-      "leads_presented": 6788831,
-      "leads_purchased": 203988,
-      "applications": 134978,
-      "apply1": 94230,
-      "brw_signed": 65843,
-      "gt_accepted": 20535,
-      "vc_ready": 437,
-      "paid_out": 236,
-      "paid_out_loan_total": 1058500.0,
-      "flag_declines": 20266,
-      "last_lead_at": "2026-05-15T08:22:35.781249",
-      "avg_loan_amount": 4255.64166012239,
-      "purchase_rate": 0.030047588458160177,
-      "app_rate": 0.661695786026629,
-      "apply1_rate": 0.6981137666879047,
-      "brw_signed_rate": 0.48780542014254175,
-      "gt_accepted_rate": 0.1521359036287395,
-      "vc_ready_rate": 0.0032375646401635824,
-      "paid_out_rate": 0.0017484330779830787,
-      "lead_to_paid_rate": 3.4762980548492076e-05,
+      "leads_presented": 6841029,
+      "leads_purchased": 204064,
+      "applications": 135029,
+      "apply1": 94260,
+      "brw_signed": 65902,
+      "gt_accepted": 20506,
+      "vc_ready": 443,
+      "paid_out": 237,
+      "paid_out_loan_total": 1066750.0,
+      "flag_declines": 20274,
+      "last_lead_at": "2026-05-16T00:10:48.398263",
+      "avg_loan_amount": 4258.3574639521885,
+      "purchase_rate": 0.029829430630976716,
+      "app_rate": 0.6616992708169986,
+      "apply1_rate": 0.6980722659576831,
+      "brw_signed_rate": 0.4880581208481141,
+      "gt_accepted_rate": 0.15186367372934703,
+      "vc_ready_rate": 0.0032807767220374884,
+      "paid_out_rate": 0.0017551785172074147,
+      "lead_to_paid_rate": 3.4643911025665876e-05,
       "top_rejections": [
         {
           "label": "Source excluded",
           "code": -1,
-          "count": 3552227
+          "count": 3591738
         },
         {
           "label": "Throttled",
           "code": 4,
-          "count": 1141474
+          "count": 1167885
         },
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 1012572
+          "count": 999049
         }
       ],
-      "flag_decline_rate": 0.09934898131262623,
+      "flag_decline_rate": 0.09935118394229261,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 11960
+          "count": 11964
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 4105
+          "count": 4128
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 1727
+          "count": 1714
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 831
+          "count": 829
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Bad combination All",
-          "count": 317
+          "count": 315
         }
       ],
       "declines_by_type": {
-        "Decline": 8137,
-        "DNL": 66,
-        "FraudRisk": 101,
-        "Cancelled": 11962
+        "Decline": 8146,
+        "FraudRisk": 99,
+        "DNL": 63,
+        "Cancelled": 11966
       }
     },
     {
@@ -480,53 +480,53 @@
       "phone": "07590554474",
       "email": "iain.williams@quickcarfinance.co.uk",
       "campaign_ids": [
+        684,
         682,
-        683,
-        684
+        683
       ],
-      "leads_presented": 6613220,
-      "leads_purchased": 1038,
-      "applications": 731,
-      "apply1": 251,
-      "brw_signed": 169,
-      "gt_accepted": 45,
+      "leads_presented": 6633961,
+      "leads_purchased": 1007,
+      "applications": 711,
+      "apply1": 240,
+      "brw_signed": 159,
+      "gt_accepted": 40,
       "vc_ready": 2,
       "paid_out": 1,
       "paid_out_loan_total": 7000.0,
-      "flag_declines": 95,
-      "last_lead_at": "2026-05-15T08:22:28.497269",
-      "avg_loan_amount": 3533.857729138167,
-      "purchase_rate": 0.00015695833497146624,
-      "app_rate": 0.7042389210019268,
-      "apply1_rate": 0.3433652530779754,
-      "brw_signed_rate": 0.23119015047879618,
-      "gt_accepted_rate": 0.06155950752393981,
-      "vc_ready_rate": 0.0027359781121751026,
-      "paid_out_rate": 0.0013679890560875513,
-      "lead_to_paid_rate": 1.51212268758638e-07,
+      "flag_declines": 91,
+      "last_lead_at": "2026-05-16T00:10:46.952178",
+      "avg_loan_amount": 3536.2165963431785,
+      "purchase_rate": 0.0001517946819403973,
+      "app_rate": 0.7060575968222443,
+      "apply1_rate": 0.33755274261603374,
+      "brw_signed_rate": 0.22362869198312235,
+      "gt_accepted_rate": 0.05625879043600562,
+      "vc_ready_rate": 0.0028129395218002813,
+      "paid_out_rate": 0.0014064697609001407,
+      "lead_to_paid_rate": 1.5073950540257924e-07,
       "top_rejections": [
         {
           "label": "Throttled",
           "code": 4,
-          "count": 4347148
+          "count": 4327641
         },
         {
           "label": "Source excluded",
           "code": -1,
-          "count": 2159102
+          "count": 2203546
         },
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 43485
+          "count": 41087
         }
       ],
-      "flag_decline_rate": 0.09152215799614644,
+      "flag_decline_rate": 0.0903674280039722,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 41
+          "count": 39
         },
         {
           "flag_type": "Decline",
@@ -536,7 +536,7 @@
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 16
+          "count": 15
         },
         {
           "flag_type": "Decline",
@@ -546,12 +546,12 @@
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 6
+          "count": 5
         }
       ],
       "declines_by_type": {
-        "Decline": 54,
-        "Cancelled": 41
+        "Decline": 52,
+        "Cancelled": 39
       }
     },
     {
@@ -566,76 +566,76 @@
         771,
         772
       ],
-      "leads_presented": 6397452,
-      "leads_purchased": 20843,
-      "applications": 18590,
-      "apply1": 13632,
-      "brw_signed": 10748,
-      "gt_accepted": 3626,
-      "vc_ready": 133,
-      "paid_out": 43,
-      "paid_out_loan_total": 192500.0,
-      "flag_declines": 3469,
-      "last_lead_at": "2026-05-15T08:22:36.695789",
-      "avg_loan_amount": 3822.256589564282,
-      "purchase_rate": 0.0032580158475593096,
-      "app_rate": 0.8919061555438277,
-      "apply1_rate": 0.7332974717590102,
-      "brw_signed_rate": 0.5781603012372243,
-      "gt_accepted_rate": 0.19505110274341045,
-      "vc_ready_rate": 0.007154384077461001,
-      "paid_out_rate": 0.002313071543840775,
-      "lead_to_paid_rate": 6.721425967713396e-06,
+      "leads_presented": 6507057,
+      "leads_purchased": 21297,
+      "applications": 18949,
+      "apply1": 13910,
+      "brw_signed": 10973,
+      "gt_accepted": 3705,
+      "vc_ready": 136,
+      "paid_out": 44,
+      "paid_out_loan_total": 197500.0,
+      "flag_declines": 3563,
+      "last_lead_at": "2026-05-16T00:10:50.241868",
+      "avg_loan_amount": 3816.9692332049185,
+      "purchase_rate": 0.003272908167240582,
+      "app_rate": 0.8897497300089214,
+      "apply1_rate": 0.7340756768167186,
+      "brw_signed_rate": 0.5790806902738931,
+      "gt_accepted_rate": 0.19552482980632224,
+      "vc_ready_rate": 0.0071771597445775505,
+      "paid_out_rate": 0.0023220222703045014,
+      "lead_to_paid_rate": 6.761889437882594e-06,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 2863801
+          "count": 2922455
         },
         {
           "label": "Source excluded",
           "code": -1,
-          "count": 2792674
+          "count": 2827019
         },
         {
           "label": "Rejected with counteroffer",
           "code": 21,
-          "count": 447293
+          "count": 457924
         }
       ],
-      "flag_decline_rate": 0.16643477426474115,
+      "flag_decline_rate": 0.16730055876414518,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 1411
+          "count": 1446
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 884
+          "count": 907
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 532
+          "count": 549
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 188
+          "count": 195
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
-          "count": 75
+          "count": 78
         }
       ],
       "declines_by_type": {
-        "Cancelled": 1412,
-        "Decline": 1991,
-        "FraudRisk": 43,
-        "DNL": 23
+        "Decline": 2046,
+        "FraudRisk": 45,
+        "DNL": 25,
+        "Cancelled": 1447
       }
     },
     {
@@ -652,76 +652,76 @@
         768,
         779
       ],
-      "leads_presented": 6238373,
-      "leads_purchased": 126096,
-      "applications": 77946,
-      "apply1": 53713,
-      "brw_signed": 41357,
-      "gt_accepted": 10895,
-      "vc_ready": 336,
-      "paid_out": 202,
-      "paid_out_loan_total": 860000.0,
-      "flag_declines": 14026,
-      "last_lead_at": "2026-05-15T08:22:37.053908",
-      "avg_loan_amount": 3406.525030149078,
-      "purchase_rate": 0.020212962578544116,
-      "app_rate": 0.6181480776551199,
-      "apply1_rate": 0.6891052780129834,
-      "brw_signed_rate": 0.5305852769866317,
-      "gt_accepted_rate": 0.13977625535627228,
-      "vc_ready_rate": 0.004310676622276961,
-      "paid_out_rate": 0.0025915377312498394,
-      "lead_to_paid_rate": 3.2380237603618765e-05,
+      "leads_presented": 6274051,
+      "leads_purchased": 125173,
+      "applications": 77265,
+      "apply1": 53175,
+      "brw_signed": 40945,
+      "gt_accepted": 10760,
+      "vc_ready": 342,
+      "paid_out": 210,
+      "paid_out_loan_total": 886500.0,
+      "flag_declines": 13919,
+      "last_lead_at": "2026-05-16T00:10:48.742601",
+      "avg_loan_amount": 3404.5072154274253,
+      "purchase_rate": 0.019950905722634388,
+      "app_rate": 0.6172657042652968,
+      "apply1_rate": 0.6882158804115706,
+      "brw_signed_rate": 0.5299294635345888,
+      "gt_accepted_rate": 0.1392609849220216,
+      "vc_ready_rate": 0.004426324985439721,
+      "paid_out_rate": 0.0027179188507086,
+      "lead_to_paid_rate": 3.3471197476717994e-05,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 3959038
+          "count": 3981861
         },
         {
           "label": "Rejected with counteroffer",
           "code": 21,
-          "count": 1202824
+          "count": 1211866
         },
         {
           "label": "Rejected for lead score",
           "code": 20,
-          "count": 319113
+          "count": 322768
         }
       ],
-      "flag_decline_rate": 0.11123271158482426,
+      "flag_decline_rate": 0.11119810182707134,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 7425
+          "count": 7364
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 3061
+          "count": 3051
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 1612
+          "count": 1592
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 584
+          "count": 575
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
-          "count": 237
+          "count": 239
         }
       ],
       "declines_by_type": {
-        "Decline": 6388,
-        "DNL": 91,
-        "Cancelled": 7430,
-        "FraudRisk": 117
+        "Decline": 6354,
+        "FraudRisk": 111,
+        "Cancelled": 7369,
+        "DNL": 85
       }
     },
     {
@@ -736,59 +736,59 @@
         640,
         317
       ],
-      "leads_presented": 5199158,
-      "leads_purchased": 93548,
-      "applications": 62978,
-      "apply1": 40922,
-      "brw_signed": 30168,
-      "gt_accepted": 8613,
-      "vc_ready": 280,
-      "paid_out": 139,
-      "paid_out_loan_total": 552000.0,
-      "flag_declines": 9772,
-      "last_lead_at": "2026-05-15T08:22:40.282192",
-      "avg_loan_amount": 3225.253263044238,
-      "purchase_rate": 0.017992913467911535,
-      "app_rate": 0.6732158891691966,
-      "apply1_rate": 0.6497824637174886,
-      "brw_signed_rate": 0.47902442122646005,
-      "gt_accepted_rate": 0.13676204388834196,
-      "vc_ready_rate": 0.004445997014830576,
-      "paid_out_rate": 0.002207119946648036,
-      "lead_to_paid_rate": 2.6735098260141354e-05,
+      "leads_presented": 5210886,
+      "leads_purchased": 95194,
+      "applications": 64314,
+      "apply1": 41685,
+      "brw_signed": 30744,
+      "gt_accepted": 8755,
+      "vc_ready": 283,
+      "paid_out": 141,
+      "paid_out_loan_total": 558000.0,
+      "flag_declines": 9922,
+      "last_lead_at": "2026-05-16T00:10:50.140459",
+      "avg_loan_amount": 3222.2844170787075,
+      "purchase_rate": 0.018268294489651088,
+      "app_rate": 0.6756098073407988,
+      "apply1_rate": 0.6481481481481481,
+      "brw_signed_rate": 0.47802966694654353,
+      "gt_accepted_rate": 0.13612899213235066,
+      "vc_ready_rate": 0.004400286096339833,
+      "paid_out_rate": 0.0021923686911092454,
+      "lead_to_paid_rate": 2.7058738187709345e-05,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 1992241
+          "count": 1995666
         },
         {
           "label": "Source excluded",
           "code": -1,
-          "count": 1480647
+          "count": 1477067
         },
         {
           "label": "Rejected with counteroffer",
           "code": 21,
-          "count": 1354459
+          "count": 1363125
         }
       ],
-      "flag_decline_rate": 0.10445974259203832,
+      "flag_decline_rate": 0.10422925814652184,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 5302
+          "count": 5409
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 2151
+          "count": 2182
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 1012
+          "count": 1021
         },
         {
           "flag_type": "Decline",
@@ -798,14 +798,14 @@
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Bad combination All",
-          "count": 157
+          "count": 159
         }
       ],
       "declines_by_type": {
-        "Decline": 4364,
-        "FraudRisk": 64,
-        "Cancelled": 5305,
-        "DNL": 39
+        "Decline": 4408,
+        "FraudRisk": 63,
+        "DNL": 39,
+        "Cancelled": 5412
       }
     },
     {
@@ -821,76 +821,76 @@
         707,
         566
       ],
-      "leads_presented": 4807480,
-      "leads_purchased": 65230,
-      "applications": 46618,
-      "apply1": 29238,
-      "brw_signed": 20971,
-      "gt_accepted": 5218,
-      "vc_ready": 138,
-      "paid_out": 86,
-      "paid_out_loan_total": 281750.0,
-      "flag_declines": 8386,
-      "last_lead_at": "2026-05-15T08:22:36.735330",
-      "avg_loan_amount": 3129.6226779355616,
-      "purchase_rate": 0.01356843918227429,
-      "app_rate": 0.7146711635750421,
-      "apply1_rate": 0.6271826333176026,
-      "brw_signed_rate": 0.449847698313956,
-      "gt_accepted_rate": 0.11193101377150456,
-      "vc_ready_rate": 0.002960229954094985,
-      "paid_out_rate": 0.0018447809858852804,
-      "lead_to_paid_rate": 1.788878996896503e-05,
+      "leads_presented": 4854030,
+      "leads_purchased": 65302,
+      "applications": 46594,
+      "apply1": 29234,
+      "brw_signed": 20979,
+      "gt_accepted": 5211,
+      "vc_ready": 140,
+      "paid_out": 89,
+      "paid_out_loan_total": 290750.0,
+      "flag_declines": 8397,
+      "last_lead_at": "2026-05-16T00:10:47.899188",
+      "avg_loan_amount": 3129.313860153668,
+      "purchase_rate": 0.013453151299023698,
+      "app_rate": 0.7135156656763958,
+      "apply1_rate": 0.6274198394643087,
+      "brw_signed_rate": 0.45025110529252693,
+      "gt_accepted_rate": 0.11183843413315019,
+      "vc_ready_rate": 0.00300467871399751,
+      "paid_out_rate": 0.001910117182469846,
+      "lead_to_paid_rate": 1.8335280169261417e-05,
       "top_rejections": [
         {
           "label": "Source excluded",
           "code": -1,
-          "count": 3552022
+          "count": 3596348
         },
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 482217
+          "count": 481977
         },
         {
           "label": "Rejected with counteroffer",
           "code": 21,
-          "count": 320388
+          "count": 321742
         }
       ],
-      "flag_decline_rate": 0.1285604783075272,
+      "flag_decline_rate": 0.12858717956571009,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 4660
+          "count": 4649
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 1874
+          "count": 1885
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 779
+          "count": 782
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 385
+          "count": 391
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
-          "count": 163
+          "count": 165
         }
       ],
       "declines_by_type": {
-        "FraudRisk": 46,
-        "Decline": 3645,
-        "Cancelled": 4661,
-        "DNL": 34
+        "Decline": 3668,
+        "DNL": 34,
+        "FraudRisk": 45,
+        "Cancelled": 4650
       }
     },
     {
@@ -904,59 +904,59 @@
       "campaign_ids": [
         692
       ],
-      "leads_presented": 3631705,
-      "leads_purchased": 22264,
-      "applications": 15165,
-      "apply1": 9442,
-      "brw_signed": 7217,
-      "gt_accepted": 2005,
-      "vc_ready": 70,
-      "paid_out": 29,
-      "paid_out_loan_total": 133250.0,
-      "flag_declines": 2393,
-      "last_lead_at": "2026-05-15T08:22:38.731513",
-      "avg_loan_amount": 3307.517309594461,
-      "purchase_rate": 0.006130453877724099,
-      "app_rate": 0.6811444484369386,
-      "apply1_rate": 0.6226178700956149,
-      "brw_signed_rate": 0.47589845037916256,
-      "gt_accepted_rate": 0.1322123310253874,
-      "vc_ready_rate": 0.004615891856247939,
-      "paid_out_rate": 0.0019122980547312892,
-      "lead_to_paid_rate": 7.985230077883529e-06,
+      "leads_presented": 3665300,
+      "leads_purchased": 22040,
+      "applications": 14959,
+      "apply1": 9306,
+      "brw_signed": 7108,
+      "gt_accepted": 1969,
+      "vc_ready": 74,
+      "paid_out": 32,
+      "paid_out_loan_total": 144500.0,
+      "flag_declines": 2373,
+      "last_lead_at": "2026-05-16T00:10:49.963622",
+      "avg_loan_amount": 3310.6825322548298,
+      "purchase_rate": 0.006013150356041798,
+      "app_rate": 0.6787205081669692,
+      "apply1_rate": 0.6221004077812688,
+      "brw_signed_rate": 0.47516545223611206,
+      "gt_accepted_rate": 0.1316264456180226,
+      "vc_ready_rate": 0.004946854736279163,
+      "paid_out_rate": 0.0021391804264990974,
+      "lead_to_paid_rate": 8.730526832728563e-06,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 2437959
+          "count": 2463189
         },
         {
           "label": "Rejected with counteroffer",
           "code": 21,
-          "count": 653144
+          "count": 660372
         },
         {
           "label": "Source excluded",
           "code": -1,
-          "count": 296946
+          "count": 295797
         }
       ],
-      "flag_decline_rate": 0.10748293208767518,
+      "flag_decline_rate": 0.10766787658802178,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 1253
+          "count": 1238
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 538
+          "count": 537
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 292
+          "count": 286
         },
         {
           "flag_type": "Decline",
@@ -966,13 +966,13 @@
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
-          "count": 46
+          "count": 48
         }
       ],
       "declines_by_type": {
-        "Decline": 1109,
+        "Decline": 1104,
+        "Cancelled": 1239,
         "FraudRisk": 19,
-        "Cancelled": 1254,
         "DNL": 11
       }
     },
@@ -985,78 +985,78 @@
       "phone": "855-552-2929",
       "email": "jessica@marketbullet.com",
       "campaign_ids": [
-        445,
-        446
+        446,
+        445
       ],
-      "leads_presented": 3612899,
-      "leads_purchased": 71951,
-      "applications": 48065,
-      "apply1": 31216,
-      "brw_signed": 23867,
-      "gt_accepted": 6749,
+      "leads_presented": 3623915,
+      "leads_purchased": 71471,
+      "applications": 47912,
+      "apply1": 30978,
+      "brw_signed": 23686,
+      "gt_accepted": 6668,
       "vc_ready": 316,
-      "paid_out": 158,
-      "paid_out_loan_total": 635000.0,
-      "flag_declines": 8292,
-      "last_lead_at": "2026-05-15T08:22:25.697490",
-      "avg_loan_amount": 3407.973577447207,
-      "purchase_rate": 0.019915032222046616,
-      "app_rate": 0.6680240719378466,
-      "apply1_rate": 0.6494538645584105,
-      "brw_signed_rate": 0.49655674607302613,
-      "gt_accepted_rate": 0.14041402267762404,
-      "vc_ready_rate": 0.006574430458753771,
-      "paid_out_rate": 0.0032872152293768856,
-      "lead_to_paid_rate": 4.3732194008191206e-05,
+      "paid_out": 166,
+      "paid_out_loan_total": 660000.0,
+      "flag_declines": 8270,
+      "last_lead_at": "2026-05-15T20:20:52.028842",
+      "avg_loan_amount": 3408.738938053097,
+      "purchase_rate": 0.01972204094190951,
+      "app_rate": 0.6703698003385988,
+      "apply1_rate": 0.6465603606612123,
+      "brw_signed_rate": 0.4943646685590249,
+      "gt_accepted_rate": 0.13917181499415596,
+      "vc_ready_rate": 0.006595424945733845,
+      "paid_out_rate": 0.0034646852563032225,
+      "lead_to_paid_rate": 4.580681390154019e-05,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 2310799
+          "count": 2314015
         },
         {
           "label": "Rejected for lead score",
           "code": 20,
-          "count": 1063330
+          "count": 1073772
         },
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 89411
+          "count": 89607
         }
       ],
-      "flag_decline_rate": 0.11524509735792414,
+      "flag_decline_rate": 0.11571126750710078,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 4625
+          "count": 4616
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 1779
+          "count": 1777
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 774
+          "count": 767
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 314
+          "count": 319
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Bad combination All",
-          "count": 160
+          "count": 161
         }
       ],
       "declines_by_type": {
-        "Decline": 3582,
-        "Cancelled": 4627,
         "FraudRisk": 52,
+        "Decline": 3569,
+        "Cancelled": 4618,
         "DNL": 31
       }
     },
@@ -1072,76 +1072,76 @@
         780,
         647
       ],
-      "leads_presented": 3100830,
-      "leads_purchased": 97673,
-      "applications": 49377,
-      "apply1": 34624,
-      "brw_signed": 26882,
-      "gt_accepted": 7895,
-      "vc_ready": 265,
-      "paid_out": 160,
-      "paid_out_loan_total": 787250.0,
-      "flag_declines": 8827,
-      "last_lead_at": "2026-05-15T08:22:37.319384",
-      "avg_loan_amount": 4508.986977742675,
-      "purchase_rate": 0.03149898575542677,
-      "app_rate": 0.5055337708476242,
-      "apply1_rate": 0.7012171658869514,
-      "brw_signed_rate": 0.5444235170220953,
-      "gt_accepted_rate": 0.15989225752880895,
-      "vc_ready_rate": 0.005366871215343176,
-      "paid_out_rate": 0.0032403750734147476,
-      "lead_to_paid_rate": 5.1599087986119846e-05,
+      "leads_presented": 3110754,
+      "leads_purchased": 98613,
+      "applications": 49711,
+      "apply1": 34927,
+      "brw_signed": 27144,
+      "gt_accepted": 7956,
+      "vc_ready": 270,
+      "paid_out": 164,
+      "paid_out_loan_total": 801750.0,
+      "flag_declines": 8892,
+      "last_lead_at": "2026-05-16T00:10:49.725756",
+      "avg_loan_amount": 4508.810927158979,
+      "purchase_rate": 0.0317006744988514,
+      "app_rate": 0.5041018932595094,
+      "apply1_rate": 0.7026010339763835,
+      "brw_signed_rate": 0.5460360885920621,
+      "gt_accepted_rate": 0.1600450604493975,
+      "vc_ready_rate": 0.005431393454165074,
+      "paid_out_rate": 0.003299068616603971,
+      "lead_to_paid_rate": 5.2720337255855015e-05,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 1443654
+          "count": 1441426
         },
         {
           "label": "Rejected with counteroffer",
           "code": 21,
-          "count": 777518
+          "count": 782253
         },
         {
           "label": "Source excluded",
           "code": -1,
-          "count": 623122
+          "count": 629457
         }
       ],
-      "flag_decline_rate": 0.09037297922660305,
+      "flag_decline_rate": 0.09017066715341791,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 4467
+          "count": 4509
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 2044
+          "count": 2054
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 992
+          "count": 1000
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 430
+          "count": 433
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
-          "count": 160
+          "count": 159
         }
       ],
       "declines_by_type": {
-        "DNL": 49,
-        "Decline": 4240,
+        "Decline": 4262,
+        "Cancelled": 4510,
         "FraudRisk": 70,
-        "Cancelled": 4468
+        "DNL": 50
       }
     },
     {
@@ -1156,76 +1156,76 @@
         621,
         439
       ],
-      "leads_presented": 2968095,
-      "leads_purchased": 209142,
-      "applications": 147087,
-      "apply1": 97416,
-      "brw_signed": 71338,
-      "gt_accepted": 20296,
-      "vc_ready": 598,
-      "paid_out": 284,
-      "paid_out_loan_total": 1187500.0,
-      "flag_declines": 22822,
-      "last_lead_at": "2026-05-15T07:01:01.192850",
-      "avg_loan_amount": 3709.064023333129,
-      "purchase_rate": 0.07046337802529906,
-      "app_rate": 0.7032877183922885,
-      "apply1_rate": 0.6623019029553937,
-      "brw_signed_rate": 0.4850054729513825,
-      "gt_accepted_rate": 0.1379863618130766,
-      "vc_ready_rate": 0.004065621027011225,
-      "paid_out_rate": 0.0019308300529618525,
-      "lead_to_paid_rate": 9.568426886605719e-05,
+      "leads_presented": 2998160,
+      "leads_purchased": 211358,
+      "applications": 148609,
+      "apply1": 98373,
+      "brw_signed": 72070,
+      "gt_accepted": 20467,
+      "vc_ready": 611,
+      "paid_out": 292,
+      "paid_out_loan_total": 1226000.0,
+      "flag_declines": 23109,
+      "last_lead_at": "2026-05-16T00:10:45.905205",
+      "avg_loan_amount": 3700.9474527114776,
+      "purchase_rate": 0.07049590415454812,
+      "app_rate": 0.7031150938218568,
+      "apply1_rate": 0.6619585624020079,
+      "brw_signed_rate": 0.48496389855257754,
+      "gt_accepted_rate": 0.1377238256094853,
+      "vc_ready_rate": 0.0041114602749497,
+      "paid_out_rate": 0.0019648877255078762,
+      "lead_to_paid_rate": 9.739306774821891e-05,
       "top_rejections": [
         {
           "label": "Rejected with counteroffer",
           "code": 21,
-          "count": 1637505
+          "count": 1657921
         },
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 992866
+          "count": 998801
         },
         {
           "label": "Rejected for lead score",
           "code": 20,
-          "count": 53861
+          "count": 54954
         }
       ],
-      "flag_decline_rate": 0.10912203192089585,
+      "flag_decline_rate": 0.10933581884764239,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 12264
+          "count": 12441
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 5031
+          "count": 5097
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 2469
+          "count": 2481
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 1007
+          "count": 1020
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
-          "count": 414
+          "count": 419
         }
       ],
       "declines_by_type": {
-        "Decline": 10320,
-        "FraudRisk": 143,
-        "Cancelled": 12267,
-        "DNL": 92
+        "Decline": 10429,
+        "DNL": 92,
+        "FraudRisk": 144,
+        "Cancelled": 12444
       }
     },
     {
@@ -1240,76 +1240,76 @@
         785,
         796
       ],
-      "leads_presented": 2575052,
-      "leads_purchased": 31683,
-      "applications": 30150,
-      "apply1": 20976,
-      "brw_signed": 16110,
-      "gt_accepted": 5264,
-      "vc_ready": 199,
-      "paid_out": 75,
-      "paid_out_loan_total": 325000.0,
-      "flag_declines": 4482,
-      "last_lead_at": "2026-05-15T08:22:26.084948",
-      "avg_loan_amount": 3517.5621890547263,
-      "purchase_rate": 0.01230382920422578,
-      "app_rate": 0.9516144304516617,
-      "apply1_rate": 0.6957213930348258,
-      "brw_signed_rate": 0.5343283582089552,
-      "gt_accepted_rate": 0.17459369817578774,
-      "vc_ready_rate": 0.0066003316749585405,
-      "paid_out_rate": 0.0024875621890547263,
-      "lead_to_paid_rate": 2.912562542426328e-05,
+      "leads_presented": 2667565,
+      "leads_purchased": 32058,
+      "applications": 30493,
+      "apply1": 21224,
+      "brw_signed": 16306,
+      "gt_accepted": 5339,
+      "vc_ready": 200,
+      "paid_out": 77,
+      "paid_out_loan_total": 334000.0,
+      "flag_declines": 4548,
+      "last_lead_at": "2026-05-16T00:10:44.060005",
+      "avg_loan_amount": 3522.734726002689,
+      "purchase_rate": 0.012017701536794793,
+      "app_rate": 0.95118223220413,
+      "apply1_rate": 0.6960285967271177,
+      "brw_signed_rate": 0.5347456793362411,
+      "gt_accepted_rate": 0.17508936477224282,
+      "vc_ready_rate": 0.006558882366444758,
+      "paid_out_rate": 0.002525169711081232,
+      "lead_to_paid_rate": 2.8865276010144084e-05,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 1430977
+          "count": 1496573
         },
         {
           "label": "Rejected with counteroffer",
           "code": 21,
-          "count": 940008
+          "count": 959525
         },
         {
           "label": "Rejected for lead score",
           "code": 20,
-          "count": 75710
+          "count": 79332
         }
       ],
-      "flag_decline_rate": 0.14146387652684406,
+      "flag_decline_rate": 0.1418678644956017,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 2216
+          "count": 2241
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 1097
+          "count": 1118
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 514
+          "count": 521
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 218
+          "count": 223
         },
         {
           "flag_type": "Decline",
-          "reason": "GT Declined, Bad combination All",
-          "count": 84
+          "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
+          "count": 85
         }
       ],
       "declines_by_type": {
-        "Decline": 2204,
+        "Decline": 2245,
         "FraudRisk": 35,
-        "Cancelled": 2219,
-        "DNL": 24
+        "DNL": 24,
+        "Cancelled": 2244
       }
     },
     {
@@ -1321,80 +1321,80 @@
       "phone": "n/a",
       "email": "lisa@pinglogix.com",
       "campaign_ids": [
-        799,
         791,
-        770
+        770,
+        799
       ],
-      "leads_presented": 1975879,
-      "leads_purchased": 85806,
-      "applications": 84109,
-      "apply1": 59431,
-      "brw_signed": 43747,
-      "gt_accepted": 13520,
-      "vc_ready": 328,
-      "paid_out": 104,
-      "paid_out_loan_total": 404250.0,
-      "flag_declines": 12707,
-      "last_lead_at": "2026-05-15T08:22:37.595725",
-      "avg_loan_amount": 3277.3722193819926,
-      "purchase_rate": 0.04342674829784617,
-      "app_rate": 0.9802228282404494,
-      "apply1_rate": 0.7065950136132875,
-      "brw_signed_rate": 0.5201226979276891,
-      "gt_accepted_rate": 0.1607437967399446,
-      "vc_ready_rate": 0.0038997015777146324,
-      "paid_out_rate": 0.00123649074415342,
-      "lead_to_paid_rate": 5.263480202988138e-05,
+      "leads_presented": 2008288,
+      "leads_purchased": 87393,
+      "applications": 85665,
+      "apply1": 60605,
+      "brw_signed": 44650,
+      "gt_accepted": 13804,
+      "vc_ready": 335,
+      "paid_out": 105,
+      "paid_out_loan_total": 407250.0,
+      "flag_declines": 12978,
+      "last_lead_at": "2026-05-16T00:10:47.642942",
+      "avg_loan_amount": 3278.208720014008,
+      "purchase_rate": 0.04351616899568189,
+      "app_rate": 0.9802272493220281,
+      "apply1_rate": 0.7074651257806572,
+      "brw_signed_rate": 0.521216366077161,
+      "gt_accepted_rate": 0.16113932177668827,
+      "vc_ready_rate": 0.003910581917936147,
+      "paid_out_rate": 0.001225704780248643,
+      "lead_to_paid_rate": 5.228333784795806e-05,
       "top_rejections": [
         {
           "label": "Rejected with counteroffer",
           "code": 21,
-          "count": 970334
+          "count": 987243
         },
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 795978
+          "count": 808233
         },
         {
           "label": "Rejected for lead score",
           "code": 20,
-          "count": 65452
+          "count": 66286
         }
       ],
-      "flag_decline_rate": 0.14808987716476704,
+      "flag_decline_rate": 0.14850159623768494,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 6349
+          "count": 6499
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 2933
+          "count": 2994
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 1545
+          "count": 1565
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 646
+          "count": 666
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Bad combination All",
-          "count": 260
+          "count": 262
         }
       ],
       "declines_by_type": {
-        "Decline": 6240,
         "FraudRisk": 75,
-        "DNL": 42,
-        "Cancelled": 6350
+        "Decline": 6361,
+        "Cancelled": 6500,
+        "DNL": 42
       }
     },
     {
@@ -1406,79 +1406,79 @@
       "phone": "7022348112",
       "email": "sherly@itmedia.xyz",
       "campaign_ids": [
-        790,
-        676
+        676,
+        790
       ],
-      "leads_presented": 1929215,
-      "leads_purchased": 19190,
-      "applications": 15133,
-      "apply1": 10448,
-      "brw_signed": 7912,
-      "gt_accepted": 2679,
+      "leads_presented": 1929661,
+      "leads_purchased": 19109,
+      "applications": 15044,
+      "apply1": 10399,
+      "brw_signed": 7867,
+      "gt_accepted": 2668,
       "vc_ready": 95,
       "paid_out": 31,
       "paid_out_loan_total": 129500.0,
-      "flag_declines": 2045,
-      "last_lead_at": "2026-05-15T08:22:15.953360",
-      "avg_loan_amount": 3659.178616269081,
-      "purchase_rate": 0.009947051002609869,
-      "app_rate": 0.788587806149036,
-      "apply1_rate": 0.6904116830767197,
-      "brw_signed_rate": 0.5228308993590167,
-      "gt_accepted_rate": 0.1770303310645609,
-      "vc_ready_rate": 0.006277671314346131,
-      "paid_out_rate": 0.0020485032709971584,
-      "lead_to_paid_rate": 1.6068711885404167e-05,
+      "flag_declines": 2032,
+      "last_lead_at": "2026-05-16T00:10:37.255865",
+      "avg_loan_amount": 3657.7040680670034,
+      "purchase_rate": 0.009902775668886919,
+      "app_rate": 0.7872730127165211,
+      "apply1_rate": 0.6912390321722947,
+      "brw_signed_rate": 0.5229327306567402,
+      "gt_accepted_rate": 0.17734645041212443,
+      "vc_ready_rate": 0.006314809890986439,
+      "paid_out_rate": 0.00206062217495347,
+      "lead_to_paid_rate": 1.606499794523494e-05,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 859086
+          "count": 857929
         },
         {
           "label": "Rejected with counteroffer",
           "code": 21,
-          "count": 833225
+          "count": 835432
         },
         {
           "label": "Source excluded",
           "code": -1,
-          "count": 137761
+          "count": 136841
         }
       ],
-      "flag_decline_rate": 0.10656591974986972,
+      "flag_decline_rate": 0.10633732796064682,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 1136
+          "count": 1128
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 436
+          "count": 435
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 188
+          "count": 185
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 83
+          "count": 82
         },
         {
           "flag_type": "Decline",
-          "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
-          "count": 40
+          "reason": "GT Declined, Bad combination All",
+          "count": 39
         }
       ],
       "declines_by_type": {
-        "Decline": 890,
-        "FraudRisk": 11,
-        "Cancelled": 1137,
-        "DNL": 7
+        "Decline": 886,
+        "DNL": 7,
+        "FraudRisk": 10,
+        "Cancelled": 1129
       }
     },
     {
@@ -1492,36 +1492,36 @@
       "campaign_ids": [
         693
       ],
-      "leads_presented": 1614418,
-      "leads_purchased": 59651,
-      "applications": 42859,
-      "apply1": 28333,
-      "brw_signed": 21475,
-      "gt_accepted": 6331,
+      "leads_presented": 1626350,
+      "leads_purchased": 60735,
+      "applications": 43651,
+      "apply1": 28895,
+      "brw_signed": 21918,
+      "gt_accepted": 6444,
       "vc_ready": 168,
-      "paid_out": 68,
-      "paid_out_loan_total": 257750.0,
-      "flag_declines": 6295,
-      "last_lead_at": "2026-05-15T08:22:40.278755",
-      "avg_loan_amount": 3170.9034275181407,
-      "purchase_rate": 0.03694891905318201,
-      "app_rate": 0.718495917922583,
-      "apply1_rate": 0.6610746867635736,
-      "brw_signed_rate": 0.5010616206631046,
-      "gt_accepted_rate": 0.14771693226626847,
-      "vc_ready_rate": 0.003919830140693904,
-      "paid_out_rate": 0.0015865979140903895,
-      "lead_to_paid_rate": 4.212044216553582e-05,
+      "paid_out": 71,
+      "paid_out_loan_total": 267000.0,
+      "flag_declines": 6451,
+      "last_lead_at": "2026-05-16T00:10:43.881130",
+      "avg_loan_amount": 3170.0934686490573,
+      "purchase_rate": 0.03734436007009561,
+      "app_rate": 0.7187124392854203,
+      "apply1_rate": 0.6619550525761151,
+      "brw_signed_rate": 0.5021190808916176,
+      "gt_accepted_rate": 0.1476254839522577,
+      "vc_ready_rate": 0.003848709078829809,
+      "paid_out_rate": 0.001626537765457836,
+      "lead_to_paid_rate": 4.365603959787254e-05,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 673370
+          "count": 675227
         },
         {
           "label": "Rejected with counteroffer",
           "code": 21,
-          "count": 648190
+          "count": 656133
         },
         {
           "label": "Source excluded",
@@ -1529,39 +1529,39 @@
           "count": 126830
         }
       ],
-      "flag_decline_rate": 0.10553050242242376,
+      "flag_decline_rate": 0.10621552646744052,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 3375
+          "count": 3459
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 1553
+          "count": 1597
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 568
+          "count": 580
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 270
+          "count": 274
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Bad combination All",
-          "count": 104
+          "count": 108
         }
       ],
       "declines_by_type": {
-        "Decline": 2869,
-        "FraudRisk": 32,
-        "DNL": 18,
-        "Cancelled": 3376
+        "Decline": 2939,
+        "FraudRisk": 33,
+        "Cancelled": 3460,
+        "DNL": 19
       }
     },
     {
@@ -1573,58 +1573,58 @@
       "phone": "816.805.8331",
       "email": "jennifer@avenuelink.com",
       "campaign_ids": [
-        421,
         389,
+        421,
         370
       ],
-      "leads_presented": 1608421,
-      "leads_purchased": 77454,
-      "applications": 37635,
-      "apply1": 25118,
-      "brw_signed": 19183,
-      "gt_accepted": 5186,
-      "vc_ready": 233,
-      "paid_out": 177,
-      "paid_out_loan_total": 825000.0,
-      "flag_declines": 7032,
-      "last_lead_at": "2026-05-15T08:22:23.266914",
-      "avg_loan_amount": 4033.2270492892253,
-      "purchase_rate": 0.04815530262288294,
-      "app_rate": 0.48590130916414903,
-      "apply1_rate": 0.6674106549754218,
-      "brw_signed_rate": 0.5097117045303574,
-      "gt_accepted_rate": 0.13779726318586422,
-      "vc_ready_rate": 0.006191045569283911,
-      "paid_out_rate": 0.004703068951773615,
-      "lead_to_paid_rate": 0.00011004581511930023,
+      "leads_presented": 1616637,
+      "leads_purchased": 77868,
+      "applications": 37792,
+      "apply1": 25270,
+      "brw_signed": 19294,
+      "gt_accepted": 5219,
+      "vc_ready": 234,
+      "paid_out": 179,
+      "paid_out_loan_total": 841500.0,
+      "flag_declines": 7068,
+      "last_lead_at": "2026-05-16T00:10:47.000835",
+      "avg_loan_amount": 4030.7274026248942,
+      "purchase_rate": 0.048166657078861856,
+      "app_rate": 0.48533415523706785,
+      "apply1_rate": 0.668660033869602,
+      "brw_signed_rate": 0.5105313293818797,
+      "gt_accepted_rate": 0.1380980101608806,
+      "vc_ready_rate": 0.006191786621507198,
+      "paid_out_rate": 0.004736452159187129,
+      "lead_to_paid_rate": 0.00011072368132116239,
       "top_rejections": [
         {
           "label": "Source excluded",
           "code": -1,
-          "count": 773577
+          "count": 777427
         },
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 586218
+          "count": 588854
         },
         {
           "label": "Seen too frequently",
           "code": 18,
-          "count": 104109
+          "count": 105073
         }
       ],
-      "flag_decline_rate": 0.09078937175613913,
+      "flag_decline_rate": 0.09076899368161503,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 3696
+          "count": 3710
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 1470
+          "count": 1486
         },
         {
           "flag_type": "Decline",
@@ -1634,19 +1634,19 @@
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 274
+          "count": 278
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Bad combination All",
-          "count": 139
+          "count": 140
         }
       ],
       "declines_by_type": {
-        "Decline": 3198,
-        "FraudRisk": 77,
-        "DNL": 59,
-        "Cancelled": 3698
+        "Decline": 3222,
+        "DNL": 58,
+        "FraudRisk": 76,
+        "Cancelled": 3712
       }
     },
     {
@@ -1658,47 +1658,47 @@
       "phone": "888-888-8888",
       "email": "lv@stopgonetworks.com",
       "campaign_ids": [
-        672,
-        795
+        795,
+        672
       ],
-      "leads_presented": 1601440,
-      "leads_purchased": 21965,
-      "applications": 11836,
-      "apply1": 8341,
-      "brw_signed": 6067,
-      "gt_accepted": 2222,
-      "vc_ready": 51,
+      "leads_presented": 1592325,
+      "leads_purchased": 21993,
+      "applications": 11851,
+      "apply1": 8357,
+      "brw_signed": 6090,
+      "gt_accepted": 2228,
+      "vc_ready": 50,
       "paid_out": 23,
       "paid_out_loan_total": 95500.0,
-      "flag_declines": 1513,
-      "last_lead_at": "2026-05-15T08:22:39.237268",
-      "avg_loan_amount": 3378.5062521122,
-      "purchase_rate": 0.013715780797282445,
-      "app_rate": 0.5388572729342135,
-      "apply1_rate": 0.7047144305508618,
-      "brw_signed_rate": 0.5125887124028388,
-      "gt_accepted_rate": 0.18773234200743494,
-      "vc_ready_rate": 0.00430888813788442,
-      "paid_out_rate": 0.00194322406218317,
-      "lead_to_paid_rate": 1.4362074133280048e-05,
+      "flag_declines": 1514,
+      "last_lead_at": "2026-05-16T00:10:38.248388",
+      "avg_loan_amount": 3378.3646949624504,
+      "purchase_rate": 0.013811878856389242,
+      "app_rate": 0.5388532714954758,
+      "apply1_rate": 0.7051725592776981,
+      "brw_signed_rate": 0.5138806851742469,
+      "gt_accepted_rate": 0.18800101257277868,
+      "vc_ready_rate": 0.004219053244451945,
+      "paid_out_rate": 0.0019407644924478947,
+      "lead_to_paid_rate": 1.4444287441320082e-05,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 846352
+          "count": 836290
         },
         {
           "label": "Source excluded",
           "code": -1,
-          "count": 551494
+          "count": 552326
         },
         {
           "label": "Rejected with counteroffer",
           "code": 21,
-          "count": 107704
+          "count": 108083
         }
       ],
-      "flag_decline_rate": 0.06888231277031641,
+      "flag_decline_rate": 0.0688400854817442,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
@@ -1708,7 +1708,7 @@
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 366
+          "count": 369
         },
         {
           "flag_type": "Decline",
@@ -1727,9 +1727,9 @@
         }
       ],
       "declines_by_type": {
-        "Decline": 742,
-        "FraudRisk": 10,
+        "Decline": 743,
         "DNL": 6,
+        "FraudRisk": 10,
         "Cancelled": 755
       }
     },
@@ -1743,68 +1743,68 @@
       "email": "Jakob@leadeconomy.com",
       "campaign_ids": [
         423,
-        706,
         422,
+        706,
         430
       ],
-      "leads_presented": 1050407,
-      "leads_purchased": 28386,
-      "applications": 20671,
-      "apply1": 14382,
-      "brw_signed": 11299,
-      "gt_accepted": 3225,
-      "vc_ready": 108,
-      "paid_out": 44,
-      "paid_out_loan_total": 231250.0,
-      "flag_declines": 3608,
-      "last_lead_at": "2026-05-15T08:21:32.833511",
-      "avg_loan_amount": 4418.629964684824,
-      "purchase_rate": 0.02702381077049182,
-      "app_rate": 0.7282110899739308,
-      "apply1_rate": 0.6957573412026511,
-      "brw_signed_rate": 0.546611194426975,
-      "gt_accepted_rate": 0.15601567413284312,
-      "vc_ready_rate": 0.005224710947704513,
-      "paid_out_rate": 0.0021285859416573945,
-      "lead_to_paid_rate": 4.188852511455084e-05,
+      "leads_presented": 1057505,
+      "leads_purchased": 28652,
+      "applications": 20831,
+      "apply1": 14529,
+      "brw_signed": 11430,
+      "gt_accepted": 3277,
+      "vc_ready": 113,
+      "paid_out": 45,
+      "paid_out_loan_total": 235750.0,
+      "flag_declines": 3668,
+      "last_lead_at": "2026-05-16T00:10:47.833783",
+      "avg_loan_amount": 4421.3791944697805,
+      "purchase_rate": 0.027093961730677397,
+      "app_rate": 0.7270347619712411,
+      "apply1_rate": 0.6974701166530651,
+      "brw_signed_rate": 0.5487014545629111,
+      "gt_accepted_rate": 0.15731361912534203,
+      "vc_ready_rate": 0.005424607556046277,
+      "paid_out_rate": 0.002160241947098075,
+      "lead_to_paid_rate": 4.2552990293190104e-05,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 728855
+          "count": 734403
         },
         {
           "label": "Rejected with counteroffer",
           "code": 21,
-          "count": 180982
+          "count": 184011
         },
         {
           "label": "Source excluded",
           "code": -1,
-          "count": 58781
+          "count": 56925
         }
       ],
-      "flag_decline_rate": 0.1271049108715564,
+      "flag_decline_rate": 0.1280189864581879,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 1527
+          "count": 1546
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 964
+          "count": 986
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 512
+          "count": 518
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 210
+          "count": 214
         },
         {
           "flag_type": "Decline",
@@ -1813,9 +1813,9 @@
         }
       ],
       "declines_by_type": {
-        "Decline": 2035,
-        "FraudRisk": 29,
-        "Cancelled": 1527,
+        "Decline": 2075,
+        "Cancelled": 1546,
+        "FraudRisk": 30,
         "DNL": 17
       }
     },
@@ -1828,80 +1828,80 @@
       "phone": "888-888-8888",
       "email": "oliver@cashloansexpress.com",
       "campaign_ids": [
-        710,
         712,
+        710,
         711
       ],
-      "leads_presented": 434866,
-      "leads_purchased": 37468,
-      "applications": 33973,
-      "apply1": 25519,
-      "brw_signed": 21535,
-      "gt_accepted": 6141,
-      "vc_ready": 163,
-      "paid_out": 128,
-      "paid_out_loan_total": 472750.0,
-      "flag_declines": 8056,
-      "last_lead_at": "2026-05-15T08:15:04.211803",
-      "avg_loan_amount": 3243.884849733612,
-      "purchase_rate": 0.08615987453606398,
-      "app_rate": 0.9067204014092025,
-      "apply1_rate": 0.7511553292320372,
-      "brw_signed_rate": 0.633885732787802,
-      "gt_accepted_rate": 0.18076119271185942,
-      "vc_ready_rate": 0.004797927766167251,
-      "paid_out_rate": 0.0037676978777264297,
-      "lead_to_paid_rate": 0.0002943435449080866,
+      "leads_presented": 439652,
+      "leads_purchased": 37757,
+      "applications": 34223,
+      "apply1": 25715,
+      "brw_signed": 21688,
+      "gt_accepted": 6180,
+      "vc_ready": 165,
+      "paid_out": 130,
+      "paid_out_loan_total": 487750.0,
+      "flag_declines": 8113,
+      "last_lead_at": "2026-05-16T00:10:48.969941",
+      "avg_loan_amount": 3243.43277912515,
+      "purchase_rate": 0.08587928634465442,
+      "app_rate": 0.9064014619805599,
+      "apply1_rate": 0.7513952604973264,
+      "brw_signed_rate": 0.6337258568798761,
+      "gt_accepted_rate": 0.18058031148642725,
+      "vc_ready_rate": 0.004821318995996844,
+      "paid_out_rate": 0.003798614966542968,
+      "lead_to_paid_rate": 0.0002956884081045918,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 289312
+          "count": 292526
         },
         {
           "label": "Rejected for lead score",
           "code": 20,
-          "count": 52476
+          "count": 53157
         },
         {
           "label": "Seen too frequently",
           "code": 18,
-          "count": 31422
+          "count": 31782
         }
       ],
-      "flag_decline_rate": 0.2150101419878296,
+      "flag_decline_rate": 0.21487406308763937,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 3913
+          "count": 3934
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 2189
+          "count": 2211
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 752
+          "count": 758
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 388
+          "count": 392
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
-          "count": 175
+          "count": 176
         }
       ],
       "declines_by_type": {
-        "Decline": 4084,
-        "Cancelled": 3916,
-        "DNL": 23,
-        "FraudRisk": 33
+        "Decline": 4118,
+        "FraudRisk": 34,
+        "DNL": 24,
+        "Cancelled": 3937
       }
     },
     {
@@ -1915,64 +1915,64 @@
       "campaign_ids": [
         458
       ],
-      "leads_presented": 153573,
-      "leads_purchased": 32237,
-      "applications": 25509,
+      "leads_presented": 154380,
+      "leads_purchased": 32238,
+      "applications": 25455,
       "apply1": 12176,
-      "brw_signed": 9269,
-      "gt_accepted": 2218,
+      "brw_signed": 9258,
+      "gt_accepted": 2212,
       "vc_ready": 51,
       "paid_out": 44,
-      "paid_out_loan_total": 147750.0,
-      "flag_declines": 4171,
-      "last_lead_at": "2026-05-15T08:19:41.460145",
-      "avg_loan_amount": 3236.553765337724,
-      "purchase_rate": 0.20991320088817697,
-      "app_rate": 0.791295716102615,
-      "apply1_rate": 0.47732172958563646,
-      "brw_signed_rate": 0.3633619506840723,
-      "gt_accepted_rate": 0.08694970402603003,
-      "vc_ready_rate": 0.001999294366694108,
-      "paid_out_rate": 0.0017248814144027599,
-      "lead_to_paid_rate": 0.0002865086961900855,
+      "paid_out_loan_total": 149750.0,
+      "flag_declines": 4135,
+      "last_lead_at": "2026-05-16T00:10:32.408940",
+      "avg_loan_amount": 3236.888626988804,
+      "purchase_rate": 0.20882238631947142,
+      "app_rate": 0.7895961287921087,
+      "apply1_rate": 0.4783343154586525,
+      "brw_signed_rate": 0.36370064820271064,
+      "gt_accepted_rate": 0.08689844824199568,
+      "vc_ready_rate": 0.0020035356511490868,
+      "paid_out_rate": 0.0017285405617756826,
+      "lead_to_paid_rate": 0.00028501101178909184,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 78776
+          "count": 79326
         },
         {
           "label": "Seen too frequently",
           "code": 18,
-          "count": 36117
+          "count": 36357
         },
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 5158
+          "count": 5171
         }
       ],
-      "flag_decline_rate": 0.12938548872413685,
+      "flag_decline_rate": 0.1282647806935914,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 2322
+          "count": 2298
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 965
+          "count": 957
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 414
+          "count": 415
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 152
+          "count": 149
         },
         {
           "flag_type": "Decline",
@@ -1981,10 +1981,10 @@
         }
       ],
       "declines_by_type": {
-        "Decline": 1801,
-        "Cancelled": 2323,
-        "FraudRisk": 26,
-        "DNL": 21
+        "Decline": 1789,
+        "DNL": 21,
+        "Cancelled": 2299,
+        "FraudRisk": 26
       }
     },
     {
@@ -1998,49 +1998,49 @@
       "campaign_ids": [
         789
       ],
-      "leads_presented": 147205,
-      "leads_purchased": 2455,
-      "applications": 2250,
-      "apply1": 2107,
-      "brw_signed": 1733,
-      "gt_accepted": 720,
+      "leads_presented": 147376,
+      "leads_purchased": 2458,
+      "applications": 2253,
+      "apply1": 2111,
+      "brw_signed": 1740,
+      "gt_accepted": 724,
       "vc_ready": 23,
       "paid_out": 14,
       "paid_out_loan_total": 71250.0,
-      "flag_declines": 836,
-      "last_lead_at": "2026-05-15T08:18:30.044974",
-      "avg_loan_amount": 4288.111111111111,
-      "purchase_rate": 0.01667742264189396,
-      "app_rate": 0.9164969450101833,
-      "apply1_rate": 0.9364444444444444,
-      "brw_signed_rate": 0.7702222222222223,
-      "gt_accepted_rate": 0.32,
-      "vc_ready_rate": 0.010222222222222223,
-      "paid_out_rate": 0.006222222222222222,
-      "lead_to_paid_rate": 9.510546516762338e-05,
+      "flag_declines": 840,
+      "last_lead_at": "2026-05-16T00:10:43.594012",
+      "avg_loan_amount": 4283.954727030626,
+      "purchase_rate": 0.01667842796656172,
+      "app_rate": 0.9165988608624899,
+      "apply1_rate": 0.9369729249889037,
+      "brw_signed_rate": 0.7723035952063915,
+      "gt_accepted_rate": 0.32134931202840655,
+      "vc_ready_rate": 0.010208610741233911,
+      "paid_out_rate": 0.006213936972924989,
+      "lead_to_paid_rate": 9.499511453696667e-05,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 144181
+          "count": 144346
         },
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 569
+          "count": 572
         }
       ],
-      "flag_decline_rate": 0.3405295315682281,
+      "flag_decline_rate": 0.3417412530512612,
       "top_decline_reasons": [
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 309
+          "count": 310
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 159
+          "count": 161
         },
         {
           "flag_type": "Cancelled",
@@ -2050,104 +2050,19 @@
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 81
+          "count": 80
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
-          "count": 27
+          "count": 29
         }
       ],
       "declines_by_type": {
-        "Decline": 673,
+        "Decline": 677,
         "DNL": 9,
-        "Cancelled": 141,
-        "FraudRisk": 13
-      }
-    },
-    {
-      "source_id": 476,
-      "friendly_name": "Leads Market",
-      "company_name": "Leads Market",
-      "username": "Leads Market",
-      "website_url": "https://leadsmarket.com/",
-      "phone": "888 666 7058",
-      "email": "melody@leadsmarket.com",
-      "campaign_ids": [
-        629,
-        782,
-        546
-      ],
-      "leads_presented": 142737,
-      "leads_purchased": 7133,
-      "applications": 5776,
-      "apply1": 3028,
-      "brw_signed": 1899,
-      "gt_accepted": 674,
-      "vc_ready": 8,
-      "paid_out": 6,
-      "paid_out_loan_total": 21500.0,
-      "flag_declines": 545,
-      "last_lead_at": "2026-05-15T08:22:24.736495",
-      "avg_loan_amount": 3814.793975069252,
-      "purchase_rate": 0.04997302731597273,
-      "app_rate": 0.8097574653021169,
-      "apply1_rate": 0.5242382271468145,
-      "brw_signed_rate": 0.3287742382271468,
-      "gt_accepted_rate": 0.11668975069252077,
-      "vc_ready_rate": 0.0013850415512465374,
-      "paid_out_rate": 0.001038781163434903,
-      "lead_to_paid_rate": 4.203535173080561e-05,
-      "top_rejections": [
-        {
-          "label": "Already claimed",
-          "code": 2,
-          "count": 102621
-        },
-        {
-          "label": "Rejected with counteroffer",
-          "code": 21,
-          "count": 19151
-        },
-        {
-          "label": "Source excluded",
-          "code": -1,
-          "count": 5870
-        }
-      ],
-      "flag_decline_rate": 0.076405439506519,
-      "top_decline_reasons": [
-        {
-          "flag_type": "Cancelled",
-          "reason": "(no reason given)",
-          "count": 301
-        },
-        {
-          "flag_type": "Decline",
-          "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 111
-        },
-        {
-          "flag_type": "Decline",
-          "reason": "GT Declined, Failed Phone Verification",
-          "count": 72
-        },
-        {
-          "flag_type": "Decline",
-          "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 20
-        },
-        {
-          "flag_type": "Decline",
-          "reason": "GT Declined, Bad combination All",
-          "count": 10
-        }
-      ],
-      "declines_by_type": {
-        "Decline": 240,
-        "FraudRisk": 2,
-        "Cancelled": 301,
-        "DNL": 2
+        "FraudRisk": 13,
+        "Cancelled": 141
       }
     },
     {
@@ -2162,36 +2077,36 @@
         681,
         651
       ],
-      "leads_presented": 139108,
-      "leads_purchased": 97786,
-      "applications": 60499,
-      "apply1": 52643,
-      "brw_signed": 40615,
-      "gt_accepted": 12713,
-      "vc_ready": 638,
+      "leads_presented": 139650,
+      "leads_purchased": 98215,
+      "applications": 60706,
+      "apply1": 52929,
+      "brw_signed": 40844,
+      "gt_accepted": 12754,
+      "vc_ready": 640,
       "paid_out": 477,
       "paid_out_loan_total": 2637250.0,
-      "flag_declines": 18660,
-      "last_lead_at": "2026-05-15T08:20:09.011404",
-      "avg_loan_amount": 5248.429726111175,
-      "purchase_rate": 0.702950225723898,
-      "app_rate": 0.6186877467122083,
-      "apply1_rate": 0.8701466139936197,
-      "brw_signed_rate": 0.6713334104695945,
-      "gt_accepted_rate": 0.2101357047223921,
-      "vc_ready_rate": 0.010545628853369477,
-      "paid_out_rate": 0.00788442784178251,
-      "lead_to_paid_rate": 0.0034289904247059837,
+      "flag_declines": 18728,
+      "last_lead_at": "2026-05-16T00:10:01.907234",
+      "avg_loan_amount": 5249.28754983033,
+      "purchase_rate": 0.7032939491586108,
+      "app_rate": 0.6180929593239322,
+      "apply1_rate": 0.8718907521497051,
+      "brw_signed_rate": 0.6728165255493691,
+      "gt_accepted_rate": 0.21009455408032154,
+      "vc_ready_rate": 0.010542615227489869,
+      "paid_out_rate": 0.007857542911738543,
+      "lead_to_paid_rate": 0.0034156820622986035,
       "top_rejections": [
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 22379
+          "count": 22428
         },
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 18939
+          "count": 19003
         },
         {
           "label": "Invalid campaign",
@@ -2199,22 +2114,22 @@
           "count": 4
         }
       ],
-      "flag_decline_rate": 0.1908248624547481,
+      "flag_decline_rate": 0.1906837041185155,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 7776
+          "count": 7838
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 4693
+          "count": 4689
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 2260
+          "count": 2262
         },
         {
           "flag_type": "Decline",
@@ -2224,14 +2139,99 @@
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Bad combination All",
-          "count": 488
+          "count": 493
         }
       ],
       "declines_by_type": {
-        "Decline": 10498,
+        "Decline": 10505,
         "FraudRisk": 232,
-        "DNL": 142,
-        "Cancelled": 7788
+        "Cancelled": 7850,
+        "DNL": 141
+      }
+    },
+    {
+      "source_id": 476,
+      "friendly_name": "Leads Market",
+      "company_name": "Leads Market",
+      "username": "Leads Market",
+      "website_url": "https://leadsmarket.com/",
+      "phone": "888 666 7058",
+      "email": "melody@leadsmarket.com",
+      "campaign_ids": [
+        782,
+        546,
+        629
+      ],
+      "leads_presented": 130341,
+      "leads_purchased": 6998,
+      "applications": 5740,
+      "apply1": 2969,
+      "brw_signed": 1851,
+      "gt_accepted": 661,
+      "vc_ready": 9,
+      "paid_out": 7,
+      "paid_out_loan_total": 24500.0,
+      "flag_declines": 533,
+      "last_lead_at": "2026-05-16T00:08:17.519364",
+      "avg_loan_amount": 3810.409407665505,
+      "purchase_rate": 0.05368993639760321,
+      "app_rate": 0.820234352672192,
+      "apply1_rate": 0.5172473867595819,
+      "brw_signed_rate": 0.3224738675958188,
+      "gt_accepted_rate": 0.11515679442508711,
+      "vc_ready_rate": 0.0015679442508710801,
+      "paid_out_rate": 0.0012195121951219512,
+      "lead_to_paid_rate": 5.370528076353565e-05,
+      "top_rejections": [
+        {
+          "label": "Already claimed",
+          "code": 2,
+          "count": 91978
+        },
+        {
+          "label": "Rejected with counteroffer",
+          "code": 21,
+          "count": 18249
+        },
+        {
+          "label": "Source excluded",
+          "code": -1,
+          "count": 6016
+        }
+      ],
+      "flag_decline_rate": 0.07616461846241783,
+      "top_decline_reasons": [
+        {
+          "flag_type": "Cancelled",
+          "reason": "(no reason given)",
+          "count": 293
+        },
+        {
+          "flag_type": "Decline",
+          "reason": "GT Declined, Credit score too low - C < 600",
+          "count": 111
+        },
+        {
+          "flag_type": "Decline",
+          "reason": "GT Declined, Failed Phone Verification",
+          "count": 68
+        },
+        {
+          "flag_type": "Decline",
+          "reason": "GT Declined, Thin file - PaymentLength < 20",
+          "count": 21
+        },
+        {
+          "flag_type": "Decline",
+          "reason": "GT Declined, Bad combination All",
+          "count": 10
+        }
+      ],
+      "declines_by_type": {
+        "Decline": 236,
+        "Cancelled": 293,
+        "FraudRisk": 2,
+        "DNL": 2
       }
     },
     {
@@ -2245,75 +2245,75 @@
       "campaign_ids": [
         575
       ],
-      "leads_presented": 87632,
-      "leads_purchased": 23693,
-      "applications": 15074,
-      "apply1": 10765,
-      "brw_signed": 9337,
-      "gt_accepted": 3077,
-      "vc_ready": 155,
-      "paid_out": 116,
-      "paid_out_loan_total": 534750.0,
-      "flag_declines": 3353,
-      "last_lead_at": "2026-05-15T08:21:32.038003",
-      "avg_loan_amount": 4063.6028923975055,
-      "purchase_rate": 0.2703692714989958,
-      "app_rate": 0.6362216688473389,
-      "apply1_rate": 0.7141435584450047,
-      "brw_signed_rate": 0.6194109061960993,
-      "gt_accepted_rate": 0.20412631020299854,
-      "vc_ready_rate": 0.010282605811330768,
-      "paid_out_rate": 0.007695369510415284,
-      "lead_to_paid_rate": 0.0013237173635201752,
+      "leads_presented": 87915,
+      "leads_purchased": 23802,
+      "applications": 15099,
+      "apply1": 10786,
+      "brw_signed": 9364,
+      "gt_accepted": 3084,
+      "vc_ready": 156,
+      "paid_out": 118,
+      "paid_out_loan_total": 549750.0,
+      "flag_declines": 3367,
+      "last_lead_at": "2026-05-16T00:10:02.001396",
+      "avg_loan_amount": 4063.944632094841,
+      "purchase_rate": 0.2707387817778536,
+      "app_rate": 0.6343584572724981,
+      "apply1_rate": 0.7143519438373402,
+      "brw_signed_rate": 0.6201735214252599,
+      "gt_accepted_rate": 0.20425193721438506,
+      "vc_ready_rate": 0.010331810053645937,
+      "paid_out_rate": 0.007815087091860387,
+      "lead_to_paid_rate": 0.001342205539441506,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 54530
+          "count": 54666
         },
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 6101
+          "count": 6109
         },
         {
           "label": "Rejected for lead score",
           "code": 20,
-          "count": 2060
+          "count": 2086
         }
       ],
-      "flag_decline_rate": 0.1415185919891951,
+      "flag_decline_rate": 0.14145870094950005,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 1677
+          "count": 1690
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 891
+          "count": 893
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 217
+          "count": 219
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 128
+          "count": 126
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Bad combination All",
-          "count": 77
+          "count": 78
         }
       ],
       "declines_by_type": {
+        "Decline": 1659,
         "FraudRisk": 12,
-        "Decline": 1658,
-        "Cancelled": 1680,
+        "Cancelled": 1693,
         "DNL": 3
       }
     },
@@ -2328,59 +2328,59 @@
       "campaign_ids": [
         636
       ],
-      "leads_presented": 56637,
-      "leads_purchased": 10803,
-      "applications": 9365,
-      "apply1": 4047,
-      "brw_signed": 3127,
-      "gt_accepted": 916,
-      "vc_ready": 42,
-      "paid_out": 21,
-      "paid_out_loan_total": 68500.0,
-      "flag_declines": 1228,
-      "last_lead_at": "2026-05-15T08:02:27.217122",
-      "avg_loan_amount": 3195.221569674319,
-      "purchase_rate": 0.19074103501244768,
-      "app_rate": 0.8668888271776358,
-      "apply1_rate": 0.4321409503470368,
-      "brw_signed_rate": 0.33390282968499735,
-      "gt_accepted_rate": 0.09781099839829151,
-      "vc_ready_rate": 0.004484783769353977,
-      "paid_out_rate": 0.0022423918846769886,
-      "lead_to_paid_rate": 0.0003707823507601038,
+      "leads_presented": 56916,
+      "leads_purchased": 10836,
+      "applications": 9381,
+      "apply1": 4050,
+      "brw_signed": 3134,
+      "gt_accepted": 922,
+      "vc_ready": 43,
+      "paid_out": 23,
+      "paid_out_loan_total": 74500.0,
+      "flag_declines": 1238,
+      "last_lead_at": "2026-05-16T00:07:15.680512",
+      "avg_loan_amount": 3196.4875812813134,
+      "purchase_rate": 0.19038583175205567,
+      "app_rate": 0.8657253599114064,
+      "apply1_rate": 0.4317236968340262,
+      "brw_signed_rate": 0.3340795224389724,
+      "gt_accepted_rate": 0.09828376505703017,
+      "vc_ready_rate": 0.004583733077497068,
+      "paid_out_rate": 0.002451764204242618,
+      "lead_to_paid_rate": 0.00040410429404736807,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 31422
+          "count": 31614
         },
         {
           "label": "Seen too frequently",
           "code": 18,
-          "count": 11750
+          "count": 11801
         },
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 2662
+          "count": 2665
         }
       ],
-      "flag_decline_rate": 0.11367212811256132,
+      "flag_decline_rate": 0.11424880029531193,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 592
+          "count": 595
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 332
+          "count": 336
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 105
+          "count": 107
         },
         {
           "flag_type": "Decline",
@@ -2394,10 +2394,10 @@
         }
       ],
       "declines_by_type": {
-        "Decline": 613,
-        "DNL": 9,
+        "Decline": 620,
+        "Cancelled": 596,
         "FraudRisk": 13,
-        "Cancelled": 593
+        "DNL": 9
       }
     },
     {
@@ -2409,62 +2409,62 @@
       "phone": null,
       "email": null,
       "campaign_ids": [
-        511,
+        762,
+        512,
+        572,
+        777,
+        720,
         784,
         642,
-        512,
-        777,
-        572,
-        720,
         715,
-        763,
         756,
+        763,
         776,
         778,
         755,
         764,
         751,
         507,
-        762
+        511
       ],
-      "leads_presented": 54722,
-      "leads_purchased": 28564,
-      "applications": 18893,
-      "apply1": 17158,
-      "brw_signed": 14594,
-      "gt_accepted": 7004,
-      "vc_ready": 583,
-      "paid_out": 409,
-      "paid_out_loan_total": 2325750.0,
-      "flag_declines": 8694,
-      "last_lead_at": "2026-05-15T07:39:31.297252",
-      "avg_loan_amount": 4779.852326258402,
-      "purchase_rate": 0.5219838456196776,
-      "app_rate": 0.6614269710124633,
-      "apply1_rate": 0.9081670459958715,
-      "brw_signed_rate": 0.77245540676441,
-      "gt_accepted_rate": 0.3707193140316519,
-      "vc_ready_rate": 0.03085798973164664,
-      "paid_out_rate": 0.021648229502990526,
-      "lead_to_paid_rate": 0.007474142026972698,
+      "leads_presented": 54582,
+      "leads_purchased": 28460,
+      "applications": 18824,
+      "apply1": 17108,
+      "brw_signed": 14559,
+      "gt_accepted": 7017,
+      "vc_ready": 584,
+      "paid_out": 410,
+      "paid_out_loan_total": 2323500.0,
+      "flag_declines": 8715,
+      "last_lead_at": "2026-05-16T00:09:53.332935",
+      "avg_loan_amount": 4784.437420314493,
+      "purchase_rate": 0.5214173170642337,
+      "app_rate": 0.6614195361911455,
+      "apply1_rate": 0.9088397790055248,
+      "brw_signed_rate": 0.7734275393115172,
+      "gt_accepted_rate": 0.3727688057798555,
+      "vc_ready_rate": 0.03102422439439014,
+      "paid_out_rate": 0.021780705482362942,
+      "lead_to_paid_rate": 0.007511633871972445,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 18882
+          "count": 18901
         },
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 7276
+          "count": 7221
         }
       ],
-      "flag_decline_rate": 0.3043691359753536,
+      "flag_decline_rate": 0.30621925509486997,
       "top_decline_reasons": [
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 2767
+          "count": 2773
         },
         {
           "flag_type": "Cancelled",
@@ -2474,24 +2474,24 @@
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 1339
+          "count": 1343
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 726
+          "count": 730
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
-          "count": 365
+          "count": 361
         }
       ],
       "declines_by_type": {
-        "FraudRisk": 196,
-        "Decline": 6609,
-        "Cancelled": 1755,
-        "DNL": 134
+        "DNL": 136,
+        "Decline": 6626,
+        "FraudRisk": 198,
+        "Cancelled": 1755
       }
     },
     {
@@ -2508,31 +2508,31 @@
         339,
         478
       ],
-      "leads_presented": 35042,
-      "leads_purchased": 1823,
-      "applications": 559,
-      "apply1": 330,
+      "leads_presented": 35154,
+      "leads_purchased": 1831,
+      "applications": 562,
+      "apply1": 329,
       "brw_signed": 236,
       "gt_accepted": 94,
       "vc_ready": 1,
       "paid_out": 0,
       "paid_out_loan_total": 0.0,
-      "flag_declines": 39,
-      "last_lead_at": "2026-05-15T08:14:58.165129",
-      "avg_loan_amount": 3432.9159212880145,
-      "purchase_rate": 0.052023286342103764,
-      "app_rate": 0.30663741086121776,
-      "apply1_rate": 0.590339892665474,
-      "brw_signed_rate": 0.4221824686940966,
-      "gt_accepted_rate": 0.16815742397137745,
-      "vc_ready_rate": 0.0017889087656529517,
+      "flag_declines": 41,
+      "last_lead_at": "2026-05-16T00:09:54.957824",
+      "avg_loan_amount": 3433.7188612099644,
+      "purchase_rate": 0.052085111224896175,
+      "app_rate": 0.3069361004915347,
+      "apply1_rate": 0.5854092526690391,
+      "brw_signed_rate": 0.4199288256227758,
+      "gt_accepted_rate": 0.16725978647686832,
+      "vc_ready_rate": 0.0017793594306049821,
       "paid_out_rate": 0.0,
       "lead_to_paid_rate": 0.0,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 16892
+          "count": 16985
         },
         {
           "label": "Source excluded",
@@ -2542,15 +2542,15 @@
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 449
+          "count": 452
         }
       ],
-      "flag_decline_rate": 0.021393307734503566,
+      "flag_decline_rate": 0.02239213544511196,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 19
+          "count": 21
         },
         {
           "flag_type": "Decline",
@@ -2563,21 +2563,21 @@
           "count": 8
         },
         {
-          "flag_type": "Decline",
-          "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
+          "flag_type": "DNL",
+          "reason": "(no reason given)",
           "count": 1
         },
         {
-          "flag_type": "FraudRisk",
-          "reason": "Suspicious activity on linked account",
+          "flag_type": "Decline",
+          "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
           "count": 1
         }
       ],
       "declines_by_type": {
         "Decline": 18,
-        "Cancelled": 19,
-        "FraudRisk": 1,
-        "DNL": 1
+        "Cancelled": 21,
+        "DNL": 1,
+        "FraudRisk": 1
       }
     },
     {
@@ -2592,36 +2592,36 @@
         294,
         800
       ],
-      "leads_presented": 33691,
-      "leads_purchased": 23473,
-      "applications": 12332,
-      "apply1": 11115,
-      "brw_signed": 8574,
-      "gt_accepted": 3444,
-      "vc_ready": 151,
-      "paid_out": 121,
-      "paid_out_loan_total": 634750.0,
-      "flag_declines": 4253,
-      "last_lead_at": "2026-05-15T08:14:25.729373",
-      "avg_loan_amount": 4747.790301654233,
-      "purchase_rate": 0.6967142560327684,
-      "app_rate": 0.5253695735525924,
-      "apply1_rate": 0.9013136555303276,
-      "brw_signed_rate": 0.6952643529030166,
-      "gt_accepted_rate": 0.27927343496594226,
-      "vc_ready_rate": 0.012244566980214077,
-      "paid_out_rate": 0.009811871553681479,
-      "lead_to_paid_rate": 0.003591463595619008,
+      "leads_presented": 33701,
+      "leads_purchased": 23514,
+      "applications": 12422,
+      "apply1": 11211,
+      "brw_signed": 8656,
+      "gt_accepted": 3466,
+      "vc_ready": 150,
+      "paid_out": 120,
+      "paid_out_loan_total": 631500.0,
+      "flag_declines": 4275,
+      "last_lead_at": "2026-05-16T00:10:01.967368",
+      "avg_loan_amount": 4744.7069715021735,
+      "purchase_rate": 0.69772410314234,
+      "app_rate": 0.5282810240707664,
+      "apply1_rate": 0.9025116728385123,
+      "brw_signed_rate": 0.6968282080180325,
+      "gt_accepted_rate": 0.2790210916116567,
+      "vc_ready_rate": 0.012075350185155369,
+      "paid_out_rate": 0.009660280148124296,
+      "lead_to_paid_rate": 0.0035607252010326105,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 6225
+          "count": 6208
         },
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 3992
+          "count": 3978
         },
         {
           "label": "Invalid state",
@@ -2629,22 +2629,22 @@
           "count": 1
         }
       ],
-      "flag_decline_rate": 0.18118689558215822,
+      "flag_decline_rate": 0.1818065833120694,
       "top_decline_reasons": [
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 1542
+          "count": 1554
         },
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 1153
+          "count": 1170
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 556
+          "count": 550
         },
         {
           "flag_type": "Decline",
@@ -2654,14 +2654,14 @@
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
-          "count": 134
+          "count": 131
         }
       ],
       "declines_by_type": {
-        "Decline": 3009,
-        "Cancelled": 1154,
-        "DNL": 37,
-        "FraudRisk": 53
+        "FraudRisk": 52,
+        "Decline": 3016,
+        "Cancelled": 1171,
+        "DNL": 36
       }
     },
     {
@@ -2675,64 +2675,64 @@
       "campaign_ids": [
         733
       ],
-      "leads_presented": 32978,
-      "leads_purchased": 11350,
-      "applications": 10591,
-      "apply1": 7893,
-      "brw_signed": 6038,
-      "gt_accepted": 2270,
-      "vc_ready": 19,
-      "paid_out": 10,
-      "paid_out_loan_total": 45500.0,
-      "flag_declines": 1339,
-      "last_lead_at": "2026-05-14T23:01:01.114917",
-      "avg_loan_amount": 3265.3620998961383,
-      "purchase_rate": 0.3441688398326157,
-      "app_rate": 0.9331277533039648,
-      "apply1_rate": 0.7452554055329997,
-      "brw_signed_rate": 0.5701066943631385,
-      "gt_accepted_rate": 0.21433292418090832,
-      "vc_ready_rate": 0.0017939760173732414,
-      "paid_out_rate": 0.0009441979038806534,
-      "lead_to_paid_rate": 0.00030323245800230455,
+      "leads_presented": 33165,
+      "leads_purchased": 11478,
+      "applications": 10698,
+      "apply1": 7970,
+      "brw_signed": 6101,
+      "gt_accepted": 2288,
+      "vc_ready": 20,
+      "paid_out": 11,
+      "paid_out_loan_total": 48500.0,
+      "flag_declines": 1354,
+      "last_lead_at": "2026-05-15T23:00:08.419986",
+      "avg_loan_amount": 3264.554122265844,
+      "purchase_rate": 0.3460877431026685,
+      "app_rate": 0.9320439100888657,
+      "apply1_rate": 0.7449990652458404,
+      "brw_signed_rate": 0.5702935128061319,
+      "gt_accepted_rate": 0.2138717517292952,
+      "vc_ready_rate": 0.001869508319312021,
+      "paid_out_rate": 0.0010282295756216114,
+      "lead_to_paid_rate": 0.0003316749585406302,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 20511
+          "count": 20563
         },
         {
           "label": "Blacklisted",
           "code": 16,
-          "count": 546
+          "count": 553
         },
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 514
+          "count": 515
         }
       ],
-      "flag_decline_rate": 0.11797356828193832,
+      "flag_decline_rate": 0.11796480223035372,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 772
+          "count": 780
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 267
+          "count": 272
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 131
+          "count": 132
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 61
+          "count": 60
         },
         {
           "flag_type": "Decline",
@@ -2741,10 +2741,10 @@
         }
       ],
       "declines_by_type": {
-        "Decline": 557,
-        "FraudRisk": 8,
-        "DNL": 2,
-        "Cancelled": 772
+        "Decline": 562,
+        "FraudRisk": 9,
+        "DNL": 3,
+        "Cancelled": 780
       }
     },
     {
@@ -2761,31 +2761,31 @@
         1,
         12345
       ],
-      "leads_presented": 32136,
-      "leads_purchased": 23275,
-      "applications": 12514,
-      "apply1": 11244,
-      "brw_signed": 8249,
-      "gt_accepted": 3460,
-      "vc_ready": 228,
-      "paid_out": 158,
-      "paid_out_loan_total": 861250.0,
-      "flag_declines": 5081,
-      "last_lead_at": "2026-05-15T08:22:24.143667",
-      "avg_loan_amount": 4838.920409141761,
-      "purchase_rate": 0.7242656211102813,
-      "app_rate": 0.5376584317937702,
-      "apply1_rate": 0.898513664695541,
-      "brw_signed_rate": 0.6591817164775452,
-      "gt_accepted_rate": 0.276490330829471,
-      "vc_ready_rate": 0.018219594054658783,
-      "paid_out_rate": 0.012625859037877578,
-      "lead_to_paid_rate": 0.004916604431167538,
+      "leads_presented": 32352,
+      "leads_purchased": 23422,
+      "applications": 12579,
+      "apply1": 11359,
+      "brw_signed": 8345,
+      "gt_accepted": 3491,
+      "vc_ready": 230,
+      "paid_out": 157,
+      "paid_out_loan_total": 855000.0,
+      "flag_declines": 5109,
+      "last_lead_at": "2026-05-16T00:08:36.608163",
+      "avg_loan_amount": 4836.374115589475,
+      "purchase_rate": 0.7239737883283878,
+      "app_rate": 0.537059175134489,
+      "apply1_rate": 0.9030129581047778,
+      "brw_signed_rate": 0.6634072660783846,
+      "gt_accepted_rate": 0.2775260354559186,
+      "vc_ready_rate": 0.0182844423245091,
+      "paid_out_rate": 0.012481119325860561,
+      "lead_to_paid_rate": 0.004852868447082097,
       "top_rejections": [
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 8830
+          "count": 8899
         },
         {
           "label": "Already claimed",
@@ -2793,22 +2793,22 @@
           "count": 31
         }
       ],
-      "flag_decline_rate": 0.21830290010741138,
+      "flag_decline_rate": 0.21812825548629494,
       "top_decline_reasons": [
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 1514
+          "count": 1529
         },
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 1231
+          "count": 1237
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 1007
+          "count": 1008
         },
         {
           "flag_type": "Decline",
@@ -2822,10 +2822,10 @@
         }
       ],
       "declines_by_type": {
-        "Decline": 3621,
-        "FraudRisk": 142,
-        "Cancelled": 1232,
-        "DNL": 86
+        "Decline": 3640,
+        "FraudRisk": 144,
+        "DNL": 87,
+        "Cancelled": 1238
       }
     },
     {
@@ -2839,49 +2839,49 @@
       "campaign_ids": [
         465
       ],
-      "leads_presented": 14526,
-      "leads_purchased": 4713,
-      "applications": 3138,
-      "apply1": 1466,
-      "brw_signed": 1161,
-      "gt_accepted": 388,
+      "leads_presented": 14575,
+      "leads_purchased": 4732,
+      "applications": 3156,
+      "apply1": 1475,
+      "brw_signed": 1169,
+      "gt_accepted": 391,
       "vc_ready": 11,
       "paid_out": 10,
       "paid_out_loan_total": 56750.0,
       "flag_declines": 401,
-      "last_lead_at": "2026-05-15T07:45:09.300519",
-      "avg_loan_amount": 5014.260675589548,
-      "purchase_rate": 0.32445270549359767,
-      "app_rate": 0.6658179503500955,
-      "apply1_rate": 0.46717654557042704,
-      "brw_signed_rate": 0.369980879541109,
-      "gt_accepted_rate": 0.12364563416188655,
-      "vc_ready_rate": 0.003505417463352454,
-      "paid_out_rate": 0.0031867431485022306,
-      "lead_to_paid_rate": 0.0006884207627702051,
+      "last_lead_at": "2026-05-15T23:48:32.936084",
+      "avg_loan_amount": 5010.06020278834,
+      "purchase_rate": 0.3246655231560892,
+      "app_rate": 0.6669484361792054,
+      "apply1_rate": 0.4673637515842839,
+      "brw_signed_rate": 0.37040557667934093,
+      "gt_accepted_rate": 0.12389100126742712,
+      "vc_ready_rate": 0.003485424588086185,
+      "paid_out_rate": 0.0031685678073510772,
+      "lead_to_paid_rate": 0.0006861063464837049,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 7225
+          "count": 7242
         },
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 2475
+          "count": 2486
         },
         {
           "label": "Blacklisted",
           "code": 16,
-          "count": 113
+          "count": 115
         }
       ],
-      "flag_decline_rate": 0.08508381073626141,
+      "flag_decline_rate": 0.08474218089602704,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 247
+          "count": 246
         },
         {
           "flag_type": "Decline",
@@ -2901,13 +2901,13 @@
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Bad combination All",
-          "count": 8
+          "count": 9
         }
       ],
       "declines_by_type": {
-        "Decline": 150,
+        "Decline": 151,
+        "Cancelled": 246,
         "DNL": 2,
-        "Cancelled": 247,
         "FraudRisk": 2
       }
     },
@@ -2922,64 +2922,64 @@
       "campaign_ids": [
         804
       ],
-      "leads_presented": 7754,
-      "leads_purchased": 1675,
-      "applications": 1652,
-      "apply1": 1286,
-      "brw_signed": 1012,
-      "gt_accepted": 364,
-      "vc_ready": 2,
+      "leads_presented": 7882,
+      "leads_purchased": 1708,
+      "applications": 1685,
+      "apply1": 1319,
+      "brw_signed": 1040,
+      "gt_accepted": 369,
+      "vc_ready": 4,
       "paid_out": 2,
       "paid_out_loan_total": 9000.0,
-      "flag_declines": 294,
-      "last_lead_at": "2026-05-15T08:22:10.918397",
-      "avg_loan_amount": 5007.26392251816,
-      "purchase_rate": 0.21601753933453702,
-      "app_rate": 0.986268656716418,
-      "apply1_rate": 0.7784503631961259,
-      "brw_signed_rate": 0.612590799031477,
-      "gt_accepted_rate": 0.22033898305084745,
-      "vc_ready_rate": 0.0012106537530266344,
-      "paid_out_rate": 0.0012106537530266344,
-      "lead_to_paid_rate": 0.00025793139025019347,
+      "flag_declines": 301,
+      "last_lead_at": "2026-05-16T00:08:16.922040",
+      "avg_loan_amount": 4990.80118694362,
+      "purchase_rate": 0.216696269982238,
+      "app_rate": 0.9865339578454333,
+      "apply1_rate": 0.7827893175074184,
+      "brw_signed_rate": 0.6172106824925816,
+      "gt_accepted_rate": 0.21899109792284865,
+      "vc_ready_rate": 0.002373887240356083,
+      "paid_out_rate": 0.0011869436201780415,
+      "lead_to_paid_rate": 0.0002537427048972342,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 5891
+          "count": 5979
         },
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 170
+          "count": 173
         },
         {
           "label": "Blacklisted",
           "code": 16,
-          "count": 17
+          "count": 21
         }
       ],
-      "flag_decline_rate": 0.1755223880597015,
+      "flag_decline_rate": 0.1762295081967213,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 143
+          "count": 146
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 84
+          "count": 86
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Failed Phone Verification",
-          "count": 19
+          "count": 20
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Thin file - PaymentLength < 20",
-          "count": 18
+          "count": 19
         },
         {
           "flag_type": "Decline",
@@ -2988,8 +2988,8 @@
         }
       ],
       "declines_by_type": {
-        "Decline": 151,
-        "Cancelled": 143
+        "Decline": 155,
+        "Cancelled": 146
       }
     },
     {
@@ -3001,43 +3001,43 @@
       "phone": "888-888-8888",
       "email": null,
       "campaign_ids": [
-        544,
         757,
+        544,
         540
       ],
-      "leads_presented": 3392,
-      "leads_purchased": 2104,
-      "applications": 551,
-      "apply1": 501,
-      "brw_signed": 335,
-      "gt_accepted": 131,
-      "vc_ready": 15,
-      "paid_out": 11,
-      "paid_out_loan_total": 62000.0,
+      "leads_presented": 3394,
+      "leads_purchased": 2105,
+      "applications": 545,
+      "apply1": 496,
+      "brw_signed": 331,
+      "gt_accepted": 129,
+      "vc_ready": 14,
+      "paid_out": 10,
+      "paid_out_loan_total": 52000.0,
       "flag_declines": 148,
-      "last_lead_at": "2026-05-15T08:08:40.702879",
-      "avg_loan_amount": 5180.127041742287,
-      "purchase_rate": 0.6202830188679245,
-      "app_rate": 0.26188212927756654,
-      "apply1_rate": 0.9092558983666061,
-      "brw_signed_rate": 0.6079854809437386,
-      "gt_accepted_rate": 0.23774954627949182,
-      "vc_ready_rate": 0.02722323049001815,
-      "paid_out_rate": 0.019963702359346643,
-      "lead_to_paid_rate": 0.003242924528301887,
+      "last_lead_at": "2026-05-15T23:54:53.284410",
+      "avg_loan_amount": 5185.779816513761,
+      "purchase_rate": 0.6202121390689452,
+      "app_rate": 0.2589073634204275,
+      "apply1_rate": 0.9100917431192661,
+      "brw_signed_rate": 0.6073394495412844,
+      "gt_accepted_rate": 0.23669724770642203,
+      "vc_ready_rate": 0.025688073394495414,
+      "paid_out_rate": 0.01834862385321101,
+      "lead_to_paid_rate": 0.0029463759575721863,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 744
+          "count": 747
         },
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 544
+          "count": 542
         }
       ],
-      "flag_decline_rate": 0.07034220532319392,
+      "flag_decline_rate": 0.07030878859857483,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
@@ -3067,8 +3067,8 @@
       ],
       "declines_by_type": {
         "Decline": 87,
-        "FraudRisk": 8,
         "Cancelled": 47,
+        "FraudRisk": 8,
         "DNL": 6
       }
     },
@@ -3083,49 +3083,49 @@
       "campaign_ids": [
         349
       ],
-      "leads_presented": 3367,
-      "leads_purchased": 1120,
-      "applications": 708,
-      "apply1": 579,
-      "brw_signed": 480,
-      "gt_accepted": 204,
+      "leads_presented": 3352,
+      "leads_purchased": 1119,
+      "applications": 702,
+      "apply1": 577,
+      "brw_signed": 479,
+      "gt_accepted": 200,
       "vc_ready": 6,
       "paid_out": 5,
       "paid_out_loan_total": 34000.0,
-      "flag_declines": 252,
-      "last_lead_at": "2026-05-15T04:46:12.135187",
-      "avg_loan_amount": 5643.714689265536,
-      "purchase_rate": 0.33264033264033266,
-      "app_rate": 0.6321428571428571,
-      "apply1_rate": 0.8177966101694916,
-      "brw_signed_rate": 0.6779661016949152,
-      "gt_accepted_rate": 0.288135593220339,
-      "vc_ready_rate": 0.00847457627118644,
-      "paid_out_rate": 0.007062146892655367,
-      "lead_to_paid_rate": 0.001485001485001485,
+      "flag_declines": 245,
+      "last_lead_at": "2026-05-15T22:08:03.264231",
+      "avg_loan_amount": 5637.820512820513,
+      "purchase_rate": 0.3338305489260143,
+      "app_rate": 0.6273458445040214,
+      "apply1_rate": 0.8219373219373219,
+      "brw_signed_rate": 0.6823361823361823,
+      "gt_accepted_rate": 0.2849002849002849,
+      "vc_ready_rate": 0.008547008547008548,
+      "paid_out_rate": 0.007122507122507123,
+      "lead_to_paid_rate": 0.0014916467780429594,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 2120
+          "count": 2107
         },
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 127
+          "count": 126
         }
       ],
-      "flag_decline_rate": 0.225,
+      "flag_decline_rate": 0.21894548704200179,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 131
+          "count": 127
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 44
+          "count": 42
         },
         {
           "flag_type": "Decline",
@@ -3144,10 +3144,10 @@
         }
       ],
       "declines_by_type": {
-        "Decline": 117,
+        "Decline": 114,
         "FraudRisk": 3,
-        "DNL": 1,
-        "Cancelled": 131
+        "Cancelled": 127,
+        "DNL": 1
       }
     },
     {
@@ -3161,36 +3161,36 @@
       "campaign_ids": [
         658
       ],
-      "leads_presented": 2545,
-      "leads_purchased": 2275,
-      "applications": 2188,
-      "apply1": 737,
+      "leads_presented": 2561,
+      "leads_purchased": 2291,
+      "applications": 2205,
+      "apply1": 741,
       "brw_signed": 552,
       "gt_accepted": 281,
       "vc_ready": 15,
       "paid_out": 3,
       "paid_out_loan_total": 18000.0,
       "flag_declines": 329,
-      "last_lead_at": "2026-05-15T05:51:00.761494",
-      "avg_loan_amount": 7079.0676416819015,
-      "purchase_rate": 0.8939096267190569,
-      "app_rate": 0.9617582417582418,
-      "apply1_rate": 0.33683729433272397,
-      "brw_signed_rate": 0.2522851919561243,
-      "gt_accepted_rate": 0.12842778793418647,
-      "vc_ready_rate": 0.006855575868372943,
-      "paid_out_rate": 0.0013711151736745886,
-      "lead_to_paid_rate": 0.0011787819253438114,
+      "last_lead_at": "2026-05-15T23:41:27.638089",
+      "avg_loan_amount": 7070.181405895692,
+      "purchase_rate": 0.8945724326434986,
+      "app_rate": 0.9624618070711479,
+      "apply1_rate": 0.3360544217687075,
+      "brw_signed_rate": 0.2503401360544218,
+      "gt_accepted_rate": 0.127437641723356,
+      "vc_ready_rate": 0.006802721088435374,
+      "paid_out_rate": 0.0013605442176870747,
+      "lead_to_paid_rate": 0.0011714174150722373,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 159
+          "count": 158
         },
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 72
+          "count": 73
         },
         {
           "label": "No valid product",
@@ -3198,7 +3198,7 @@
           "count": 20
         }
       ],
-      "flag_decline_rate": 0.14461538461538462,
+      "flag_decline_rate": 0.1436054124836316,
       "top_decline_reasons": [
         {
           "flag_type": "Decline",
@@ -3208,7 +3208,7 @@
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 92
+          "count": 93
         },
         {
           "flag_type": "Decline",
@@ -3228,9 +3228,9 @@
       ],
       "declines_by_type": {
         "FraudRisk": 8,
-        "Decline": 226,
-        "DNL": 2,
-        "Cancelled": 93
+        "Cancelled": 94,
+        "Decline": 225,
+        "DNL": 2
       }
     },
     {
@@ -3246,22 +3246,22 @@
         563,
         564
       ],
-      "leads_presented": 1835,
+      "leads_presented": 1826,
       "leads_purchased": 276,
       "applications": 219,
       "apply1": 78,
-      "brw_signed": 56,
+      "brw_signed": 55,
       "gt_accepted": 14,
       "vc_ready": 0,
       "paid_out": 0,
       "paid_out_loan_total": 0.0,
       "flag_declines": 5,
-      "last_lead_at": "2026-05-15T03:58:37.148436",
+      "last_lead_at": "2026-05-15T13:26:11.015775",
       "avg_loan_amount": 3400.6849315068494,
-      "purchase_rate": 0.15040871934604905,
+      "purchase_rate": 0.1511500547645126,
       "app_rate": 0.7934782608695652,
       "apply1_rate": 0.3561643835616438,
-      "brw_signed_rate": 0.2557077625570776,
+      "brw_signed_rate": 0.2511415525114155,
       "gt_accepted_rate": 0.0639269406392694,
       "vc_ready_rate": 0.0,
       "paid_out_rate": 0.0,
@@ -3270,7 +3270,7 @@
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 1006
+          "count": 997
         },
         {
           "label": "Rejected for lead score",
@@ -3297,8 +3297,8 @@
         }
       ],
       "declines_by_type": {
-        "Decline": 1,
-        "Cancelled": 4
+        "Cancelled": 4,
+        "Decline": 1
       }
     },
     {
@@ -3312,49 +3312,49 @@
       "campaign_ids": [
         725
       ],
-      "leads_presented": 1188,
-      "leads_purchased": 659,
-      "applications": 446,
-      "apply1": 408,
-      "brw_signed": 284,
-      "gt_accepted": 98,
+      "leads_presented": 1194,
+      "leads_purchased": 669,
+      "applications": 452,
+      "apply1": 413,
+      "brw_signed": 290,
+      "gt_accepted": 100,
       "vc_ready": 6,
       "paid_out": 1,
       "paid_out_loan_total": 10000.0,
-      "flag_declines": 140,
-      "last_lead_at": "2026-05-15T06:43:09.379356",
-      "avg_loan_amount": 4149.663677130045,
-      "purchase_rate": 0.5547138047138047,
-      "app_rate": 0.6767830045523521,
-      "apply1_rate": 0.9147982062780269,
-      "brw_signed_rate": 0.6367713004484304,
-      "gt_accepted_rate": 0.21973094170403587,
-      "vc_ready_rate": 0.013452914798206279,
-      "paid_out_rate": 0.002242152466367713,
-      "lead_to_paid_rate": 0.0008417508417508417,
+      "flag_declines": 141,
+      "last_lead_at": "2026-05-15T22:20:55.992751",
+      "avg_loan_amount": 4159.29203539823,
+      "purchase_rate": 0.5603015075376885,
+      "app_rate": 0.6756352765321375,
+      "apply1_rate": 0.9137168141592921,
+      "brw_signed_rate": 0.6415929203539823,
+      "gt_accepted_rate": 0.22123893805309736,
+      "vc_ready_rate": 0.01327433628318584,
+      "paid_out_rate": 0.0022123893805309734,
+      "lead_to_paid_rate": 0.0008375209380234506,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 310
+          "count": 307
         },
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 219
+          "count": 218
         }
       ],
-      "flag_decline_rate": 0.212443095599393,
+      "flag_decline_rate": 0.21076233183856502,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 39
+          "count": 40
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 39
+          "count": 40
         },
         {
           "flag_type": "Decline",
@@ -3368,15 +3368,15 @@
         },
         {
           "flag_type": "Decline",
-          "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
-          "count": 7
+          "reason": "BW Declined, DoNotLend",
+          "count": 6
         }
       ],
       "declines_by_type": {
         "Decline": 95,
-        "DNL": 3,
         "FraudRisk": 3,
-        "Cancelled": 39
+        "DNL": 3,
+        "Cancelled": 40
       }
     },
     {
@@ -3390,49 +3390,49 @@
       "campaign_ids": [
         738
       ],
-      "leads_presented": 944,
-      "leads_purchased": 752,
+      "leads_presented": 952,
+      "leads_purchased": 754,
       "applications": 690,
-      "apply1": 593,
-      "brw_signed": 495,
-      "gt_accepted": 134,
-      "vc_ready": 5,
+      "apply1": 595,
+      "brw_signed": 499,
+      "gt_accepted": 137,
+      "vc_ready": 6,
       "paid_out": 3,
       "paid_out_loan_total": 20500.0,
       "flag_declines": 182,
-      "last_lead_at": "2026-05-15T06:41:54.313437",
-      "avg_loan_amount": 5167.753623188406,
-      "purchase_rate": 0.7966101694915254,
-      "app_rate": 0.9175531914893617,
-      "apply1_rate": 0.8594202898550725,
-      "brw_signed_rate": 0.717391304347826,
-      "gt_accepted_rate": 0.19420289855072465,
-      "vc_ready_rate": 0.007246376811594203,
+      "last_lead_at": "2026-05-15T23:54:05.633114",
+      "avg_loan_amount": 5171.376811594203,
+      "purchase_rate": 0.792016806722689,
+      "app_rate": 0.9151193633952255,
+      "apply1_rate": 0.8623188405797102,
+      "brw_signed_rate": 0.7231884057971014,
+      "gt_accepted_rate": 0.19855072463768117,
+      "vc_ready_rate": 0.008695652173913044,
       "paid_out_rate": 0.004347826086956522,
-      "lead_to_paid_rate": 0.0031779661016949155,
+      "lead_to_paid_rate": 0.0031512605042016808,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 127
+          "count": 134
         },
         {
           "label": "Duplicate",
           "code": 3,
-          "count": 65
+          "count": 64
         }
       ],
-      "flag_decline_rate": 0.24202127659574468,
+      "flag_decline_rate": 0.2413793103448276,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 99
+          "count": 100
         },
         {
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
-          "count": 34
+          "count": 33
         },
         {
           "flag_type": "Decline",
@@ -3446,15 +3446,15 @@
         },
         {
           "flag_type": "Decline",
-          "reason": "GT Declined, Credit score too low - C < 650",
+          "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
           "count": 6
         }
       ],
       "declines_by_type": {
-        "Decline": 80,
-        "DNL": 1,
         "FraudRisk": 2,
-        "Cancelled": 99
+        "Decline": 79,
+        "DNL": 1,
+        "Cancelled": 100
       }
     },
     {
@@ -3468,31 +3468,31 @@
       "campaign_ids": [
         571
       ],
-      "leads_presented": 618,
-      "leads_purchased": 366,
-      "applications": 319,
-      "apply1": 294,
-      "brw_signed": 228,
-      "gt_accepted": 96,
+      "leads_presented": 623,
+      "leads_purchased": 370,
+      "applications": 324,
+      "apply1": 299,
+      "brw_signed": 234,
+      "gt_accepted": 97,
       "vc_ready": 12,
       "paid_out": 7,
       "paid_out_loan_total": 38000.0,
-      "flag_declines": 211,
-      "last_lead_at": "2026-05-15T06:03:20.502408",
-      "avg_loan_amount": 4888.71473354232,
-      "purchase_rate": 0.5922330097087378,
-      "app_rate": 0.8715846994535519,
-      "apply1_rate": 0.9216300940438872,
-      "brw_signed_rate": 0.7147335423197492,
-      "gt_accepted_rate": 0.30094043887147337,
-      "vc_ready_rate": 0.03761755485893417,
-      "paid_out_rate": 0.0219435736677116,
-      "lead_to_paid_rate": 0.011326860841423949,
+      "flag_declines": 213,
+      "last_lead_at": "2026-05-15T22:12:36.073625",
+      "avg_loan_amount": 4878.858024691358,
+      "purchase_rate": 0.593900481540931,
+      "app_rate": 0.8756756756756757,
+      "apply1_rate": 0.9228395061728395,
+      "brw_signed_rate": 0.7222222222222222,
+      "gt_accepted_rate": 0.2993827160493827,
+      "vc_ready_rate": 0.037037037037037035,
+      "paid_out_rate": 0.021604938271604937,
+      "lead_to_paid_rate": 0.011235955056179775,
       "top_rejections": [
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 155
+          "count": 156
         },
         {
           "label": "Duplicate",
@@ -3500,7 +3500,7 @@
           "count": 97
         }
       ],
-      "flag_decline_rate": 0.5765027322404371,
+      "flag_decline_rate": 0.5756756756756757,
       "top_decline_reasons": [
         {
           "flag_type": "Decline",
@@ -3529,7 +3529,7 @@
         }
       ],
       "declines_by_type": {
-        "Decline": 184,
+        "Decline": 186,
         "FraudRisk": 2,
         "Cancelled": 25
       }
@@ -3543,16 +3543,16 @@
       "phone": "01202312018",
       "email": null,
       "campaign_ids": [
+        590,
+        583,
         591,
         582,
-        583,
         670,
         581,
         593,
         592,
-        590,
-        594,
-        619
+        619,
+        594
       ],
       "leads_presented": 434,
       "leads_purchased": 121,
@@ -3594,13 +3594,13 @@
       "flag_decline_rate": 0.14049586776859505,
       "top_decline_reasons": [
         {
-          "flag_type": "Decline",
-          "reason": "BW Declined, Borrower Hard credit file rules",
+          "flag_type": "DNL",
+          "reason": "(no reason given)",
           "count": 2
         },
         {
-          "flag_type": "DNL",
-          "reason": "(no reason given)",
+          "flag_type": "Decline",
+          "reason": "BW Declined, Borrower Hard credit file rules",
           "count": 2
         },
         {
@@ -3614,16 +3614,16 @@
           "count": 2
         },
         {
-          "flag_type": "Decline",
-          "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
+          "flag_type": "Cancelled",
+          "reason": "(no reason given)",
           "count": 1
         }
       ],
       "declines_by_type": {
+        "Cancelled": 1,
         "Decline": 10,
         "FraudRisk": 4,
-        "DNL": 2,
-        "Cancelled": 1
+        "DNL": 2
       }
     },
     {
@@ -3683,18 +3683,18 @@
         },
         {
           "flag_type": "Decline",
-          "reason": "GT Declined, Credit score too low - C < 600",
+          "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
           "count": 1
         },
         {
           "flag_type": "Decline",
-          "reason": "GT Declined, Thin file - TotalLinesConsidered < 2",
+          "reason": "GT Declined, Credit score too low - C < 600",
           "count": 1
         }
       ],
       "declines_by_type": {
-        "Decline": 2,
-        "Cancelled": 2
+        "Cancelled": 2,
+        "Decline": 2
       }
     },
     {
@@ -3711,19 +3711,19 @@
       "leads_presented": 282,
       "leads_purchased": 213,
       "applications": 202,
-      "apply1": 172,
-      "brw_signed": 141,
+      "apply1": 173,
+      "brw_signed": 142,
       "gt_accepted": 42,
       "vc_ready": 1,
       "paid_out": 0,
       "paid_out_loan_total": 0.0,
-      "flag_declines": 47,
+      "flag_declines": 46,
       "last_lead_at": "2026-05-11T20:55:49.746377",
-      "avg_loan_amount": 3824.2574257425745,
+      "avg_loan_amount": 3826.732673267327,
       "purchase_rate": 0.7553191489361702,
       "app_rate": 0.9483568075117371,
-      "apply1_rate": 0.8514851485148515,
-      "brw_signed_rate": 0.698019801980198,
+      "apply1_rate": 0.8564356435643564,
+      "brw_signed_rate": 0.7029702970297029,
       "gt_accepted_rate": 0.2079207920792079,
       "vc_ready_rate": 0.0049504950495049506,
       "paid_out_rate": 0.0,
@@ -3740,12 +3740,12 @@
           "count": 28
         }
       ],
-      "flag_decline_rate": 0.22065727699530516,
+      "flag_decline_rate": 0.215962441314554,
       "top_decline_reasons": [
         {
           "flag_type": "Cancelled",
           "reason": "(no reason given)",
-          "count": 28
+          "count": 27
         },
         {
           "flag_type": "Decline",
@@ -3759,18 +3759,18 @@
         },
         {
           "flag_type": "Decline",
-          "reason": "GT Declined, Credit score too low - C < 650",
+          "reason": "BW Declined, Existing customer Aref = 0605033510302815082803 = LiveLoan",
           "count": 1
         },
         {
           "flag_type": "Decline",
-          "reason": "GT Declined, Guarantor scorecard fail",
+          "reason": "GT Declined, Credit score too low - C < 650",
           "count": 1
         }
       ],
       "declines_by_type": {
         "Decline": 19,
-        "Cancelled": 28
+        "Cancelled": 27
       }
     },
     {
@@ -3830,17 +3830,17 @@
         },
         {
           "flag_type": "Decline",
-          "reason": "BW Declined, Borrower state location not accepted",
+          "reason": "GT Declined, DoNotLend",
+          "count": 1
+        },
+        {
+          "flag_type": "Decline",
+          "reason": "GT Declined, Credit score too low - C < 600",
           "count": 1
         },
         {
           "flag_type": "Decline",
           "reason": "BW Declined, Existing customer Aref = 0601040615222307052001 = LiveLoan",
-          "count": 1
-        },
-        {
-          "flag_type": "Decline",
-          "reason": "BW Declined: Affordability Concerns",
           "count": 1
         }
       ],
@@ -3912,18 +3912,18 @@
         },
         {
           "flag_type": "Decline",
-          "reason": "GT Declined, Bad combination All",
+          "reason": "GT Declined, Failed Phone Verification",
           "count": 1
         },
         {
           "flag_type": "Decline",
-          "reason": "GT Declined, Failed Phone Verification",
+          "reason": "GT Declined, Bad combination All",
           "count": 1
         }
       ],
       "declines_by_type": {
-        "Cancelled": 2,
-        "Decline": 9
+        "Decline": 9,
+        "Cancelled": 2
       }
     },
     {
@@ -3937,23 +3937,23 @@
       "campaign_ids": [
         461
       ],
-      "leads_presented": 84,
-      "leads_purchased": 19,
-      "applications": 12,
+      "leads_presented": 77,
+      "leads_purchased": 17,
+      "applications": 11,
       "apply1": 10,
       "brw_signed": 7,
       "gt_accepted": 2,
       "vc_ready": 0,
       "paid_out": 0,
       "paid_out_loan_total": 0.0,
-      "flag_declines": 10,
+      "flag_declines": 9,
       "last_lead_at": "2026-04-05T05:55:47.983786",
-      "avg_loan_amount": 5666.666666666667,
-      "purchase_rate": 0.2261904761904762,
-      "app_rate": 0.631578947368421,
-      "apply1_rate": 0.8333333333333334,
-      "brw_signed_rate": 0.5833333333333334,
-      "gt_accepted_rate": 0.16666666666666666,
+      "avg_loan_amount": 5818.181818181818,
+      "purchase_rate": 0.22077922077922077,
+      "app_rate": 0.6470588235294118,
+      "apply1_rate": 0.9090909090909091,
+      "brw_signed_rate": 0.6363636363636364,
+      "gt_accepted_rate": 0.18181818181818182,
       "vc_ready_rate": 0.0,
       "paid_out_rate": 0.0,
       "lead_to_paid_rate": 0.0,
@@ -3961,10 +3961,10 @@
         {
           "label": "Already claimed",
           "code": 2,
-          "count": 65
+          "count": 60
         }
       ],
-      "flag_decline_rate": 0.5263157894736842,
+      "flag_decline_rate": 0.5294117647058824,
       "top_decline_reasons": [
         {
           "flag_type": "Decline",
@@ -3972,17 +3972,12 @@
           "count": 5
         },
         {
-          "flag_type": "Cancelled",
-          "reason": "(no reason given)",
-          "count": 2
-        },
-        {
           "flag_type": "FraudRisk",
           "reason": "Suspicious activity on linked account",
           "count": 1
         },
         {
-          "flag_type": "DNL",
+          "flag_type": "Cancelled",
           "reason": "(no reason given)",
           "count": 1
         },
@@ -3990,13 +3985,18 @@
           "flag_type": "Decline",
           "reason": "GT Declined, Credit score too low - C < 600",
           "count": 1
+        },
+        {
+          "flag_type": "DNL",
+          "reason": "(no reason given)",
+          "count": 1
         }
       ],
       "declines_by_type": {
         "FraudRisk": 1,
-        "DNL": 1,
-        "Cancelled": 2,
-        "Decline": 6
+        "Cancelled": 1,
+        "Decline": 6,
+        "DNL": 1
       }
     },
     {
@@ -4066,42 +4066,6 @@
       }
     },
     {
-      "source_id": 458,
-      "friendly_name": "Transform Credit e-mail",
-      "company_name": "n/a",
-      "username": "EmailMarketing",
-      "website_url": "n/a",
-      "phone": "n/a",
-      "email": null,
-      "campaign_ids": [
-        398
-      ],
-      "leads_presented": 1,
-      "leads_purchased": 1,
-      "applications": 0,
-      "apply1": 0,
-      "brw_signed": 0,
-      "gt_accepted": 0,
-      "vc_ready": 0,
-      "paid_out": 0,
-      "paid_out_loan_total": 0.0,
-      "flag_declines": 0,
-      "last_lead_at": "2026-03-29T03:37:55.863050",
-      "avg_loan_amount": null,
-      "purchase_rate": 1.0,
-      "app_rate": 0.0,
-      "apply1_rate": null,
-      "brw_signed_rate": null,
-      "gt_accepted_rate": null,
-      "vc_ready_rate": null,
-      "paid_out_rate": null,
-      "lead_to_paid_rate": 0.0,
-      "top_rejections": [],
-      "flag_decline_rate": 0.0,
-      "top_decline_reasons": [],
-      "declines_by_type": {}
-    },
-    {
       "source_id": 35,
       "friendly_name": "Source 35",
       "company_name": null,
@@ -4131,6 +4095,42 @@
       "gt_accepted_rate": 0.0,
       "vc_ready_rate": 0.0,
       "paid_out_rate": 0.0,
+      "lead_to_paid_rate": 0.0,
+      "top_rejections": [],
+      "flag_decline_rate": 0.0,
+      "top_decline_reasons": [],
+      "declines_by_type": {}
+    },
+    {
+      "source_id": 458,
+      "friendly_name": "Transform Credit e-mail",
+      "company_name": "n/a",
+      "username": "EmailMarketing",
+      "website_url": "n/a",
+      "phone": "n/a",
+      "email": null,
+      "campaign_ids": [
+        398
+      ],
+      "leads_presented": 1,
+      "leads_purchased": 1,
+      "applications": 0,
+      "apply1": 0,
+      "brw_signed": 0,
+      "gt_accepted": 0,
+      "vc_ready": 0,
+      "paid_out": 0,
+      "paid_out_loan_total": 0.0,
+      "flag_declines": 0,
+      "last_lead_at": "2026-03-29T03:37:55.863050",
+      "avg_loan_amount": null,
+      "purchase_rate": 1.0,
+      "app_rate": 0.0,
+      "apply1_rate": null,
+      "brw_signed_rate": null,
+      "gt_accepted_rate": null,
+      "vc_ready_rate": null,
+      "paid_out_rate": null,
       "lead_to_paid_rate": 0.0,
       "top_rejections": [],
       "flag_decline_rate": 0.0,
