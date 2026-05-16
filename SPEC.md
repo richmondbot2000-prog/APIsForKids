@@ -1474,13 +1474,13 @@ Log is FIFO-trimmed at 5000 entries.
 
 #### 11.9.3 Page layout
 
-- Header row carries the H1, the admin-only person dropdown, and a holiday-day count (totals `holiday` + `maternity` + default UK BH on weekdays).
-- Legend strip below the header (Quiet-Edition swatches matching the table above).
-- When the viewer has ≥1 direct report, a **My calendar / Team — N** tab strip appears below the legend.
-  - **My calendar** view: 52 weekly rows × 7 day cells (Sun → Sat), 100 px sticky week-label column on the left. Cells are ~64 px tall. Click any in-year day → popover picker.
-  - **Team** view: one horizontal strip per direct report. 10 px wide cells × 365 days. Sticky 160 px name column on the left + holiday count below name. Month markers stripped across the top. Strip scrolls horizontally; click any cell → popover.
-- Status picker popover sits over the clicked cell. Options are the 8 statuses + (manager edits only) **Approved Holiday** + a "Reset to default" item that deletes the override.
-- Change log section at the bottom shows every change as `<time> · <date> · <from> → <to> · by <name>`. In Team view, log entries are tagged with the affected person too.
+- Header row carries the H1, the admin-only person dropdown, and a holiday-day count (sums `holiday` + `maternity` + `approved-holiday` overrides at +1, half-day overrides at +0.5, and default UK BHs on weekdays at +1).
+- Legend strip below the header (Quiet-Edition swatches matching the table above). Each status hue is in its own family (sage / teal / amber / red / mauve / brass / slate) so two never get confused.
+- When the viewer has ≥1 direct report, a **My calendar / Team — N** tab strip appears below the legend. Tab visibility updates dynamically — clicking Team re-fetches `annotations.json` from raw GH so a freshly-set Line Manager appears without a reload; a window-focus refresh (30 s debounced) catches the same case on tab-return.
+  - **My calendar** view: 52 weekly rows × 7 day cells (Sun → Sat), 100 px sticky week-label column on the left. Cells are ~64 px tall. Click any in-year day → popover picker. Day numerals flip to paper (`#FDFBF4`) on saturated status fills for legibility.
+  - **Team** view: a **Sunday-anchored calendar grid**. ONE shared DOW header at the top (Week of · Sun Mon Tue Wed Thu Fri Sat). Beneath it, 52-ish week blocks, each carrying its own date strip and one row per direct report. Day-of-week columns are fixed; months stagger so the 1st of each month falls in whichever DOW column it actually occupies (rendered with the month abbreviation under the date number). Every cell sits on `--paper-50` inside an `--ink-300` grid container with a 1 px gap so cell-to-cell separation is consistent regardless of adjacent colour. Scanning down a column shows e.g. "all of Sarah's Tuesdays" stacked.
+- Status picker popover sits over the clicked cell. Options are the 8 self-settable statuses + (manager edits only) **Approved Holiday** + a "Reset to default" item that deletes the override.
+- Change log section at the bottom shows every change as `<time> · <date> · <from> → <to> · by <name>`. In Team view, log entries label both the target person and the actor explicitly; filter is the union of (viewer's own days) ∪ (changes the viewer made to a direct report's day).
 - Edits are optimistic — paint the new cell, POST `/api/holidays/set`, roll back + banner on error.
 
 #### 11.9.4 Worker endpoints (`/api/holidays/*`)
