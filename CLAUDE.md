@@ -33,7 +33,7 @@ Decorative-only choices get rejected. Every icon, colour, axis must communicate 
 - **GitHub auth:** `gh` CLI is logged in as `richmondbot2000-prog` (PAT in macOS keychain)
 - **Deploy flow:** `git push` to `main` → GitHub Pages rebuild (~30s) → Cloudflare edge propagation (~10s). Cache-bust CSS/image/JSON refs on every push (see SPEC §15).
 - **Data:** flat HTML files fetch JSON files at the repo root. JSONs are refreshed by `.github/workflows/refresh-*.yml` running Python scripts in `scripts/`. Data comes from the **Fabric data warehouse** (nightly mirror of Central Services).
-- **Workers:** two Cloudflare Workers handle dynamic writes — `apifk-workspace-worker2` (sources `worker/workspace-worker.js`; routes `/api/workspace/*` + `/api/wall/*` + `/api/holidays/*`) and `apifk-annotations-worker` (sources `worker/annotations-worker.js`; route `/api/annotations*`). Both are deployed by pasting the source file into the Cloudflare dashboard.
+- **Workers:** two Cloudflare Workers handle dynamic writes — `apifk-workspace-worker2` (sources `worker/workspace-worker.js`; routes `/api/workspace/*` + `/api/wall/*` + `/api/holidays/*`) and `apifk-annotations-worker` (sources `worker/annotations-worker.js`; route `/api/annotations*`). Deploy `apifk-workspace-worker2` with `python3 ~/.togetherbook/deploy_worker.py` — it inherits existing bindings (4 secrets + IMPERSONATE_USER + IMPERSONATE_USER_TOGETHERLOANS + PAYROLL_KV + ACTIVITY_DB) via the Cloudflare API token in `~/.togetherbook/cloudflare.json`. No dashboard paste needed for everyday edits. The other worker (annotations) is rarely edited and still needs the dashboard route per `worker/SETUP.md`.
 - **Pages with write-back:** Wall (posts/comments/reactions), Directory (annotations + workspace actions), Holidays (per-user calendar). The rest are read-only.
 - **No build step.** No SPA. No bundler. Edits are direct.
 
@@ -76,8 +76,11 @@ NEW=$(date +%s); python3 -c "
 import re, pathlib; p = pathlib.Path('brokers.html')
 p.write_text(re.sub(r'\?v=\d+', '?v=$NEW', p.read_text()))"
 
-# Copy a worker to clipboard for paste-and-deploy
-cat worker/workspace-worker.js | pbcopy
+# Deploy the workspace worker (after editing worker/workspace-worker.js)
+python3 ~/.togetherbook/deploy_worker.py
+# Verifies by re-fetching settings + printing the binding list at the end.
+# Cloudflare edge picks up the new version within seconds; no GH Pages
+# rebuild and no browser hard-refresh required for worker-side fixes.
 ```
 
 ## 9. Things you should NOT do
