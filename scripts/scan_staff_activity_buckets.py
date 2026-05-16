@@ -57,10 +57,12 @@ WINDOW_DAYS = 14   # short enough to keep the JSON under a few hundred KB
 TS_DATA_TYPES = ('datetime', 'datetime2', 'datetimeoffset', 'smalldatetime', 'date')
 
 TS_NAME_PREF = (
-    "DateTimeUTC", "EventDateUTC", "CreatedDateUTC", "CreatedAtUTC",
+    "DateTimeUTC", "DateTimeUtc", "UTCTime", "UtcTime",
+    "EventDateUTC", "CreatedDateUTC", "CreatedAtUTC",
     "EventDateTime", "DateTime", "EventDate", "Created", "CreatedAt",
     "ModifiedDateUTC", "ModifiedAtUTC", "ModifiedDate", "ModifiedAt",
     "InsertDateUTC", "InsertedAt", "Stamp", "Timestamp", "EventTime",
+    "StatusTime", "ReceivedAt", "ReceivedUtc", "SentAt", "SentUtc",
 )
 
 QUERY_TIMEOUT = 240
@@ -142,6 +144,8 @@ def scan_database(database: str, cutoff: datetime.datetime, buckets_out, events_
     try:
         targets = find_tables_and_timestamp(cur, database)
         print(f"  - {len(targets)} table(s) with ClientUsername + timestamp", flush=True)
+        for s, t, ts in targets:
+            print(f"    · {s}.{t} (ts={ts})", flush=True)
     except Exception as e:
         print(f"  ! schema scan failed: {e}", flush=True)
         try: c.close()
