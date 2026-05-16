@@ -74,19 +74,31 @@ jobs:
           FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
         run: python scripts/scan_staff_activity.py
 
-      - name: Commit if staff-activity.json changed
+      - name: Scan staff activity buckets (15-min granularity, last 14 d)
+        if: steps.guard.outputs.skip != 'true'
+        env:
+          FABRIC_SQL_ENDPOINT: d76gbn5gtayeppltcrsxsvkluq-ruqkpz7fkwpelmnjh4kbg2lqpi.datawarehouse.fabric.microsoft.com
+          FABRIC_TENANT_ID:    b760fc1f-98a6-4730-bd73-146579554ba4
+          FABRIC_CLIENT_ID:    b8fb2709-6e42-4a1e-91e6-8a3807a9884d
+          FABRIC_CLIENT_SECRET: ${{ secrets.FABRIC_CLIENT_SECRET }}
+        continue-on-error: true
+        run: python scripts/scan_staff_activity_buckets.py
+
+      - name: Commit if staff-activity*.json changed
         if: steps.guard.outputs.skip != 'true'
         run: |
           set -euo pipefail
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add staff-activity.json
-          if git diff --cached --quiet -- staff-activity.json; then
+          for f in staff-activity.json staff-activity-buckets.json; do
+            if [ -f "$f" ]; then git add "$f"; fi
+          done
+          if git diff --cached --quiet; then
             echo "no changes — nothing to commit"
             exit 0
           fi
           ACTIVE=$(python -c "import json; print(json.load(open('staff-activity.json'))['active_count'])")
-          git commit -m "Refresh staff activity: ${ACTIVE} active in last 60d"
+          git commit -m "Refresh staff activity: ${ACTIVE} active in last 60d (+ 14d buckets)"
           for attempt in 1 2 3; do
             if git push; then
               break

@@ -9,11 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1778930132">
-<link rel="stylesheet" href="quiet-tokens.css?v=1778930132">
-<link rel="stylesheet" href="quiet.css?v=1778930132">
-<link rel="stylesheet" href="quiet-extras.css?v=1778930132">
-<link rel="stylesheet" href="quiet-legacy.css?v=1778930132">
+<link rel="stylesheet" href="style.css?v=1778931261">
+<link rel="stylesheet" href="quiet-tokens.css?v=1778931261">
+<link rel="stylesheet" href="quiet.css?v=1778931261">
+<link rel="stylesheet" href="quiet-extras.css?v=1778931261">
+<link rel="stylesheet" href="quiet-legacy.css?v=1778931261">
 <style>
   .hd-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
   .hd-section h1 {
@@ -474,6 +474,128 @@
     font: italic 400 14px/1.4 var(--font-display, 'Newsreader', serif);
   }
 
+  /* Activity view — one row per direct report. Each row shows N day-
+     columns. Each day is a thin vertical 24-hour bar; horizontal
+     hairlines mark the 15-min windows where the user actually wrote
+     to a warehouse table or logged in. Click a day-bar → drill-down
+     panel below the grid listing every detail event for that day. */
+  .hd-act { margin: 6px 0 28px; overflow-x: auto; }
+  .hd-act-empty {
+    padding: 18px 24px;
+    color: var(--ink-500);
+    font: italic 400 14px/1.4 var(--font-display, 'Newsreader', serif);
+  }
+  .hd-act-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    align-items: stretch;
+    border-bottom: 1px solid var(--ink-300);
+    padding: 6px 0;
+  }
+  .hd-act-name {
+    padding: 6px 10px;
+    font: 500 13px/1.2 var(--font-display, 'Newsreader', serif);
+    color: var(--ink-900);
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .hd-act-name .hd-act-sub {
+    font: italic 400 11px/1.2 var(--font-display, 'Newsreader', serif);
+    color: var(--ink-500);
+    margin-top: 2px;
+  }
+  .hd-act-days {
+    display: flex;
+    gap: 4px;
+    align-items: flex-end;
+  }
+  .hd-act-day {
+    flex: 0 0 auto;
+    width: 12px;
+    cursor: pointer;
+    text-align: center;
+  }
+  .hd-act-day-bar {
+    position: relative;
+    width: 100%;
+    height: 192px; /* 96 buckets × 2 px */
+    background: var(--paper-200, #ECDFB6);
+    border: 1px solid var(--ink-300);
+    box-sizing: border-box;
+  }
+  .hd-act-day:hover .hd-act-day-bar { outline: 2px solid var(--ink-900); outline-offset: -2px; }
+  .hd-act-day.is-active .hd-act-day-bar { outline: 2px solid var(--red-500, #b14040); outline-offset: -2px; }
+  .hd-act-day-bar .hd-act-tick {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: var(--sage-700, #2E6B1A);
+  }
+  .hd-act-day-bar .hd-act-tick.is-google { background: var(--teal-600, #2F8F87); }
+  /* Tiny labels above 09:00 and 17:00 latitudes via gridlines. */
+  .hd-act-day-bar::before,
+  .hd-act-day-bar::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0;
+    height: 1px;
+    background: rgba(0,0,0,0.06);
+  }
+  .hd-act-day-bar::before { top: 72px; }   /* 09:00 = bucket 36 × 2 px */
+  .hd-act-day-bar::after  { top: 136px; }  /* 17:00 = bucket 68 × 2 px */
+  .hd-act-day-label {
+    font: 500 9px/1 var(--font-mono, 'JetBrains Mono', monospace);
+    color: var(--ink-600);
+    margin-top: 4px;
+    letter-spacing: 0.04em;
+  }
+  .hd-act-day.is-today .hd-act-day-label { color: var(--red-500); font-weight: 700; }
+  .hd-act-detail {
+    margin: 10px 0 0;
+    padding: 14px 18px;
+    background: var(--paper-50);
+    border: 1px solid var(--ink-300);
+    border-left: 4px solid var(--brass-500);
+  }
+  .hd-act-detail-head {
+    font: italic 500 14px/1.3 var(--font-display, 'Newsreader', serif);
+    color: var(--ink-700);
+    margin-bottom: 8px;
+  }
+  .hd-act-detail-empty {
+    color: var(--ink-500);
+    font-style: italic;
+  }
+  .hd-act-detail table {
+    width: 100%;
+    border-collapse: collapse;
+    font: 400 12px/1.5 var(--font-mono, 'JetBrains Mono', monospace);
+  }
+  .hd-act-detail th, .hd-act-detail td {
+    text-align: left;
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--ink-300);
+    vertical-align: top;
+  }
+  .hd-act-detail th {
+    font: 600 10px/1 var(--font-mono, 'JetBrains Mono', monospace);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-500);
+  }
+  .hd-act-detail td.num { text-align: right; color: var(--ink-700); }
+  .hd-act-detail-source { color: var(--ink-900); }
+  .hd-act-detail-tag {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 5px;
+    border: 1px solid var(--ink-500);
+    border-radius: 3px;
+    font: 600 9px/1 var(--font-mono, 'JetBrains Mono', monospace);
+    color: var(--ink-700);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
   /* Audit log */
   .hd-log-section { margin-top: 36px; }
   .hd-log-section h2 {
@@ -552,7 +674,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="index.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778930132" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1778931261" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -585,8 +707,9 @@
     </div>
 
     <nav class="hd-view-tabs" id="hdViewTabs" style="display:none;" role="tablist" aria-label="Holidays view">
-      <button type="button" class="hd-view-tab is-active" data-view="own"  role="tab" aria-selected="true">My calendar</button>
-      <button type="button" class="hd-view-tab"           data-view="team" role="tab" aria-selected="false">Team — <span id="hdTeamCount">0</span></button>
+      <button type="button" class="hd-view-tab is-active" data-view="own"      role="tab" aria-selected="true">My calendar</button>
+      <button type="button" class="hd-view-tab"           data-view="team"     role="tab" aria-selected="false">Team — <span id="hdTeamCount">0</span></button>
+      <button type="button" class="hd-view-tab"           data-view="activity" role="tab" aria-selected="false">Activity</button>
     </nav>
 
     <div class="hd-legend" aria-label="Status colour legend">
@@ -610,6 +733,10 @@
     </div>
     <div id="hdTeamView" style="display:none;">
       <div class="hd-team" id="hdTeam" role="grid" aria-label="Team calendar strip"></div>
+    </div>
+    <div id="hdActivityView" style="display:none;">
+      <p class="hd-meta" id="hdActivityMeta">Loading 14-day activity…</p>
+      <div class="hd-act" id="hdAct" aria-label="Team data-warehouse activity"></div>
     </div>
 
     <div class="hd-log-section">
@@ -848,13 +975,16 @@
     refreshLineManagers();
   });
   function renderAll() {
-    document.getElementById("hdOwnView").style.display  = (currentView === "own")  ? "" : "none";
-    document.getElementById("hdTeamView").style.display = (currentView === "team") ? "" : "none";
+    document.getElementById("hdOwnView").style.display      = (currentView === "own")      ? "" : "none";
+    document.getElementById("hdTeamView").style.display     = (currentView === "team")     ? "" : "none";
+    document.getElementById("hdActivityView").style.display = (currentView === "activity") ? "" : "none";
     if (currentView === "team") {
-      // In team view the header still tallies the viewer's own holiday days,
-      // but the meta line reflects what's on screen.
       renderHeader();
       renderTeam();
+      renderLog();
+    } else if (currentView === "activity") {
+      renderHeader();
+      renderActivity();
       renderLog();
     } else {
       renderHeader();
@@ -1170,6 +1300,158 @@
 
       root.appendChild(block);
     }
+  }
+
+  // ── Activity view ─────────────────────────────────────────────────
+  // Renders a 14-day strip per direct report. Each day = a vertical
+  // 24-hour bar; thin horizontal ticks at active 15-min positions.
+  // Click a day → drill-down panel below the grid listing every
+  // detail event the warehouse captured for that user-day.
+  let activityData = null;     // staff-activity-buckets.json, lazy-loaded
+  let activityFocus = null;    // { email, iso } currently expanded
+
+  const ACTIVITY_RAW_URL = "https://raw.githubusercontent.com/richmondbot2000-prog/togetherbook/main/staff-activity-buckets.json";
+
+  async function ensureActivityData() {
+    if (activityData !== null) return activityData;
+    try {
+      const r = await fetch(`${ACTIVITY_RAW_URL}?ts=${Date.now()}`, { cache: "no-store" });
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      activityData = await r.json();
+    } catch (e) {
+      activityData = { by_email: {}, window_days: 14, missing: true };
+    }
+    return activityData;
+  }
+
+  async function renderActivity() {
+    const root = document.getElementById("hdAct");
+    const meta = document.getElementById("hdActivityMeta");
+    root.innerHTML = "";
+    if (directReports.size === 0) {
+      meta.textContent = "";
+      root.innerHTML = `<div class="hd-act-empty">You have no direct reports on file. Have admins set you as someone's line manager on the Directory page.</div>`;
+      return;
+    }
+
+    const data = await ensureActivityData();
+    const windowDays = data && data.window_days ? data.window_days : 14;
+    const byEmail = (data && data.by_email) || {};
+    const snapshotAt = data && data.snapshot_at ? new Date(data.snapshot_at).toLocaleString("en-GB") : null;
+    if (data.missing) {
+      meta.innerHTML = `<em>staff-activity-buckets.json hasn't landed yet — trigger <code>refresh-staff-activity</code> to populate it.</em>`;
+    } else {
+      meta.textContent = `Last ${windowDays} days of warehouse activity · snapshot ${snapshotAt || "—"} · click a day for the detail`;
+    }
+
+    // Days: descending from today (most recent on the right).
+    const days = [];
+    const today = new Date();
+    for (let i = windowDays - 1; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      days.push(d);
+    }
+    const todayIso = isoDate(today);
+
+    const reports = [...directReports]
+      .map(e => ({ email: e, user: staffByEmail[e] || { email: e, name: e } }))
+      .sort((a, b) => (a.user.name || a.email).localeCompare(b.user.name || b.email));
+
+    for (const r of reports) {
+      const rec = byEmail[r.email] || { buckets: {}, events: {} };
+      const buckets = rec.buckets || {};
+      const events  = rec.events  || {};
+      const totalBuckets = Object.values(buckets).reduce((n, arr) => n + (arr || []).length, 0);
+
+      const row = document.createElement("div");
+      row.className = "hd-act-row";
+      row.dataset.email = r.email;
+
+      const name = document.createElement("div");
+      name.className = "hd-act-name";
+      name.innerHTML = `
+        <span>${escapeHtml(r.user.name || r.email)}</span>
+        <span class="hd-act-sub">${totalBuckets} active 15-min slot${totalBuckets === 1 ? "" : "s"} in ${windowDays} d</span>`;
+      row.appendChild(name);
+
+      const daysWrap = document.createElement("div");
+      daysWrap.className = "hd-act-days";
+      for (const d of days) {
+        const iso = isoDate(d);
+        const dayBuckets = buckets[iso] || [];
+        const col = document.createElement("div");
+        col.className = "hd-act-day";
+        col.dataset.email = r.email;
+        col.dataset.date = iso;
+        if (iso === todayIso) col.classList.add("is-today");
+        if (activityFocus && activityFocus.email === r.email && activityFocus.iso === iso) col.classList.add("is-active");
+        const bar = document.createElement("div");
+        bar.className = "hd-act-day-bar";
+        for (const b of dayBuckets) {
+          const tick = document.createElement("div");
+          tick.className = "hd-act-tick";
+          tick.style.top = (b * 2) + "px";  // 2 px per 15-min bucket
+          bar.appendChild(tick);
+        }
+        col.appendChild(bar);
+        const lab = document.createElement("div");
+        lab.className = "hd-act-day-label";
+        lab.textContent = d.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+        col.appendChild(lab);
+        col.title = `${r.user.name || r.email} · ${d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })} — ${dayBuckets.length} active slot${dayBuckets.length === 1 ? "" : "s"}`;
+        col.addEventListener("click", () => {
+          activityFocus = { email: r.email, iso };
+          renderActivity();
+        });
+        daysWrap.appendChild(col);
+      }
+      row.appendChild(daysWrap);
+      root.appendChild(row);
+    }
+
+    // Drill-down panel for the focused day.
+    if (activityFocus) {
+      const rec = byEmail[activityFocus.email] || {};
+      const events = (rec.events || {})[activityFocus.iso] || [];
+      const buckets = (rec.buckets || {})[activityFocus.iso] || [];
+      const u = staffByEmail[activityFocus.email] || { name: activityFocus.email };
+      const dateLabel = new Date(activityFocus.iso).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "short", year: "numeric" });
+      const panel = document.createElement("div");
+      panel.className = "hd-act-detail";
+      const head = `<div class="hd-act-detail-head">${escapeHtml(u.name || activityFocus.email)} · ${escapeHtml(dateLabel)} · ${buckets.length} active 15-min slot${buckets.length === 1 ? "" : "s"}</div>`;
+      if (!events.length) {
+        panel.innerHTML = head + `<div class="hd-act-detail-empty">No detail events captured for this day.</div>`;
+      } else {
+        events.sort((a, b) => (a.bucket || 0) - (b.bucket || 0));
+        const rows = events.map(e => {
+          const from = bucketTime(e.bucket || 0);
+          const to   = bucketTime((e.bucket || 0) + 1);
+          const src  = e.src || "?";
+          const writes = e.writes || 0;
+          const kind = e.kind === "login" ? `<span class="hd-act-detail-tag">login</span>` : "";
+          return `
+            <tr>
+              <td class="num">${escapeHtml(from)}–${escapeHtml(to)}</td>
+              <td class="hd-act-detail-source">${escapeHtml(src)}${kind}</td>
+              <td class="num">${writes.toLocaleString("en-GB")}</td>
+            </tr>`;
+        }).join("");
+        panel.innerHTML = head + `
+          <table>
+            <thead>
+              <tr><th>Window (UTC)</th><th>Source</th><th style="text-align:right;">Writes</th></tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>`;
+      }
+      root.appendChild(panel);
+    }
+  }
+  function bucketTime(bucket) {
+    const h = Math.floor(bucket / 4);
+    const m = (bucket % 4) * 15;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
   }
 
   function openTeamPicker(anchor, d, reportEmail) {
@@ -1617,6 +1899,6 @@
     a.addEventListener('click', () => document.body.classList.remove('nav-open'))
   );
 </script>
-<script src="nav.js?v=1778930132" defer></script>
+<script src="nav.js?v=1778931261" defer></script>
 </body>
 </html>
