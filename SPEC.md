@@ -416,8 +416,10 @@ There's no Cloudflare API integration. If we ever need one, the old DNS-flip tok
 | `WORKSPACE_TENANTS` | directory (multi-tenant path) | JSON array, one entry per Workspace tenant. Schema: `[{"name":"letme","delegate":"james.benamor@letme.co.uk","domain":"letme.co.uk"},{"name":"rgroup","delegate":"ben.gardner@rgroup.co.uk","domain":"rgroup.co.uk"}]`. Each tenant must have DWD enabled and the SA Client ID (`116293508437634653191`) plus user.readonly scope authorised in that Workspace's Admin Console. |
 | `SMTP_USERNAME` | brandwatch email | `noreply@togetherbook.net` — the Workspace user that sends new-mention notification emails. See §14. |
 | `SMTP_PASSWORD` | brandwatch email | 16-character Gmail App Password for the `noreply@togetherbook.net` account. Generated at `myaccount.google.com/apppasswords` while signed in as that user; requires 2-Step Verification turned on. |
+| `AUTH0_CLIENT_ID` | refresh-auth0 | Client ID for the Auth0 Management API M2M app `TogetherBook directory reader` in the `rgcore` tenant. Scope: `read:users` only. Create at https://manage.auth0.com/#/apis → Auth0 Management API → Machine to Machine Applications. |
+| `AUTH0_CLIENT_SECRET` | refresh-auth0 | Client Secret paired with `AUTH0_CLIENT_ID`. |
 
-Non-secret values (`FABRIC_SQL_ENDPOINT`, `FABRIC_TENANT_ID`, `FABRIC_CLIENT_ID`) are inline in workflow `env:` blocks.
+Non-secret values (`FABRIC_SQL_ENDPOINT`, `FABRIC_TENANT_ID`, `FABRIC_CLIENT_ID`, `AUTH0_DOMAIN=rgcore.auth0.com`) are inline in workflow `env:` blocks.
 
 ---
 
@@ -2094,6 +2096,90 @@ and the live HTML.
 
 ---
 
+## 16.7 Iteration — 2026-05-17
+
+Single-day pass: site-wide deep-link URL restructure, Wall search,
+Holidays log fix, and a new Auth0 data source on the Directory page.
+
+### Deep links — every page reads + writes its own filter state to the URL
+
+Coordinated overnight pass so any view on the site is shareable /
+reload-stable / linkable from a notification. Each page debounces
+`history.replaceState` while users interact and parses its params on
+load. All keys are non-required (missing → page default).
+
+| Page | Query params |
+|---|---|
+| `wall.html` | `?post=<id>` (canonical, replaces legacy `#post-<id>` hash), `?page=<n>` |
+| `directory.html` | `?group=<letme\|togetherloans\|crm\|suspended\|all>`, `?sort=`, `?q=` |
+| `holidays.html` | `?view=<my\|team\|activity>`, `?user=<email>` (already existed; now stays sticky on tab switch) |
+| `brokers.html` | `?sort=`, `?dir=`, `?filter=`, `?min=`, `?q=`, `?source=` |
+| `comms.html` | `?excludeRR=`, `?excludeNoReply=`, `?metric=` |
+| `1stcontact.html` | `?role=`, `?lender=` |
+| `org-structure.html` | `?center=<email>` — centres the d3-org-chart on a specific person on load |
+
+Combined with the existing `?email=` on `user.html`, this means a
+notification or DM can drop a viewer onto an exact filtered state on
+any page.
+
+### Wall search (`wall.html`)
+
+- **Magnifier icon** at the top-right, sits left of the bell (40 px
+  circle, same Quiet-paper border style). Click expands a fixed
+  full-width bar across the top (covers both icons) with a single
+  `<input type="search">`.
+- **Google-style results panel** opens just below the bar. Search-as-
+  you-type with 80 ms debounce. Scans every loaded post body, every
+  comment + reply body, plus `post.poll.question` and each
+  `post.poll.options[]` entry. Each match emits its own result card:
+  author + kind chip + 90-char snippet either side of the hit, with
+  the hit wrapped in a brass `<mark>`.
+- **Click a result** → search closes, `jumpToPost(postId, {commentId})`
+  fires (existing helper). Comment hits get the same brass flash that
+  notification jumps use.
+- **Esc / × close**. No backend; entirely client-side over the loaded
+  `posts[]` array.
+
+### Holidays change-log fix (`holidays.html`)
+
+The Team-view change-log filter previously kept only changes the
+viewer made themselves (`by === me && directReports.has(u)`). The
+notification bell, however, surfaces any change to a direct report
+regardless of who made it — so Clementia editing Ashwin John's day
+pinged the bell and vanished from the log. Filter broadened to
+include any change targeting a direct report, matching the
+notification rule exactly. Single-line fix at `holidays.html:2388`.
+
+### Auth0 active accounts on Directory (`directory.html` + new scanner)
+
+Fourth data source on the Directory page alongside Google Workspace,
+warehouse activity, and payroll. The `rgcore.auth0.com` tenant is the
+auth layer for CRM / Admin Site / Reporting / VVC — its user list is
+the authoritative "who can log into our stuff" record.
+
+- **`scripts/scan_auth0.py`** — `client_credentials` grant against
+  `/oauth/token`, paginates `/api/v2/users` (per_page=100, up to the
+  Auth0 offset cap of 1000), keeps `blocked != true AND last_login is
+  set`. Writes `auth0-users.json` with `users[]` (email, name,
+  last_login, logins_count, email_verified, connections) + totals.
+  Logs a warning + sets `offset_window_capped: true` if rgcore ever
+  exceeds 1000 users (in which case switch to the bulk export job).
+- **`.github/workflows/refresh-auth0.yml`** — hourly 06:00–23:00 UTC,
+  guard step (skip when today's snapshot already exists), retry-on-
+  rebase. Mirrors `refresh-directory.yml` exactly.
+- **Directory UI** — page fetches `auth0-users.json` in its load
+  `Promise.all`, builds `auth0ByEmail`, and adds a small red
+  `.dir-auth0-chip` "AUTH0" pill on every staff row whose primary
+  email or any alias matches. Chip tooltip = last-login date +
+  sign-in count. Header banner gains `· N active in Auth0`.
+- **Activation** — gated on two new GH secrets:
+  `AUTH0_CLIENT_ID` and `AUTH0_CLIENT_SECRET` from a Management API
+  M2M app with `read:users` scope only. Until both exist the
+  workflow runs but the scan step fails fast and no JSON is
+  written.
+
+---
+
 ## 17. Pending / blocked work
 
 | Item | Status | Blocker |
@@ -2108,6 +2194,7 @@ and the live HTML.
 | Reddit OAuth | Code wired, abandoned | Reddit dev registration impossible via Google sign-in. ScraperAPI fallback is in use. |
 | UK Bank Holidays after 2027 | Hard-coded for 2026-04 → 2027-03 | When the fiscal year rolls over, append next year's BHs to the `UK_BANK_HOLIDAYS` Set in `holidays.html`. |
 | Sanitisation pass | Not done | Cloudflare Access reduces urgency but internal hostnames + payment partners + employee email pattern are still in the public-mirror copy. |
+| Auth0 Directory chip — secrets | Code shipped 2026-05-17 (commit `014e171`); awaiting secrets | User needs to (a) create a Management API M2M app at https://manage.auth0.com/#/apis with `read:users` scope only, (b) paste `AUTH0_CLIENT_ID` + `AUTH0_CLIENT_SECRET` into the repo secrets, (c) `gh workflow run refresh-auth0.yml --ref main`. Until done, every Directory row renders without the AUTH0 chip and the header banner omits the count. |
 
 ---
 
