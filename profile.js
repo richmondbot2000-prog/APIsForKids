@@ -869,9 +869,11 @@
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
       Object.assign(person, out.person);
+      LS.set(person.id, "on_payroll", turnOn);
       if (out.payroll_record) {
         payrollRecordsById[out.payroll_record.id] = out.payroll_record;
         payrollByPersonId[person.id] = out.payroll_record;
+        LS.set(person.id, "most_recent_payroll_id", out.payroll_record.id);
       }
       renderPanel();
     } catch (err) {
@@ -1335,6 +1337,7 @@
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
       Object.assign(person, out.person);
+      LS.set(person.id, "suspended", turnOn);
       renderPanel();
     } catch (err) {
       if (status) { status.textContent = "Failed — " + err.message; status.className = "up-edit-status up-edit-status--err"; }

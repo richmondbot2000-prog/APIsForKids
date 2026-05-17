@@ -48,8 +48,9 @@
   .pp-btn--danger { background: var(--paper-50); color: var(--red-600, #b3261e); border-color: var(--red-200, #f3c8c4); }
   .pp-btn--danger:hover { background: var(--red-50, #fcf0ee); border-color: var(--red-500); }
 
-  .pp-stats { display: flex; gap: 14px; font: 500 12px/1.3 var(--font-body); color: var(--ink-600); margin-bottom: 10px; }
+  .pp-stats { display: flex; gap: 14px; font: 500 12px/1.3 var(--font-body); color: var(--ink-600); margin-bottom: 6px; flex-wrap: wrap; }
   .pp-stat strong { color: var(--ink-900); font-weight: 700; }
+  .pp-freshness { font: 400 11px/1.2 var(--font-body); color: var(--ink-500); margin-bottom: 12px; cursor: help; }
 
   .pp-table {
     background: var(--paper-50, white);
@@ -326,6 +327,7 @@
   </div>
 
   <div class="pp-stats" id="ppStats"></div>
+  <div class="pp-freshness" id="ppFreshness" title="People table is read directly from the GitHub Contents API at HEAD of main — no cache, no publish lag. Hit refresh to re-read."></div>
   <div id="ppGate"></div>
   <div class="pp-table" id="ppTable"></div>
 </main>
@@ -893,6 +895,14 @@
     fetch("/api/workspace/table?file=warehouse-activity",   { cache: "no-store", headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" } }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch("/api/workspace/table?file=payroll-data",         { cache: "no-store", headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" } }).then(r => r.ok ? r.json() : null).catch(() => null),
   ]).then(([who, peopleFile, staff, gaccounts, warehouse, payroll]) => {
+    // Stamp the load time so the user can verify data freshness at a
+    // glance — proxy reads are always canonical, so this is when
+    // we last asked the GitHub Contents API.
+    const fresh = document.getElementById("ppFreshness");
+    if (fresh) {
+      const t = new Date();
+      fresh.textContent = `Loaded at ${String(t.getHours()).padStart(2,"0")}:${String(t.getMinutes()).padStart(2,"0")}:${String(t.getSeconds()).padStart(2,"0")} — canonical (no cache)`;
+    }
     if (who) { viewerEmail = (who.email||"").toLowerCase(); isAdmin = !!who.is_admin; }
     if (staff && Array.isArray(staff.users)) {
       for (const u of staff.users) { const k = (u.email||"").toLowerCase(); if (k) staffByEmail[k] = u; }

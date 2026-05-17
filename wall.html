@@ -1661,7 +1661,10 @@
     fetch(`${WALL_API}/whoami`, { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch("annotations.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch("admins.json",      { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-    fetch("people.json",      { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    // Use the Worker proxy endpoint instead of the static people.json
+    // so renames + merges propagate to @mention rendering without
+    // waiting for GitHub Pages publish lag or any cache layer.
+    fetch("/api/workspace/table?file=people", { cache: "no-store", headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" } }).then(r => r.ok ? r.json() : null).catch(() => null),
   ]).then(([wall, staff, seen, who, annFile, adminsFile, peopleFile]) => {
     const adminEmails = new Set(((adminsFile && adminsFile.admins) || []).map(e => (e || "").toLowerCase()));
     posts = Array.isArray(wall.posts) ? wall.posts : [];
