@@ -1188,6 +1188,12 @@
   let payrollData = null;
   let payrollByEmailLc = new Map();
   let payrollByNameNorm = new Map();
+  // people.json — used to collapse the multiple Google emails of a
+  // merged Person into a single team-calendar row (and to merge their
+  // holiday entries across all linked emails).
+  let peopleList = [];
+  let peopleById = {};
+  let personByEmail = {};
 
   // ── Boot ──────────────────────────────────────────────────────────
   // holidays.json is fetched via api.github.com's contents endpoint, NOT
@@ -1230,7 +1236,21 @@
     fetch("/api/workspace/payroll", { cache: "no-store" })
       .then(r => r.ok ? r.json() : null).catch(() => null),
     fetchFreshJson("holidays-seen.json", HD_SEEN_RAW_URL, { by_user: {} }),
-  ]).then(([who, s, ad, hd, an, pr, seen]) => {
+    fetch("people.json",      { cache: "no-store" }).then(r => r.ok ? r.json() : ({ people: [] })).catch(() => ({ people: [] })),
+  ]).then(([who, s, ad, hd, an, pr, seen, pf]) => {
+    // Build a canonical email → Person map so the team-calendar view
+    // can collapse the multiple Google emails of a merged person into
+    // a single row. `peopleById` is the dedupe target; `personByEmail`
+    // is the lookup keyed on every linked email (main + alts + external).
+    peopleList = (pf && pf.people) || [];
+    peopleById = {};
+    personByEmail = {};
+    for (const p of peopleList) {
+      peopleById[p.id] = p;
+      const linked = [p.main_google_email, ...(p.alt_google_emails || []), p.external_google_email]
+        .filter(Boolean).map(x => x.toLowerCase());
+      for (const e of linked) personByEmail[e] = p;
+    }
     payrollData = pr;
     payrollByEmailLc = new Map();
     payrollByNameNorm = new Map();
@@ -1736,13 +1756,39 @@
       return;
     }
 
-    // Drop off-payroll directs entirely — no row at all (the old
-    // grey-disabled placeholder added noise to the calendar). The Team
-    // tab count is rewritten here to match the filtered list.
-    const reports = [...directReports]
-      .filter(e => isOnPayroll(e))
-      .map(e => ({ email: e, user: staffByEmail[e] || { email: e, name: e } }))
-      .sort((a, b) => (a.user.name || a.email).localeCompare(b.user.name || b.email));
+    // Drop off-payroll directs entirely, then collapse multi-email
+    // Persons (e.g. Kelly Black: letme + togetherloans) into one row
+    // each. `repEmail` is the chosen calendar key (main_google_email
+    // when known), and `dayMap` is the merged set of statuses across
+    // every linked email so a holiday recorded under either account
+    // shows up exactly once. The Team — N count tracks the deduped list.
+    const seenPersonIds = new Set();
+    const reports = [];
+    for (const e of directReports) {
+      if (!isOnPayroll(e)) continue;
+      const person = personByEmail[e] || null;
+      const linked = person
+        ? [person.main_google_email, ...(person.alt_google_emails || []), person.external_google_email]
+            .filter(Boolean).map(x => x.toLowerCase())
+        : [e];
+      const repEmail = (person && (person.main_google_email || "").toLowerCase()) || e;
+      const dedupeKey = person ? "p:" + person.id : "e:" + e;
+      if (seenPersonIds.has(dedupeKey)) continue;
+      seenPersonIds.add(dedupeKey);
+      // Merge dayMaps + noteMaps across every linked email — most
+      // recent entry wins on collision. Holidays may live under whichever
+      // Google account the person was using when they last edited.
+      const mergedDays = {}; const mergedNotes = {};
+      for (const le of linked) {
+        const u = (holidaysDoc.by_user || {})[le] || {};
+        Object.assign(mergedDays, u.days || {});
+        Object.assign(mergedNotes, u.notes || {});
+      }
+      const user = staffByEmail[repEmail] || staffByEmail[e] ||
+                   (person ? { email: repEmail, name: person.name } : { email: e, name: e });
+      reports.push({ email: repEmail, user, dayMap: mergedDays, noteMap: mergedNotes });
+    }
+    reports.sort((a, b) => (a.user.name || a.email).localeCompare(b.user.name || b.email));
 
     const countEl = document.getElementById("hdTeamCount");
     if (countEl) countEl.textContent = String(reports.length);
@@ -1828,9 +1874,8 @@
         if (!onPayroll) name.title = "Not on payroll — calendar disabled";
         row.appendChild(name);
 
-        const userMap = (holidaysDoc.by_user || {})[r.email] || {};
-        const dayMap = userMap.days || {};
-        const noteMap = userMap.notes || {};
+        const dayMap = r.dayMap || ((holidaysDoc.by_user || {})[r.email] || {}).days || {};
+        const noteMap = r.noteMap || ((holidaysDoc.by_user || {})[r.email] || {}).notes || {};
         for (let i = 0; i < COLS; i++) {
           const cell = document.createElement("div");
           cell.className = "hd-team-cell";
