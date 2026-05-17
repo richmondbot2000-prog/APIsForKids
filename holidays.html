@@ -33,10 +33,7 @@
     padding: 0;
   }
   .hd-notif-btn:hover { color: var(--ink-900); border-color: var(--brass-500); }
-  .hd-notif-btn::before {
-    content: "🔔";
-    font-size: 18px; line-height: 1;
-  }
+  .hd-notif-btn svg { width: 20px; height: 20px; }
   .hd-notif-btn[data-count]:not([data-count="0"])::after {
     content: attr(data-count);
     position: absolute;
@@ -962,7 +959,9 @@
        Populated client-side from holidaysDoc.log filtered by viewer/manager
        relationship. -->
   <div class="hd-notif-anchor">
-    <button class="hd-notif-btn" id="hdNotifBtn" data-count="0" title="Holiday change notifications" aria-label="Notifications"></button>
+    <button class="hd-notif-btn" id="hdNotifBtn" data-count="0" title="Holiday change notifications" aria-label="Notifications">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 5 3 5 3 8H3c0-3 3-3 3-8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 21a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
     <div class="hd-notif-panel" id="hdNotifPanel">
       <div class="hd-notif-head">
         <span>Holiday changes</span>
