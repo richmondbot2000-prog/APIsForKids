@@ -123,19 +123,57 @@
     fetch('/api/workspace/whoami', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch('/staff.json',           { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch('/annotations.json',     { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
-  ]).then(([who, staff, ann]) => {
+    fetch('/people.json',          { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
+  ]).then(([who, staff, ann, peopleFile]) => {
     const email = (who && who.email || '').toLowerCase();
     if (!email) return; // keep the fallback icon + /directory.html href
-    const slug = emailToSlug(email);
+
+    // Locate this viewer's Person record so we can walk ALL their
+    // linked Google emails (main + alts + external) when looking for an
+    // uploaded directory photo. Without this, an upload made under
+    // @letme.co.uk would be invisible to a viewer signed in as
+    // @letme.com — and the avatar would silently fall back to the
+    // Google profile photo while the profile-page hero shows the
+    // upload (profile.js walks all candidates).
+    const people = (peopleFile && peopleFile.people) || [];
+    const matchEmail = (p, e) => {
+      const all = [p.main_google_email, ...(p.alt_google_emails || []), p.external_google_email]
+        .filter(Boolean).map(x => x.toLowerCase());
+      return all.includes(e);
+    };
+    const person = people.find(p => matchEmail(p, email)) || null;
+    const candidates = person
+      ? [person.main_google_email, ...(person.alt_google_emails || []), person.external_google_email]
+          .filter(Boolean).map(x => x.toLowerCase())
+      : [email];
+    // Prefer the Person's URL slug for the profile link so the chip
+    // always points at the canonical /directory/<slug> regardless of
+    // which alias the viewer signed in with.
+    const slug = (person && person.url_slug) || emailToSlug(email);
     slot.href = '/directory/' + slug;
 
-    let photo = '', name = email;
+    let photo = '', name = (person && person.name) || email;
+    // Google profile photo as the baseline — picked from whichever
+    // staff.json row matches one of the candidate emails.
     if (staff && Array.isArray(staff.users)) {
-      const u = staff.users.find(x => (x.email || '').toLowerCase() === email);
-      if (u) { name = u.name || email; photo = u.photo_url || ''; }
+      for (const e of candidates) {
+        const u = staff.users.find(x => (x.email || '').toLowerCase() === e);
+        if (u) {
+          if (!person) name = u.name || email;
+          if (u.photo_url) { photo = u.photo_url; break; }
+        }
+      }
     }
-    if (ann && ann.annotations && ann.annotations[email] && ann.annotations[email].directory_photo_uploaded_at) {
-      photo = '/assets/photos/' + dirPhotoKey(email) + '.jpg?v=' + encodeURIComponent(ann.annotations[email].directory_photo_uploaded_at);
+    // Uploaded photo wins — same lookup profile.js uses for the hero
+    // avatar, so the two surfaces never drift apart.
+    if (ann && ann.annotations) {
+      for (const e of candidates) {
+        const a = ann.annotations[e];
+        if (a && a.directory_photo_uploaded_at) {
+          photo = '/assets/photos/' + dirPhotoKey(e) + '.jpg?v=' + encodeURIComponent(a.directory_photo_uploaded_at);
+          break;
+        }
+      }
     }
     slot.title = name;
     const av = slot.querySelector('.qb-me-avatar');
