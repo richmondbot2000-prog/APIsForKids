@@ -1422,7 +1422,15 @@
       );
       if (!r.ok) throw new Error("api.github.com " + r.status);
       const data = await r.json();
-      const txt = atob((data.content || "").replace(/\s/g, ""));
+      // atob returns a Latin-1 string — each byte becomes one JS char. If
+      // the original payload had multi-byte UTF-8 (smart quotes, emoji,
+      // accented names), Latin-1 interpretation splits them into garbage
+      // ("don't" → "donâ\x80\x99t"). Round-trip through Uint8Array +
+      // TextDecoder so JSON.parse sees the right characters.
+      const bin = atob((data.content || "").replace(/\s/g, ""));
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const txt = new TextDecoder("utf-8").decode(bytes);
       return JSON.parse(txt);
     } catch (e) {
       try {

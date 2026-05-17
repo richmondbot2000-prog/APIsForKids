@@ -1112,7 +1112,12 @@
       );
       if (!r.ok) throw new Error("api.github.com " + r.status);
       const data = await r.json();
-      const txt = atob((data.content || "").replace(/\s/g, ""));
+      // atob returns Latin-1; smart quotes, emoji, accented names need
+      // UTF-8 decoding after base64 or they corrupt into mojibake.
+      const bin = atob((data.content || "").replace(/\s/g, ""));
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      const txt = new TextDecoder("utf-8").decode(bytes);
       return JSON.parse(txt);
     } catch (e) {
       try {
