@@ -58,6 +58,16 @@
   }
   function avatarSrc() {
     if (!person) return "";
+    // The photo could have been uploaded against any of the Person's
+    // Google emails. annotations.json is keyed by the upload email, so
+    // walk all of them and use the first that has a stamp.
+    const candidates = [person.main_google_email, ...(person.alt_google_emails||[]), person.external_google_email].filter(Boolean);
+    for (const e of candidates) {
+      const ann = annotationsMap[e.toLowerCase()];
+      if (ann && ann.directory_photo_uploaded_at) {
+        return `/assets/photos/${dirPhotoKey(e)}.jpg?v=${encodeURIComponent(ann.directory_photo_uploaded_at)}`;
+      }
+    }
     if (person.directory_photo_uploaded_at && person.main_google_email) {
       return `/assets/photos/${dirPhotoKey(person.main_google_email)}.jpg?v=${encodeURIComponent(person.directory_photo_uploaded_at)}`;
     }
@@ -1196,29 +1206,39 @@
 
   async function uploadImage(file, opts) {
     if (!file) return;
+    let step = "init";
     try {
+      step = `read file (${file.type || "?"}, ${Math.round(file.size/1024)}kB)`;
       const img = await readImage(file);
+      step = `resize ${img.width}×${img.height} → ${opts.kind === "cover" ? "1600×500" : "400×400"}`;
       const b64 = resizeToJpegB64(img, opts);
+      step = `encoded b64 (${Math.round(b64.length/1024)}kB)`;
       const action = opts.kind === "cover" ? "cover-photo-upload" : "directory-photo-upload";
+      step = `POST /api/workspace/${action}`;
       const res = await fetch(WORKSPACE_API + "/" + action, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action, user_email: person.main_google_email, photo_b64: b64, tenant: (person.company || "").includes("togetherloans") ? "togetherloans" : "" }),
       });
+      step = `read response (${res.status})`;
       const out = await res.json();
+      step = `worker reply ok=${out.ok}`;
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
-      // Record the timestamp on the Person record so caches bust.
       const stamp = new Date().toISOString();
       const field = opts.kind === "cover" ? "cover_photo_uploaded_at" : "directory_photo_uploaded_at";
+      step = `POST /api/workspace/people-set ${field}`;
       const setRes = await fetch(WORKSPACE_API + "/people-set", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: person.id, [field]: stamp  }),
+        body: JSON.stringify({ action: "people-set", id: person.id, [field]: stamp }),
       });
       const setOut = await setRes.json();
+      step = `people-set reply ok=${setOut.ok}`;
       if (!setRes.ok || !setOut.ok) throw new Error(setOut.error || `HTTP ${setRes.status}`);
       Object.assign(person, setOut.person);
       renderProfile();
     } catch (err) {
-      alert("Upload failed: " + (err && err.message || err));
+      alert("Upload failed at step [" + step + "]\n\n"
+            + (err && err.name ? err.name + ": " : "")
+            + (err && err.message || err));
     }
   }
 
