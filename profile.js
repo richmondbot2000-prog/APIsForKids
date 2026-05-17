@@ -1378,13 +1378,20 @@
     return null;
   }
   function feedBodyHtml(rawText) {
-    // Linkify http(s) URLs; strip the YouTube URL from the body if we
-    // can embed it below so the user doesn't see the URL twice.
-    const escaped = escapeHtml(plainBody(rawText));
-    return escaped.replace(_FP_URL_RX, (m) => {
+    // Plain text + linkify http(s) URLs + render `**foo**` as <strong>
+    // (mirrors wall.html's enrichBody({bold:true}) for post bodies).
+    // Order: escapeHtml first → bold replace + linkify on the already-
+    // escaped string so `**` stays literal in the input but is
+    // interpreted as a marker by the regex.
+    let html = escapeHtml(plainBody(rawText));
+    html = html.replace(_FP_URL_RX, (m) => {
       const safe = m.replace(/"/g, "&quot;");
       return `<a href="${safe}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();">${m}</a>`;
     });
+    // Bold pass — non-greedy, single-line, doesn't merge consecutive
+    // spans or honour a dangling `**`. Same regex wall.html uses.
+    html = html.replace(/\*\*([^*\n][^*\n]*?)\*\*/g, '<strong>$1</strong>');
+    return html;
   }
   function feedLinkBlocksHtml(rawText) {
     const urls = (rawText || "").match(_FP_URL_RX) || [];
