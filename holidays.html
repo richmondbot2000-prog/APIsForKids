@@ -546,96 +546,53 @@
   }
 
   /* ── Mobile team view (≤720 px) ──────────────────────────────────
-     The desktop wide-grid is unusable on phones — the 180 px name
-     column + 42-column day strip leaves ~4 px per day cell. This
-     layout stacks one person at a time, with full-width 7-cell
-     week strips so each day clears the 44 px Apple HIG tap target.
-     Both DOMs are populated by renderTeam(); CSS swaps them. */
-  .hd-team-mobile { display: none; }
+     Keep the desktop matrix — that's the whole point of this view
+     (scan vertically down a day column to see who's in). On a phone
+     we just shrink everything: 40 px name column, 7-8 px wide day
+     cells, smaller fonts. A full month of 10 direct reports stays
+     visible in one block. Earlier per-person-stack layout dropped
+     the column-glance pattern entirely; this matrix preserves it. */
+  .hd-team-mobile { display: none !important; }
   @media (max-width: 720px) {
-    .hd-team { display: none; }
-    .hd-team-mobile { display: block; background: var(--paper-50, white); }
-    .hd-team-mobile-dow {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 2px;
-      position: sticky;
-      top: 0;
-      z-index: 5;
-      background: var(--paper-100, #FBF6E9);
-      border-bottom: 1px solid var(--brass-300);
-      padding: 8px 6px;
-      font: 600 11px/1 var(--font-mono, 'JetBrains Mono', monospace);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--ink-700);
-      text-align: center;
+    .hd-team-month-dow,
+    .hd-team-month-dates,
+    .hd-team-month-person {
+      grid-template-columns: 44px repeat(42, minmax(0, 1fr));
     }
-    .hd-team-mobile-dow > * { padding: 3px 0; }
-    .hd-team-mobile-dow .is-weekend-dow { color: var(--brass-600, #A47829); }
-    .hd-team-mobile-person {
-      margin-top: 14px;
-      padding: 0 6px 6px;
+    .hd-team-cell { height: 16px; }
+    .hd-team-month { margin-top: 8px; padding: 1px 0; }
+    .hd-team-month-label {
+      padding: 4px 6px !important;
+      font: italic 600 11px/1.1 var(--font-display, 'Newsreader', serif) !important;
     }
-    .hd-team-mobile-person:first-child { margin-top: 4px; }
-    .hd-team-mobile-name {
-      padding: 8px 4px;
-      font: italic 600 16px/1.2 var(--font-display, 'Newsreader', serif);
-      color: var(--ink-900);
-      background: var(--paper-100, #FBF6E9);
-      border-left: 3px solid var(--brass-500, #C8973F);
-      padding-left: 10px;
-      margin-bottom: 4px;
+    .hd-team-month-label::before { font-size: 8px; margin-right: 5px; }
+    .hd-team-month-dow > * { padding: 2px 0; font-size: 8px; letter-spacing: 0; }
+    .hd-team-month-dates {
+      font: 500 8px/1 var(--font-mono, 'JetBrains Mono', monospace);
     }
-    .hd-team-mobile-name .tb-profile-link { color: inherit; }
-    .hd-team-mobile-month {
-      font: 600 10px/1 var(--font-mono, 'JetBrains Mono', monospace);
-      letter-spacing: 0.1em;
-      color: var(--ink-500);
-      text-transform: uppercase;
-      padding: 10px 4px 4px;
+    .hd-team-month-dates > * { padding: 1px 0; }
+    /* Names: first ~5 chars + ellipsis. Full name still in the
+       profileLink anchor's underlying text for screen readers and the
+       browser tooltip. */
+    .hd-team-month-name {
+      padding: 0 4px;
+      font: 500 10px/1.1 var(--font-display, 'Newsreader', serif);
+      overflow: hidden;
     }
-    .hd-team-mobile-week {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 2px;
-      margin-bottom: 2px;
+    .hd-team-month-name .tb-profile-link {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-    .hd-team-mobile-week .hd-team-cell {
-      aspect-ratio: 1;
-      height: auto;
-      min-height: 44px;
-      display: flex;
-      align-items: flex-start;
-      justify-content: flex-end;
-      padding: 3px 5px;
+    .hd-team-cell.has-note::before {
+      width: 3px; height: 3px; top: 1px; right: 1px;
     }
-    .hd-team-mobile-week .hd-team-cell.is-pad {
-      background: transparent !important;
-      cursor: default;
-    }
-    .hd-team-mobile-week .hd-team-cell .hd-team-mobile-daynum {
-      font: 500 11px/1 var(--font-mono, 'JetBrains Mono', monospace);
-      color: var(--ink-700);
-      pointer-events: none;
-      text-shadow: 0 0 2px rgba(253,251,244,0.55);
-    }
-    .hd-team-mobile-week .hd-team-cell[data-status]:not([data-status="office"]) .hd-team-mobile-daynum {
-      color: rgba(253,251,244,0.95);
-      text-shadow: 0 0 2px rgba(0,0,0,0.4);
-    }
-    .hd-team-mobile-week .hd-team-cell.has-note::before {
-      width: 6px; height: 6px; top: 4px; left: 4px; right: auto;
-    }
-    /* Non-payroll people fade as a block. */
-    .hd-team-mobile-person.is-not-on-payroll {
-      opacity: 0.55;
-    }
-    .hd-team-mobile-person.is-not-on-payroll .hd-team-mobile-name::after {
-      content: " · read-only";
-      font-style: normal;
-      font-size: 11px;
-      color: var(--ink-500);
+    /* Status marks (A for approved-holiday, M for maternity) need to
+       shrink with the cell. */
+    .hd-team-cell[data-status="maternity"]::after,
+    .hd-team-cell[data-status="approved-holiday"]::after {
+      font-size: 8px;
     }
   }
   .hd-team-month-person.is-not-on-payroll .hd-team-cell::after { content: none !important; }
@@ -1616,10 +1573,8 @@
 
       root.appendChild(block);
     }
-    // Populate the sibling mobile container with a stacked-per-person
-    // layout so phones get usable tap targets. CSS shows only one of
-    // the two containers based on the viewport (≤720 px → mobile).
-    renderTeamMobile();
+    // (Mobile layout now reuses the same desktop matrix via CSS
+    // overrides; renderTeamMobile() is no longer called.)
   }
 
   // Mobile-only stacked layout. One block per direct report; inside each
