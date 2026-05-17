@@ -669,6 +669,13 @@
     document.querySelectorAll("[data-payroll-toggle]").forEach(btn => {
       btn.addEventListener("click", () => togglePayroll(btn.dataset.payrollToggle === "on"));
     });
+    // Admin controls — Suspend / Reactivate + Delete Person.
+    document.querySelectorAll("[data-person-suspend]").forEach(btn => {
+      btn.addEventListener("click", () => suspendPerson(btn.dataset.personSuspend === "suspend"));
+    });
+    document.querySelectorAll("[data-person-delete]").forEach(btn => {
+      btn.addEventListener("click", () => deletePerson());
+    });
     const saveBtn = document.querySelector("[data-payroll-save]");
     if (saveBtn) saveBtn.addEventListener("click", savePayrollEdits);
     const mergeBtn = document.getElementById("upMergeGo");
@@ -932,13 +939,27 @@
     const root = document.querySelector(`[data-edit-field="${field}"]`);
     if (!root) return;
     const status = root.querySelector("[data-edit-status]");
-    const input  = root.querySelector("input, textarea");
-    const value  = (input && input.value || "").trim();
+    const input  = root.querySelector("input, textarea, select");
+    let value  = input ? (input.value || "") : "";
+    // Trim free-text inputs; <select> / type=date keep their raw value.
+    if (input && input.tagName !== "SELECT" && input.type !== "date") value = value.trim();
+    // Field-specific coercions on the way out to the worker:
+    let payloadValue = value;
+    if (field === "aliases") {
+      // Comma-split → trimmed, de-duped, empty-stripped array.
+      payloadValue = Array.from(new Set(
+        value.split(",").map(s => s.trim()).filter(Boolean)
+      ));
+    } else if (field === "line_manager_id") {
+      // Empty-option → null; numeric ids keep their string form
+      // (the worker accepts both Number and string ids).
+      payloadValue = value === "" ? null : value;
+    }
     status.textContent = "Saving…"; status.className = "up-edit-status up-edit-status--working";
     try {
       const res = await fetch(WORKSPACE_API + "/people-set", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: person.id, [field]: value  }),
+        body: JSON.stringify({ id: person.id, [field]: payloadValue  }),
       });
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
@@ -949,6 +970,49 @@
     } catch (err) {
       status.textContent = "Failed — " + (err && err.message || err);
       status.className = "up-edit-status up-edit-status--err";
+    }
+  }
+
+  // Admin-only: flip the Person record's `suspended` flag via people-set.
+  // Doesn't touch the linked Google accounts — those have their own
+  // Suspend / Delete buttons on the Google accounts card.
+  async function suspendPerson(turnOn) {
+    const status = document.querySelector('[data-edit-status="suspended"]');
+    if (status) { status.textContent = "Working…"; status.className = "up-edit-status up-edit-status--working"; }
+    try {
+      const res = await fetch(WORKSPACE_API + "/people-set", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: person.id, suspended: turnOn }),
+      });
+      const out = await res.json();
+      if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
+      Object.assign(person, out.person);
+      renderPanel();
+    } catch (err) {
+      if (status) { status.textContent = "Failed — " + err.message; status.className = "up-edit-status up-edit-status--err"; }
+    }
+  }
+
+  // Admin-only: delete the Person record + redirect to the People list.
+  // Linked Google accounts + payroll records aren't touched here —
+  // admins should delete those from their own rows.
+  async function deletePerson() {
+    const status = document.querySelector('[data-edit-status="delete"]');
+    const name = person.name || person.url_slug;
+    if (!confirm(`Delete the Person record for ${name}?\n\n` +
+                 `This removes the row from people.json only. The linked Google account(s) and payroll record(s) are NOT touched — delete those from their own rows first if you want a full off-boarding.\n\n` +
+                 `Recoverable from git history but no in-app undo.`)) return;
+    if (status) { status.textContent = "Deleting…"; status.className = "up-edit-status up-edit-status--working"; }
+    try {
+      const res = await fetch(WORKSPACE_API + "/people-delete", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: person.id }),
+      });
+      const out = await res.json();
+      if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
+      location.href = "/directory.html";
+    } catch (err) {
+      if (status) { status.textContent = "Failed — " + err.message; status.className = "up-edit-status up-edit-status--err"; }
     }
   }
 
