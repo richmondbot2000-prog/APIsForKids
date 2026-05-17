@@ -247,7 +247,8 @@
   }
 
   async function workspaceCall(payload) {
-    const res = await fetch(WORKSPACE_API, {
+    // Worker reads action from URL path, not body — see legacy directory.
+    const res = await fetch(WORKSPACE_API + "/" + (payload && payload.action || ""), {
       method: "POST", headers: {"Content-Type":"application/json"},
       body: JSON.stringify(payload),
     });

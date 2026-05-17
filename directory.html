@@ -674,9 +674,9 @@
       ? { suspended: true,  access_level: "former" }
       : { suspended: false, access_level: p.access_level === "former" ? "staff" : p.access_level };
     try {
-      const res = await fetch(WORKSPACE_API, {
-        method: "POST", headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ action: "people-set", id: pid, ...patch }),
+      const res = await fetch(WORKSPACE_API + "/people-set", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: pid, ...patch  }),
       });
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
@@ -702,7 +702,7 @@
     }
     setStatus(pid, "Saving…");
     try {
-      const res = await fetch(WORKSPACE_API, {
+      const res = await fetch(WORKSPACE_API + "/people-set", {
         method: "POST", headers: {"Content-Type":"application/json"},
         body: JSON.stringify(payload),
       });
@@ -722,9 +722,9 @@
     const newAlts = [...(p.alt_google_emails||[]).filter(e => e !== email)];
     if (p.main_google_email && p.main_google_email !== email) newAlts.push(p.main_google_email);
     try {
-      const res = await fetch(WORKSPACE_API, {
-        method: "POST", headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ action: "people-set", id: pid, main_google_email: email, alt_google_emails: newAlts }),
+      const res = await fetch(WORKSPACE_API + "/people-set", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: pid, main_google_email: email, alt_google_emails: newAlts  }),
       });
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
@@ -744,9 +744,9 @@
     const p = people.find(x => String(x.id) === String(pid)); if (!p) return;
     if (!confirm(`Delete the Person record for ${p.name}?\n\nThis does NOT delete any Google account — those stay in Workspace and can still be managed in Directory. This only removes the row from the People table.`)) return;
     try {
-      const res = await fetch(WORKSPACE_API, {
-        method: "POST", headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ action: "people-delete", id: pid }),
+      const res = await fetch(WORKSPACE_API + "/people-delete", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: pid  }),
       });
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
@@ -780,9 +780,9 @@
     document.getElementById("newStatus").className = "pp-status";
     try {
       // No id passed — worker auto-assigns the next integer.
-      const res = await fetch(WORKSPACE_API, {
-        method: "POST", headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ action: "people-set", url_slug, name, main_google_email: email, access_level: acc, company: email.split("@")[1] || "" }),
+      const res = await fetch(WORKSPACE_API + "/people-set", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url_slug, name, main_google_email: email, access_level: acc, company: email.split("@")[1] || ""  }),
       });
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
@@ -801,9 +801,9 @@
     const orig = btn.textContent;
     btn.textContent = "Syncing…"; btn.disabled = true;
     try {
-      const res = await fetch(WORKSPACE_API, {
-        method: "POST", headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ action: "people-sync-access" }),
+      const res = await fetch(WORKSPACE_API + "/people-sync-access", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({  }),
       });
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);

@@ -210,6 +210,71 @@
         </div>`;
     }
 
+    // Line-manager picker (admin only). The display falls back to the
+    // read-only chip / "No line manager" when the viewer isn't admin.
+    const lineMgrOptions = people
+      .filter(x => x.id !== person.id)
+      .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
+      .map(x => `<option value="${escapeHtml(x.id)}" ${String(x.id) === String(person.line_manager_id) ? "selected" : ""}>${escapeHtml(x.name || x.url_slug)}</option>`)
+      .join("");
+    const lineMgrEditor = viewerIsAdmin ? `
+      <div class="up-field-editor" hidden>
+        <select name="line_manager_id">
+          <option value="">(none)</option>${lineMgrOptions}
+        </select>
+        <div class="up-editor-row">
+          <button type="button" class="up-btn-sm up-btn-sm--primary" data-edit-save="line_manager_id">Save</button>
+          <button type="button" class="up-btn-sm" data-edit-cancel="line_manager_id">Cancel</button>
+          <span class="up-edit-status" data-edit-status="line_manager_id"></span>
+        </div>
+      </div>` : "";
+
+    // Access-level editor (admin only).
+    const accessLevels = [
+      ["admin",    "Admin"],
+      ["staff",    "Standard user"],
+      ["agent",    "Agent"],
+      ["outsider", "Outsider"],
+      ["former",   "Former (no access)"],
+    ];
+    const accessLevelEditor = viewerIsAdmin ? `
+      <div class="up-field-editor" hidden>
+        <select name="access_level">
+          ${accessLevels.map(([v, l]) => `<option value="${v}" ${person.access_level === v ? "selected" : ""}>${l}</option>`).join("")}
+        </select>
+        <div class="up-editor-row">
+          <button type="button" class="up-btn-sm up-btn-sm--primary" data-edit-save="access_level">Save</button>
+          <button type="button" class="up-btn-sm" data-edit-cancel="access_level">Cancel</button>
+          <span class="up-edit-status" data-edit-status="access_level"></span>
+        </div>
+      </div>` : "";
+
+    // Admin-controls card: Suspend toggle + Delete person. Visible only
+    // to admins; calls people-set / people-delete (people-delete is
+    // admin-gated in the worker, see line 396).
+    const adminControls = viewerIsAdmin ? `
+      <div class="up-card up-card--danger">
+        <div class="up-card-head">Admin controls</div>
+        <div class="up-field">
+          <div class="up-field-label">Status</div>
+          <div class="up-field-display">
+            <span class="up-pill up-pill--${person.suspended ? "suspended" : "live"}">${person.suspended ? "Suspended" : "Live"}</span>
+            <button type="button" class="up-link-btn" data-person-suspend="${person.suspended ? "unsuspend" : "suspend"}">
+              ${person.suspended ? "Reactivate" : "Suspend access"}
+            </button>
+            <span class="up-edit-status" data-edit-status="suspended"></span>
+          </div>
+        </div>
+        <div class="up-field">
+          <div class="up-field-label">Danger zone</div>
+          <div class="up-field-display">
+            <button type="button" class="up-btn-sm up-btn-sm--danger" data-person-delete="${escapeHtml(person.id)}">Delete person</button>
+            <span class="up-card-hint">Removes the Person record. Linked Google accounts are NOT touched — use the per-account Delete button below for those.</span>
+            <span class="up-edit-status" data-edit-status="delete"></span>
+          </div>
+        </div>
+      </div>` : "";
+
     return `
       <h2 class="up-panel-title">Information</h2>
 
@@ -217,12 +282,28 @@
 
       <div class="up-card">
         <div class="up-card-head">Editable details ${lockedBadge}</div>
-        ${editableRow("role",    "Role",    "text",     person.role)}
-        ${editableRow("phone",   "Phone",   "tel",      person.phone)}
-        ${editableRow("address", "Address", "textarea", person.address)}
+        ${editableRow("name",       "Display name", "text",     person.name)}
+        ${editableRow("aliases",    "Aliases",      "text",     (person.aliases || []).join(", "), "Comma-separated — used in name search + mentions")}
+        ${editableRow("role",       "Role",         "text",     person.role)}
+        ${editableRow("phone",      "Phone",        "tel",      person.phone)}
+        ${editableRow("address",    "Address",      "textarea", person.address)}
+        ${editableRow("start_date", "Start date",   "date",     person.start_date)}
+        ${editableRow("notes",      "Notes",        "textarea", person.notes)}
         <div class="up-field" data-edit-field="line_manager_id">
           <div class="up-field-label">Line manager</div>
-          <div class="up-field-display">${lineMgrDisplay}</div>
+          <div class="up-field-display">
+            ${lineMgrDisplay}
+            ${viewerIsAdmin ? `<button type="button" class="up-link-btn" data-edit-toggle="line_manager_id">Edit</button>` : ""}
+          </div>
+          ${lineMgrEditor}
+        </div>
+        <div class="up-field" data-edit-field="access_level">
+          <div class="up-field-label">Access level</div>
+          <div class="up-field-display">
+            <span class="up-pill up-pill--${escapeHtml(person.access_level || "staff")}">${escapeHtml(person.access_level || "staff")}</span>
+            ${viewerIsAdmin ? `<button type="button" class="up-link-btn" data-edit-toggle="access_level">Edit</button>` : ""}
+          </div>
+          ${accessLevelEditor}
         </div>
       </div>
 
@@ -230,6 +311,8 @@
         <div class="up-card-head">Identity & access</div>
         <div class="up-fields-grid">${readOnlyHtml}</div>
       </div>
+
+      ${adminControls}
 
       ${viewerIsAdmin ? renderMergeCard() : ""}`;
   }
@@ -609,9 +692,9 @@
                  `This is permanent (well, recoverable from git history but no in-app undo).`)) return;
     status.textContent = "Merging…"; status.className = "up-edit-status up-edit-status--working";
     try {
-      const res = await fetch(WORKSPACE_API, {
+      const res = await fetch(WORKSPACE_API + "/people-merge", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "people-merge", winner_id: winnerId, loser_id: person.id }),
+        body: JSON.stringify({ winner_id: winnerId, loser_id: person.id  }),
       });
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
@@ -627,9 +710,9 @@
     const status = document.querySelector('[data-edit-status="on_payroll"]');
     if (status) { status.textContent = "Saving…"; status.className = "up-edit-status up-edit-status--working"; }
     try {
-      const res = await fetch(WORKSPACE_API, {
+      const res = await fetch(WORKSPACE_API + "/people-set", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "people-set", id: person.id, on_payroll: turnOn }),
+        body: JSON.stringify({ id: person.id, on_payroll: turnOn  }),
       });
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
@@ -652,7 +735,7 @@
       payload[inp.name] = inp.value;
     });
     try {
-      const res = await fetch(WORKSPACE_API, {
+      const res = await fetch(WORKSPACE_API + "/payroll-set", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -746,7 +829,7 @@
     const [act, args] = map[action] || [];
     if (!act) return;
     try {
-      const res = await fetch(WORKSPACE_API, {
+      const res = await fetch(WORKSPACE_API + "/" + act, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: act, tenant, ...args }),
       });
@@ -792,10 +875,10 @@
       }
       status.textContent = "Linking…"; status.className = "up-edit-status up-edit-status--working";
       try {
-        const res = await fetch(WORKSPACE_API, {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "google-account-set", person_id: person.id, email, tenant }),
-        });
+        const res = await fetch(WORKSPACE_API + "/google-account-set", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ person_id: person.id, email, tenant  }),
+      });
         const out = await res.json();
         if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
         // Append the new row to our local index and re-render.
@@ -814,9 +897,9 @@
     if (!acct) return;
     if (!confirm(`Unlink ${acct.email} from this Person?\n\nThis only removes the row in google-accounts.json. The Workspace account itself isn't touched — use Suspend / Delete actions for that.`)) return;
     try {
-      const res = await fetch(WORKSPACE_API, {
+      const res = await fetch(WORKSPACE_API + "/google-account-delete", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "google-account-delete", id }),
+        body: JSON.stringify({ id  }),
       });
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
@@ -853,9 +936,9 @@
     const value  = (input && input.value || "").trim();
     status.textContent = "Saving…"; status.className = "up-edit-status up-edit-status--working";
     try {
-      const res = await fetch(WORKSPACE_API, {
+      const res = await fetch(WORKSPACE_API + "/people-set", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "people-set", id: person.id, [field]: value }),
+        body: JSON.stringify({ id: person.id, [field]: value  }),
       });
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
@@ -1053,7 +1136,7 @@
       const img = await readImage(file);
       const b64 = resizeToJpegB64(img, opts);
       const action = opts.kind === "cover" ? "cover-photo-upload" : "directory-photo-upload";
-      const res = await fetch(WORKSPACE_API, {
+      const res = await fetch(WORKSPACE_API + "/" + action, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action, user_email: person.main_google_email, photo_b64: b64, tenant: (person.company || "").includes("togetherloans") ? "togetherloans" : "" }),
       });
@@ -1062,9 +1145,9 @@
       // Record the timestamp on the Person record so caches bust.
       const stamp = new Date().toISOString();
       const field = opts.kind === "cover" ? "cover_photo_uploaded_at" : "directory_photo_uploaded_at";
-      const setRes = await fetch(WORKSPACE_API, {
+      const setRes = await fetch(WORKSPACE_API + "/people-set", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "people-set", id: person.id, [field]: stamp }),
+        body: JSON.stringify({ id: person.id, [field]: stamp  }),
       });
       const setOut = await setRes.json();
       if (!setRes.ok || !setOut.ok) throw new Error(setOut.error || `HTTP ${setRes.status}`);

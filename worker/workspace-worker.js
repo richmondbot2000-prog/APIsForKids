@@ -482,6 +482,7 @@ export default {
         case "group-member-add":     result = await doGroupMemberAdd(adminToken, body); break;
         case "group-member-remove":  result = await doGroupMemberRemove(adminToken, body); break;
         case "user-alias-remove":    result = await doUserAliasRemove(adminToken, body); break;
+        case "user-alias-add":       result = await doUserAliasAdd(adminToken, body); break;
         case "alias-to-group":       result = await doAliasToGroup(adminToken, body); break;
         case "rename-user":          result = await doRenameUser(adminToken, body); break;
         case "directory-photo-upload": result = await doDirectoryPhotoUpload(env, body, actor); break;
@@ -990,6 +991,19 @@ async function doUserAliasRemove(token, body) {
     token,
     "DELETE",
     `users/${encodeURIComponent(body.user_email)}/aliases/${encodeURIComponent(body.alias)}`,
+  );
+}
+
+// Add an editable alias to a user. Errors (409 alias-in-use, 400 invalid
+// address, etc.) bubble up via adminApi.
+async function doUserAliasAdd(token, body) {
+  if (!body.user_email) return { ok: false, error: "missing user_email" };
+  if (!body.alias) return { ok: false, error: "missing alias" };
+  return adminApi(
+    token,
+    "POST",
+    `users/${encodeURIComponent(body.user_email)}/aliases`,
+    { alias: body.alias },
   );
 }
 
