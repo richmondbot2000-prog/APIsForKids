@@ -246,6 +246,13 @@ def scan_database(database: str, cutoff: datetime.datetime) -> dict[str, dict]:
                 bucket = aggregated[un]
                 bucket["writes"] += int(writes or 0)
                 bucket["by_db"][database] += int(writes or 0)
+                # Some warehouse columns are DATETIME, others DATE. ODBC
+                # returns datetime.date vs datetime.datetime for those,
+                # and Python won't compare across the two types. Coerce
+                # date → datetime at midnight so all `> last_at` checks
+                # downstream work regardless of source column type.
+                if isinstance(last_at, datetime.date) and not isinstance(last_at, datetime.datetime):
+                    last_at = datetime.datetime.combine(last_at, datetime.time.min)
                 if last_at is not None and (bucket["last_at"] is None or last_at > bucket["last_at"]):
                     bucket["last_at"] = last_at
         except Exception as e:
