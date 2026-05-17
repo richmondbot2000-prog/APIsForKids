@@ -1,0 +1,90 @@
+name: Refresh Auth0 users
+
+# Pulls the list of active accounts from the rgcore Auth0 tenant and
+# commits auth0-users.json back to main so directory.html can chip
+# every staff row that has an Auth0 account.
+#
+# Same hourly + guard + retry-on-rebase pattern as refresh-directory.yml.
+# The Management API is quota-limited per-minute (Auth0 free tier is
+# generous for our size) so one daily snapshot is plenty.
+
+on:
+  schedule:
+    - cron: '0 6-23 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-auth0
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Skip if already up to date
+        id: guard
+        run: |
+          set -euo pipefail
+          EXPECTED=$(date -u +%Y-%m-%d)
+          if [ -f auth0-users.json ]; then
+            CURRENT=$(python3 -c "import json; print(json.load(open('auth0-users.json')).get('snapshot_date',''))")
+          else
+            CURRENT=""
+          fi
+          echo "expected_snapshot_date=$EXPECTED  current_snapshot_date=$CURRENT"
+          if [ "$CURRENT" = "$EXPECTED" ] && [ "${GITHUB_EVENT_NAME:-}" != "workflow_dispatch" ]; then
+            echo "Snapshot already taken for $EXPECTED — skipping (scheduled run)."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Python
+        if: steps.guard.outputs.skip != 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Scan
+        if: steps.guard.outputs.skip != 'true'
+        env:
+          AUTH0_DOMAIN:        rgcore.auth0.com
+          AUTH0_CLIENT_ID:     ${{ secrets.AUTH0_CLIENT_ID }}
+          AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
+        run: python scripts/scan_auth0.py
+
+      - name: Commit if auth0-users.json changed
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          set -euo pipefail
+          git add auth0-users.json
+          if git diff --cached --quiet -- auth0-users.json; then
+            echo "no changes — nothing to commit"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          N=$(python -c "import json; d=json.load(open('auth0-users.json')); print(d['totals']['active_users'])")
+          DATE=$(python -c "import json; d=json.load(open('auth0-users.json')); print(d.get('snapshot_date',''))")
+          git commit -m "Refresh Auth0: ${N} active users on ${DATE}"
+
+          for attempt in 1 2 3; do
+            if git push; then
+              break
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "::error::Push failed after 3 attempts"
+              exit 1
+            fi
+            echo "Push rejected (concurrent commit); rebasing and retrying (attempt $attempt)…"
+            git fetch origin main
+            git rebase origin/main
+          done

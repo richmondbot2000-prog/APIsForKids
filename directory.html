@@ -345,6 +345,22 @@
     padding: 2px 8px;
     border-radius: 4px;
   }
+  /* Auth0 chip — small "Auth0" pill shown on every staff row whose email
+     matches an active account in the rgcore Auth0 tenant. Active means
+     not blocked AND ever logged in (scan_auth0.py filter). Manuscript-red
+     so it reads as a security/access signal distinct from the sage
+     Workspace-tenant chip. */
+  .dir-auth0-chip {
+    display: inline-block;
+    font: 600 10px/1.4 var(--font-mono, "JetBrains Mono", ui-monospace, monospace);
+    color: var(--red-700, #8a3a32);
+    background: rgba(156, 58, 55, 0.08);
+    border: 1px solid rgba(156, 58, 55, 0.30);
+    padding: 2px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
   /* Workspace-tenant chip. Only rendered when there's more than one tenant
      in staff.json (multi-tenant deployments). */
   .dir-workspace-chip {
@@ -1381,8 +1397,13 @@
     // "Transferring + Deleting" badge. File maintained by Worker (writes
     // on queue) + scripts/process_pending_transfers.py (clears on completion).
     fetch("pending-transfers.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    // Active Auth0 accounts (rgcore tenant). Drives the small "Auth0"
+    // chip on every staff row whose email matches. Optional — file is
+    // absent until refresh-auth0.yml runs successfully against the
+    // AUTH0_CLIENT_ID + AUTH0_CLIENT_SECRET secrets.
+    fetch("auth0-users.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
   ])
-    .then(([staff, activity, annotationsFile, payrollFile, workspaceActions, groupsFile, pendingTransfersFile]) => {
+    .then(([staff, activity, annotationsFile, payrollFile, workspaceActions, groupsFile, pendingTransfersFile, auth0File]) => {
       annotationsMap = (annotationsFile && annotationsFile.annotations && typeof annotationsFile.annotations === "object")
         ? annotationsFile.annotations
         : {};
@@ -1398,6 +1419,16 @@
           if (k) pendingTransfersByEmail[k] = p;
         }
       }
+      // auth0ByEmail: lowercase email -> active Auth0 user record. Drives
+      // the "Auth0" chip on staff rows + the active-account count in the
+      // header banner.
+      auth0ByEmail = {};
+      for (const u of ((auth0File && auth0File.users) || [])) {
+        const k = (u.email || "").toLowerCase();
+        if (k) auth0ByEmail[k] = u;
+      }
+      auth0Snapshot = (auth0File && auth0File.snapshot_date) || "";
+      auth0Count = Object.keys(auth0ByEmail).length;
       // Build per-email indexes from the audit log:
       //   - forwardingByEmail: target -> current forward address (or undefined if unsuspended)
       //   - auditByEmail: target -> chronological list of every successful action
@@ -1526,9 +1557,10 @@
 
       const updated = staff.updated_at ? staff.updated_at.replace("T", " ").replace("Z", " UTC") : "—";
       const activeStaffCount = allEntries.filter(e => e.type === "staff" && e.activity).length;
+      const auth0Bit = auth0Count ? ` · ${auth0Count} active in Auth0` : "";
       const meta = activity
-        ? `Updated ${updated} · ${allWorkspaceUsers.length} Workspace accounts · ${activeStaffCount} active in DB · ${externalUsers.length} extra people active in DB only`
-        : `Updated ${updated} · ${allWorkspaceUsers.length} accounts (activity data not yet available)`;
+        ? `Updated ${updated} · ${allWorkspaceUsers.length} Workspace accounts · ${activeStaffCount} active in DB · ${externalUsers.length} extra people active in DB only${auth0Bit}`
+        : `Updated ${updated} · ${allWorkspaceUsers.length} accounts (activity data not yet available)${auth0Bit}`;
       document.getElementById("dirMeta").textContent = meta;
 
       renderGroupPills();
@@ -1927,6 +1959,21 @@
       if (tenants) parts.push(`<span class="dir-tenants">${tenants}</span>`);
       if (a.top_warehouse) parts.push(`<span class="dir-warehouse">mostly <em>${escapeHtml(a.top_warehouse)}</em></span>`);
     }
+    // Auth0 chip — check the staff row's primary email + any aliases so
+    // someone signed into Auth0 with james@letme.com still chips when
+    // their Workspace primary is james@letme.co.uk (alias domain).
+    const u = entry && entry.user;
+    if (u) {
+      const candidates = [u.email, ...(u.aliases || [])].map(e => (e || "").toLowerCase()).filter(Boolean);
+      const u0 = candidates.map(e => auth0ByEmail[e]).find(Boolean);
+      if (u0) {
+        const last = u0.last_login
+          ? new Date(u0.last_login).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
+          : "—";
+        const tip = `Active in Auth0 (rgcore tenant) · last login ${last} · ${u0.logins_count || 0} sign-ins`;
+        parts.push(`<span class="dir-auth0-chip" title="${escapeHtml(tip)}">Auth0</span>`);
+      }
+    }
     if (phone) parts.push(`<span class="dir-note">phone <b>${escapeHtml(phone)}</b>${phoneSource}</span>`);
     if (startDate) {
       const d = new Date(startDate);
@@ -2078,6 +2125,9 @@
   let forwardingByEmail = {};                           // email -> route_to (suspended-and-routed users)
   let auditByEmail = {};                                // email -> chronological [{ts, actor, action, ok, route_to?, member_email?, ...}]
   let pendingTransfersByEmail = {};                     // email -> pending-transfer entry (Drive+Mail migration in flight before final delete)
+  let auth0ByEmail = {};                                // email -> active Auth0 user (not blocked, ever logged in)
+  let auth0Snapshot = "";                               // ISO date of the auth0-users.json snapshot, "" until first scan
+  let auth0Count = 0;                                   // size of auth0ByEmail, surfaced in the header banner
   let allGroups = [];                                   // [{ email, name, description, members:[…], … }]
   let groupsByMemberEmail = {};                         // memberEmail -> [group, …]
 
