@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-17T19:48:28.899Z",
+  "updated_at": "2026-05-17T19:49:24.894Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -425,7 +425,7 @@
       "given": "Ashwin",
       "family": "John",
       "aliases": [
-        "ashmin"
+        "ashwin alummoottil"
       ],
       "main_google_email": "ashwin.john@togetherloans.com",
       "alt_google_emails": [],
@@ -444,7 +444,7 @@
       "directory_photo_uploaded_at": "2026-05-14T09:05:41+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:28.899Z",
+      "updated_at": "2026-05-17T19:49:24.894Z",
       "url_slug": "ashwin.john",
       "most_recent_payroll_id": null
     },
