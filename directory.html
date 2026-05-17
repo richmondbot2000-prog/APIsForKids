@@ -58,11 +58,15 @@
   }
   .pp-thead, .pp-row {
     display: grid;
-    grid-template-columns: 44px minmax(180px, 1.6fr) minmax(140px, 1fr) 200px 110px 100px 90px;
+    grid-template-columns: 44px minmax(180px, 1.6fr) minmax(140px, 1fr) 200px 110px 100px;
     align-items: center;
     gap: 12px;
     padding: 10px 14px;
   }
+  /* Row is now an anchor — strip default link styling and keep the
+     existing grid layout + hover affordance from the previous div row. */
+  a.pp-row { color: inherit; text-decoration: none; }
+  a.pp-row:hover { background: var(--paper-100); }
   .pp-company { font: 500 13px/1.3 var(--font-body); color: var(--ink-700); overflow-wrap: anywhere; }
 
   /* Source icons — one chip per linked source. Coloured = present,
@@ -467,8 +471,11 @@
     const status = statusOf(p);
     const nameDisplay = p.name || p.url_slug || "(no name)";
     const company = companyLabel(p);
+    // The whole row is now the link to /directory/<slug>. The inline
+    // edit form is gone; editing happens on the person's page.
+    const slug = p.url_slug || emailToSlug(p.main_google_email);
     return `
-      <div class="pp-row${String(expandedId) === String(p.id) ? " is-expanded" : ""}" data-id="${escapeHtml(p.id)}">
+      <a class="pp-row" data-id="${escapeHtml(p.id)}" href="/directory/${escapeHtml(slug)}">
         <div class="pp-avatar">${avatarHtml(p)}</div>
         <div>
           <div class="pp-name">${escapeHtml(nameDisplay)}</div>
@@ -478,9 +485,7 @@
         <div class="pp-src-chips">${sourceChipsHtml(p)}</div>
         <div><span class="pp-pill ${pillClass(p.access_level)}">${escapeHtml(p.access_level || "—")}</span></div>
         <div><span class="pp-pill pp-pill--${status}">${statusLabel(p)}</span></div>
-        <div><a class="pp-btn pp-btn--ghost" href="/directory/${escapeHtml(p.url_slug || emailToSlug(p.main_google_email))}" onclick="event.stopPropagation();">Open</a></div>
-        ${String(expandedId) === String(p.id) ? detailHtml(p) : ""}
-      </div>`;
+      </a>`;
   }
 
   function accountRow(p, email, isPrimary) {
@@ -575,7 +580,6 @@
         <div title="Linked sources: Google Letme · Google Together · Warehouse · Payroll · External Gmail · ! = an account is deleted/suspended">Sources</div>
         <div><button data-sort="access_level">Access</button></div>
         <div>Status</div>
-        <div></div>
       </div>
       ${rows.length ? rows.map(rowHtml).join("") : '<div class="pp-empty">No people match the current filters.</div>'}`;
     document.getElementById("ppTable").innerHTML = html;
@@ -619,14 +623,9 @@
   }
 
   function wireRows() {
-    document.querySelectorAll(".pp-row[data-id]").forEach(row => {
-      row.addEventListener("click", e => {
-        // Don't toggle if click was on a button/input inside the detail.
-        if (e.target.closest("input,select,textarea,button,a")) return;
-        expandedId = String(expandedId) === String(row.dataset.id) ? null : row.dataset.id;
-        render();
-      });
-    });
+    // Rows are now plain <a href="/directory/<slug>"> — the browser
+    // handles navigation, no JS handler needed. The inline edit form
+    // moved to the person's page (profile.js).
     document.querySelectorAll(".pp-thead [data-sort]").forEach(b => {
       b.addEventListener("click", () => {
         if (sortBy === b.dataset.sort) sortDir *= -1;

@@ -147,6 +147,29 @@ export default {
       if (url.pathname.replace(/\/$/, "").endsWith("/activity-items")) {
         return await handleActivityItemsRead(req, env, url);
       }
+      // GET /api/workspace/whoami — mirror of the POST whoami below so
+      // simple `fetch(url)` calls from the page (the avatar chip in
+      // nav.js, the directory bootstrap) resolve identity without
+      // having to specify method:POST. Same payload shape as the POST
+      // path further down.
+      if (url.pathname.replace(/\/$/, "").endsWith("/whoami")) {
+        if (!req.headers.get("Cf-Access-Jwt-Assertion")) {
+          return json({ error: "not authenticated via Cloudflare Access" }, 401, req);
+        }
+        const actor = (req.headers.get("Cf-Access-Authenticated-User-Email") || "").toLowerCase();
+        const ownerLc = OWNER_EMAIL.toLowerCase();
+        const isOwner = actor === ownerLc;
+        const admins = await fetchAdmins();
+        const isAdmin = admins.includes(actor);
+        return json({
+          ok: true,
+          email: actor,
+          is_admin: isAdmin,
+          is_owner: isOwner,
+          owner: ownerLc,
+          admins: isAdmin ? admins : null,
+        }, 200, req);
+      }
       return json({ error: "unknown GET endpoint" }, 404, req);
     }
 
