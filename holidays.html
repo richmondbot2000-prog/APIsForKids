@@ -453,12 +453,21 @@
   .hd-team {
     margin: 0 0 24px;
     background: var(--paper-50, white);
-    /* Calendar locks to a minimum width (~2× the legacy mobile layout)
-       so every cell stays large enough to read. On screens narrower
-       than that the whole strip scrolls horizontally as one unit;
-       wider screens see the date cells expand to fill space. */
+    /* Scroll viewport for the calendar: fixed at the parent's width
+       (never grows with content) and scrolls internally when content
+       exceeds it. width: 100% is explicit so the browser can't decide
+       to size .hd-team to its content. */
+    width: 100%;
+    max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+  }
+  /* Inner track that .renderTeam wraps every month in. Carries the
+     minimum width; .hd-team scrolls when this is wider than the
+     viewport. */
+  .hd-team-inner {
+    min-width: 852px;
+    display: block;
   }
   .hd-team-empty {
     padding: 18px 24px;
@@ -1798,6 +1807,12 @@
       return;
     }
 
+    // Inner wrapper carries the 852 px min-width; .hd-team itself
+    // stays at viewport-width and scrolls this wrapper horizontally
+    // when the screen is narrower.
+    const inner = document.createElement("div");
+    inner.className = "hd-team-inner";
+
     // Enumerate the fiscal-year months as (year, month0) pairs.
     const months = [];
     {
@@ -1929,8 +1944,9 @@
         block.appendChild(row);
       }
 
-      root.appendChild(block);
+      inner.appendChild(block);
     }
+    root.appendChild(inner);
     // (Mobile layout now reuses the same desktop matrix via CSS
     // overrides; renderTeamMobile() is no longer called.)
   }
