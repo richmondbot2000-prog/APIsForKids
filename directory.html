@@ -58,26 +58,35 @@
   }
   .pp-thead, .pp-row {
     display: grid;
-    grid-template-columns: 44px minmax(180px, 1.4fr) minmax(180px, 1.5fr) 130px 110px 100px 90px;
+    grid-template-columns: 44px minmax(180px, 1.6fr) minmax(140px, 1fr) 200px 110px 100px 90px;
     align-items: center;
     gap: 12px;
     padding: 10px 14px;
   }
-  .pp-src-chips { display: inline-flex; gap: 3px; }
+  .pp-company { font: 500 13px/1.3 var(--font-body); color: var(--ink-700); overflow-wrap: anywhere; }
+
+  /* Source icons — one chip per linked source. Coloured = present,
+     grey = not present. Hover for the identifier (email / username). */
+  .pp-src-chips { display: inline-flex; gap: 4px; flex-wrap: wrap; }
   .pp-src-chip {
     display: inline-flex; align-items: center; justify-content: center;
-    width: 22px; height: 22px; border-radius: 4px;
-    font: 700 10px/1 var(--font-body);
-    color: var(--ink-400, #999);
-    background: var(--paper-100);
+    width: 24px; height: 24px;
     border: 1px solid var(--paper-300);
+    background: var(--paper-100);
+    color: var(--ink-400, #999);
     cursor: help;
+    border-radius: 4px;
   }
-  .pp-src-chip.is-on {
-    color: #1a7f37; background: #eefaf0; border-color: #b8e3c4;
-  }
+  .pp-src-chip svg { width: 14px; height: 14px; display: block; }
+  .pp-src-chip.off svg { opacity: 0.35; }
+  .pp-src-chip--letme.on    { background: #e8f0fe; border-color: #4285F4; color: #1a5fc0; }
+  .pp-src-chip--together.on { background: #fff3e6; border-color: #F97316; color: #b85412; }
+  .pp-src-chip--warehouse.on{ background: #f3eaf4; border-color: #742774; color: #5a1e5a; }
+  .pp-src-chip--payroll.on  { background: #eefaf0; border-color: #1a7f37; color: #15602a; }
+  .pp-src-chip--gmail.on    { background: #fce8e6; border-color: #EA4335; color: #b1271c; }
   .pp-src-chip--old {
     color: var(--red-600, #b3261e); background: #fcf0ee; border-color: var(--red-200, #f3c8c4);
+    font: 700 11px/1 var(--font-body);
   }
   .pp-orphans {
     margin-top: 24px;
@@ -431,17 +440,42 @@
     });
   }
 
-  function sourceChip(letter, present, title) {
-    return `<span class="pp-src-chip${present ? " is-on" : ""}" title="${escapeHtml(title)}">${letter}</span>`;
+  // Inline SVGs for each source. Compact glyphs that read at 14px.
+  const SRC_ICON = {
+    google:    `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.6 12.23c0-.68-.06-1.34-.18-1.98H12v3.75h5.4a4.62 4.62 0 0 1-2 3.03v2.51h3.23c1.9-1.74 2.97-4.31 2.97-7.31z"/><path fill="currentColor" d="M12 22c2.7 0 4.96-.9 6.62-2.46l-3.23-2.51c-.9.6-2.05.96-3.39.96-2.6 0-4.81-1.76-5.6-4.12H3.06v2.6A10 10 0 0 0 12 22z"/><path fill="currentColor" d="M6.4 13.87a6 6 0 0 1 0-3.74V7.53H3.06a10 10 0 0 0 0 8.94l3.34-2.6z"/><path fill="currentColor" d="M12 5.88c1.47 0 2.79.51 3.83 1.5l2.87-2.87A10 10 0 0 0 12 2a10 10 0 0 0-8.94 5.53l3.34 2.6c.79-2.36 3-4.25 5.6-4.25z"/></svg>`,
+    warehouse: `<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 5v6c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5V5M4 11v6c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5v-6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>`,
+    payroll:   `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 7H9c-1.7 0-3 1.3-3 3s1.3 3 3 3h2M8 17h7c1.7 0 3-1.3 3-3s-1.3-3-3-3h-2M12 4v3M12 17v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  };
+  function sourceChip(kind, present, title) {
+    const cls = `pp-src-chip pp-src-chip--${kind} ${present ? "on" : "off"}`;
+    const glyph = (kind === "letme" || kind === "together" || kind === "gmail")
+      ? SRC_ICON.google
+      : SRC_ICON[kind] || "";
+    return `<span class="${cls}" title="${escapeHtml(title)}">${glyph}</span>`;
   }
   function sourceChipsHtml(p) {
     const m = sourceMatches(p);
+    const gmail = p.external_google_email || "";
     return `
-      ${sourceChip("P", !!m.payroll,  m.payroll  ? `Payroll: ${m.payroll.label}`  : "No payroll record matched")}
-      ${sourceChip("L", !!m.letme,    m.letme    ? `Google Letme: ${m.letme.items.map(x=>x.email).join(", ")}` : "No Letme Google account")}
-      ${sourceChip("T", !!m.together, m.together ? `Google Together: ${m.together.items.map(x=>x.email).join(", ")}` : "No Together Google account")}
-      ${sourceChip("W", !!m.warehouse, m.warehouse ? `Warehouse: ${m.warehouse.label}` : "No warehouse activity matched")}
+      ${sourceChip("letme",     !!m.letme,    m.letme    ? `Google Letme: ${m.letme.items.map(x=>x.email).join(", ")}`     : "No Letme Google account")}
+      ${sourceChip("together",  !!m.together, m.together ? `Google Together: ${m.together.items.map(x=>x.email).join(", ")}` : "No Together Google account")}
+      ${sourceChip("warehouse", !!m.warehouse, m.warehouse ? `Warehouse: ${m.warehouse.label}` : "No warehouse activity matched")}
+      ${sourceChip("payroll",   !!m.payroll,  m.payroll  ? `Payroll: ${m.payroll.label}`      : "No payroll record")}
+      ${sourceChip("gmail",     !!gmail,      gmail ? `External Gmail: ${gmail}` : "No external Gmail / login account")}
       ${hasDeletedAccount(p) ? `<span class="pp-src-chip pp-src-chip--old" title="One or more of this person's Google accounts is suspended or deleted">!</span>` : ""}`;
+  }
+  function companyLabel(p) {
+    if (p.company) {
+      const c = p.company.toLowerCase();
+      if (c === "letme.co.uk" || c === "letme.com" || c === "letme") return "Letme";
+      if (c === "togetherloans.com" || c === "togetherloans" || c === "together loans") return "Together Loans";
+      if (c.includes("property management")) return "LetMe Property Management";
+      return p.company;
+    }
+    const dom = ((p.main_google_email || "").split("@")[1] || "").toLowerCase();
+    if (dom === "letme.co.uk" || dom === "letme.com") return "Letme";
+    if (dom === "togetherloans.com") return "Together Loans";
+    return "";
   }
 
   function renderStats() {
@@ -481,20 +515,16 @@
 
   function rowHtml(p) {
     const status = statusOf(p);
-    const alts = (p.alt_google_emails || []).slice(0, 2).join(", ");
-    const moreAlts = (p.alt_google_emails || []).length > 2 ? ` <span class="alt">+${(p.alt_google_emails||[]).length - 2}</span>` : "";
-    const altLine = alts ? `<div class="alt">${escapeHtml(alts)}${moreAlts}</div>` : "";
+    const nameDisplay = p.name || p.url_slug || "(no name)";
+    const company = companyLabel(p);
     return `
       <div class="pp-row${String(expandedId) === String(p.id) ? " is-expanded" : ""}" data-id="${escapeHtml(p.id)}">
         <div class="pp-avatar">${avatarHtml(p)}</div>
         <div>
-          <div class="pp-name">${escapeHtml(p.name || p.id)}</div>
+          <div class="pp-name">${escapeHtml(nameDisplay)}</div>
           ${p.role || p.title ? `<div class="pp-role">${escapeHtml(p.role || p.title)}</div>` : ""}
         </div>
-        <div class="pp-emails">
-          ${escapeHtml(p.main_google_email || "—")}
-          ${altLine}
-        </div>
+        <div class="pp-company">${company ? escapeHtml(company) : '<span class="alt">—</span>'}</div>
         <div class="pp-src-chips">${sourceChipsHtml(p)}</div>
         <div><span class="pp-pill ${pillClass(p.access_level)}">${escapeHtml(p.access_level || "—")}</span></div>
         <div><span class="pp-pill pp-pill--${status}">${statusLabel(p)}</span></div>
@@ -591,8 +621,8 @@
       <div class="pp-thead">
         <div></div>
         <div><button data-sort="name">Name</button></div>
-        <div><button data-sort="main_google_email">Google accounts</button></div>
-        <div title="Source matches: P=Payroll · L=Letme Google · T=Together Google · W=Warehouse · ! = an account is deleted/suspended">Sources</div>
+        <div><button data-sort="company">Company</button></div>
+        <div title="Linked sources: Google Letme · Google Together · Warehouse · Payroll · External Gmail · ! = an account is deleted/suspended">Sources</div>
         <div><button data-sort="access_level">Access</button></div>
         <div>Status</div>
         <div></div>
