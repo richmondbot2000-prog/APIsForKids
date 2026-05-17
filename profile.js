@@ -1281,6 +1281,39 @@
   function plainBody(text) {
     return String(text || "").replace(/<\/?strong>/gi, "").replace(/<\/?em>/gi, "").trim();
   }
+  // Mirrors wall.html's matchYouTube + URL_RX so YouTube videos in a
+  // post body embed as an iframe inside the per-person feed too,
+  // instead of just showing the raw URL in the body text.
+  const _FP_URL_RX = /\b(https?:\/\/[^\s<>"']+)/g;
+  function matchYouTubeId(url) {
+    let m = url.match(/youtu\.be\/([\w-]{6,})/);                                  if (m) return m[1];
+    m = url.match(/youtube\.com\/(?:watch\?[^"\s]*?\bv=|embed\/|shorts\/|v\/)([\w-]{6,})/); if (m) return m[1];
+    return null;
+  }
+  function feedBodyHtml(rawText) {
+    // Linkify http(s) URLs; strip the YouTube URL from the body if we
+    // can embed it below so the user doesn't see the URL twice.
+    const escaped = escapeHtml(plainBody(rawText));
+    return escaped.replace(_FP_URL_RX, (m) => {
+      const safe = m.replace(/"/g, "&quot;");
+      return `<a href="${safe}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();">${m}</a>`;
+    });
+  }
+  function feedLinkBlocksHtml(rawText) {
+    const urls = (rawText || "").match(_FP_URL_RX) || [];
+    if (!urls.length) return "";
+    const seen = new Set();
+    const blocks = [];
+    for (const url of urls) {
+      if (seen.has(url)) continue; seen.add(url);
+      const yt = matchYouTubeId(url);
+      if (yt) {
+        blocks.push(`<div class="up-fp-yt"><iframe src="https://www.youtube-nocookie.com/embed/${escapeHtml(yt)}" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`);
+      }
+      if (blocks.length >= 2) break;
+    }
+    return blocks.join("");
+  }
   function postPhotoUrl(p) {
     if (!p) return "";
     // wall.json post schema stores attached media as `photos: [path, …]`
@@ -1304,7 +1337,8 @@
     const cards = posts.map(p => {
       const ts = p.created_at ? new Date(p.created_at).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
       const href = `/wall.html?post=${encodeURIComponent(p.id)}`;
-      const body = escapeHtml(plainBody(p.body));
+      const body = feedBodyHtml(p.body);
+      const linkBlocks = feedLinkBlocksHtml(p.body);
       const mediaUrl = postPhotoUrl(p);
       const mediaHtml = mediaUrl ? `<div class="up-fp-media"><img src="${escapeHtml(mediaUrl)}" alt="" loading="lazy"></div>` : "";
       // Comments here = top-level comments on the post; ignore replies
@@ -1332,6 +1366,7 @@
             </div>
           </div>
           ${body ? `<div class="up-fp-body">${body}</div>` : ""}
+          ${linkBlocks}
           ${mediaHtml}
           ${meta ? `<div class="up-fp-meta">${escapeHtml(meta)}</div>` : ""}
           <div class="up-fp-open">Open on Wall →</div>
