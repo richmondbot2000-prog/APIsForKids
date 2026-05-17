@@ -1626,7 +1626,36 @@ async function fetchPeopleFile(env) {
   return { sha: data.sha, file };
 }
 
+// Pre-commit schema validator for people.json. Catches duplicate ids /
+// slugs, empty names, self-line-manager loops. Throws on any failure
+// so the commit is refused — bad data can never land. Cheap (linear
+// pass over the ~200-row table) so we run it on every people-set.
+function validatePeopleFile(file) {
+  const errs = [];
+  const seenIds = new Set(), seenSlugs = new Set();
+  for (const p of file.people || []) {
+    if (!Number.isInteger(p.id) || p.id <= 0) errs.push(`bad id on Person ${p.name || "?"}: ${p.id!== undefined ? p.id : "(missing)"}`);
+    else if (seenIds.has(p.id)) errs.push(`duplicate Person id ${p.id}`);
+    else seenIds.add(p.id);
+    const slug = (p.url_slug || "").toLowerCase();
+    if (slug) {
+      if (seenSlugs.has(slug)) errs.push(`duplicate url_slug ${slug}`);
+      seenSlugs.add(slug);
+    }
+    if (!(p.name || "").trim()) errs.push(`Person #${p.id} has empty name`);
+    if (p.line_manager_id === p.id) errs.push(`Person #${p.id} is its own line_manager`);
+  }
+  // FK integrity: line_manager_id must resolve.
+  for (const p of file.people || []) {
+    const lm = p.line_manager_id;
+    if (lm == null || lm === "") continue;
+    if (!seenIds.has(Number(lm))) errs.push(`Person #${p.id} line_manager_id=${lm} → no Person`);
+  }
+  if (errs.length) throw new Error("people.json validation failed: " + errs.slice(0, 5).join("; "));
+}
+
 async function commitPeopleFile(env, file, sha, message) {
+  validatePeopleFile(file);
   file.schema_version = 1;
   file.updated_at = new Date().toISOString();
   file.people.sort((a, b) => ((a.name || "").toLowerCase().localeCompare((b.name || "").toLowerCase())) || (a.id || "").localeCompare(b.id || ""));
@@ -1925,7 +1954,22 @@ async function fetchPayrollFile(env) {
   return { sha: data.sha, file };
 }
 
+function validatePayrollFile(file) {
+  const errs = [];
+  const seen = new Set();
+  for (const r of file.records || []) {
+    if (!Number.isInteger(r.id) || r.id <= 0) errs.push(`PayrollData has bad id: ${r.id}`);
+    else if (seen.has(r.id)) errs.push(`duplicate PayrollData id ${r.id}`);
+    else seen.add(r.id);
+    if (r.person_id !== null && r.person_id !== undefined && !Number.isInteger(r.person_id)) {
+      errs.push(`PayrollData #${r.id} bad person_id type: ${r.person_id}`);
+    }
+  }
+  if (errs.length) throw new Error("payroll-data.json validation failed: " + errs.slice(0, 5).join("; "));
+}
+
 async function commitPayrollFile(env, file, sha, message) {
+  validatePayrollFile(file);
   file.schema_version = 1;
   file.updated_at = new Date().toISOString();
   const body = JSON.stringify(file, null, 2) + "\n";
@@ -2065,7 +2109,28 @@ async function fetchGoogleAccountsFile(env) {
   return { sha: data.sha, file };
 }
 
+function validateGoogleAccountsFile(file) {
+  const errs = [];
+  const seen = new Set(); const seenEmails = new Set();
+  for (const r of file.records || []) {
+    if (!Number.isInteger(r.id) || r.id <= 0) errs.push(`GoogleAccount has bad id: ${r.id}`);
+    else if (seen.has(r.id)) errs.push(`duplicate GoogleAccount id ${r.id}`);
+    else seen.add(r.id);
+    if (r.tenant && !["letme","together","external"].includes(r.tenant)) {
+      errs.push(`GoogleAccount #${r.id} bad tenant ${r.tenant}`);
+    }
+    const email = (r.email || "").toLowerCase();
+    if (email && seenEmails.has(email)) errs.push(`duplicate GoogleAccount email ${email}`);
+    if (email) seenEmails.add(email);
+    if (r.person_id !== null && r.person_id !== undefined && !Number.isInteger(r.person_id)) {
+      errs.push(`GoogleAccount #${r.id} bad person_id type: ${r.person_id}`);
+    }
+  }
+  if (errs.length) throw new Error("google-accounts.json validation failed: " + errs.slice(0, 5).join("; "));
+}
+
 async function commitGoogleAccountsFile(env, file, sha, message) {
+  validateGoogleAccountsFile(file);
   file.schema_version = 1;
   file.updated_at = new Date().toISOString();
   const body = JSON.stringify(file, null, 2) + "\n";
@@ -2105,7 +2170,22 @@ async function fetchWarehouseActivityFile(env) {
   if (!Array.isArray(file.records)) file.records = [];
   return { sha: data.sha, file };
 }
+function validateWarehouseActivityFile(file) {
+  const errs = [];
+  const seen = new Set();
+  for (const r of file.records || []) {
+    if (!Number.isInteger(r.id) || r.id <= 0) errs.push(`WarehouseActivity has bad id: ${r.id}`);
+    else if (seen.has(r.id)) errs.push(`duplicate WarehouseActivity id ${r.id}`);
+    else seen.add(r.id);
+    if (r.person_id !== null && r.person_id !== undefined && !Number.isInteger(r.person_id)) {
+      errs.push(`WarehouseActivity #${r.id} bad person_id type: ${r.person_id}`);
+    }
+  }
+  if (errs.length) throw new Error("warehouse-activity.json validation failed: " + errs.slice(0, 5).join("; "));
+}
+
 async function commitWarehouseActivityFile(env, file, sha, message) {
+  validateWarehouseActivityFile(file);
   file.schema_version = 1;
   file.updated_at = new Date().toISOString();
   const body = JSON.stringify(file, null, 2) + "\n";
@@ -2308,6 +2388,19 @@ async function doPeopleMerge(env, body, actor) {
   }
   winner.updated_at = new Date().toISOString();
 
+  // Re-point any other Person who had this loser as their
+  // line_manager — leaving them stale would orphan that FK too.
+  // Walked BEFORE removing the loser so we don't lose the chance
+  // to find it.
+  let lineManagerRepointed = 0;
+  for (const p of pFile.people) {
+    if (String(p.line_manager_id) === loserId) {
+      p.line_manager_id = winner.id;
+      p.updated_at = new Date().toISOString();
+      lineManagerRepointed++;
+    }
+  }
+
   // Remove loser from people.json.
   pFile.people = pFile.people.filter(p => String(p.id) !== loserId);
 
@@ -2375,6 +2468,7 @@ async function doPeopleMerge(env, body, actor) {
     ok: true,
     winner_id: winner.id,
     loser_id: loserId,
+    line_manager_refs_repointed: lineManagerRepointed,
     payroll_records_repointed: payrollUpdated,
     google_accounts_repointed: googleUpdated,
     warehouse_rows_repointed: warehouseUpdated,
