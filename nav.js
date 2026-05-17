@@ -65,8 +65,11 @@
     const s = document.createElement('style');
     s.id = 'qbMeStyle';
     s.textContent = `
+      /* Sits next to the System nav-link on desktop with the same
+         22 px gap the nav uses between its own items, and ~14 px from
+         the hamburger on narrow screens. */
       .qb-me { display: inline-flex; align-items: center; gap: 8px;
-               text-decoration: none; flex: 0 0 auto; order: 99; margin-left: 10px; }
+               text-decoration: none; flex: 0 0 auto; order: 99; margin-left: 22px; }
       .qb-me-avatar { width: 36px; height: 36px; border-radius: 50%;
                       background: var(--paper-200, #F5ECD4);
                       display: inline-flex; align-items: center; justify-content: center;
@@ -78,7 +81,11 @@
       .qb-me:hover .qb-me-avatar { border-color: var(--brass-500, #C8973F); }
       .qb-me-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
       .qb-me-avatar svg { width: 60%; height: 60%; color: var(--ink-500, #6B779A); }
-      @media (max-width: 960px) { .qb-me { margin-left: 6px; }
+      /* On narrow screens the hamburger anchors left (next to the
+         brand); the avatar gets an auto left margin so it lands on
+         the right end of the topbar regardless of how wide the
+         hamburger or brand are. */
+      @media (max-width: 960px) { .qb-me { margin-left: auto; }
                                   .qb-me-avatar { width: 32px; height: 32px; font-size: 11px; } }
     `;
     document.head.appendChild(s);

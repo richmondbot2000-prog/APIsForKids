@@ -119,13 +119,16 @@
                      when body.nav-open is set.
    ───────────────────────────────────────────────────────────────────────── */
 
-/* Reset the original quiet.css grid topbar in favour of a flex bar */
+/* Reset the original quiet.css grid topbar in favour of a flex bar.
+   Nav + avatar form one right-aligned cluster via the nav's
+   margin-left: auto (see below); the parent gap is dropped so the
+   only space between System and the avatar is the nav's internal
+   22 px gap. Brand stays at the left edge. */
 .qb-topbar {
   display: flex !important;
   grid-template-columns: none !important;
   align-items: center;
-  justify-content: space-between;
-  gap: 32px;
+  gap: 0;
   height: 72px; padding: 0 16px;
   position: sticky; top: 0; z-index: 1000;
   background: rgba(251, 246, 233, 0.92);
@@ -145,14 +148,16 @@
   max-height: none;
 }
 
-/* Desktop nav — single horizontal row, never wraps */
+/* Desktop nav — single horizontal row, never wraps. `margin-left: auto`
+   pushes the nav (and the avatar that follows in DOM order) to the
+   right end of the topbar, leaving the brand at the left edge. */
 .qb-nav {
   display: flex;
   flex: 0 1 auto;
   gap: 22px;
   flex-wrap: nowrap;
   align-items: center;
-  justify-self: end;
+  margin-left: auto;
 }
 .qb-nav-link {
   white-space: nowrap;
@@ -170,21 +175,22 @@
   border-bottom-color: var(--brass-500);
 }
 
-/* Hamburger — only visible ≤960px. `order: 98` + margin-left:auto
-   slot it on the right end of the topbar immediately before the
-   avatar chip (which is order: 99 from nav.js), so the two controls
-   sit next to each other instead of being split across the bar. */
+/* Hamburger — only visible ≤960px. Sits to the right of the brand
+   (order: 0; no left auto-margin) so the drawer that opens beneath
+   it is anchored on the LEFT of the screen, away from any
+   right-edge floating affordances (e.g. the Wall page's bell + search
+   icons that are fixed at top-right). 64 px wide so the open X has
+   enough breathing room when the drawer is over the page; no border
+   so the icon stands on its own. */
 .qb-hamburger {
   display: none;
   background: transparent;
-  border: 1px solid var(--ink-300);
-  width: 44px; height: 44px;
+  border: 0;
+  width: 64px; height: 40px;
   padding: 0; cursor: pointer;
   position: relative;
-  border-radius: var(--radius-xs);
+  border-radius: 0;
   flex: 0 0 auto;
-  order: 98;
-  margin-left: auto;
 }
 .qb-hamburger span {
   display: block;
@@ -274,7 +280,10 @@ body.nav-open .qb-nav-backdrop {
     flex-direction: column;
     align-items: stretch;
     gap: 0;
-    padding: 8px 24px 20px;
+    /* Heavy right padding so menu items stop ~80 px before the edge,
+       leaving the Wall page's fixed bell + magnifier icons (which
+       sit at top-right) with their own column. */
+    padding: 8px 80px 20px 24px;
     transform: translateY(-12px);
     opacity: 0;
     pointer-events: none;
