@@ -1535,6 +1535,23 @@
       renderBillingSummary();
       renderHealth();
       document.getElementById("dirControls").hidden = allEntries.length === 0;
+      // Pull filter state from the URL before the first render so the
+      // page lands on the right view when shared.
+      // Supported: ?group=letme|togetherloans|crm|suspended|all,
+      // ?sort=surname|start_date|last_seen, ?q=<search term>.
+      try {
+        const qs0 = new URLSearchParams(location.search || "");
+        const g = (qs0.get("group") || "").toLowerCase();
+        const s = (qs0.get("sort") || "").toLowerCase();
+        const q = qs0.get("q") || "";
+        if (["all","letme","togetherloans","crm","suspended"].includes(g)) activeGroup = g;
+        if (["surname","start_date","last_seen"].includes(s)) activeSort = s;
+        if (q) {
+          searchTerm = q.toLowerCase();
+          const input = document.getElementById("dirSearch");
+          if (input) input.value = q;
+        }
+      } catch (e) { /* noop */ }
       renderGrid();
       // ?email=<addr> deep-link — auto-opens the matching staff card.
       // Used by the Org Structure page to jump from a node to the
@@ -1599,6 +1616,7 @@
         document.querySelectorAll(".dir-pill--group").forEach(b => b.classList.remove("active"));
         p.classList.add("active");
         activeGroup = p.dataset.value;
+        syncDirUrl();
         renderGrid();
       });
     });
@@ -1609,6 +1627,7 @@
       search.dataset.wired = "1";
       search.addEventListener("input", e => {
         searchTerm = e.target.value.trim().toLowerCase();
+        syncDirUrl();
         renderGrid();
       });
     }
@@ -1621,10 +1640,24 @@
         document.querySelectorAll(".dir-pill--sort").forEach(b => b.classList.remove("active"));
         p.classList.add("active");
         activeSort = p.dataset.value;
+        syncDirUrl();
         sortEntries();
         renderGrid();
       });
     });
+  }
+  // Reflect current filter state in the URL so the page can be shared /
+  // bookmarked / reloaded into the same view. Omits defaults so the URL
+  // stays clean when nothing's filtered.
+  function syncDirUrl() {
+    try {
+      const url = new URL(location.href);
+      const set = (k, v) => v ? url.searchParams.set(k, v) : url.searchParams.delete(k);
+      set("group", activeGroup === "all" ? "" : activeGroup);
+      set("sort", activeSort === "surname" ? "" : activeSort);
+      set("q", searchTerm || "");
+      history.replaceState({}, "", url.toString());
+    } catch (e) { /* noop */ }
   }
 
   // Compute + render the data-quality health panel. Three lines:
