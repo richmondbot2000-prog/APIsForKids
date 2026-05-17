@@ -2385,7 +2385,8 @@
         const u = (e.user_email || "").toLowerCase();
         const by = (e.changed_by || "").toLowerCase();
         if (u === me) return true;
-        if (by === me && directReports.has(u)) return true;
+        if (directReports.has(u)) return true;
+        if (by === me) return true;
         return false;
       });
     } else {
