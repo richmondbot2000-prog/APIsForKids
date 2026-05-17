@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-17T00:20:06.154Z",
+  "updated_at": "2026-05-17T00:23:19.974Z",
   "posts": [
     {
       "id": "post_mp913h7o_eb2kp2",
@@ -21,7 +21,9 @@
           "I don’t think anyone will use this wall",
           "Chicken Pizza"
         ],
-        "votes": {},
+        "votes": {
+          "james.benamor@letme.com": 2
+        },
         "created_at": "2026-05-17T00:20:05.988Z"
       }
     },
