@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-17T11:13:52Z",
+  "updated_at": "2026-05-17T14:05:40Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -190,7 +190,9 @@
       "suspended": true,
       "deletion_time": "2026-05-12T15:31:46.000Z",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740fptnsd",
+      "on_payroll": true
     },
     {
       "id": "danny.flores",
@@ -541,7 +543,9 @@
       "suspended": true,
       "deletion_time": "2026-05-13T14:31:09.000Z",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740glis03",
+      "on_payroll": true
     },
     {
       "id": "lucas.bishop",
@@ -909,7 +913,9 @@
       "directory_photo_uploaded_at": "2026-05-14T09:08:15+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740v5yneu",
+      "on_payroll": true
     },
     {
       "id": "aldrine.sejour",
@@ -984,7 +990,9 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740jkch01",
+      "on_payroll": true
     },
     {
       "id": "amber.lewis",
@@ -1186,7 +1194,9 @@
       "directory_photo_uploaded_at": "2026-05-14T09:02:42+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740eupmbb",
+      "on_payroll": true
     },
     {
       "id": "azure",
@@ -1338,7 +1348,9 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740vona6f",
+      "on_payroll": true
     },
     {
       "id": "bryony.leach",
@@ -1363,7 +1375,9 @@
       "directory_photo_uploaded_at": "2026-05-14T08:59:54+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_17790267408e0arq",
+      "on_payroll": true
     },
     {
       "id": "bushra.tabassum",
@@ -1513,7 +1527,9 @@
       "directory_photo_uploaded_at": "2026-05-14T08:58:00+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740mxbje4",
+      "on_payroll": true
     },
     {
       "id": "claire.stratford",
@@ -1538,7 +1554,9 @@
       "directory_photo_uploaded_at": "2026-05-14T08:57:07+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740jsgwpj",
+      "on_payroll": true
     },
     {
       "id": "autobots",
@@ -1590,7 +1608,9 @@
       "directory_photo_uploaded_at": "2026-05-14T08:56:24+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_17790267408m1sjt",
+      "on_payroll": true
     },
     {
       "id": "courtnie.raine",
@@ -1740,7 +1760,9 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_17790267401q24k6",
+      "on_payroll": true
     },
     {
       "id": "daniel.bartlett",
@@ -1790,7 +1812,9 @@
       "directory_photo_uploaded_at": "2026-05-14T08:54:40+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740svm4fk",
+      "on_payroll": true
     },
     {
       "id": "david.dewaard",
@@ -2090,7 +2114,9 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740bn5boh",
+      "on_payroll": true
     },
     {
       "id": "ekrem.yurtman",
@@ -2167,7 +2193,9 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740itwgnn",
+      "on_payroll": true
     },
     {
       "id": "finance",
@@ -2367,7 +2395,9 @@
       "directory_photo_uploaded_at": "2026-05-14T08:51:43+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740cwl67w",
+      "on_payroll": true
     },
     {
       "id": "harriet.gregory",
@@ -2392,7 +2422,9 @@
       "directory_photo_uploaded_at": "2026-05-14T08:50:53+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_17790267409euwfc",
+      "on_payroll": true
     },
     {
       "id": "historic",
@@ -2444,7 +2476,9 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740rfrvz2",
+      "on_payroll": true
     },
     {
       "id": "irlendz.arne",
@@ -2494,7 +2528,9 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740z288o9",
+      "on_payroll": true
     },
     {
       "id": "jaimi.struble",
@@ -2571,7 +2607,9 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_17790267402arby0",
+      "on_payroll": true
     },
     {
       "id": "james.webster",
@@ -2598,7 +2636,9 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740l39gsm",
+      "on_payroll": true
     },
     {
       "id": "jamie.stevens",
@@ -2798,7 +2838,9 @@
       "directory_photo_uploaded_at": "2026-05-14T08:45:43+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740oj3iva",
+      "on_payroll": true
     },
     {
       "id": "joseph.shabazz",
@@ -2873,7 +2915,9 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740lt6osq",
+      "on_payroll": true
     },
     {
       "id": "joshua.gesin",
@@ -3052,7 +3096,9 @@
       "directory_photo_uploaded_at": "2026-05-14T08:43:02+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740a5gzbz",
+      "on_payroll": true
     },
     {
       "id": "kenishia.cotner",
@@ -3154,7 +3200,9 @@
       "directory_photo_uploaded_at": "2026-05-14T08:40:26+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_17790267404yyxig",
+      "on_payroll": true
     },
     {
       "id": "laurine.beaubrun",
@@ -3229,7 +3277,9 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740wou0ut",
+      "on_payroll": true
     },
     {
       "id": "office",
@@ -3331,7 +3381,9 @@
       "directory_photo_uploaded_at": "2026-05-14T08:34:55+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_17790267407urtyb",
+      "on_payroll": true
     },
     {
       "id": "maisey.lapskas",
@@ -3356,7 +3408,9 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740pn3fpr",
+      "on_payroll": true
     },
     {
       "id": "marcos.gallegos",
@@ -3583,7 +3637,9 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740ywf018",
+      "on_payroll": true
     },
     {
       "id": "mourad.malki",
@@ -3611,7 +3667,9 @@
       "directory_photo_uploaded_at": "2026-05-14T08:28:48+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_177902674027mo0v",
+      "on_payroll": true
     },
     {
       "id": "murray.breingan",
@@ -3661,7 +3719,9 @@
       "directory_photo_uploaded_at": "2026-05-14T08:27:52+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740zqcnwy",
+      "on_payroll": true
     },
     {
       "id": "navodi.sammani",
@@ -3786,7 +3846,9 @@
       "directory_photo_uploaded_at": "2026-05-14T08:26:37+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740k2qfnu",
+      "on_payroll": true
     },
     {
       "id": "olivia.melvin",
@@ -4013,7 +4075,9 @@
       "directory_photo_uploaded_at": "2026-05-14T08:19:11+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740o7fgx0",
+      "on_payroll": true
     },
     {
       "id": "rebekah.dewaard",
@@ -4215,7 +4279,9 @@
       "directory_photo_uploaded_at": "2026-05-14T07:59:45+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740yp2hoz",
+      "on_payroll": true
     },
     {
       "id": "srujana.paspuleti",
@@ -4365,7 +4431,9 @@
       "directory_photo_uploaded_at": "2026-05-14T07:55:18+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740vi4rgj",
+      "on_payroll": true
     },
     {
       "id": "timothy.torres",
@@ -4540,7 +4608,9 @@
       "directory_photo_uploaded_at": "2026-05-14T07:52:25+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740qi9p4y",
+      "on_payroll": true
     },
     {
       "id": "yikyu.chan",
@@ -4590,7 +4660,9 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z"
+      "updated_at": "2026-05-17T14:05:40Z",
+      "most_recent_payroll_id": "pay_1779026740uu8dpm",
+      "on_payroll": true
     }
   ]
 }
