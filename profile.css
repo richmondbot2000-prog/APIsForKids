@@ -322,6 +322,19 @@ body { background: var(--paper-100, #FBF6E9); }
   margin-top: 8px;
 }
 
+/* ─── Payroll editor grid ────────────────────────────────────────── */
+.up-pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; margin-bottom: 12px; }
+@media (max-width: 720px) { .up-pay-grid { grid-template-columns: 1fr; } }
+.up-pay-row { display: flex; flex-direction: column; gap: 4px; }
+.up-pay-input {
+  width: 100%; box-sizing: border-box;
+  font: 400 13px/1.4 var(--font-body); color: var(--ink-900);
+  background: var(--paper-100); border: 1px solid var(--ink-300);
+  padding: 6px 9px;
+}
+.up-pay-input:focus { outline: 0; border-color: var(--brass-500); }
+textarea.up-pay-input { resize: vertical; min-height: 50px; font-family: var(--font-body); }
+
 /* ─── Google accounts section (inline per-account actions) ───────── */
 .up-acct {
   border: 1px solid var(--ink-300);

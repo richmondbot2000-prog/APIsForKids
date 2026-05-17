@@ -28,6 +28,8 @@
   let annotationsMap = {};       // for forward_to fallback
   let pendingTransfersByEmail = {};
   let adminEmails = new Set();
+  let payrollRecordsById = {};   // PayrollData rows keyed by id
+  let payrollByPersonId = {};    // most-recent PayrollData row per person_id
 
   const WORKSPACE_API = "/api/workspace";
 
@@ -116,9 +118,11 @@
   function renderPanel() {
     const panel = document.getElementById("upPanel");
     if (!panel) return;
-    if (currentTab === "info")        panel.innerHTML = renderInfoPanel();
-    else if (currentTab === "wall")   panel.innerHTML = renderFeedPanel();
+    if (currentTab === "info")          panel.innerHTML = renderInfoPanel();
+    else if (currentTab === "wall")     panel.innerHTML = renderFeedPanel();
     else if (currentTab === "calendar") panel.innerHTML = renderCalendarPanel();
+    else if (currentTab === "accounts") panel.innerHTML = renderAccountsPanel();
+    else if (currentTab === "payroll")  panel.innerHTML = renderPayrollPanel();
     wirePanel();
   }
 
@@ -216,11 +220,107 @@
       <div class="up-card">
         <div class="up-card-head">Identity & access</div>
         <div class="up-fields-grid">${readOnlyHtml}</div>
-      </div>
+      </div>`;
+  }
 
+  /* ─── Accounts tab — Google accounts + external identities ─────── */
+  function renderAccountsPanel() {
+    return `
+      <h2 class="up-panel-title">Accounts</h2>
       ${renderGoogleAccountsSection()}
-
       ${viewerIsAdmin ? renderExternalIdentitySection() : ""}`;
+  }
+
+  /* ─── Payroll tab — most-recent PayrollData record + editor ────── */
+  function renderPayrollPanel() {
+    const onPayroll = !!person.on_payroll;
+    const rec = payrollByPersonId[person.id] || (person.most_recent_payroll_id ? payrollRecordsById[person.most_recent_payroll_id] : null);
+
+    if (!viewerIsAdmin) {
+      if (!onPayroll) return `<h2 class="up-panel-title">Payroll</h2><div class="up-empty">This person is not on payroll.</div>`;
+      if (!rec)       return `<h2 class="up-panel-title">Payroll</h2><div class="up-empty">No payroll record yet — ask an admin to fill it in.</div>`;
+      return `
+        <h2 class="up-panel-title">Payroll</h2>
+        <div class="up-card">
+          <div class="up-card-head">Most recent payroll record <span class="up-card-hint">read-only · admins can edit</span></div>
+          <div class="up-fields-grid">${payrollReadOnlyHtml(rec)}</div>
+        </div>`;
+    }
+
+    // Admin view: on_payroll toggle + editable fields (or "create blank" when on_payroll=true but no record).
+    const toggleBtn = `
+      <button type="button" class="up-btn-sm ${onPayroll ? "" : "up-btn-sm--primary"}" data-payroll-toggle="${onPayroll ? "off" : "on"}">
+        ${onPayroll ? "Mark as NOT on payroll" : "Mark as ON payroll"}
+      </button>`;
+
+    if (!onPayroll) {
+      return `
+        <h2 class="up-panel-title">Payroll</h2>
+        <div class="up-card">
+          <div class="up-card-head">On payroll? <span class="up-pill up-pill--suspended">No</span></div>
+          <p class="up-hint">This person isn't currently flagged as on payroll. Mark them on payroll to start a record — a blank line will be created in PayrollData and you can fill in the fields.</p>
+          <div class="up-editor-row">${toggleBtn}<span class="up-edit-status" data-edit-status="on_payroll"></span></div>
+        </div>`;
+    }
+
+    // on_payroll = true. If no record yet, the worker creates one on next edit.
+    const blank = !rec;
+    const r = rec || { employer:"", employee_number:"", first_name:person.given||"", last_name:person.family||"", email:person.main_google_email||"", start_date:"", termination_date:"", mobile:person.phone||"", address:person.address||"", annual_salary:null, monthly_pay:null, tax_code:"", ni_number:"", bank_sort_code:"", bank_account_last4:"", notes:"" };
+    return `
+      <h2 class="up-panel-title">Payroll</h2>
+      <div class="up-card">
+        <div class="up-card-head">Most recent payroll record <span class="up-card-hint">${blank ? "no record yet — save any change to create one" : `record id <code>${escapeHtml(r.id || person.most_recent_payroll_id || "")}</code>`}</span></div>
+        ${payrollEditorHtml(r)}
+        <div class="up-editor-row">
+          <button type="button" class="up-btn-sm up-btn-sm--primary" data-payroll-save>Save</button>
+          <span class="up-edit-status" data-edit-status="payroll"></span>
+        </div>
+      </div>
+      <div class="up-card">
+        <div class="up-card-head">On payroll? <span class="up-pill up-pill--live">Yes</span></div>
+        <p class="up-hint">Turning this off does NOT delete the existing PayrollData record — it just stops showing the editor here and unmarks the Person from payroll views.</p>
+        <div class="up-editor-row">${toggleBtn}<span class="up-edit-status" data-edit-status="on_payroll"></span></div>
+      </div>`;
+  }
+
+  function payrollFields() {
+    return [
+      ["employer",            "Employer"],
+      ["employee_number",     "Employee number"],
+      ["first_name",          "First name"],
+      ["last_name",           "Last name"],
+      ["email",               "Payroll email"],
+      ["start_date",          "Start date"],
+      ["termination_date",    "Termination date"],
+      ["mobile",              "Mobile"],
+      ["address",             "Address"],
+      ["annual_salary",       "Annual salary"],
+      ["monthly_pay",         "Monthly pay"],
+      ["tax_code",            "Tax code"],
+      ["ni_number",           "NI number"],
+      ["bank_sort_code",      "Bank sort code"],
+      ["bank_account_last4",  "Bank account (last 4)"],
+      ["notes",               "Notes"],
+    ];
+  }
+  function payrollReadOnlyHtml(r) {
+    return payrollFields().map(([k, label]) => {
+      const v = r[k];
+      const display = v == null || v === "" ? '<span class="up-empty-val">—</span>' : escapeHtml(String(v));
+      return `<div class="up-field"><div class="up-field-label">${escapeHtml(label)}</div><div class="up-field-value">${display}</div></div>`;
+    }).join("");
+  }
+  function payrollEditorHtml(r) {
+    const rows = payrollFields().map(([k, label]) => {
+      const inputType = /date/i.test(k) ? "date" : (/salary|pay/.test(k) ? "number" : "text");
+      const val = (r && r[k] != null) ? r[k] : "";
+      const big = k === "address" || k === "notes";
+      const field = big
+        ? `<textarea class="up-pay-input" name="${k}" rows="2">${escapeHtml(val)}</textarea>`
+        : `<input class="up-pay-input" type="${inputType}" name="${k}" value="${escapeHtml(val)}">`;
+      return `<div class="up-pay-row"><label class="up-field-label">${escapeHtml(label)}</label>${field}</div>`;
+    }).join("");
+    return `<div class="up-pay-grid">${rows}</div>`;
   }
 
   /* ─── Google accounts section (inline per-account actions) ─────── */
@@ -369,6 +469,58 @@
     document.querySelectorAll("[data-acc-action]").forEach(btn => {
       btn.addEventListener("click", () => handleAccountAction(btn));
     });
+    document.querySelectorAll("[data-payroll-toggle]").forEach(btn => {
+      btn.addEventListener("click", () => togglePayroll(btn.dataset.payrollToggle === "on"));
+    });
+    const saveBtn = document.querySelector("[data-payroll-save]");
+    if (saveBtn) saveBtn.addEventListener("click", savePayrollEdits);
+  }
+
+  async function togglePayroll(turnOn) {
+    const status = document.querySelector('[data-edit-status="on_payroll"]');
+    if (status) { status.textContent = "Saving…"; status.className = "up-edit-status up-edit-status--working"; }
+    try {
+      const res = await fetch(WORKSPACE_API, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "people-set", id: person.id, on_payroll: turnOn }),
+      });
+      const out = await res.json();
+      if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
+      Object.assign(person, out.person);
+      if (out.payroll_record) {
+        payrollRecordsById[out.payroll_record.id] = out.payroll_record;
+        payrollByPersonId[person.id] = out.payroll_record;
+      }
+      renderPanel();
+    } catch (err) {
+      if (status) { status.textContent = "Failed — " + err.message; status.className = "up-edit-status up-edit-status--err"; }
+    }
+  }
+
+  async function savePayrollEdits() {
+    const status = document.querySelector('[data-edit-status="payroll"]');
+    status.textContent = "Saving…"; status.className = "up-edit-status up-edit-status--working";
+    const payload = { action: "payroll-set", person_id: person.id };
+    document.querySelectorAll(".up-pay-input").forEach(inp => {
+      payload[inp.name] = inp.value;
+    });
+    try {
+      const res = await fetch(WORKSPACE_API, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const out = await res.json();
+      if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
+      payrollRecordsById[out.record.id] = out.record;
+      payrollByPersonId[person.id] = out.record;
+      if (out.created) person.most_recent_payroll_id = out.record.id;
+      status.textContent = "Saved";
+      status.className = "up-edit-status up-edit-status--ok";
+      setTimeout(() => renderPanel(), 350);
+    } catch (err) {
+      status.textContent = "Failed — " + err.message;
+      status.className = "up-edit-status up-edit-status--err";
+    }
   }
 
   /* ─── Account action handlers (call workspace worker inline) ───── */
@@ -623,6 +775,8 @@
         <nav class="up-tabs" aria-label="Profile sections">
           <a class="up-tab" data-tab="calendar" href="?tab=calendar">${svgIcon("calendar")}<span>Calendar</span></a>
           <a class="up-tab" data-tab="info"     href="?tab=info">${svgIcon("info")}<span>Info</span></a>
+          <a class="up-tab" data-tab="accounts" href="?tab=accounts">${svgIcon("org")}<span>Accounts</span></a>
+          <a class="up-tab" data-tab="payroll"  href="?tab=payroll">${svgIcon("info")}<span>Payroll</span></a>
           <a class="up-tab" data-tab="wall"     href="?tab=wall">${svgIcon("feed")}<span>Wall</span></a>
         </nav>
         <section class="up-panel" id="upPanel"></section>
@@ -634,7 +788,7 @@
       t.addEventListener("click", e => { e.preventDefault(); setTab(t.dataset.tab); });
     });
     if (editable) wirePhotoUploads();
-    setTab(["info","wall","calendar"].includes(initialTab) ? initialTab : "calendar");
+    setTab(["info","wall","calendar","accounts","payroll"].includes(initialTab) ? initialTab : "calendar");
   }
 
   /* ─── Photo uploads (avatar + cover) ──────────────────────────────── */
@@ -735,7 +889,8 @@
     fetch("/annotations.json",      { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch("/admins.json",           { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch("/pending-transfers.json",{ cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-  ]).then(([peopleFile, staff, wallFile, payroll, who, annFile, adminsFile, pending]) => {
+    fetch("/payroll-data.json",     { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+  ]).then(([peopleFile, staff, wallFile, payroll, who, annFile, adminsFile, pending, payrollFile]) => {
     if (peopleFile && Array.isArray(peopleFile.people)) {
       people = peopleFile.people;
       for (const p of people) {
@@ -770,6 +925,16 @@
       for (const p of pending.entries) {
         const k = (p.source_email || "").toLowerCase();
         if (k) pendingTransfersByEmail[k] = p;
+      }
+    }
+    if (payrollFile && Array.isArray(payrollFile.records)) {
+      for (const r of payrollFile.records) payrollRecordsById[r.id] = r;
+      // Person.most_recent_payroll_id is authoritative; build the per-person
+      // lookup from it (records that aren't linked are historical or orphan).
+      for (const p of people) {
+        if (p.most_recent_payroll_id && payrollRecordsById[p.most_recent_payroll_id]) {
+          payrollByPersonId[p.id] = payrollRecordsById[p.most_recent_payroll_id];
+        }
       }
     }
     renderProfile();

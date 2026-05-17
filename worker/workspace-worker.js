@@ -292,6 +292,26 @@ export default {
       return json(result, result.ok ? 200 : 400, req);
     }
 
+    // payroll-set — admin-only, edits a Person's most-recent PayrollData
+    // record (or creates the blank shell if Person is on_payroll=true and
+    // has no record yet).
+    if (action === "payroll-set") {
+      if (!isAdmin) return json({ error: "admin required" }, 403, req);
+      let result;
+      try { result = await doPayrollSet(env, body, actor); }
+      catch (e) { result = { ok: false, error: e.message }; }
+      try {
+        await appendAudit(env, {
+          ts: new Date().toISOString(),
+          actor, action,
+          target: (body.person_id || "").toLowerCase(),
+          ok: !!result.ok,
+          ...(result.ok ? {} : { error: String(result.error || "").slice(0, 300) }),
+        });
+      } catch (e) {}
+      return json(result, result.ok ? 200 : 400, req);
+    }
+
     // Manual access sync — admin-only. Re-derives admins.json from
     // people.json and pushes the resulting allow-list to Cloudflare Access.
     if (action === "people-sync-access") {
@@ -1404,6 +1424,7 @@ const PEOPLE_ALLOWED_FIELDS = new Set([
   "role", "notes",
   "directory_photo_uploaded_at", "cover_photo_uploaded_at",
   "suspended", "deletion_time",
+  "on_payroll", "most_recent_payroll_id",
 ]);
 // Fields a person can self-edit on their own profile page without admin
 // rights. Everything else (access_level, main/alt google emails, auth0,
@@ -1552,7 +1573,29 @@ async function doPeopleSet(env, body, actor, isAdmin) {
     patch.main_google_email !== undefined ||
     patch.alt_google_emails !== undefined;
 
+  // If on_payroll is being flipped to true and this Person has no
+  // PayrollData record yet, create a blank one and link it BEFORE
+  // committing people.json so the link goes out in the same write.
+  const turningOnPayroll = (patch.on_payroll === true) && !person.most_recent_payroll_id;
+
   Object.assign(person, patch, { updated_at: now });
+
+  let createdPayrollRecord = null;
+  let payrollBootstrapError = null;
+  if (turningOnPayroll) {
+    try {
+      const { sha: paySha, file: payFile } = await fetchPayrollFile(env);
+      const rec = blankPayrollRecord(person, actor, "auto-on-flag");
+      payFile.records.push(rec);
+      await commitPayrollFile(env, payFile, paySha, `Payroll: auto-create blank for ${person.id} (by ${actor})`);
+      person.most_recent_payroll_id = rec.id;
+      createdPayrollRecord = rec;
+    } catch (e) {
+      // Don't fail people-set if the payroll bootstrap couldn't write;
+      // the user can re-trigger by editing payroll on the Person page.
+      payrollBootstrapError = e.message;
+    }
+  }
 
   const msg = created
     ? `People: create ${id} (by ${actor})`
@@ -1563,6 +1606,8 @@ async function doPeopleSet(env, body, actor, isAdmin) {
   // new allow-list to Cloudflare Access. Non-fatal: people-set itself
   // already succeeded, so a sync failure is reported back as a warning.
   const result = { ok: true, person, created };
+  if (createdPayrollRecord) result.payroll_record = createdPayrollRecord;
+  if (payrollBootstrapError) result.payroll_bootstrap_error = payrollBootstrapError;
   if (accessChanged) {
     try {
       const adminSync  = await syncAdminsFromPeople(env, file, actor);
@@ -1630,6 +1675,152 @@ async function syncAdminsFromPeople(env, file, actor) {
     return { ok: false, error: `admins.json PUT failed (${putRes.status}): ${detail}` };
   }
   return { ok: true, admins };
+}
+
+/* ----------- PayrollData table (payroll-data.json) -----------
+ *
+ * One canonical PayrollData record per Person (the most recent snapshot).
+ * Historical records are kept in the same file — Person.most_recent_payroll_id
+ * points to the active one. Manual admin edits via the Person page mutate
+ * that record in place; bulk imports (payroll-import, not built yet) will
+ * append a new row and re-point the link.
+ */
+const PAYROLL_DATA_PATH = "payroll-data.json";
+const PAYROLL_ALLOWED_FIELDS = new Set([
+  "employer", "employee_number",
+  "first_name", "last_name", "email",
+  "start_date", "termination_date",
+  "mobile", "address",
+  "annual_salary", "monthly_pay",
+  "tax_code", "ni_number",
+  "bank_sort_code", "bank_account_last4",
+  "notes",
+]);
+
+async function fetchPayrollFile(env) {
+  const ghHeaders = {
+    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "apifk-workspace-worker",
+  };
+  const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PAYROLL_DATA_PATH}?ref=${BRANCH}`, { headers: ghHeaders });
+  if (res.status === 404) return { sha: null, file: { schema_version: 1, updated_at: null, records: [] } };
+  if (!res.ok) throw new Error(`payroll-data.json GET failed: ${res.status}`);
+  const data = await res.json();
+  let file;
+  try {
+    const bin = atob((data.content || "").replace(/\s/g, ""));
+    file = JSON.parse(new TextDecoder("utf-8").decode(Uint8Array.from(bin, c => c.charCodeAt(0))));
+  } catch (e) { throw new Error("payroll-data.json could not be parsed: " + e.message); }
+  if (!Array.isArray(file.records)) file.records = [];
+  return { sha: data.sha, file };
+}
+
+async function commitPayrollFile(env, file, sha, message) {
+  file.schema_version = 1;
+  file.updated_at = new Date().toISOString();
+  const body = JSON.stringify(file, null, 2) + "\n";
+  const ghHeaders = {
+    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "apifk-workspace-worker",
+    "Content-Type": "application/json",
+  };
+  const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PAYROLL_DATA_PATH}`, {
+    method: "PUT",
+    headers: ghHeaders,
+    body: JSON.stringify({ message, content: b64Encode(body), branch: BRANCH, sha: sha || undefined }),
+  });
+  if (!res.ok) {
+    const detail = (await res.text()).slice(0, 200);
+    throw new Error(`payroll-data.json commit failed (${res.status}): ${detail}`);
+  }
+}
+
+function newPayrollId() {
+  return "pay_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
+}
+
+function normalisePayrollPatch(patch) {
+  const out = {};
+  for (const k of Object.keys(patch || {})) {
+    if (!PAYROLL_ALLOWED_FIELDS.has(k)) continue;
+    let v = patch[k];
+    if (typeof v === "string") v = v.trim();
+    if (k === "email" && typeof v === "string") v = v.toLowerCase();
+    out[k] = v;
+  }
+  return out;
+}
+
+// Build a blank payroll record for a Person who's been flagged on_payroll
+// but has no record yet. Caller appends and links most_recent_payroll_id.
+function blankPayrollRecord(person, actor, source) {
+  return {
+    id: newPayrollId(),
+    person_id: person.id,
+    employer: "",
+    employee_number: "",
+    first_name: person.given || "",
+    last_name: person.family || "",
+    email: person.main_google_email || "",
+    start_date: person.start_date || "",
+    termination_date: "",
+    mobile: person.phone || "",
+    address: person.address || "",
+    annual_salary: null,
+    monthly_pay: null,
+    tax_code: "",
+    ni_number: "",
+    bank_sort_code: "",
+    bank_account_last4: "",
+    notes: "",
+    imported_at: new Date().toISOString(),
+    imported_by: actor || "(system)",
+    source: source || "auto-blank",
+  };
+}
+
+// payroll-set: admin-only edit of a Person's most-recent PayrollData record.
+// If the Person is on_payroll=true and has no record yet, creates a blank
+// one and applies the patch in a single commit.
+async function doPayrollSet(env, body, actor) {
+  if (!env.GITHUB_TOKEN) return { ok: false, error: "GITHUB_TOKEN not configured" };
+  const personId = ((body || {}).person_id || "").toString().trim().toLowerCase();
+  if (!personId) return { ok: false, error: "missing person_id" };
+
+  const patch = normalisePayrollPatch(body);
+
+  // Load people.json to find the Person and their link.
+  const { sha: pSha, file: pFile } = await fetchPeopleFile(env);
+  const person = (pFile.people || []).find(p => (p.id || "").toLowerCase() === personId);
+  if (!person) return { ok: false, error: `person ${personId} not found` };
+  if (!person.on_payroll) {
+    return { ok: false, error: `${person.name || personId} is not flagged on_payroll — set that to Yes first` };
+  }
+
+  // Load payroll-data.json and find the active record.
+  const { sha, file } = await fetchPayrollFile(env);
+  let rec = person.most_recent_payroll_id
+    ? file.records.find(r => r.id === person.most_recent_payroll_id)
+    : null;
+  let created = false;
+  if (!rec) {
+    rec = blankPayrollRecord(person, actor, "manual");
+    file.records.push(rec);
+    created = true;
+  }
+  Object.assign(rec, patch);
+  // Link the Person if we created a new record OR no link existed.
+  if (created || person.most_recent_payroll_id !== rec.id) {
+    person.most_recent_payroll_id = rec.id;
+    person.updated_at = new Date().toISOString();
+    await commitPeopleFile(env, pFile, pSha, `People: link payroll for ${person.id} (by ${actor})`);
+  }
+  await commitPayrollFile(env, file, sha,
+    created ? `Payroll: create blank for ${person.id} + edits (by ${actor})`
+            : `Payroll: edit ${rec.id} (${person.id}) (by ${actor})`);
+  return { ok: true, record: rec, person_id: person.id, created };
 }
 
 async function doPeopleDelete(env, body, actor) {
