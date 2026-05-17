@@ -425,6 +425,9 @@
 
           <div class="pp-detail-actions">
             <span class="pp-status" data-status-for="${escapeHtml(p.id)}"></span>
+            <button class="pp-btn pp-btn--ghost" data-suspend="${escapeHtml(p.id)}">
+              ${statusOf(p) === "live" ? "Suspend access" : "Reactivate"}
+            </button>
             <button class="pp-btn pp-btn--danger" data-delete="${escapeHtml(p.id)}">Delete person</button>
           </div>
         </div>
@@ -489,6 +492,31 @@
     document.querySelectorAll("[data-delete]").forEach(btn => {
       btn.addEventListener("click", () => deletePerson(btn.dataset.delete));
     });
+    document.querySelectorAll("[data-suspend]").forEach(btn => {
+      btn.addEventListener("click", () => toggleSuspend(btn.dataset.suspend));
+    });
+  }
+
+  async function toggleSuspend(pid) {
+    const p = people.find(x => x.id === pid); if (!p) return;
+    const goingDown = statusOf(p) === "live";
+    const verb = goingDown ? "Suspend" : "Reactivate";
+    if (!confirm(`${verb} ${p.name}?\n\n${goingDown
+      ? "Their Person record will be marked Suspended. Sign-in via Google still works until you also suspend the Google account itself (use the Manage button next to each Google email)."
+      : "Their Person record will be marked Live again. If their Google account was also suspended, you'll need to Unsuspend it from Directory."}`)) return;
+    const patch = goingDown
+      ? { suspended: true,  access_level: "former" }
+      : { suspended: false, access_level: p.access_level === "former" ? "staff" : p.access_level };
+    try {
+      const res = await fetch(WORKSPACE_API, {
+        method: "POST", headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ action: "people-set", id: pid, ...patch }),
+      });
+      const out = await res.json();
+      if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
+      Object.assign(p, out.person);
+      render();
+    } catch (err) { setStatus(pid, "Failed — " + err.message, true); }
   }
 
   function setStatus(pid, msg, isErr) {

@@ -1645,13 +1645,34 @@
     fetch(`${WALL_API}/whoami`, { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch("annotations.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch("admins.json",      { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-  ]).then(([wall, staff, seen, who, annFile, adminsFile]) => {
+    fetch("people.json",      { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+  ]).then(([wall, staff, seen, who, annFile, adminsFile, peopleFile]) => {
     const adminEmails = new Set(((adminsFile && adminsFile.admins) || []).map(e => (e || "").toLowerCase()));
     posts = Array.isArray(wall.posts) ? wall.posts : [];
     if (staff && Array.isArray(staff.users)) {
       for (const u of staff.users) {
         const k = (u.email || "").toLowerCase();
         if (k) staffByEmail[k] = u;
+      }
+    }
+    // Layer people.json over staffByEmail: every Person's main/alt/external
+    // email gets a record so mentions like @james.benamor resolve via the
+    // Person table first. Synthesize a staff-shaped record for Persons whose
+    // email isn't in Workspace (e.g. external Google or auth0-only users).
+    if (peopleFile && Array.isArray(peopleFile.people)) {
+      for (const p of peopleFile.people) {
+        const emails = [p.main_google_email, ...(p.alt_google_emails || []), p.external_google_email].filter(Boolean);
+        for (const eRaw of emails) {
+          const e = eRaw.toLowerCase();
+          if (!staffByEmail[e]) {
+            staffByEmail[e] = { email: e, name: p.name || p.id, photo_url: "", tenant: (p.company || "").includes("togetherloans") ? "togetherloans" : "letme.co.uk" };
+          }
+          // If this Person has an uploaded avatar, prefer it over the raw
+          // Workspace photo so the Wall + mentions stay consistent.
+          if (p.directory_photo_uploaded_at) {
+            staffByEmail[e].directory_photo_override = `/assets/photos/${e.replace(/@/g, "_at_")}.jpg?v=${encodeURIComponent(p.directory_photo_uploaded_at)}`;
+          }
+        }
       }
     }
     buildStaffByLocal();
@@ -4109,6 +4130,7 @@
   }
   function photoUrlFor(u) {
     if (!u || !u.email) return "";
+    if (u.directory_photo_override) return u.directory_photo_override;
     const email = u.email.toLowerCase();
     const ann = annotationsMap[email];
     if (ann && ann.directory_photo_uploaded_at) {

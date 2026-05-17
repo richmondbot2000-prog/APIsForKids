@@ -229,14 +229,18 @@ export default {
       return json({ ok: true, admins, owner: ownerLc }, 200, req);
     }
 
-    // Everything else requires admin status.
-    if (!isAdmin) {
-      return json({ error: `not authorized — ${actor || "(no email)"} is not an admin. Ask an admin to grant access.` }, 403, req);
-    }
-
+    // people-set + photo uploads have a self-edit carve-out (any signed-in
+    // user can edit their own record / avatar / cover), so we let them
+    // through the admin gate and check ownership inside the handler. Read
+    // the body now since both branches need it.
     let body;
     try { body = await req.json(); }
     catch { return json({ error: "invalid JSON body" }, 400, req); }
+
+    const SELF_EDITABLE_ACTIONS = new Set(["people-set", "cover-photo-upload", "cover-photo-remove", "directory-photo-upload", "directory-photo-remove"]);
+    if (!isAdmin && !SELF_EDITABLE_ACTIONS.has(action)) {
+      return json({ error: `not authorized — ${actor || "(no email)"} is not an admin. Ask an admin to grant access.` }, 403, req);
+    }
 
     // Owner-protection: suspend, password reset, and admin flag changes ON
     // the owner require the actor to BE the owner. Stops a rogue admin from
@@ -290,10 +294,13 @@ export default {
 
     // People table CRUD — no Google token needed, just GitHub.
     if (action === "people-set" || action === "people-delete") {
+      if (action === "people-delete" && !isAdmin) {
+        return json({ error: "admin required to delete a Person record" }, 403, req);
+      }
       let result;
       try {
         result = (action === "people-set")
-          ? await doPeopleSet(env, body, actor)
+          ? await doPeopleSet(env, body, actor, isAdmin)
           : await doPeopleDelete(env, body, actor);
       } catch (e) {
         result = { ok: false, error: e.message };
@@ -308,6 +315,25 @@ export default {
         });
       } catch (e) {}
       return json(result, result.ok ? 200 : 400, req);
+    }
+
+    // Avatar / cover photo uploads — same self-or-admin gating handled
+    // inside the doPhoto helpers. Goes through GitHub Contents API, no
+    // Google token.
+    if (action === "cover-photo-upload" || action === "cover-photo-remove") {
+      let result;
+      try {
+        result = (action === "cover-photo-upload")
+          ? await doCoverPhotoUpload(env, body, actor, isAdmin)
+          : await doCoverPhotoRemove(env, body, actor, isAdmin);
+      } catch (e) { result = { ok: false, error: e.message }; }
+      return json(result, result.ok ? 200 : 400, req);
+    }
+    if (!isAdmin && (action === "directory-photo-upload" || action === "directory-photo-remove")) {
+      // Self-only check for directory (avatar) photos.
+      const target = ((body.user_email || "") + "").toLowerCase();
+      const ok = await actorOwnsEmail(env, actor, target);
+      if (!ok) return json({ error: "self or admin required for avatar changes" }, 403, req);
     }
 
     if (!env.GOOGLE_SERVICE_ACCOUNT_JSON) {
@@ -1095,6 +1121,59 @@ async function doDirectoryPhotoRemove(env, body, actor) {
   return { ok: true, path };
 }
 
+// Cover banner photo — wider, shown at the top of /directory/<slug>. Same
+// upload flow as the avatar but written to assets/covers/ and tracked via
+// a separate Person field (cover_photo_uploaded_at) for cache-busting.
+function coverFilename(email) {
+  return (email || "").toString().trim().toLowerCase().replace(/@/g, "_at_") + ".jpg";
+}
+
+async function doCoverPhotoUpload(env, body, actor, isAdmin) {
+  if (!env.GITHUB_TOKEN) return { ok: false, error: "GITHUB_TOKEN secret not configured" };
+  const email = (body.user_email || "").toString().trim().toLowerCase();
+  if (!email || !email.includes("@")) return { ok: false, error: "missing or invalid user_email" };
+  if (!isAdmin && !(await actorOwnsEmail(env, actor, email))) {
+    return { ok: false, error: "self or admin required for cover changes" };
+  }
+  const b64 = (body.photo_b64 || "").toString();
+  if (!b64) return { ok: false, error: "missing photo_b64" };
+  // Covers are larger than avatars (1500×500 ish). Cap at 3 MB base64.
+  if (b64.length > 3 * 1024 * 1024) {
+    return { ok: false, error: `cover too large (${Math.round(b64.length / 1024)} KB base64) — resize client-side` };
+  }
+  const path = `assets/covers/${coverFilename(email)}`;
+  return await commitFile(env, path, b64, `Cover photo: upload ${email} (by ${actor})`);
+}
+
+async function doCoverPhotoRemove(env, body, actor, isAdmin) {
+  if (!env.GITHUB_TOKEN) return { ok: false, error: "GITHUB_TOKEN secret not configured" };
+  const email = (body.user_email || "").toString().trim().toLowerCase();
+  if (!email || !email.includes("@")) return { ok: false, error: "missing or invalid user_email" };
+  if (!isAdmin && !(await actorOwnsEmail(env, actor, email))) {
+    return { ok: false, error: "self or admin required for cover changes" };
+  }
+  const path = `assets/covers/${coverFilename(email)}`;
+  const ghHeaders = {
+    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "apifk-workspace-worker",
+  };
+  const getRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}?ref=${BRANCH}`, { headers: ghHeaders });
+  if (getRes.status === 404) return { ok: true, no_op: true, message: "no cover to remove" };
+  if (!getRes.ok) return { ok: false, error: `failed to read cover: ${getRes.status}` };
+  const sha = (await getRes.json()).sha;
+  const delRes = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
+    method: "DELETE",
+    headers: { ...ghHeaders, "Content-Type": "application/json" },
+    body: JSON.stringify({ message: `Cover photo: remove ${email} (by ${actor})`, sha, branch: BRANCH }),
+  });
+  if (!delRes.ok) {
+    const detail = (await delRes.text()).slice(0, 200);
+    return { ok: false, error: `failed to delete (${delRes.status}): ${detail}` };
+  }
+  return { ok: true, path };
+}
+
 // Shared helper: PUT a file to the GitHub Contents API. Handles new files
 // (no SHA) and updates (must include SHA of the prior version).
 async function commitFile(env, path, b64Content, message) {
@@ -1305,10 +1384,38 @@ const PEOPLE_ALLOWED_FIELDS = new Set([
   "phone", "address", "start_date",
   "line_manager_id", "line_manager_email_raw",
   "role", "notes",
-  "directory_photo_uploaded_at",
+  "directory_photo_uploaded_at", "cover_photo_uploaded_at",
   "suspended", "deletion_time",
 ]);
+// Fields a person can self-edit on their own profile page without admin
+// rights. Everything else (access_level, main/alt google emails, auth0,
+// line manager, dates) is admin-only.
+const PEOPLE_SELF_EDITABLE = new Set([
+  "phone", "address", "role", "notes",
+  "directory_photo_uploaded_at", "cover_photo_uploaded_at",
+]);
 const PEOPLE_ACCESS_LEVELS = new Set(["admin", "staff", "agent", "outsider", "former"]);
+
+// Return true if `actor` (a Cf-Access-Authenticated email) appears on the
+// Person record at `targetEmail` as main / alt / external Google account.
+// Used by the self-edit carve-outs.
+async function actorOwnsEmail(env, actor, targetEmail) {
+  if (!actor || !targetEmail) return false;
+  const a = actor.toLowerCase(), t = targetEmail.toLowerCase();
+  if (a === t) return true;
+  try {
+    const { file } = await fetchPeopleFile(env);
+    const p = (file.people || []).find(p =>
+      (p.main_google_email || "").toLowerCase() === t ||
+      ((p.alt_google_emails || []).map(e => (e || "").toLowerCase())).includes(t) ||
+      (p.external_google_email || "").toLowerCase() === t
+    );
+    if (!p) return false;
+    const emails = [p.main_google_email, ...(p.alt_google_emails || []), p.external_google_email]
+      .filter(Boolean).map(e => e.toLowerCase());
+    return emails.includes(a);
+  } catch (e) { return false; }
+}
 
 async function fetchPeopleFile(env) {
   const ghHeaders = {
@@ -1380,7 +1487,7 @@ function normalisePeoplePatch(patch) {
   return out;
 }
 
-async function doPeopleSet(env, body, actor) {
+async function doPeopleSet(env, body, actor, isAdmin) {
   if (!env.GITHUB_TOKEN) return { ok: false, error: "GITHUB_TOKEN not configured" };
   const id = ((body || {}).id || "").toString().trim().toLowerCase();
   if (!id) return { ok: false, error: "missing id" };
@@ -1393,6 +1500,7 @@ async function doPeopleSet(env, body, actor) {
   let person = file.people.find(p => (p.id || "").toLowerCase() === id);
   let created = false;
   if (!person) {
+    if (!isAdmin) return { ok: false, error: "admin required to create a new Person" };
     person = {
       id, name: "", given: "", family: "", aliases: [],
       main_google_email: "", alt_google_emails: [], external_google_email: "",
@@ -1401,13 +1509,21 @@ async function doPeopleSet(env, body, actor) {
       phone: "", address: "", start_date: "",
       line_manager_id: "", line_manager_email_raw: "",
       role: "", notes: "",
-      directory_photo_uploaded_at: "",
+      directory_photo_uploaded_at: "", cover_photo_uploaded_at: "",
       created_at: now, updated_at: now,
     };
     file.people.push(person);
     created = true;
+  } else if (!isAdmin) {
+    // Self-edit path: actor must own one of this Person's Google emails,
+    // and the patch must touch only self-editable fields.
+    const owned = [person.main_google_email, ...(person.alt_google_emails || []), person.external_google_email]
+      .filter(Boolean).map(e => e.toLowerCase()).includes((actor || "").toLowerCase());
+    if (!owned) return { ok: false, error: "self or admin required" };
+    for (const k of Object.keys(patch)) {
+      if (!PEOPLE_SELF_EDITABLE.has(k)) return { ok: false, error: `field "${k}" is admin-only` };
+    }
   }
-  // main_google_email is required on first save.
   if (created && !patch.main_google_email && !person.main_google_email) {
     file.people.pop();
     return { ok: false, error: "main_google_email is required for new people" };

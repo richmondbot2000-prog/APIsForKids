@@ -5,27 +5,28 @@
     - user.html?email=<addr>   (legacy direct link)
     - /directory/<slug>        (clean URL, served by 404.html SPA shim)
 
-  The host page sets either window.__profileEmail (resolved address) or
-  leaves it blank — in which case we fall back to the ?email= query.
+  Primary data source is /people.json (canonical Person table). Falls back
+  to /staff.json for display fields where the Person record is sparse.
 */
 (function () {
   const qs = new URLSearchParams(location.search || "");
-  const initialTab = (qs.get("tab") || "info").toLowerCase();
+  const initialTab = (qs.get("tab") || "calendar").toLowerCase();
 
   let targetEmail = (window.__profileEmail || qs.get("email") || "").toLowerCase().trim();
   let targetSlug  = (window.__profileSlug  || "").toLowerCase().trim();
 
-  let staffByEmail = {};
-  let staffBySlug  = {};
-  let annotationsMap = {};
-  let groupsList = [];
+  let people = [];
+  let peopleByEmail = {};
+  let peopleBySlug = {};
+  let person = null;             // the resolved target Person
+  let staffByEmail = {};         // fallback display source
   let wallPosts = [];
   let payrollByEmail = {};
+  let viewerEmail = "";
+  let viewerIsAdmin = false;
   let currentTab = "info";
-  let dataReady = false;
-  let pendingTimers = {};
 
-  const ANNOTATIONS_API = "/api/annotations";
+  const WORKSPACE_API = "/api/workspace";
 
   function escapeHtml(s) {
     return String(s == null ? "" : s)
@@ -43,30 +44,41 @@
   function dirPhotoKey(email) {
     return (email || "").toString().trim().toLowerCase().replace(/@/g, "_at_");
   }
-  function photoUrlFor(u) {
-    if (!u || !u.email) return "";
-    const email = u.email.toLowerCase();
-    const ann = annotationsMap[email];
-    if (ann && ann.directory_photo_uploaded_at) {
-      return `/assets/photos/${dirPhotoKey(email)}.jpg?v=${encodeURIComponent(ann.directory_photo_uploaded_at)}`;
+  function avatarSrc() {
+    if (!person) return "";
+    if (person.directory_photo_uploaded_at && person.main_google_email) {
+      return `/assets/photos/${dirPhotoKey(person.main_google_email)}.jpg?v=${encodeURIComponent(person.directory_photo_uploaded_at)}`;
     }
-    return u.photo_url || "";
+    const u = staffByEmail[(person.main_google_email || "").toLowerCase()];
+    return (u && u.photo_url) || "";
+  }
+  function coverSrc() {
+    if (!person || !person.cover_photo_uploaded_at || !person.main_google_email) return "";
+    return `/assets/covers/${dirPhotoKey(person.main_google_email)}.jpg?v=${encodeURIComponent(person.cover_photo_uploaded_at)}`;
   }
   function svgIcon(name) {
     const paths = {
-      info:   `<rect x="3" y="3" width="14" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 8h6M7 12h6M7 16h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`,
-      feed:   `<path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`,
-      groups: `<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="7" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`,
-      org:    `<circle cx="12" cy="5" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="5" cy="19" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="19" cy="19" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v4M12 12H5v4M12 12h7v4" stroke="currentColor" stroke-width="1.6" fill="none"/>`,
-      edit:   `<path d="M14 4l6 6-9 9H5v-6l9-9z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`,
+      info:    `<rect x="3" y="3" width="14" height="18" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 8h6M7 12h6M7 16h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`,
+      feed:    `<path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`,
+      calendar: `<rect x="3" y="5" width="18" height="16" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 9h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`,
+      org:     `<circle cx="12" cy="5" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="5" cy="19" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="19" cy="19" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v4M12 12H5v4M12 12h7v4" stroke="currentColor" stroke-width="1.6" fill="none"/>`,
+      edit:    `<path d="M14 4l6 6-9 9H5v-6l9-9z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`,
+      camera:  `<path d="M4 8h3l2-3h6l2 3h3v11H4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.6"/>`,
     };
     return `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[name] || ""}</svg>`;
   }
 
-  function tenureLabel(payrollEntry) {
-    if (!payrollEntry) return "";
-    const start = payrollEntry.start_date || payrollEntry.startDate;
-    if (!start) return "";
+  function tenureLabel() {
+    const start = person && person.start_date;
+    if (!start) {
+      const p = peopleByEmail[(person && person.main_google_email || "").toLowerCase()];
+      const pr = payrollByEmail[(person && person.main_google_email || "").toLowerCase()];
+      if (!pr || !pr.start_date) return "";
+      return formatTenure(pr.start_date);
+    }
+    return formatTenure(start);
+  }
+  function formatTenure(start) {
     const d = new Date(start);
     if (isNaN(d.getTime())) return "";
     const now = new Date();
@@ -80,9 +92,16 @@
     return `${yrs} year${yrs === 1 ? "" : "s"} in the organisation`;
   }
 
+  function canEditPerson() {
+    if (!person) return false;
+    if (viewerIsAdmin) return true;
+    const owned = [person.main_google_email, ...(person.alt_google_emails || []), person.external_google_email]
+      .filter(Boolean).map(e => e.toLowerCase());
+    return owned.includes(viewerEmail);
+  }
+
   function setTab(tab) {
     currentTab = tab;
-    // Update URL but keep the path stable — only flip the ?tab= param.
     const url = new URL(location.href);
     if (tab && tab !== "info") url.searchParams.set("tab", tab);
     else url.searchParams.delete("tab");
@@ -101,10 +120,7 @@
   }
 
   function renderCalendarPanel() {
-    // The calendar lives in holidays.html — we embed it locked to this user.
-    // embed=1 tells holidays.html to hide the page chrome; postMessage syncs
-    // iframe height to its content so the panel scrolls naturally.
-    const src = `/holidays.html?user=${encodeURIComponent(targetEmail)}&view=own&embed=1`;
+    const src = `/holidays.html?user=${encodeURIComponent(person.main_google_email)}&view=own&embed=1`;
     return `
       <h2 class="up-panel-title">Calendar</h2>
       <div class="up-cal-wrap">
@@ -112,40 +128,39 @@
       </div>`;
   }
 
-  /* ─── Information panel ────────────────────────────────────────────── */
+  /* ─── Information panel — fields come from the Person record ──────── */
   function renderInfoPanel() {
-    const u   = staffByEmail[targetEmail] || {};
-    const ann = annotationsMap[targetEmail] || {};
-    const pr  = payrollByEmail[targetEmail];
+    const editable = canEditPerson();
+    const lockedBadge = editable ? "" : `<span class="up-card-hint">read-only · sign in as ${escapeHtml(person.name || person.id)} or an admin to edit</span>`;
 
-    const phoneVal = ann.phone || (pr && pr.mobile) || "";
-    const phoneSrc = ann.phone ? "" : (phoneVal ? '<span class="up-src">from payroll</span>' : "");
-    const addrVal = ann.address || (pr && pr.address) || "";
-    const addrSrc = ann.address ? "" : (addrVal ? '<span class="up-src">from payroll</span>' : "");
+    const lineMgr = (person.line_manager_id && people.find(p => p.id === person.line_manager_id)) || null;
+    const lineMgrDisplay = lineMgr
+      ? `<a class="up-mgr-link" href="${profileHref(lineMgr.main_google_email)}">${escapeHtml(lineMgr.name || lineMgr.id)}</a>`
+      : (person.line_manager_email_raw
+          ? `<span>${escapeHtml(person.line_manager_email_raw)}</span>`
+          : `<span class="up-empty-val">No line manager</span>`);
 
-    const lineMgrEmail = (ann.line_manager || "").toLowerCase().trim();
-    const lineMgr = lineMgrEmail ? staffByEmail[lineMgrEmail] : null;
-    const lineMgrDisplay = lineMgrEmail
-      ? (lineMgr
-          ? `<a class="up-mgr-link" href="${profileHref(lineMgrEmail)}">${escapeHtml(lineMgr.name || lineMgrEmail)}</a>`
-          : `<span>${escapeHtml(lineMgrEmail)}</span>`)
-      : `<span class="up-empty-val">No line manager</span>`;
-
-    // Datalist for line-manager picker — every other staff member.
-    const lmOptions = Object.values(staffByEmail)
-      .filter(x => !x.suspended && !x.deletion_time && (x.email || "").toLowerCase() !== targetEmail)
-      .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
-      .map(x => `<option value="${escapeHtml((x.email || "").toLowerCase())}">${escapeHtml(x.name || "")}</option>`)
-      .join("");
-
-    // Read-only block fields (department, tenant, hiring date, email).
+    // Read-only "Workspace" fields summarised from the Person record + the
+    // raw Workspace row.
+    const u = staffByEmail[(person.main_google_email || "").toLowerCase()] || {};
+    const tenants = (person.alt_google_emails || []).length
+      ? `${person.main_google_email} · ${person.alt_google_emails.join(" · ")}`
+      : person.main_google_email;
     const readOnly = [
-      ["Email",         escapeHtml(u.email || targetEmail)],
-      ["Department",    u.department ? escapeHtml(u.department) : '<span class="up-empty-val">—</span>'],
-      ["Tenant",        u.tenant ? escapeHtml(u.tenant) : '<span class="up-empty-val">—</span>'],
-      ["Hiring date",   (pr && pr.start_date)
-                          ? escapeHtml(new Date(pr.start_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }))
-                          : '<span class="up-empty-val">—</span>'],
+      ["Main Google account", escapeHtml(person.main_google_email || "—")],
+      ["Alt Google accounts", (person.alt_google_emails || []).length
+                                ? escapeHtml(person.alt_google_emails.join(", "))
+                                : '<span class="up-empty-val">—</span>'],
+      ["External Google",     person.external_google_email ? escapeHtml(person.external_google_email) : '<span class="up-empty-val">—</span>'],
+      ["Auth0 ID",            person.auth0_id ? `<code>${escapeHtml(person.auth0_id)}</code>` : '<span class="up-empty-val">—</span>'],
+      ["Access level",        `<span class="up-pill up-pill--${escapeHtml(person.access_level || "staff")}">${escapeHtml(person.access_level || "staff")}</span>`],
+      ["Status",              person.suspended || person.access_level === "former"
+                                ? '<span class="up-pill up-pill--suspended">Suspended</span>'
+                                : '<span class="up-pill up-pill--live">Live</span>'],
+      ["Department",          u.department ? escapeHtml(u.department) : (person.department ? escapeHtml(person.department) : '<span class="up-empty-val">—</span>')],
+      ["Start date",          person.start_date
+                                ? escapeHtml(new Date(person.start_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }))
+                                : '<span class="up-empty-val">—</span>'],
     ];
     const readOnlyHtml = readOnly.map(([label, value]) => `
       <div class="up-field">
@@ -153,85 +168,50 @@
         <div class="up-field-value">${value}</div>
       </div>`).join("");
 
+    // Editable block (Role, Phone, Address). Line manager + access_level
+    // are admin-only — we show them as read-only here and admins use
+    // /people.html for the deeper edits.
+    function editableRow(field, label, type, value, hint) {
+      const readonly = !editable;
+      const editor = readonly ? "" : `
+          <div class="up-field-editor" hidden>
+            ${type === "textarea"
+              ? `<textarea name="${field}" rows="3">${escapeHtml(value || "")}</textarea>`
+              : `<input type="${type}" name="${field}" value="${escapeHtml(value || "")}">`}
+            ${hint ? `<p class="up-hint">${hint}</p>` : ""}
+            <div class="up-editor-row">
+              <button type="button" class="up-btn-sm up-btn-sm--primary" data-edit-save="${field}">Save</button>
+              <button type="button" class="up-btn-sm" data-edit-cancel="${field}">Cancel</button>
+              <span class="up-edit-status" data-edit-status="${field}"></span>
+            </div>
+          </div>`;
+      return `
+        <div class="up-field" data-edit-field="${field}">
+          <div class="up-field-label">${escapeHtml(label)}</div>
+          <div class="up-field-display">
+            <span class="up-field-value ${value ? "" : "up-empty-val"}" style="white-space:pre-wrap;">${escapeHtml(value) || "Not set"}</span>
+            ${readonly ? "" : `<button type="button" class="up-link-btn" data-edit-toggle="${field}">Edit</button>`}
+          </div>
+          ${editor}
+        </div>`;
+    }
+
     return `
       <h2 class="up-panel-title">Information</h2>
 
       <div class="up-card">
-        <div class="up-card-head">Editable details <span class="up-card-hint">click any value to change · saves to <code>annotations.json</code></span></div>
-
-        <div class="up-field" data-edit-field="role">
-          <div class="up-field-label">Role</div>
-          <div class="up-field-display">
-            <span class="up-field-value ${ann.role ? "" : "up-empty-val"}">${escapeHtml(ann.role) || "Not set"}</span>
-            <button type="button" class="up-link-btn" data-edit-toggle="role">Edit</button>
-          </div>
-          <div class="up-field-editor" hidden>
-            <input type="text" name="role" maxlength="80" value="${escapeHtml(ann.role || "")}" placeholder="e.g. Communications Director">
-            <div class="up-editor-row">
-              <button type="button" class="up-btn-sm up-btn-sm--primary" data-edit-save="role">Save</button>
-              <button type="button" class="up-btn-sm" data-edit-cancel="role">Cancel</button>
-              <span class="up-edit-status" data-edit-status="role"></span>
-            </div>
-          </div>
-        </div>
-
-        <div class="up-field" data-edit-field="phone">
-          <div class="up-field-label">Phone</div>
-          <div class="up-field-display">
-            <span class="up-field-value ${phoneVal ? "" : "up-empty-val"}">${escapeHtml(phoneVal) || "Not set"}</span>
-            ${phoneSrc}
-            <button type="button" class="up-link-btn" data-edit-toggle="phone">Edit</button>
-          </div>
-          <div class="up-field-editor" hidden>
-            <input type="tel" name="phone" value="${escapeHtml(ann.phone || "")}" placeholder="${escapeHtml(phoneVal || "+44 7…")}">
-            <div class="up-editor-row">
-              <button type="button" class="up-btn-sm up-btn-sm--primary" data-edit-save="phone">Save</button>
-              <button type="button" class="up-btn-sm" data-edit-cancel="phone">Cancel</button>
-              <span class="up-edit-status" data-edit-status="phone"></span>
-            </div>
-          </div>
-        </div>
-
-        <div class="up-field" data-edit-field="address">
-          <div class="up-field-label">Address</div>
-          <div class="up-field-display">
-            <span class="up-field-value ${addrVal ? "" : "up-empty-val"}" style="white-space:pre-line;">${escapeHtml(addrVal) || "Not set"}</span>
-            ${addrSrc}
-            <button type="button" class="up-link-btn" data-edit-toggle="address">Edit</button>
-          </div>
-          <div class="up-field-editor" hidden>
-            <textarea name="address" rows="3" placeholder="${escapeHtml(addrVal || "Home address")}">${escapeHtml(ann.address || "")}</textarea>
-            <div class="up-editor-row">
-              <button type="button" class="up-btn-sm up-btn-sm--primary" data-edit-save="address">Save</button>
-              <button type="button" class="up-btn-sm" data-edit-cancel="address">Cancel</button>
-              <span class="up-edit-status" data-edit-status="address"></span>
-            </div>
-          </div>
-        </div>
-
-        <div class="up-field" data-edit-field="line_manager">
+        <div class="up-card-head">Editable details ${lockedBadge}</div>
+        ${editableRow("role",    "Role",    "text",     person.role)}
+        ${editableRow("phone",   "Phone",   "tel",      person.phone)}
+        ${editableRow("address", "Address", "textarea", person.address)}
+        <div class="up-field" data-edit-field="line_manager_id">
           <div class="up-field-label">Line manager</div>
-          <div class="up-field-display">
-            ${lineMgrDisplay}
-            <button type="button" class="up-link-btn" data-edit-toggle="line_manager">Edit</button>
-          </div>
-          <div class="up-field-editor" hidden>
-            <input type="email" name="line_manager" list="upLineManagerOptions" autocomplete="off"
-                   value="${escapeHtml(ann.line_manager || "")}"
-                   placeholder="manager.email@…">
-            <datalist id="upLineManagerOptions">${lmOptions}</datalist>
-            <p class="up-hint">Pick a colleague from the list. This person can see + edit this user's calendar on Holidays.</p>
-            <div class="up-editor-row">
-              <button type="button" class="up-btn-sm up-btn-sm--primary" data-edit-save="line_manager">Save</button>
-              <button type="button" class="up-btn-sm" data-edit-cancel="line_manager">Cancel</button>
-              <span class="up-edit-status" data-edit-status="line_manager"></span>
-            </div>
-          </div>
+          <div class="up-field-display">${lineMgrDisplay}</div>
         </div>
       </div>
 
       <div class="up-card">
-        <div class="up-card-head">Workspace</div>
+        <div class="up-card-head">Identity & Workspace ${editable ? '<span class="up-card-hint">structural fields — change from <a href="/people.html" style="color:inherit;text-decoration:underline;">People</a></span>' : ""}</div>
         <div class="up-fields-grid">${readOnlyHtml}</div>
       </div>`;
   }
@@ -239,7 +219,6 @@
   function wirePanel() {
     document.querySelectorAll("[data-edit-toggle]").forEach(btn => {
       btn.addEventListener("click", () => {
-        const f = btn.dataset.editToggle;
         const root = btn.closest("[data-edit-field]");
         if (!root) return;
         root.querySelector(".up-field-display").hidden = true;
@@ -258,11 +237,11 @@
       });
     });
     document.querySelectorAll("[data-edit-save]").forEach(btn => {
-      btn.addEventListener("click", () => saveField(btn.dataset.editSave));
+      btn.addEventListener("click", () => savePersonField(btn.dataset.editSave));
     });
   }
 
-  async function saveField(field) {
+  async function savePersonField(field) {
     const root = document.querySelector(`[data-edit-field="${field}"]`);
     if (!root) return;
     const status = root.querySelector("[data-edit-status]");
@@ -270,24 +249,13 @@
     const value  = (input && input.value || "").trim();
     status.textContent = "Saving…"; status.className = "up-edit-status up-edit-status--working";
     try {
-      const payload = { key: targetEmail };
-      payload[field] = value;
-      const res = await fetch(ANNOTATIONS_API, {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+      const res = await fetch(WORKSPACE_API, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "people-set", id: person.id, [field]: value }),
       });
-      if (!res.ok) {
-        let detail = "";
-        try { detail = (await res.json()).error || ""; } catch (e) {}
-        throw new Error(`HTTP ${res.status}${detail ? " — " + detail : ""}`);
-      }
       const out = await res.json();
-      if (out && out.all && out.all.annotations) {
-        annotationsMap = out.all.annotations;
-      } else if (out && out.value === null) {
-        delete annotationsMap[targetEmail];
-      } else if (out && out.value) {
-        annotationsMap[targetEmail] = out.value;
-      }
+      if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
+      Object.assign(person, out.person);
       status.textContent = "Saved";
       status.className = "up-edit-status up-edit-status--ok";
       setTimeout(() => { renderPanel(); }, 350);
@@ -298,14 +266,8 @@
   }
 
   /* ─── Feed panel (Wall preview, read-only) ─────────────────────────── */
-  // Strip mention markup back to plain @local-part text so preview cards
-  // don't carry unfilled HTML from the Wall renderer.
   function plainBody(text) {
-    if (!text) return "";
-    return String(text)
-      .replace(/<\/?strong>/gi, "")
-      .replace(/<\/?em>/gi, "")
-      .trim();
+    return String(text || "").replace(/<\/?strong>/gi, "").replace(/<\/?em>/gi, "").trim();
   }
   function postPhotoUrl(p) {
     if (!p) return "";
@@ -314,18 +276,15 @@
     return "";
   }
   function renderFeedPanel() {
+    const ownedEmails = [person.main_google_email, ...(person.alt_google_emails || []), person.external_google_email]
+      .filter(Boolean).map(e => e.toLowerCase());
     const posts = (wallPosts || [])
-      .filter(p => (p.author_email || "").toLowerCase() === targetEmail)
+      .filter(p => ownedEmails.includes((p.author_email || "").toLowerCase()))
       .sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
-    if (!posts.length) {
-      return `<h2 class="up-panel-title">Wall</h2><div class="up-empty">No posts yet.</div>`;
-    }
-    const u = staffByEmail[targetEmail] || {};
-    const photo = photoUrlFor(u);
-    const avatarHtml = photo
-      ? `<img src="${escapeHtml(photo)}" alt="">`
-      : `<span>${escapeHtml(initials(u.name))}</span>`;
+    if (!posts.length) return `<h2 class="up-panel-title">Wall</h2><div class="up-empty">No posts yet.</div>`;
 
+    const photo = avatarSrc();
+    const avatarHtml = photo ? `<img src="${escapeHtml(photo)}" alt="">` : `<span>${escapeHtml(initials(person.name))}</span>`;
     const cards = posts.map(p => {
       const ts = p.created_at ? new Date(p.created_at).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
       const href = `/wall.html?post=${encodeURIComponent(p.id)}`;
@@ -343,7 +302,7 @@
           <div class="up-fp-head">
             <div class="up-fp-avatar">${avatarHtml}</div>
             <div>
-              <div class="up-fp-name">${escapeHtml(u.name || targetEmail)}</div>
+              <div class="up-fp-name">${escapeHtml(person.name || person.id)}</div>
               <div class="up-fp-time">${escapeHtml(ts)}</div>
             </div>
           </div>
@@ -356,22 +315,6 @@
     return `<h2 class="up-panel-title">Wall (${posts.length})</h2><div class="up-fp-list">${cards}</div>`;
   }
 
-  /* ─── Groups panel ─────────────────────────────────────────────────── */
-  function renderGroupsPanel() {
-    const memberships = (groupsList || []).filter(g =>
-      Array.isArray(g.members) && g.members.some(m => (m.email || "").toLowerCase() === targetEmail)
-    );
-    if (!memberships.length) {
-      return `<h2 class="up-panel-title">Workspace groups</h2><div class="up-empty">Not a member of any Workspace group.</div>`;
-    }
-    const chips = memberships.map(g => `
-      <a class="up-group-chip" href="/directory.html?email=${encodeURIComponent(g.email)}" title="${escapeHtml(g.description || g.email)}">
-        ${escapeHtml(g.name || g.email)}
-        <code>${escapeHtml(g.email)}</code>
-      </a>`).join("");
-    return `<h2 class="up-panel-title">Workspace groups (${memberships.length})</h2><div class="up-groups">${chips}</div>`;
-  }
-
   /* ─── Page assembly ────────────────────────────────────────────────── */
   function renderEmpty(msg) {
     const root = document.getElementById("upRoot");
@@ -379,25 +322,24 @@
   }
 
   function renderProfile() {
-    // If we were handed a slug instead of an email, resolve now that staff
-    // data is loaded.
-    if (!targetEmail && targetSlug) {
-      const match = staffBySlug[targetSlug];
-      if (match) targetEmail = (match.email || "").toLowerCase();
+    // Resolve target: slug → Person, email → Person.
+    if (targetSlug && peopleBySlug[targetSlug]) person = peopleBySlug[targetSlug];
+    else if (targetEmail && peopleByEmail[targetEmail]) person = peopleByEmail[targetEmail];
+
+    if (!person) {
+      renderEmpty(`No person matched "${targetSlug || targetEmail || "(missing)"}".`);
+      return;
     }
-    if (!targetEmail) { renderEmpty(`No user matched "${targetSlug || "(missing)"}".`); return; }
 
-    const u = staffByEmail[targetEmail];
-    if (!u) { renderEmpty(`No staff record found for ${targetEmail}.`); return; }
-
-    const pr = payrollByEmail[targetEmail];
-    const photo = photoUrlFor(u);
+    targetEmail = (person.main_google_email || "").toLowerCase();
+    const editable = canEditPerson();
+    const photo = avatarSrc();
     const avatar = photo
-      ? `<img src="${escapeHtml(photo)}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'${escapeHtml(initials(u.name))}'}))">`
-      : escapeHtml(initials(u.name));
-    const ann = annotationsMap[targetEmail] || {};
-    const role = ann.role || u.title || "";
-    const tenure = tenureLabel(pr);
+      ? `<img src="${escapeHtml(photo)}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'${escapeHtml(initials(person.name))}'}))">`
+      : escapeHtml(initials(person.name));
+    const cover = coverSrc();
+    const role = person.role || person.title || "";
+    const tenure = tenureLabel();
     const subline = [
       role ? `<span class="up-role">${escapeHtml(role)}</span>` : "",
       tenure ? `<span class="up-tenure">${escapeHtml(tenure)}</span>` : "",
@@ -405,39 +347,126 @@
 
     document.getElementById("upRoot").innerHTML = `
       <div class="up-header">
-        <div class="up-cover"></div>
+        <div class="up-cover" ${cover ? `style="background-image: linear-gradient(135deg, rgba(44,62,102,0.0) 0%, rgba(44,62,102,0.18) 100%), url('${escapeHtml(cover)}'); background-size: cover; background-position: center;"` : ""}>
+          ${editable ? `
+            <button class="up-cover-edit" type="button" id="upCoverEdit" title="Change cover photo">${svgIcon("camera")} Edit cover</button>
+            <input type="file" id="upCoverInput" accept="image/*" hidden>
+          ` : ""}
+        </div>
         <div class="up-info">
           <div class="up-id">
             <div class="up-avatar-wrap">
               <div class="up-avatar">${avatar}</div>
+              ${editable ? `
+                <button class="up-avatar-edit" type="button" id="upAvatarEdit" title="Change avatar">${svgIcon("camera")}</button>
+                <input type="file" id="upAvatarInput" accept="image/*" hidden>
+              ` : ""}
             </div>
             <div class="up-headline">
-              <h1 class="up-name">${escapeHtml(u.name || targetEmail)}</h1>
-              <div class="up-subline">${subline || `<span class="up-tenure">${escapeHtml(u.email || targetEmail)}</span>`}</div>
+              <h1 class="up-name">${escapeHtml(person.name || person.id)}</h1>
+              <div class="up-subline">${subline || `<span class="up-tenure">${escapeHtml(person.main_google_email || person.id)}</span>`}</div>
             </div>
           </div>
           <div class="up-actions">
-            <a class="up-btn" href="/org-structure.html?center=${encodeURIComponent(targetEmail)}">${svgIcon("org")} Org chart</a>
-            <a class="up-btn up-btn--primary" href="/directory.html?email=${encodeURIComponent(targetEmail)}">${svgIcon("edit")} Open in Directory</a>
+            <a class="up-btn" href="/org-structure.html?center=${encodeURIComponent(person.main_google_email)}">${svgIcon("org")} Org chart</a>
+            ${viewerIsAdmin ? `<a class="up-btn up-btn--primary" href="/people.html">${svgIcon("edit")} Manage in People</a>` : ""}
           </div>
         </div>
       </div>
 
       <div class="up-body">
         <nav class="up-tabs" aria-label="Profile sections">
-          <a class="up-tab" data-tab="calendar" href="?tab=calendar">${svgIcon("info")}<span>Calendar</span></a>
+          <a class="up-tab" data-tab="calendar" href="?tab=calendar">${svgIcon("calendar")}<span>Calendar</span></a>
           <a class="up-tab" data-tab="info"     href="?tab=info">${svgIcon("info")}<span>Info</span></a>
           <a class="up-tab" data-tab="wall"     href="?tab=wall">${svgIcon("feed")}<span>Wall</span></a>
         </nav>
         <section class="up-panel" id="upPanel"></section>
       </div>`;
 
-    document.title = `${u.name || u.email} — BOOK Profile`;
+    document.title = `${person.name || person.id} — BOOK Profile`;
 
     document.querySelectorAll("[data-tab]").forEach(t => {
       t.addEventListener("click", e => { e.preventDefault(); setTab(t.dataset.tab); });
     });
+    if (editable) wirePhotoUploads();
     setTab(["info","wall","calendar"].includes(initialTab) ? initialTab : "calendar");
+  }
+
+  /* ─── Photo uploads (avatar + cover) ──────────────────────────────── */
+  function wirePhotoUploads() {
+    const ave = document.getElementById("upAvatarEdit");
+    const avi = document.getElementById("upAvatarInput");
+    if (ave && avi) {
+      ave.addEventListener("click", () => avi.click());
+      avi.addEventListener("change", () => uploadImage(avi.files && avi.files[0], { kind: "avatar" }));
+    }
+    const cove = document.getElementById("upCoverEdit");
+    const covi = document.getElementById("upCoverInput");
+    if (cove && covi) {
+      cove.addEventListener("click", () => covi.click());
+      covi.addEventListener("change", () => uploadImage(covi.files && covi.files[0], { kind: "cover" }));
+    }
+  }
+
+  function readImage(file) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload  = () => {
+        const img = new Image();
+        img.onload  = () => resolve(img);
+        img.onerror = () => reject(new Error("could not decode image"));
+        img.src = r.result;
+      };
+      r.onerror = () => reject(new Error("could not read file"));
+      r.readAsDataURL(file);
+    });
+  }
+
+  function resizeToJpegB64(img, opts) {
+    // Cover (1600×500 max, crop centred) or avatar (400×400 square crop).
+    const isCover = opts.kind === "cover";
+    const tw = isCover ? 1600 : 400;
+    const th = isCover ? 500  : 400;
+    const sAspect = img.width / img.height;
+    const tAspect = tw / th;
+    let sx = 0, sy = 0, sw = img.width, sh = img.height;
+    if (sAspect > tAspect) {
+      sw = img.height * tAspect; sx = (img.width - sw) / 2;
+    } else {
+      sh = img.width / tAspect; sy = (img.height - sh) / 2;
+    }
+    const c = document.createElement("canvas");
+    c.width = tw; c.height = th;
+    c.getContext("2d").drawImage(img, sx, sy, sw, sh, 0, 0, tw, th);
+    return c.toDataURL("image/jpeg", 0.85).split(",")[1];
+  }
+
+  async function uploadImage(file, opts) {
+    if (!file) return;
+    try {
+      const img = await readImage(file);
+      const b64 = resizeToJpegB64(img, opts);
+      const action = opts.kind === "cover" ? "cover-photo-upload" : "directory-photo-upload";
+      const res = await fetch(WORKSPACE_API, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, user_email: person.main_google_email, photo_b64: b64, tenant: (person.company || "").includes("togetherloans") ? "togetherloans" : "" }),
+      });
+      const out = await res.json();
+      if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
+      // Record the timestamp on the Person record so caches bust.
+      const stamp = new Date().toISOString();
+      const field = opts.kind === "cover" ? "cover_photo_uploaded_at" : "directory_photo_uploaded_at";
+      const setRes = await fetch(WORKSPACE_API, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "people-set", id: person.id, [field]: stamp }),
+      });
+      const setOut = await setRes.json();
+      if (!setRes.ok || !setOut.ok) throw new Error(setOut.error || `HTTP ${setRes.status}`);
+      Object.assign(person, setOut.person);
+      renderProfile();
+    } catch (err) {
+      alert("Upload failed: " + (err && err.message || err));
+    }
   }
 
   // Calendar iframe sends {type:"holidaysEmbedSize", height: N} as its
@@ -451,43 +480,31 @@
     if (h) frame.style.height = h + "px";
   });
 
+  /* ─── Boot ────────────────────────────────────────────────────────── */
   Promise.all([
-    fetch("/staff.json",       { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-    fetch("/annotations.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-    fetch("/groups.json",      { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-    fetch("/wall.json",        { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/people.json",       { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/staff.json",        { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/wall.json",         { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch("/api/workspace/payroll", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-  ]).then(([staff, annFile, groupsFile, wallFile, payroll]) => {
-    if (staff && Array.isArray(staff.users)) {
-      // When two tenants share a local-part we prefer the @letme.co.uk one,
-      // then @letme.com, then alphabetical first.
-      const slugWeight = email => {
-        const e = (email || "").toLowerCase();
-        if (e.endsWith("@letme.co.uk")) return 0;
-        if (e.endsWith("@letme.com"))   return 1;
-        return 2;
-      };
-      const sorted = [...staff.users].sort((a, b) => {
-        const w = slugWeight(a.email) - slugWeight(b.email);
-        return w !== 0 ? w : (a.email || "").localeCompare(b.email || "");
-      });
-      for (const u of sorted) {
-        const k = (u.email || "").toLowerCase();
-        if (!k) continue;
-        staffByEmail[k] = u;
-        const slug = emailToSlug(u.email);
-        if (slug && !staffBySlug[slug]) staffBySlug[slug] = u;
+    fetch("/api/workspace/whoami",  { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+  ]).then(([peopleFile, staff, wallFile, payroll, who]) => {
+    if (peopleFile && Array.isArray(peopleFile.people)) {
+      people = peopleFile.people;
+      for (const p of people) {
+        const slug = (p.id || emailToSlug(p.main_google_email)).toLowerCase();
+        if (slug && !peopleBySlug[slug]) peopleBySlug[slug] = p;
+        for (const e of [p.main_google_email, ...(p.alt_google_emails || []), p.external_google_email].filter(Boolean)) {
+          peopleByEmail[e.toLowerCase()] = p;
+        }
       }
     }
-    if (annFile && annFile.annotations && typeof annFile.annotations === "object") {
-      annotationsMap = annFile.annotations;
+    if (staff && Array.isArray(staff.users)) {
+      for (const u of staff.users) {
+        const k = (u.email || "").toLowerCase();
+        if (k) staffByEmail[k] = u;
+      }
     }
-    if (groupsFile && Array.isArray(groupsFile.groups)) {
-      groupsList = groupsFile.groups;
-    }
-    if (wallFile && Array.isArray(wallFile.posts)) {
-      wallPosts = wallFile.posts;
-    }
+    if (wallFile && Array.isArray(wallFile.posts)) wallPosts = wallFile.posts;
     if (payroll && Array.isArray(payroll.rows)) {
       for (const r of payroll.rows) {
         const e = (r.email || "").toLowerCase();
@@ -496,7 +513,7 @@
     } else if (payroll && payroll.by_email) {
       payrollByEmail = payroll.by_email;
     }
-    dataReady = true;
+    if (who) { viewerEmail = (who.email || "").toLowerCase(); viewerIsAdmin = !!who.is_admin; }
     renderProfile();
   }).catch(err => renderEmpty("Failed to load: " + String(err)));
 })();
