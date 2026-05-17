@@ -309,10 +309,10 @@ body.nav-open .qb-nav-backdrop {
     pointer-events: auto;
   }
 
-  /* Mobile sub-page accordion (driven by nav.js).
-     Desktop subnav row is hidden — sub-pages live inside the drawer instead.
-     A top-level link with data-sub waits for the first tap to expand its
-     children inline; the second tap navigates. */
+  /* Mobile sub-pages — rendered eagerly by nav.js so the drawer is
+     always at its maximum height regardless of which section the user
+     has tapped. No accordion, no expand/collapse. Desktop subnav row
+     is hidden — sub-pages live inside the drawer instead. */
   .qb-subnav { display: none; }
   .qb-nav-sublist {
     display: flex; flex-direction: column;
@@ -328,15 +328,12 @@ body.nav-open .qb-nav-backdrop {
   }
   .qb-nav-sublink:last-child { border-bottom: none; }
   .qb-nav-sublink.is-active { color: var(--fg-strong); font-style: italic; }
-  /* Visual cue on parent items that have children */
-  .qb-nav-link[data-sub]::after {
-    content: "  ▸";
-    color: var(--brass-500);
-    font-size: 13px;
-    transition: transform var(--dur-fast) var(--ease-out);
-    display: inline-block;
-  }
-  .qb-nav-link--expanded[data-sub]::after { transform: rotate(90deg); }
+}
+
+/* Desktop: hide the inline sublists nav.js eagerly renders on every
+   page — sub-page navigation on wide screens lives in .qb-subnav. */
+@media (min-width: 961px) {
+  .qb-nav-sublist { display: none; }
 }
 
 @media (max-width: 480px) {

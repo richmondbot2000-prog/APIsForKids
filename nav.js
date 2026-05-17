@@ -1,49 +1,34 @@
-/* Mobile sub-page accordion for the top nav.
-   On a narrow viewport (drawer open), a top-level link that carries a
-   data-sub attribute (JSON array of {href, label}) expands its sub-pages
-   inline on the first tap; the second tap navigates.
+/* Mobile sub-page panel for the top nav.
+   Every top-level link with `data-sub` renders its sub-pages eagerly as
+   a sibling block, so the drawer is always at its maximum height and
+   doesn't grow/shrink as the user taps around. Parent links navigate
+   on the first tap — no accordion expand step.
 
    Desktop (>960px) is untouched — the .qb-subnav row beneath the topbar
-   handles sub-page navigation there. */
+   handles sub-page navigation there, and the .qb-nav-sublist nodes are
+   hidden via CSS. */
 (function () {
   const links = document.querySelectorAll('.qb-nav-link[data-sub]');
   if (!links.length) return;
-
+  const currentHref = location.pathname.split('/').pop();
   links.forEach(a => {
-    a.addEventListener('click', function (ev) {
-      // Desktop: no interception — let the browser navigate normally.
-      if (window.innerWidth > 960) return;
-      // Second tap (already expanded): navigate.
-      if (a.classList.contains('qb-nav-link--expanded')) return;
-
-      let subs;
-      try { subs = JSON.parse(a.dataset.sub); } catch (e) { return; }
-      if (!Array.isArray(subs) || !subs.length) return;
-
-      ev.preventDefault();
-
-      // Collapse any other expanded sibling first.
-      a.parentNode.querySelectorAll('.qb-nav-link--expanded').forEach(other => {
-        if (other === a) return;
-        other.classList.remove('qb-nav-link--expanded');
-        const list = other.nextElementSibling;
-        if (list && list.classList.contains('qb-nav-sublist')) list.remove();
-      });
-
-      a.classList.add('qb-nav-link--expanded');
-      const list = document.createElement('div');
-      list.className = 'qb-nav-sublist';
-      const currentHref = location.pathname.split('/').pop();
-      subs.forEach(s => {
-        const sa = document.createElement('a');
-        sa.className = 'qb-nav-sublink';
-        if (s.href === currentHref) sa.classList.add('is-active');
-        sa.href = s.href;
-        sa.textContent = s.label;
-        list.appendChild(sa);
-      });
-      a.parentNode.insertBefore(list, a.nextSibling);
+    // Don't double-render if a sublist is already in place from a prior run.
+    const next = a.nextElementSibling;
+    if (next && next.classList && next.classList.contains('qb-nav-sublist')) return;
+    let subs;
+    try { subs = JSON.parse(a.dataset.sub); } catch (e) { return; }
+    if (!Array.isArray(subs) || !subs.length) return;
+    const list = document.createElement('div');
+    list.className = 'qb-nav-sublist';
+    subs.forEach(s => {
+      const sa = document.createElement('a');
+      sa.className = 'qb-nav-sublink';
+      if (s.href === currentHref) sa.classList.add('is-active');
+      sa.href = s.href;
+      sa.textContent = s.label;
+      list.appendChild(sa);
     });
+    a.parentNode.insertBefore(list, a.nextSibling);
   });
 })();
 
