@@ -1,39 +1,39 @@
 {
   "schema_version": 1,
-  "snapshot_date": "2026-05-16",
-  "updated_at": "2026-05-16T17:20:24Z",
+  "snapshot_date": "2026-05-17",
+  "updated_at": "2026-05-17T07:43:13Z",
   "brands": [
     "Together Loans",
     "TransformCredit"
   ],
   "totals": {
-    "all": 354,
+    "all": 363,
     "by_source": {
-      "trustpilot": 295,
+      "trustpilot": 297,
       "bbb": 21,
       "reddit": 25,
       "bluesky": 0,
       "lemmy": 0,
       "hackernews": 0,
       "courtlistener": 0,
-      "google_news": 0,
+      "google_news": 1,
       "cfpb": 6,
-      "youtube": 7
+      "youtube": 13
     },
     "by_brand": {
-      "together_loans": 337,
-      "transform_credit": 17
+      "together_loans": 342,
+      "transform_credit": 21
     }
   },
   "source_status": {
     "trustpilot": {
       "ok": true,
-      "fetched": 0,
+      "fetched": 2,
       "error": null
     },
     "bbb": {
       "ok": true,
-      "fetched": 5,
+      "fetched": 0,
       "error": null
     },
     "reddit": {
@@ -63,7 +63,7 @@
     },
     "google_news": {
       "ok": true,
-      "fetched": 65,
+      "fetched": 68,
       "error": null
     },
     "cfpb": {
@@ -339,6 +339,20 @@
       "url": "https://www.trustpilot.com/review/transformcredit.com#6a0764dfd5f97e6252e3f5a1",
       "date": "2026-05-14",
       "author": "DEARMENT, AIMEE",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a089e41a6ef81887cdccbff",
+      "title": "Great and pain-free company to work with. One of best experiences in any kind of Loan transaction",
+      "snippet": "Abigail was very thoroughly detailed in what was transpiring. She gets 5+ stars S",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a089e41a6ef81887cdccbff",
+      "date": "2026-05-13",
+      "author": "Dee Cooper",
       "score": 5,
       "score_max": 5,
       "site_name": "Trustpilot",
@@ -959,6 +973,20 @@
       "score_max": null,
       "site_name": "r/Loan_",
       "site_domain": "reddit.com"
+    },
+    {
+      "source": "trustpilot",
+      "brand": "together_loans",
+      "id": "tp-6a08c1917fb4c46cd380171f",
+      "title": "it was fast and just in time",
+      "snippet": "it was fast and just in time",
+      "url": "https://www.trustpilot.com/review/transformcredit.com#6a08c1917fb4c46cd380171f",
+      "date": "2026-05-08",
+      "author": "customer",
+      "score": 5,
+      "score_max": 5,
+      "site_name": "Trustpilot",
+      "site_domain": "trustpilot.com"
     },
     {
       "source": "bbb",
@@ -2107,6 +2135,20 @@
       "score_max": 5,
       "site_name": "BBB",
       "site_domain": "bbb.org"
+    },
+    {
+      "source": "youtube",
+      "brand": "together_loans",
+      "id": "yt-5DpNjs8GR88",
+      "title": "Together Loans Review 2026 — Is It Legit or a Scam?",
+      "snippet": "In this video, we give an honest review of Together Loans in 2026 to see if it's legit or a scam. We'll cover how it works, loan types, ...",
+      "url": "https://www.youtube.com/watch?v=5DpNjs8GR88",
+      "date": "2026-04-29",
+      "author": "EASY STEP",
+      "score": null,
+      "score_max": null,
+      "site_name": "EASY STEP",
+      "site_domain": "youtube.com"
     },
     {
       "source": "trustpilot",
@@ -4377,6 +4419,20 @@
       "site_domain": "reddit.com"
     },
     {
+      "source": "youtube",
+      "brand": "together_loans",
+      "id": "yt-lQKhXKm9K9U",
+      "title": "Together Loans Review — Is It Legit? (2026)",
+      "snippet": "Together Loans review (2026) — is this cosigner personal loan company actually legit or are there red flags you need to know ...",
+      "url": "https://www.youtube.com/watch?v=lQKhXKm9K9U",
+      "date": "2026-04-04",
+      "author": "Marisol Vega Daily",
+      "score": null,
+      "score_max": null,
+      "site_name": "Marisol Vega Daily",
+      "site_domain": "youtube.com"
+    },
+    {
       "source": "reddit",
       "brand": "together_loans",
       "id": "rd-1sa4v8k",
@@ -4385,7 +4441,7 @@
       "url": "https://www.reddit.com/r/findacosigner/comments/1sa4v8k/scammer_alert/",
       "date": "2026-04-02",
       "author": "u/dlopez2018",
-      "score": 7,
+      "score": 3,
       "score_max": null,
       "site_name": "r/findacosigner",
       "site_domain": "reddit.com"
@@ -4497,7 +4553,7 @@
       "url": "https://www.reddit.com/r/debtfree/comments/1rjs7hz/anyone_have_experience_with_together_loans_seems/",
       "date": "2026-03-03",
       "author": "u/PM_Me_Money_Daddy",
-      "score": 7,
+      "score": 8,
       "score_max": null,
       "site_name": "r/debtfree",
       "site_domain": "reddit.com"
@@ -4539,7 +4595,7 @@
       "url": "https://www.reddit.com/r/Scams/comments/1r8j5km/us_tcrdt_com_stkgpbbbg_phishingsmishing_scam/",
       "date": "2026-02-18",
       "author": "u/ImplementLong5304",
-      "score": 3,
+      "score": 4,
       "score_max": null,
       "site_name": "r/Scams",
       "site_domain": "reddit.com"
@@ -4571,6 +4627,34 @@
       "score_max": null,
       "site_name": "r/findacosigner",
       "site_domain": "reddit.com"
+    },
+    {
+      "source": "youtube",
+      "brand": "together_loans",
+      "id": "yt-CpI6Ejljq_U",
+      "title": "Together Loans Review 2026 | Worth It or Leave It?",
+      "snippet": "Finding a personal loan with a low credit score is a major challenge, but Together Loans offers a trust-based lending model that ...",
+      "url": "https://www.youtube.com/watch?v=CpI6Ejljq_U",
+      "date": "2026-02-06",
+      "author": "Elliot Explains",
+      "score": null,
+      "score_max": null,
+      "site_name": "Elliot Explains",
+      "site_domain": "youtube.com"
+    },
+    {
+      "source": "youtube",
+      "brand": "transform_credit",
+      "id": "yt-tfkhkQPGl_4",
+      "title": "6X faster credit analysis for big-ticket loans",
+      "snippet": "Transform credit underwriters into productivity powerhouses—process 6X more applications with unwavering consistency, moving ...",
+      "url": "https://www.youtube.com/watch?v=tfkhkQPGl_4",
+      "date": "2026-01-28",
+      "author": "Perfios",
+      "score": null,
+      "score_max": null,
+      "site_name": "Perfios",
+      "site_domain": "youtube.com"
     },
     {
       "source": "cfpb",
@@ -4651,7 +4735,7 @@
       "url": "https://www.reddit.com/r/findacosigner/comments/1q7hl9n/co_signers_beware/",
       "date": "2026-01-08",
       "author": "u/Dirftboat95",
-      "score": 9,
+      "score": 10,
       "score_max": null,
       "site_name": "r/findacosigner",
       "site_domain": "reddit.com"
@@ -4811,6 +4895,20 @@
       "site_domain": "consumerfinance.gov"
     },
     {
+      "source": "youtube",
+      "brand": "transform_credit",
+      "id": "yt-ngknWCks36U",
+      "title": "Transform Credit Loan Reviews - Is Legit or a Scam?",
+      "snippet": "Is Transform Credit Legit or a Scam? Transform Credit offers loans up to $10000 based on trust, not just your credit score.",
+      "url": "https://www.youtube.com/watch?v=ngknWCks36U",
+      "date": "2025-11-21",
+      "author": "ZoneReviewsBlegedeg",
+      "score": null,
+      "score_max": null,
+      "site_name": "ZoneReviewsBlegedeg",
+      "site_domain": "youtube.com"
+    },
+    {
       "source": "reddit",
       "brand": "transform_credit",
       "id": "rd-1oto5r6",
@@ -4875,7 +4973,7 @@
       "url": "https://www.reddit.com/r/findacosigner/comments/1ocmme8/need_a_cosigner/",
       "date": "2025-10-21",
       "author": "u/CodyPalmer7",
-      "score": 5,
+      "score": 4,
       "score_max": null,
       "site_name": "r/findacosigner",
       "site_domain": "reddit.com"
@@ -4979,6 +5077,20 @@
       "site_domain": "trustpilot.com"
     },
     {
+      "source": "google_news",
+      "brand": "transform_credit",
+      "id": "gn-VoWDlPdmJ4eW4xLXpucFY2QmZMMXlCaW53VWxqUQ",
+      "title": "TransformCredit Review – Is it Safe and Legit? (April 2026) - Traders Union",
+      "snippet": "TransformCredit Review – Is it Safe and Legit? (April 2026) Traders Union",
+      "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE1iYk9KVV9PMVdfYXdhTFA5bXlrazlXZlhzRG5zNjByOGh2YXB4OU1HRW5PVGpnMkx5cktPMjdxUHZ1b0VPXzVoWDlPdmJ4eW4xLXpucFY2QmZMMXlCaW53VWxqUQ?oc=5",
+      "date": "2025-02-05",
+      "author": null,
+      "score": null,
+      "score_max": null,
+      "site_name": "Traders Union",
+      "site_domain": "tradersunion.com"
+    },
+    {
       "source": "youtube",
       "brand": "transform_credit",
       "id": "yt-t0_BAxZ83N8",
@@ -4990,6 +5102,20 @@
       "score": null,
       "score_max": null,
       "site_name": "Verify Giant - TOKYO HQ 111",
+      "site_domain": "youtube.com"
+    },
+    {
+      "source": "youtube",
+      "brand": "transform_credit",
+      "id": "yt-v1lFYPOeNMc",
+      "title": "Transform Credit Review - Legit Loans or Scam?",
+      "snippet": "Looking into a personal loan from Transform Credit? They offer loans from $3000 to $10000 with terms ranging from 24 to 60 ...",
+      "url": "https://www.youtube.com/watch?v=v1lFYPOeNMc",
+      "date": "2024-12-28",
+      "author": "Info Men",
+      "score": null,
+      "score_max": null,
+      "site_name": "Info Men",
       "site_domain": "youtube.com"
     },
     {
