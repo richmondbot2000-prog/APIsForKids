@@ -930,7 +930,18 @@
       "photos": [],
       "channel": null,
       "reactions": {},
-      "comments": []
+      "comments": [
+        {
+          "id": "com_imp_20240911_pittodrie",
+          "parent_comment_id": null,
+          "author_email": "james.benamor@letme.com",
+          "author_name": "james.benamor",
+          "created_at": "2024-09-11T12:00:00.000Z",
+          "body": "Bad news everyone. 😟 Unfortunately our borrowers now won't fit in Pittodrie Stadium, home of Aberdeen FC, as that stadium only has a maximum capacity of 20,866. If any of you were about to book that stadium for a compulsory all-hands meeting please make alternative arrangements. Aberdeen FC played at various venues within the city, until a former dung hill for police horses was cleared and became the site of Pittodrie in 1899. Pittodrie stadium was the first stadium in the world to have a dugout. In 1978, Pittodrie became the first all-seated stadium in Great Britain.",
+          "photos": [],
+          "reactions": {}
+        }
+      ]
     }
   ]
 }
