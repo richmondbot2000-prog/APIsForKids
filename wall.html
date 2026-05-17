@@ -121,6 +121,147 @@
   .wl-attach-btn.is-active:hover { background: var(--ink-700, #2C3E66); color: var(--paper-50, white); }
   .wl-attach-btn .wl-icon { width: 22px; height: 22px; }
   .wl-attach-btn input[type=file] { display: none; }
+
+  /* Poll chip in the compose area (between textarea and action strip)
+     — summary line of the poll the user is about to attach. */
+  .wl-compose-poll-slot:empty { display: none; }
+  .wl-compose-poll-chip {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: var(--paper-100, #FBF6E9);
+    border: 1px solid var(--brass-300, #E2BF74);
+  }
+  .wl-compose-poll-chip-icon { color: var(--brass-600, #A47829); display: inline-flex; }
+  .wl-compose-poll-chip-icon .wl-icon { width: 18px; height: 18px; }
+  .wl-compose-poll-chip-text { flex: 1 1 auto; min-width: 0; font: 500 13px/1.3 var(--font-body); color: var(--ink-900); display: flex; flex-direction: column; gap: 2px; }
+  .wl-compose-poll-chip-text strong { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .wl-compose-poll-chip-meta { font: 400 11px/1 var(--font-body); color: var(--ink-500); }
+  .wl-compose-poll-chip-edit, .wl-compose-poll-chip-remove {
+    background: transparent; border: 0; cursor: pointer; padding: 4px 6px;
+    font: 500 12px/1 var(--font-body); color: var(--ink-700);
+  }
+  .wl-compose-poll-chip-edit:hover { color: var(--brass-600); }
+  .wl-compose-poll-chip-remove { font-size: 18px; line-height: 1; color: var(--ink-500); }
+  .wl-compose-poll-chip-remove:hover { color: var(--red-500); }
+
+  /* Poll-create modal — same backdrop pattern as the GIF picker, sized
+     for a question + up to 10 options. */
+  .wl-poll-panel {
+    position: fixed; inset: 0; z-index: 2500;
+    background: rgba(17,25,46,0.55);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .wl-poll-modal {
+    background: var(--paper-50, white);
+    border: 1px solid var(--ink-300, #B6BECF);
+    max-width: 460px; width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    padding: 18px 18px 12px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .wl-poll-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 0;
+  }
+  .wl-poll-head h2 { margin: 0; font: 600 16px/1.2 var(--font-body); color: var(--ink-900); }
+  .wl-poll-close {
+    background: transparent; border: 0; cursor: pointer; padding: 4px;
+    color: var(--ink-600); display: inline-flex;
+  }
+  .wl-poll-close .wl-icon { width: 18px; height: 18px; }
+  .wl-poll-label {
+    font: 600 11px/1 var(--font-body); letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-500); margin: 0 0 4px;
+  }
+  .wl-poll-input, .wl-poll-option {
+    width: 100%; box-sizing: border-box;
+    border: 1px solid var(--paper-300, #ECDFB6);
+    background: white; padding: 9px 12px;
+    font: 400 15px/1.3 var(--font-body); color: var(--ink-900);
+    border-radius: 0;
+  }
+  .wl-poll-input:focus, .wl-poll-option:focus {
+    outline: 1px solid var(--brass-500); border-color: var(--brass-500);
+  }
+  .wl-poll-options { display: flex; flex-direction: column; gap: 6px; }
+  .wl-poll-option-row { display: flex; gap: 6px; align-items: center; }
+  .wl-poll-option-row .wl-poll-option { flex: 1 1 auto; min-width: 0; }
+  .wl-poll-option-remove {
+    background: transparent; border: 0; cursor: pointer; padding: 4px 8px;
+    color: var(--ink-500); font: 500 18px/1 var(--font-body);
+    min-width: 32px; min-height: 32px;
+  }
+  .wl-poll-option-remove:hover { color: var(--red-500); }
+  .wl-poll-add {
+    background: transparent; border: 1px dashed var(--brass-300);
+    color: var(--brass-600); cursor: pointer; padding: 8px;
+    font: 600 13px/1 var(--font-body);
+    margin-top: 4px;
+  }
+  .wl-poll-add:hover { color: var(--ink-900); border-color: var(--brass-500); }
+  .wl-poll-add:disabled { opacity: 0.4; cursor: not-allowed; }
+  .wl-poll-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
+  .wl-poll-cancel {
+    background: transparent; border: 0; cursor: pointer;
+    font: 500 13px/1 var(--font-body); color: var(--ink-600); padding: 9px 14px;
+  }
+  .wl-poll-save {
+    background: var(--brass-500, #C8973F); color: var(--paper-50, white);
+    border: 0; padding: 9px 18px; font: 600 13px/1 var(--font-body);
+    cursor: pointer; min-height: 36px;
+  }
+  .wl-poll-save:hover:not(:disabled) { background: var(--brass-600, #A47829); }
+  .wl-poll-save:disabled { background: var(--paper-300); color: var(--ink-500); cursor: not-allowed; }
+
+  /* Rendered poll widget inside a post body. */
+  .wl-poll {
+    margin: 10px 0 4px;
+    padding: 10px 12px;
+    background: var(--paper-50, white);
+    border: 1px solid var(--paper-300, #ECDFB6);
+    border-left: 3px solid var(--brass-500, #C8973F);
+  }
+  .wl-poll-q {
+    font: 600 15px/1.3 var(--font-body);
+    color: var(--ink-900); margin: 0 0 8px;
+  }
+  .wl-poll-opts { display: flex; flex-direction: column; gap: 4px; }
+  .wl-poll-opt {
+    position: relative; cursor: pointer; user-select: none;
+    background: var(--paper-100, #FBF6E9);
+    border: 1px solid var(--paper-300, #ECDFB6);
+    padding: 8px 12px;
+    font: 500 14px/1.3 var(--font-body); color: var(--ink-900);
+    overflow: hidden;
+    text-align: left;
+    width: 100%;
+    transition: border-color 140ms ease;
+  }
+  .wl-poll-opt:hover:not(.is-mine) { border-color: var(--brass-500); }
+  .wl-poll-opt .wl-poll-opt-fill {
+    position: absolute; inset: 0 auto 0 0;
+    background: var(--brass-300, #E2BF74);
+    opacity: 0.35;
+    transition: width 240ms ease;
+  }
+  .wl-poll-opt.is-mine { border-color: var(--brass-500); }
+  .wl-poll-opt.is-mine .wl-poll-opt-fill { opacity: 0.55; background: var(--brass-500, #C8973F); }
+  .wl-poll-opt-row {
+    position: relative; z-index: 1;
+    display: flex; gap: 10px; align-items: center; justify-content: space-between;
+  }
+  .wl-poll-opt-label { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+  .wl-poll-opt-pct {
+    font: 600 12px/1 var(--font-mono); color: var(--ink-700);
+    white-space: nowrap;
+  }
+  .wl-poll-opt-mine { font: 600 11px/1 var(--font-body); color: var(--brass-600); margin-left: 6px; }
+  .wl-poll-foot {
+    margin-top: 6px;
+    font: 500 11px/1 var(--font-body); color: var(--ink-500);
+  }
   .wl-compose-previews { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
   .wl-compose-preview {
     position: relative; width: 88px; height: 88px;
@@ -1102,19 +1243,19 @@
         </div>
       </div>
       <textarea id="wlComposeText" placeholder="What's on your mind?" maxlength="10000"></textarea>
+      <div class="wl-compose-poll-slot" id="wlComposePollChip"></div>
       <div class="wl-compose-previews" id="wlComposePreviews"></div>
       <div class="wl-compose-actions">
         <div class="wl-compose-attach">
-          <label class="wl-attach-btn" title="Add photos (up to 10)" aria-label="Add photos">
-            <input type="file" id="wlComposePhotoInput" accept="image/*" multiple>
+          <label class="wl-attach-btn" title="Upload photo or video" aria-label="Upload photo or video">
+            <input type="file" id="wlComposePhotoInput" accept="image/*,video/*" multiple>
             <span id="wlIconPhoto"></span>
-          </label>
-          <label class="wl-attach-btn" title="Add a video" aria-label="Add a video">
-            <input type="file" id="wlComposeVideoInput" accept="video/*">
-            <span id="wlIconVideo"></span>
           </label>
           <button type="button" class="wl-attach-btn" id="wlComposeGifBtn" title="Pick a GIF / meme" aria-label="Add a GIF">
             <span id="wlIconGif"></span>
+          </button>
+          <button type="button" class="wl-attach-btn" id="wlComposePollBtn" title="Add a poll" aria-label="Add a poll">
+            <span id="wlIconPoll"></span>
           </button>
           <button type="button" class="wl-attach-btn" id="wlComposeBoldBtn" title="Bold (anything you type while this is on becomes bold)" aria-label="Bold" aria-pressed="false">
             <span id="wlIconBold"></span>
@@ -1251,6 +1392,12 @@
       outline: `<path d="M5 18 L12 5 L19 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M8 13 L16 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M5 21 L19 21" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>`,
       filled:  `<path d="M5 18 L12 5 L19 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M8 13 L16 13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M5 21 L19 21" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>`,
     },
+    poll: {
+      // Bar-chart: three vertical rounded bars on a baseline (left short,
+      // middle tallest, right medium). Matches the reference screenshot.
+      outline: `<rect x="4" y="13" width="4" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="10" y="7" width="4" height="13" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="16" y="10" width="4" height="10" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/>`,
+      filled:  `<rect x="4" y="13" width="4" height="7" rx="1" fill="currentColor"/><rect x="10" y="7" width="4" height="13" rx="1" fill="currentColor"/><rect x="16" y="10" width="4" height="10" rx="1" fill="currentColor"/>`,
+    },
   };
   function icon(name, active) {
     const i = ICONS[name];
@@ -1318,12 +1465,16 @@
   const postBtn = document.getElementById("wlPostBtn");
   const previewsEl = document.getElementById("wlComposePreviews");
   let composeAttachments = [];
+  // Poll attached to the compose, if any. Shape: { question, options[] }.
+  // Sent alongside body + photos when the post is submitted.
+  let composePoll = null;
 
   function refreshComposeState() {
     const n = composeText.value.length;
     charCount.textContent = `${n.toLocaleString()} / 10,000`;
     charCount.classList.toggle("over", n > 10000);
-    postBtn.disabled = (n === 0 && composeAttachments.length === 0) || n > 10000;
+    const hasContent = n > 0 || composeAttachments.length > 0 || !!composePoll;
+    postBtn.disabled = !hasContent || n > 10000;
   }
   // Auto-grow the textarea down the page as the user types. Lower bound
   // is the CSS min-height so the empty state stays compact; no upper
@@ -1352,25 +1503,58 @@
       });
     });
   }
+  function renderPollChip() {
+    const slot = document.getElementById("wlComposePollChip");
+    if (!slot) return;
+    if (!composePoll) { slot.innerHTML = ""; return; }
+    const optionsCount = composePoll.options.length;
+    slot.innerHTML = `
+      <div class="wl-compose-poll-chip">
+        <span class="wl-compose-poll-chip-icon">${icon("poll", false)}</span>
+        <span class="wl-compose-poll-chip-text">
+          <strong>${escapeHtml(composePoll.question)}</strong>
+          <span class="wl-compose-poll-chip-meta">${optionsCount} option${optionsCount === 1 ? "" : "s"}</span>
+        </span>
+        <button type="button" class="wl-compose-poll-chip-edit" data-poll-edit aria-label="Edit poll">Edit</button>
+        <button type="button" class="wl-compose-poll-chip-remove" data-poll-remove aria-label="Remove poll">×</button>
+      </div>`;
+    slot.querySelector("[data-poll-edit]").addEventListener("click", () => {
+      openPollComposer(composePoll, p => { composePoll = p; renderPollChip(); refreshComposeState(); });
+    });
+    slot.querySelector("[data-poll-remove]").addEventListener("click", () => {
+      composePoll = null; renderPollChip(); refreshComposeState();
+    });
+  }
 
   // Render attach-button icons at boot.
   document.getElementById("wlIconPhoto").innerHTML = icon("photo", false);
-  document.getElementById("wlIconVideo").innerHTML = icon("video", false);
   document.getElementById("wlIconGif").innerHTML   = icon("gif",   false);
+  document.getElementById("wlIconPoll").innerHTML  = icon("poll",  false);
   document.getElementById("wlIconBold").innerHTML  = icon("bold",  false);
 
-  document.getElementById("wlComposePhotoInput").addEventListener("change", e => {
-    handleFilePick(Array.from(e.target.files || []), "photo");
+  document.getElementById("wlComposePhotoInput").addEventListener("change", async e => {
+    // The input accepts both image/* and video/* — route each picked
+    // file by its real MIME type so videos still go through the video
+    // upload path (single-file, larger limit) and photos through the
+    // photo path (up to 10).
+    const files = Array.from(e.target.files || []);
     e.target.value = "";
-  });
-  document.getElementById("wlComposeVideoInput").addEventListener("change", e => {
-    handleFilePick(Array.from(e.target.files || []), "video");
-    e.target.value = "";
+    const photos = files.filter(f => f.type.startsWith("image/"));
+    const videos = files.filter(f => f.type.startsWith("video/"));
+    if (photos.length) await handleFilePick(photos, "photo");
+    if (videos.length) await handleFilePick(videos, "video");
   });
   document.getElementById("wlComposeGifBtn").addEventListener("click", () => {
     openGifPicker(gif => {
       composeAttachments.push({ path: gif.url, kind: "gif", preview: gif.preview });
       renderComposePreviews(); refreshComposeState();
+    });
+  });
+  document.getElementById("wlComposePollBtn").addEventListener("click", () => {
+    openPollComposer(composePoll, poll => {
+      composePoll = poll;
+      renderPollChip();
+      refreshComposeState();
     });
   });
 
@@ -1469,14 +1653,16 @@
 
   postBtn.addEventListener("click", async () => {
     const body = composeText.value.trim();
-    if (!body && composeAttachments.length === 0) return;
+    if (!body && composeAttachments.length === 0 && !composePoll) return;
     if (composeAttachments.some(a => a.uploading)) {
       showBanner("Wait for uploads to finish", true); return;
     }
     postBtn.disabled = true; postBtn.textContent = "Posting…";
     try {
       const photos = composeAttachments.map(a => a.path).filter(Boolean);
-      const res = await wallAction("post", { body, photos });
+      const payload = { body, photos };
+      if (composePoll) payload.poll = composePoll;
+      const res = await wallAction("post", payload);
       if (res && res.post) {
         posts.unshift(res.post);
         currentPage = 0; // jump back to the newest page so the author sees their post
@@ -1485,6 +1671,8 @@
       composeText.value = "";
       fitCompose();
       composeAttachments = [];
+      composePoll = null;
+      renderPollChip();
       composeBoldOn = false;
       boldBtn.classList.remove("is-active");
       boldBtn.setAttribute("aria-pressed", "false");
@@ -1494,7 +1682,7 @@
     } catch (err) {
       showBanner(err.message || String(err), true);
     } finally {
-      postBtn.disabled = false; postBtn.textContent = "Post this page";
+      postBtn.disabled = false; postBtn.textContent = "Post";
     }
   });
 
@@ -1555,6 +1743,161 @@
     gifPickerState.root.remove();
     document.removeEventListener("keydown", gifPickerState.onKey);
     gifPickerState = null;
+  }
+
+  // Poll composer modal. Same backdrop pattern as the GIF picker.
+  // existing = null OR { question, options:[] } for re-editing.
+  // onSave = ({question, options}) callback.
+  let pollComposerState = null;
+  function openPollComposer(existing, onSave) {
+    closePollComposer();
+    const seedQ = (existing && existing.question) || "";
+    const seedOpts = (existing && existing.options) || ["", ""];
+    const root = document.createElement("div");
+    root.className = "wl-poll-panel";
+    root.innerHTML = `
+      <div class="wl-poll-modal" role="dialog" aria-label="Create poll">
+        <div class="wl-poll-head">
+          <h2>${existing ? "Edit poll" : "Create poll"}</h2>
+          <button type="button" class="wl-poll-close" aria-label="Close">${icon("close", false)}</button>
+        </div>
+        <div>
+          <div class="wl-poll-label">Question</div>
+          <input type="text" class="wl-poll-input" id="wlPollQ" maxlength="200" placeholder="What would you like to ask?" value="${escapeHtml(seedQ)}">
+        </div>
+        <div>
+          <div class="wl-poll-label">Options (2–10)</div>
+          <div class="wl-poll-options" id="wlPollOpts"></div>
+          <button type="button" class="wl-poll-add" id="wlPollAdd">+ Add option</button>
+        </div>
+        <div class="wl-poll-actions">
+          <button type="button" class="wl-poll-cancel">Cancel</button>
+          <button type="button" class="wl-poll-save" disabled>${existing ? "Save changes" : "Attach poll"}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(root);
+    const optsEl = root.querySelector("#wlPollOpts");
+    const qEl    = root.querySelector("#wlPollQ");
+    const addEl  = root.querySelector("#wlPollAdd");
+    const saveEl = root.querySelector(".wl-poll-save");
+
+    function refresh() {
+      // Save enabled when question + at least 2 non-empty options.
+      const q = qEl.value.trim();
+      const opts = Array.from(optsEl.querySelectorAll("input.wl-poll-option"))
+        .map(i => i.value.trim()).filter(v => v.length);
+      saveEl.disabled = !(q.length && opts.length >= 2);
+      addEl.disabled = optsEl.querySelectorAll("input.wl-poll-option").length >= 10;
+    }
+    function renderOpts(values) {
+      optsEl.innerHTML = values.map((v, i) => `
+        <div class="wl-poll-option-row">
+          <input type="text" class="wl-poll-option" maxlength="100" placeholder="Option ${i + 1}" value="${escapeHtml(v)}">
+          <button type="button" class="wl-poll-option-remove" data-rm aria-label="Remove option">×</button>
+        </div>`).join("");
+      optsEl.querySelectorAll("input.wl-poll-option").forEach(inp => {
+        inp.addEventListener("input", refresh);
+      });
+      optsEl.querySelectorAll("[data-rm]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const rows = Array.from(optsEl.querySelectorAll("input.wl-poll-option"));
+          if (rows.length <= 2) return; // keep at least 2
+          const current = rows.map(i => i.value);
+          const idx = Array.from(optsEl.querySelectorAll("[data-rm]")).indexOf(btn);
+          current.splice(idx, 1);
+          renderOpts(current);
+          refresh();
+        });
+      });
+    }
+    renderOpts(seedOpts.length >= 2 ? seedOpts : ["", ""]);
+    qEl.addEventListener("input", refresh);
+    addEl.addEventListener("click", () => {
+      const current = Array.from(optsEl.querySelectorAll("input.wl-poll-option")).map(i => i.value);
+      if (current.length >= 10) return;
+      current.push("");
+      renderOpts(current);
+      refresh();
+      const newest = optsEl.querySelectorAll("input.wl-poll-option");
+      newest[newest.length - 1].focus();
+    });
+    saveEl.addEventListener("click", () => {
+      const q = qEl.value.trim();
+      const opts = Array.from(optsEl.querySelectorAll("input.wl-poll-option"))
+        .map(i => i.value.trim()).filter(v => v.length);
+      if (!q || opts.length < 2) return;
+      onPick({ question: q.slice(0, 200), options: opts.slice(0, 10).map(o => o.slice(0, 100)) });
+      closePollComposer();
+    });
+    function onPick(poll) { onSave(poll); }
+    root.querySelector(".wl-poll-close").addEventListener("click", closePollComposer);
+    root.querySelector(".wl-poll-cancel").addEventListener("click", closePollComposer);
+    root.addEventListener("click", e => { if (e.target === root) closePollComposer(); });
+    const onKey = e => { if (e.key === "Escape") closePollComposer(); };
+    document.addEventListener("keydown", onKey);
+    pollComposerState = { root, onKey };
+    qEl.focus();
+    refresh();
+  }
+  function closePollComposer() {
+    if (!pollComposerState) return;
+    pollComposerState.root.remove();
+    document.removeEventListener("keydown", pollComposerState.onKey);
+    pollComposerState = null;
+  }
+
+  // Poll widget rendered inside a post body. Click an option to vote (or
+  // click your current vote again to remove it). The widget always shows
+  // every voter's choice — no anonymous mode in v1.
+  function renderPoll(post) {
+    const poll = post.poll;
+    if (!poll || !Array.isArray(poll.options)) return "";
+    const votes = poll.votes || {};
+    const totals = poll.options.map((_, i) =>
+      Object.values(votes).filter(v => v === i).length
+    );
+    const totalVotes = totals.reduce((a, b) => a + b, 0);
+    const myVote = (viewerEmail && Object.prototype.hasOwnProperty.call(votes, viewerEmail))
+      ? votes[viewerEmail] : null;
+    const opts = poll.options.map((opt, i) => {
+      const n = totals[i];
+      const pct = totalVotes ? Math.round((n / totalVotes) * 100) : 0;
+      const isMine = myVote === i;
+      return `<button type="button" class="wl-poll-opt ${isMine ? "is-mine" : ""}" data-poll-vote="${escapeHtml(post.id)}::${i}" data-stop-card-click>
+        <span class="wl-poll-opt-fill" style="width:${pct}%"></span>
+        <span class="wl-poll-opt-row">
+          <span class="wl-poll-opt-label">${escapeHtml(opt)}${isMine ? `<span class="wl-poll-opt-mine"> · your vote</span>` : ""}</span>
+          <span class="wl-poll-opt-pct">${pct}% (${n})</span>
+        </span>
+      </button>`;
+    }).join("");
+    const foot = `${totalVotes} vote${totalVotes === 1 ? "" : "s"}` +
+      (viewerEmail && myVote === null ? ` · click to vote` : "");
+    return `<div class="wl-poll" data-stop-card-click>
+      <div class="wl-poll-q">${escapeHtml(poll.question)}</div>
+      <div class="wl-poll-opts">${opts}</div>
+      <div class="wl-poll-foot">${escapeHtml(foot)}</div>
+    </div>`;
+  }
+  async function votePoll(postId, optionIdx) {
+    if (!viewerEmail) { showBanner("Sign in via Cloudflare Access first.", true); return; }
+    const post = posts.find(p => p.id === postId);
+    if (!post || !post.poll) return;
+    // Optimistic: flip vote locally + re-render, then post to worker.
+    const prev = (post.poll.votes || {})[viewerEmail];
+    post.poll.votes = post.poll.votes || {};
+    if (prev === optionIdx) delete post.poll.votes[viewerEmail];
+    else post.poll.votes[viewerEmail] = optionIdx;
+    renderFeed();
+    try {
+      await wallAction("poll-vote", { post_id: postId, option_index: optionIdx });
+    } catch (err) {
+      // Roll back on error.
+      if (prev === undefined) delete post.poll.votes[viewerEmail];
+      else post.poll.votes[viewerEmail] = prev;
+      renderFeed();
+      showBanner("Vote failed: " + (err.message || String(err)), true);
+    }
   }
 
   // Navigate to a specific post: jump to the page that contains it,
@@ -1694,6 +2037,7 @@
           : `<div class="wl-post-body wl-post-body--teaser">${enrichBody(body250, { bold: true })}</div>`}
         ${photoStrip}
         ${linkBlocks}
+        ${renderPoll(post)}
         <div class="wl-compact-meta">
           ${reactCount > 0 ? `<span class="wl-compact-react">${myReaction ? emojiGlyph(myReaction) : emojiGlyph("👍")} ${reactCount}</span>` : ""}
           ${cmCount > 0 ? `<span class="wl-compact-count ${newCount > 0 ? "has-new" : ""}">${cmCount} ${cmCount === 1 ? "comment" : "comments"}${newCount > 0 ? ` · ${newCount} new` : ""}</span>` : ""}
@@ -1735,7 +2079,7 @@
           ? `<textarea class="wl-edit-input" data-edit-save="post:${escapeHtml(post.id)}" maxlength="10000">${escapeHtml(bodyText)}</textarea>`
           : `<div class="wl-post-body">${bodyHtml}</div>`}
         ${linkBlocks}
-        <button type="button" class="wl-see-more" data-expand="${escapeHtml(post.id)}" data-collapse="1">Show less</button>
+        ${renderPoll(post)}
         ${photos}
         <div class="wl-reaction-summary">
           <div>${reactions}</div>
@@ -2289,6 +2633,18 @@
         if (el.dataset.collapse) expandedPostIds.delete(id);
         else expandedPostIds.add(id);
         renderFeed();
+      });
+    });
+    // Poll vote — data-poll-vote="<postId>::<optionIdx>".
+    document.querySelectorAll("[data-poll-vote]").forEach(el => {
+      el.addEventListener("click", e => {
+        e.stopPropagation();
+        const v = el.dataset.pollVote || "";
+        const sep = v.lastIndexOf("::");
+        if (sep < 0) return;
+        const pid = v.slice(0, sep);
+        const idx = parseInt(v.slice(sep + 2), 10);
+        if (!isNaN(idx)) votePoll(pid, idx);
       });
     });
     document.querySelectorAll("[data-toggle-comments]").forEach(el => {

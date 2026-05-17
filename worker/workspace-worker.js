@@ -1410,6 +1410,7 @@ async function handleWall(req, env, url) {
       case "gif-search":   return json(await wallGifSearch(env, body), 200, req);
       case "delete":       return json(await wallDelete(env, viewerEmail, body), 200, req);
       case "edit":         return json(await wallEdit(env, viewerEmail, body), 200, req);
+      case "poll-vote":    return json(await wallPollVote(env, viewerEmail, body), 200, req);
       case "link-preview": return json(await wallLinkPreview(env, body), 200, req);
       default:             return json({ error: `unknown wall action: ${action}` }, 404, req);
     }
@@ -1550,6 +1551,32 @@ async function wallEdit(env, viewerEmail, body) {
   return { ok: true, kind, id, edited_at: editedAt };
 }
 
+// Cast or remove a vote on a post's attached poll. Clicking the option
+// you've already voted for removes the vote; clicking any other option
+// changes it. One vote per user per poll.
+async function wallPollVote(env, viewerEmail, body) {
+  if (!viewerEmail) throw new Error("not authenticated");
+  const id = (body.post_id || "").toString();
+  const idx = parseInt(body.option_index, 10);
+  if (!id) throw new Error("missing post_id");
+  if (Number.isNaN(idx) || idx < 0 || idx > 100) throw new Error("invalid option_index");
+
+  await updateWallJson(env, doc => {
+    const post = (doc.posts || []).find(p => p.id === id);
+    if (!post) throw new Error("post not found");
+    if (!post.poll || !Array.isArray(post.poll.options)) throw new Error("post has no poll");
+    if (idx >= post.poll.options.length) throw new Error("option_index out of range");
+    post.poll.votes = post.poll.votes || {};
+    if (post.poll.votes[viewerEmail] === idx) {
+      delete post.poll.votes[viewerEmail];
+    } else {
+      post.poll.votes[viewerEmail] = idx;
+    }
+  }, `Wall: poll vote ${id} by ${viewerEmail}`);
+
+  return { ok: true };
+}
+
 // Server-side OpenGraph scraper for the page's link-preview cards. The
 // page can't fetch arbitrary URLs from the browser (CORS), so the Worker
 // pulls the page on its behalf, extracts og:title / og:description /
@@ -1682,10 +1709,29 @@ function wallId(prefix) {
 async function wallPost(env, viewerEmail, viewerName, body) {
   if (!viewerEmail) throw new Error("not authenticated");
   const text = (body.body || "").trim();
-  if (!text) throw new Error("empty body");
   if (text.length > 10000) throw new Error("body exceeds 10,000 chars");
   const photos = Array.isArray(body.photos) ? body.photos.slice(0, 10) : [];
   const channel = (body.channel || "").toString().slice(0, 40) || null;
+
+  // Optional poll. Validate shape: a question (1-200 chars) + 2-10 non-empty options
+  // (each ≤ 100 chars). Reject silently if the shape is wrong.
+  let poll = null;
+  if (body.poll && typeof body.poll === "object") {
+    const q = (body.poll.question || "").toString().trim();
+    const rawOpts = Array.isArray(body.poll.options) ? body.poll.options : [];
+    const opts = rawOpts.map(o => (o || "").toString().trim()).filter(o => o.length).slice(0, 10);
+    if (q.length >= 1 && q.length <= 200 && opts.length >= 2) {
+      poll = {
+        question: q.slice(0, 200),
+        options:  opts.map(o => o.slice(0, 100)),
+        votes:    {},
+        created_at: new Date().toISOString(),
+      };
+    }
+  }
+
+  // A post needs SOMETHING — body text, attached media, or a poll.
+  if (!text && photos.length === 0 && !poll) throw new Error("empty post");
 
   const now = new Date().toISOString();
   const newPost = {
@@ -1699,6 +1745,7 @@ async function wallPost(env, viewerEmail, viewerName, body) {
     reactions:    {},
     comments:     [],
   };
+  if (poll) newPost.poll = poll;
 
   await updateWallJson(env, doc => {
     doc.posts = Array.isArray(doc.posts) ? doc.posts : [];
