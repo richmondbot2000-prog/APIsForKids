@@ -1408,10 +1408,35 @@
     return `<svg class="wl-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">${active ? i.filled : i.outline}</svg>`;
   }
 
+  // GitHub Pages + Cloudflare cache wall.json for ~30-90 s after each
+  // commit, so a "post → refresh" sequence often serves a pre-commit copy
+  // and the post (or poll) appears to vanish. api.github.com's contents
+  // endpoint reflects the latest sha immediately; this helper hits it
+  // first and falls back to the relative path on rate-limit / network
+  // failure. Same fix shipped earlier for holidays.json.
+  async function fetchFreshJson(path, fallbackRelative, defaultValue) {
+    try {
+      const r = await fetch(
+        `https://api.github.com/repos/richmondbot2000-prog/togetherbook/contents/${path}?ref=main`,
+        { cache: "no-store", headers: { "Accept": "application/vnd.github+json" } },
+      );
+      if (!r.ok) throw new Error("api.github.com " + r.status);
+      const data = await r.json();
+      const txt = atob((data.content || "").replace(/\s/g, ""));
+      return JSON.parse(txt);
+    } catch (e) {
+      try {
+        const r = await fetch(`${fallbackRelative}?ts=${Date.now()}`, { cache: "no-store" });
+        if (r.ok) return await r.json();
+      } catch (_) {}
+      return defaultValue;
+    }
+  }
+
   Promise.all([
-    fetch("wall.json",        { cache: "no-store" }).then(r => r.ok ? r.json() : { posts: [] }).catch(() => ({ posts: [] })),
+    fetchFreshJson("wall.json",      "wall.json",      { posts: [] }),
     fetch("staff.json",       { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-    fetch("wall-seen.json",   { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetchFreshJson("wall-seen.json", "wall-seen.json", null),
     fetch(`${WALL_API}/whoami`, { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch("annotations.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch("admins.json",      { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
