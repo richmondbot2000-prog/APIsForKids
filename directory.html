@@ -281,6 +281,7 @@
         <option value="live">Live</option>
         <option value="suspended">Suspended</option>
       </select>
+      <a class="pp-btn pp-btn--ghost" id="ppReconcile" href="/reconcile.html" title="Open the Reconcile page to see records in Payroll / Google / Warehouse that aren't yet linked to a Person">Reconcile sources <span id="ppReconcileCount"></span></a>
       <button class="pp-btn pp-btn--ghost" id="ppSync" title="Re-derive admins.json from people.json and push the allow-list to Cloudflare Access">Sync access</button>
       <button class="pp-btn" id="ppAdd">+ Add person</button>
     </div>
@@ -289,7 +290,6 @@
   <div class="pp-stats" id="ppStats"></div>
   <div id="ppGate"></div>
   <div class="pp-table" id="ppTable"></div>
-  <div id="ppOrphans"></div>
 </main>
 
 <div class="pp-modal-bg" id="ppModalBg">
@@ -599,9 +599,19 @@
       </div>
       ${rows.length ? rows.map(rowHtml).join("") : '<div class="pp-empty">No people match the current filters.</div>'}`;
     document.getElementById("ppTable").innerHTML = html;
-    document.getElementById("ppOrphans").innerHTML = orphansHtml();
+    renderReconcileBadge();
     wireRows();
-    wireOrphans();
+  }
+
+  // Count unmatched source records (no full render — that lives on /reconcile.html).
+  function renderReconcileBadge() {
+    const el = document.getElementById("ppReconcileCount");
+    if (!el) return;
+    const o = findOrphans();
+    const n = o.payroll.length + o.letme.length + o.together.length + o.warehouse.length;
+    el.textContent = n ? `· ${n} unmatched` : "· clean ✓";
+    el.style.color = n ? "var(--red-600, #b3261e)" : "#1a7f37";
+    el.style.fontWeight = "600";
   }
 
   /* ─── Orphan accounts (records in a source with no Person link) ─── */
@@ -661,190 +671,6 @@
       }
     }
     return orphans;
-  }
-
-  function personPicker(label, dataAction) {
-    const opts = people
-      .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
-      .map(p => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name || p.id)}</option>`).join("");
-    return `
-      <select data-link-target>
-        <option value="">${escapeHtml(label)}</option>
-        ${opts}
-      </select>
-      <button class="primary" ${dataAction}>Link</button>`;
-  }
-
-  function orphansHtml() {
-    if (!isAdmin) return "";
-    const o = findOrphans();
-    const total = o.payroll.length + o.letme.length + o.together.length + o.warehouse.length;
-    if (!total) return `<div class="pp-orphans"><div class="pp-orphans-head">Unlinked accounts<span class="pp-orphan-empty">All sources reconciled — every record links to a Person.</span></div></div>`;
-
-    const section = (title, items, render) => `
-      <div class="pp-orphan-section">
-        <h3>${escapeHtml(title)} (${items.length})</h3>
-        ${items.length ? items.slice(0, 30).map(render).join("") : '<div class="pp-orphan-empty">None.</div>'}
-        ${items.length > 30 ? `<div class="pp-orphan-empty">+${items.length - 30} more…</div>` : ""}
-      </div>`;
-
-    return `
-      <div class="pp-orphans">
-        <div class="pp-orphans-head">Unlinked accounts<span class="pp-orphan-empty">${total} record(s) exist in a source but don't link to any Person</span></div>
-        ${section("Payroll", o.payroll, r => `
-          <div class="pp-orphan-row">
-            <div class="meta">
-              <strong>${escapeHtml((r.first_name || "") + " " + (r.last_name || ""))}</strong>
-              ${r.email ? ` · <code>${escapeHtml(r.email)}</code>` : ""}
-              ${r.employer ? ` · ${escapeHtml(r.employer)}` : ""}
-              ${r.employee_number ? ` · #${escapeHtml(r.employee_number)}` : ""}
-              ${r.start_date ? ` · started ${escapeHtml(r.start_date)}` : ""}
-            </div>
-            <div class="pp-orphan-actions">
-              ${personPicker("Link to person…", `data-link-payroll='${escapeHtml(JSON.stringify({ name: (r.first_name||"")+" "+(r.last_name||""), email: r.email||"", start_date: r.start_date||"" }))}'`)}
-              <button data-create-payroll='${escapeHtml(JSON.stringify({ name: (r.first_name||"")+" "+(r.last_name||""), email: r.email||"", start_date: r.start_date||"" }))}'>+ Create person</button>
-            </div>
-          </div>`)}
-        ${section("Google Letme", o.letme, u => `
-          <div class="pp-orphan-row">
-            <div class="meta">
-              <strong>${escapeHtml(u.name || u.email)}</strong> · <code>${escapeHtml(u.email)}</code>
-              ${u.title ? ` · ${escapeHtml(u.title)}` : ""}
-            </div>
-            <div class="pp-orphan-actions">
-              ${personPicker("Link to person…", `data-link-email="${escapeHtml(u.email)}"`)}
-              <button data-create-google='${escapeHtml(JSON.stringify({ email: u.email, name: u.name || "" }))}'>+ Create person</button>
-            </div>
-          </div>`)}
-        ${section("Google Together", o.together, u => `
-          <div class="pp-orphan-row">
-            <div class="meta">
-              <strong>${escapeHtml(u.name || u.email)}</strong> · <code>${escapeHtml(u.email)}</code>
-              ${u.title ? ` · ${escapeHtml(u.title)}` : ""}
-            </div>
-            <div class="pp-orphan-actions">
-              ${personPicker("Link to person…", `data-link-email="${escapeHtml(u.email)}"`)}
-              <button data-create-google='${escapeHtml(JSON.stringify({ email: u.email, name: u.name || "" }))}'>+ Create person</button>
-            </div>
-          </div>`)}
-        ${section("Warehouse only (CRM)", o.warehouse, e => `
-          <div class="pp-orphan-row">
-            <div class="meta">
-              <strong>${escapeHtml(e.username || e.email || "(unknown)")}</strong>
-              · ${e.writes_60d || 0} writes (60d)
-              ${e.primary_tenant ? ` · ${escapeHtml(e.primary_tenant)}` : ""}
-            </div>
-            <div class="pp-orphan-actions">
-              ${personPicker("Link to person…", `data-link-warehouse="${escapeHtml(e.username || e.email || "")}"`)}
-            </div>
-          </div>`)}
-      </div>`;
-  }
-
-  function wireOrphans() {
-    // Each orphan row has its own picker; the click handler scopes to the
-    // local row's select rather than the global one.
-    document.querySelectorAll("[data-link-email]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const row = btn.closest(".pp-orphan-row");
-        const sel = row.querySelector("[data-link-target]");
-        const pid = sel.value;
-        const email = btn.dataset.linkEmail;
-        if (!pid) { alert("Pick a person from the dropdown first."); return; }
-        linkEmailToPerson(pid, email);
-      });
-    });
-    document.querySelectorAll("[data-create-google]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const { email, name } = JSON.parse(btn.dataset.createGoogle);
-        document.getElementById("newName").value = name;
-        document.getElementById("newEmail").value = email;
-        openCreate();
-      });
-    });
-    document.querySelectorAll("[data-link-payroll]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const row = btn.closest(".pp-orphan-row");
-        const pid = row.querySelector("[data-link-target]").value;
-        if (!pid) { alert("Pick a person from the dropdown first."); return; }
-        const meta = JSON.parse(btn.dataset.linkPayroll);
-        linkPayrollToPerson(pid, meta);
-      });
-    });
-    document.querySelectorAll("[data-create-payroll]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const meta = JSON.parse(btn.dataset.createPayroll);
-        if (!meta.email) { alert("Payroll record has no email — can't auto-create a Person without a Google address. Add a Google account in Workspace first, then come back."); return; }
-        document.getElementById("newName").value = meta.name.trim();
-        document.getElementById("newEmail").value = meta.email;
-        openCreate();
-      });
-    });
-    document.querySelectorAll("[data-link-warehouse]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const row = btn.closest(".pp-orphan-row");
-        const pid = row.querySelector("[data-link-target]").value;
-        if (!pid) { alert("Pick a person from the dropdown first."); return; }
-        const uname = btn.dataset.linkWarehouse;
-        // The warehouse match is name-based and computed at render time;
-        // there's no field on Person to write. Adding the username as an
-        // alias creates the textual record so future renames don't break
-        // the match. (TODO: a real warehouse_usernames field.)
-        linkWarehouseToPerson(pid, uname);
-      });
-    });
-  }
-
-  async function linkEmailToPerson(pid, email) {
-    const p = people.find(x => x.id === pid); if (!p) return;
-    // Add to alt_google_emails unless main is empty.
-    const patch = {};
-    if (!p.main_google_email) patch.main_google_email = email;
-    else patch.alt_google_emails = Array.from(new Set([...(p.alt_google_emails||[]), email])).filter(e => e !== p.main_google_email);
-    try {
-      const res = await fetch(WORKSPACE_API, {
-        method: "POST", headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ action: "people-set", id: pid, ...patch }),
-      });
-      const out = await res.json();
-      if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
-      Object.assign(p, out.person);
-      render();
-    } catch (err) { alert("Link failed: " + err.message); }
-  }
-  async function linkPayrollToPerson(pid, meta) {
-    const p = people.find(x => x.id === pid); if (!p) return;
-    const patch = {};
-    if (meta.start_date && !p.start_date) patch.start_date = meta.start_date;
-    if (meta.email && !emailsOf(p).includes(meta.email.toLowerCase())) {
-      patch.alt_google_emails = Array.from(new Set([...(p.alt_google_emails||[]), meta.email.toLowerCase()])).filter(e => e !== p.main_google_email);
-    }
-    // Add the payroll name as an alias so the by_name matcher links next refresh.
-    patch.aliases = Array.from(new Set([...(p.aliases||[]), meta.name.trim()])).filter(Boolean);
-    try {
-      const res = await fetch(WORKSPACE_API, {
-        method: "POST", headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ action: "people-set", id: pid, ...patch }),
-      });
-      const out = await res.json();
-      if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
-      Object.assign(p, out.person);
-      render();
-    } catch (err) { alert("Link failed: " + err.message); }
-  }
-  async function linkWarehouseToPerson(pid, uname) {
-    const p = people.find(x => x.id === pid); if (!p) return;
-    const patch = { aliases: Array.from(new Set([...(p.aliases||[]), uname.split("@")[0].replace(/\./g, " ")])).filter(Boolean) };
-    try {
-      const res = await fetch(WORKSPACE_API, {
-        method: "POST", headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ action: "people-set", id: pid, ...patch }),
-      });
-      const out = await res.json();
-      if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
-      Object.assign(p, out.person);
-      render();
-    } catch (err) { alert("Link failed: " + err.message); }
   }
 
   function wireRows() {

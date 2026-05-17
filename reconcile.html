@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BOOK — Reconcile sources</title>
+<link rel="icon" type="image/png" href="/site-icon.png">
+<link rel="apple-touch-icon" href="/site-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css?v=1778923602">
+<link rel="stylesheet" href="/quiet-tokens.css?v=1778923602">
+<link rel="stylesheet" href="/quiet.css?v=1778923602">
+<link rel="stylesheet" href="/quiet-extras.css?v=1778923602">
+<style>
+  body { background: var(--paper-100, #FBF6E9); }
+  .rc-page { max-width: 1080px; margin: 0 auto; padding: 16px 12px 64px; }
+
+  .rc-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 14px; flex-wrap: wrap; }
+  .rc-title { font: 600 22px/1.2 var(--font-display, 'Newsreader', serif); color: var(--ink-900); margin: 0; }
+  .rc-sub   { font: 400 13px/1.4 var(--font-body); color: var(--ink-600); margin: 2px 0 0; max-width: 720px; }
+  .rc-back  { font: 600 13px/1 var(--font-body); color: var(--ink-700); text-decoration: none; padding: 8px 12px; border: 1px solid var(--ink-300); background: var(--paper-50); }
+  .rc-back:hover { border-color: var(--brass-500); color: var(--ink-900); }
+
+  .rc-banner.warn { background: #fcf0ee; border: 1px solid var(--red-500); padding: 10px 14px; font: 500 13px/1.4 var(--font-body); color: var(--red-600); margin-bottom: 12px; }
+
+  .rc-section {
+    background: var(--paper-50); border: 1px solid var(--ink-300);
+    padding: 14px 18px; margin-bottom: 14px;
+  }
+  .rc-section h2 {
+    font: 700 11px/1 var(--font-body); letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--ink-500); margin: 0 0 10px;
+    display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  }
+  .rc-section h2 .count { font-size: 12px; letter-spacing: 0; text-transform: none; color: var(--ink-700); font-weight: 500; }
+
+  .rc-row {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 10px; padding: 8px 0;
+    border-bottom: 1px dashed var(--paper-300);
+    font: 500 13px/1.4 var(--font-body);
+  }
+  .rc-row:last-child { border-bottom: 0; }
+  .rc-row .meta { color: var(--ink-700); overflow-wrap: anywhere; }
+  .rc-row .meta code { font: 500 12px/1.3 var(--font-mono); color: var(--ink-500); }
+  .rc-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+  .rc-actions select, .rc-actions button {
+    font: 500 12px/1 var(--font-body);
+    padding: 7px 9px;
+    background: var(--paper-50); color: var(--ink-800);
+    border: 1px solid var(--ink-300); cursor: pointer;
+  }
+  .rc-actions button.primary { background: var(--brass-500); color: var(--paper-50); border-color: var(--brass-500); }
+  .rc-actions button.primary:hover { background: var(--brass-600); border-color: var(--brass-600); }
+  .rc-empty { color: var(--ink-500); font: italic 400 13px/1.4 var(--font-body); padding: 6px 0; }
+  .rc-clean {
+    text-align: center; padding: 60px 20px;
+    color: var(--ink-600); font: 500 14px/1.6 var(--font-body);
+    background: #eefaf0; border: 1px solid #b8e3c4;
+  }
+
+  .rc-loading { padding: 60px 0; text-align: center; color: var(--ink-500); font: italic 400 14px/1.4 var(--font-body); }
+</style>
+</head>
+<body>
+
+<header class="qb-topbar">
+  <a class="qb-brand" href="/index.html" aria-label="TogetherBOOK — home">
+    <img class="qb-brand-logo" src="/togetherbook-logo.png?v=1778923602" alt="TogetherBOOK">
+  </a>
+  <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
+          onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="qb-nav">
+    <a class="qb-nav-link is-active" href="/directory.html">People</a>
+    <a class="qb-nav-link" href="/wall.html" data-sub='[{"href": "/holidays.html", "label": "Holidays"}, {"href": "/org-structure.html", "label": "Org Structure"}]'>Team</a>
+    <a class="qb-nav-link" href="/reports.html" data-sub='[{"href": "/yesterday.html", "label": "Payouts"}, {"href": "/brandwatch.html", "label": "Brandwatch"}, {"href": "/1stcontact.html", "label": "1st Contact"}, {"href": "/topups.html", "label": "Top Ups"}, {"href": "/pipeline.html", "label": "Pipeline"}, {"href": "/brokers.html", "label": "Brokers"}, {"href": "/comms.html", "label": "Comms"}]'>Business</a>
+    <a class="qb-nav-link" href="/index.html" data-sub='[{"href": "/database.html", "label": "Schema"}, {"href": "/stats.html", "label": "Code"}]'>System</a>
+  </nav>
+</header>
+
+<main class="rc-page">
+  <div class="rc-head">
+    <div>
+      <h1 class="rc-title">Reconcile sources</h1>
+      <p class="rc-sub">Records that exist in one of our four canonical sources (Payroll · Google Letme · Google Together · Warehouse CRM) but don't link to any Person record. Link each to the right Person, or create a new Person from it.</p>
+    </div>
+    <a class="rc-back" href="/directory.html">← Back to People</a>
+  </div>
+  <div id="rcGate"></div>
+  <div id="rcBody"><div class="rc-loading">Loading…</div></div>
+</main>
+
+<script>
+  const WORKSPACE_API = "/api/workspace";
+  let people = [];
+  let staffByEmail = {};
+  let payrollData = null;
+  let activity = null;
+  let isAdmin = false;
+  let viewerEmail = "";
+
+  function escapeHtml(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  }
+  function emailsOf(p) {
+    return [p.main_google_email, ...(p.alt_google_emails||[]), p.external_google_email]
+      .filter(Boolean).map(e => e.toLowerCase());
+  }
+  function nameKeys(p) {
+    const out = new Set();
+    const strip = s => (s || "").toLowerCase().replace(/['’.\-]/g, "").trim();
+    const add = s => { const t = (s || "").trim(); if (!t) return; out.add(t.toLowerCase()); out.add(strip(t)); };
+    if (p.given && p.family) add(`${p.given} ${p.family}`);
+    if (p.name) {
+      const parts = p.name.trim().split(/\s+/);
+      if (parts.length >= 2) add(`${parts[0]} ${parts[parts.length - 1]}`);
+      add(p.name);
+    }
+    return out;
+  }
+
+  function findOrphans() {
+    const personEmails = new Set();
+    const personNames = new Set();
+    for (const p of people) {
+      for (const e of emailsOf(p)) personEmails.add(e);
+      for (const n of nameKeys(p)) personNames.add(n);
+    }
+    const orphans = { payroll: [], letme: [], together: [], warehouse: [] };
+
+    if (payrollData) {
+      const seen = new Set();
+      const consider = (rec) => {
+        const id = `${rec.employer || ""}|${rec.employee_number || ""}|${(rec.first_name || "").toLowerCase()}|${(rec.last_name || "").toLowerCase()}`;
+        if (seen.has(id)) return;
+        seen.add(id);
+        const email = (rec.email || "").toLowerCase();
+        if (email && personEmails.has(email)) return;
+        const full  = `${rec.first_name || ""} ${rec.last_name || ""}`.trim().toLowerCase();
+        const strip = full.replace(/['’.\-]/g, "").trim();
+        if (full && (personNames.has(full) || personNames.has(strip))) return;
+        orphans.payroll.push(rec);
+      };
+      for (const lst of Object.values(payrollData.by_email || {})) for (const r of lst) consider(r);
+      for (const lst of Object.values(payrollData.by_name  || {})) for (const r of lst) consider(r);
+    }
+
+    for (const e of Object.keys(staffByEmail)) {
+      if (personEmails.has(e)) continue;
+      const u = staffByEmail[e];
+      if (u.suspended || u.deletion_time) continue;
+      const dom = e.split("@")[1] || "";
+      if (dom === "letme.co.uk" || dom === "letme.com")  orphans.letme.push(u);
+      else if (dom === "togetherloans.com")              orphans.together.push(u);
+    }
+
+    if (activity) {
+      for (const e of (activity.external_users || [])) {
+        const uname = (e.username || "").toLowerCase().split("@")[0];
+        const cand = [uname, uname.replace(/\./g, " ")];
+        if (cand.some(c => personNames.has(c))) continue;
+        orphans.warehouse.push(e);
+      }
+      for (const a of (activity.active_users || [])) {
+        const em = (a.email || "").toLowerCase();
+        if (!em || personEmails.has(em)) continue;
+        if (!staffByEmail[em]) orphans.warehouse.push(a);
+      }
+    }
+    return orphans;
+  }
+
+  function personPicker() {
+    const opts = people
+      .slice().sort((a, b) => (a.name || "").localeCompare(b.name || ""))
+      .map(p => `<option value="${escapeHtml(p.id)}">${escapeHtml(p.name || p.id)}</option>`).join("");
+    return `<select data-link-target><option value="">Link to person…</option>${opts}</select>`;
+  }
+
+  function section(title, items, render) {
+    return `
+      <div class="rc-section">
+        <h2>${escapeHtml(title)}<span class="count">${items.length} record(s)</span></h2>
+        ${items.length ? items.slice(0, 200).map(render).join("") : '<div class="rc-empty">All clean — every record in this source links to a Person.</div>'}
+        ${items.length > 200 ? `<div class="rc-empty">+${items.length - 200} more — link the first batch first to keep this list manageable.</div>` : ""}
+      </div>`;
+  }
+
+  function render() {
+    const o = findOrphans();
+    const total = o.payroll.length + o.letme.length + o.together.length + o.warehouse.length;
+    if (total === 0) {
+      document.getElementById("rcBody").innerHTML = `
+        <div class="rc-clean">
+          <strong>All four sources are reconciled.</strong><br>
+          Every Payroll record, every active Google account, and every Warehouse CRM user links to a Person record.
+        </div>`;
+      return;
+    }
+
+    const html = `
+      ${section("Payroll", o.payroll, r => `
+        <div class="rc-row">
+          <div class="meta">
+            <strong>${escapeHtml((r.first_name || "") + " " + (r.last_name || ""))}</strong>
+            ${r.email ? ` · <code>${escapeHtml(r.email)}</code>` : ""}
+            ${r.employer ? ` · ${escapeHtml(r.employer)}` : ""}
+            ${r.employee_number ? ` · #${escapeHtml(r.employee_number)}` : ""}
+            ${r.start_date ? ` · started ${escapeHtml(r.start_date)}` : ""}
+          </div>
+          <div class="rc-actions">
+            ${personPicker()}
+            <button class="primary" data-link-payroll='${escapeHtml(JSON.stringify({ name: (r.first_name||"")+" "+(r.last_name||""), email: r.email||"", start_date: r.start_date||"" }))}'>Link</button>
+            <button data-create-payroll='${escapeHtml(JSON.stringify({ name: (r.first_name||"")+" "+(r.last_name||""), email: r.email||"", start_date: r.start_date||"" }))}'>+ Create</button>
+          </div>
+        </div>`)}
+      ${section("Google Letme", o.letme, u => `
+        <div class="rc-row">
+          <div class="meta">
+            <strong>${escapeHtml(u.name || u.email)}</strong> · <code>${escapeHtml(u.email)}</code>
+            ${u.title ? ` · ${escapeHtml(u.title)}` : ""}
+          </div>
+          <div class="rc-actions">
+            ${personPicker()}
+            <button class="primary" data-link-email="${escapeHtml(u.email)}">Link</button>
+            <button data-create-google='${escapeHtml(JSON.stringify({ email: u.email, name: u.name || "" }))}'>+ Create</button>
+          </div>
+        </div>`)}
+      ${section("Google Together", o.together, u => `
+        <div class="rc-row">
+          <div class="meta">
+            <strong>${escapeHtml(u.name || u.email)}</strong> · <code>${escapeHtml(u.email)}</code>
+            ${u.title ? ` · ${escapeHtml(u.title)}` : ""}
+          </div>
+          <div class="rc-actions">
+            ${personPicker()}
+            <button class="primary" data-link-email="${escapeHtml(u.email)}">Link</button>
+            <button data-create-google='${escapeHtml(JSON.stringify({ email: u.email, name: u.name || "" }))}'>+ Create</button>
+          </div>
+        </div>`)}
+      ${section("Warehouse only (CRM)", o.warehouse, e => `
+        <div class="rc-row">
+          <div class="meta">
+            <strong>${escapeHtml(e.username || e.email || "(unknown)")}</strong>
+            · ${e.writes_60d || 0} writes (60d)
+            ${e.primary_tenant ? ` · ${escapeHtml(e.primary_tenant)}` : ""}
+          </div>
+          <div class="rc-actions">
+            ${personPicker()}
+            <button class="primary" data-link-warehouse="${escapeHtml(e.username || e.email || "")}">Link</button>
+          </div>
+        </div>`)}`;
+    document.getElementById("rcBody").innerHTML = html;
+    wire();
+  }
+
+  function wire() {
+    document.querySelectorAll("[data-link-email]").forEach(btn => btn.addEventListener("click", () => {
+      const sel = btn.closest(".rc-row").querySelector("[data-link-target]");
+      if (!sel.value) return alert("Pick a Person from the dropdown first.");
+      linkEmail(sel.value, btn.dataset.linkEmail);
+    }));
+    document.querySelectorAll("[data-link-payroll]").forEach(btn => btn.addEventListener("click", () => {
+      const sel = btn.closest(".rc-row").querySelector("[data-link-target]");
+      if (!sel.value) return alert("Pick a Person from the dropdown first.");
+      linkPayroll(sel.value, JSON.parse(btn.dataset.linkPayroll));
+    }));
+    document.querySelectorAll("[data-link-warehouse]").forEach(btn => btn.addEventListener("click", () => {
+      const sel = btn.closest(".rc-row").querySelector("[data-link-target]");
+      if (!sel.value) return alert("Pick a Person from the dropdown first.");
+      linkWarehouse(sel.value, btn.dataset.linkWarehouse);
+    }));
+    document.querySelectorAll("[data-create-google]").forEach(btn => btn.addEventListener("click", () => {
+      const meta = JSON.parse(btn.dataset.createGoogle);
+      const slug = (meta.email.split("@")[0] || "").toLowerCase();
+      const name = meta.name || meta.email;
+      createPerson({ id: slug, name, main_google_email: meta.email, company: meta.email.split("@")[1] || "" });
+    }));
+    document.querySelectorAll("[data-create-payroll]").forEach(btn => btn.addEventListener("click", () => {
+      const meta = JSON.parse(btn.dataset.createPayroll);
+      if (!meta.email) return alert("Payroll record has no email — can't auto-create a Person without one.\n\nUse the terminal: scripts/import_payroll.py <csv> --create-missing --apply --commit");
+      const slug = (meta.email.split("@")[0] || "").toLowerCase();
+      createPerson({ id: slug, name: meta.name.trim(), main_google_email: meta.email, start_date: meta.start_date || "" });
+    }));
+  }
+
+  async function workspaceCall(payload) {
+    const res = await fetch(WORKSPACE_API, {
+      method: "POST", headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(payload),
+    });
+    const out = await res.json();
+    if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
+    return out;
+  }
+
+  async function linkEmail(pid, email) {
+    const p = people.find(x => x.id === pid); if (!p) return;
+    const patch = {};
+    if (!p.main_google_email) patch.main_google_email = email;
+    else patch.alt_google_emails = Array.from(new Set([...(p.alt_google_emails||[]), email])).filter(e => e !== p.main_google_email);
+    try { const out = await workspaceCall({ action: "people-set", id: pid, ...patch }); Object.assign(p, out.person); render(); }
+    catch (err) { alert("Link failed: " + err.message); }
+  }
+  async function linkPayroll(pid, meta) {
+    const p = people.find(x => x.id === pid); if (!p) return;
+    const patch = { on_payroll: true };
+    if (meta.start_date && !p.start_date) patch.start_date = meta.start_date;
+    if (meta.email && !emailsOf(p).includes(meta.email.toLowerCase())) {
+      patch.alt_google_emails = Array.from(new Set([...(p.alt_google_emails||[]), meta.email.toLowerCase()])).filter(e => e !== p.main_google_email);
+    }
+    patch.aliases = Array.from(new Set([...(p.aliases||[]), meta.name.trim()])).filter(Boolean);
+    try { const out = await workspaceCall({ action: "people-set", id: pid, ...patch }); Object.assign(p, out.person); render(); }
+    catch (err) { alert("Link failed: " + err.message); }
+  }
+  async function linkWarehouse(pid, uname) {
+    const p = people.find(x => x.id === pid); if (!p) return;
+    const patch = { aliases: Array.from(new Set([...(p.aliases||[]), uname.split("@")[0].replace(/\./g, " ")])).filter(Boolean) };
+    try { const out = await workspaceCall({ action: "people-set", id: pid, ...patch }); Object.assign(p, out.person); render(); }
+    catch (err) { alert("Link failed: " + err.message); }
+  }
+  async function createPerson(fields) {
+    if (!fields.id || !fields.main_google_email) return alert("Need both id and main_google_email to create.");
+    if (!confirm(`Create new Person ${fields.name} (${fields.main_google_email})?`)) return;
+    try {
+      const out = await workspaceCall({ action: "people-set", id: fields.id, name: fields.name, main_google_email: fields.main_google_email, ...(fields.start_date ? { start_date: fields.start_date } : {}), ...(fields.company ? { company: fields.company } : {}) });
+      people.push(out.person);
+      render();
+    } catch (err) { alert("Create failed: " + err.message); }
+  }
+
+  Promise.all([
+    fetch("/api/workspace/whoami",  { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/people.json",           { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/staff.json",            { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/api/workspace/payroll", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/staff-activity.json",   { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+  ]).then(([who, peopleFile, staff, payroll, act]) => {
+    if (who) { viewerEmail = (who.email||"").toLowerCase(); isAdmin = !!who.is_admin; }
+    if (staff && Array.isArray(staff.users)) for (const u of staff.users) { const k = (u.email||"").toLowerCase(); if (k) staffByEmail[k] = u; }
+    if (peopleFile && Array.isArray(peopleFile.people)) people = peopleFile.people;
+    if (payroll && (payroll.by_email || payroll.by_name)) payrollData = payroll;
+    if (act && (Array.isArray(act.active_users) || Array.isArray(act.external_users))) activity = act;
+    if (!isAdmin) {
+      document.getElementById("rcGate").innerHTML = `<div class="rc-banner warn">Signed in as <strong>${escapeHtml(viewerEmail || "(unknown)")}</strong> — not a TogetherBook admin. Reconcile actions will fail.</div>`;
+    }
+    render();
+  });
+</script>
+<script src="/nav.js?v=1778923602" defer></script>
+</body>
+</html>
