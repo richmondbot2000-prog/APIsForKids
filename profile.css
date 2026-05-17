@@ -383,6 +383,24 @@ textarea.up-pay-input { resize: vertical; min-height: 50px; font-family: var(--f
   padding: 3px 7px;
   border: 1px solid var(--ink-300); color: var(--ink-700); background: var(--paper-100);
 }
+.up-acct-badge--tenant-letme    { color: #1a5fc0; border-color: #4285F4; background: #e8f0fe; }
+.up-acct-badge--tenant-together { color: #b85412; border-color: #F97316; background: #fff3e6; }
+.up-acct-badge--tenant-external { color: #b1271c; border-color: #EA4335; background: #fce8e6; }
+.up-acct-add-row { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.up-acct-add-form { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--paper-300); }
+.up-acct-add-form h4 { font: 600 12px/1.2 var(--font-body); color: var(--ink-800); margin: 0 0 6px; }
+.up-acct-add-form input[type="email"] {
+  width: 100%; box-sizing: border-box;
+  font: 400 13px/1.4 var(--font-body); color: var(--ink-900);
+  background: var(--paper-100); border: 1px solid var(--ink-300);
+  padding: 7px 10px; margin-top: 4px;
+}
+.up-acct-row-unlink {
+  font: 500 10px/1 var(--font-body); padding: 4px 7px;
+  background: transparent; color: var(--ink-500); border: 1px solid transparent;
+  cursor: pointer; margin-left: 4px;
+}
+.up-acct-row-unlink:hover { color: var(--red-600); border-color: var(--red-200); }
 .up-acct-badge--live      { color: #1a7f37; border-color: #b8e3c4; background: #eefaf0; }
 .up-acct-badge--suspended { color: #888; border-color: #ddd; background: #f3f3f3; }
 .up-acct-badge--deleted   { color: var(--red-600, #b3261e); border-color: var(--red-200, #f3c8c4); background: #fcf0ee; }

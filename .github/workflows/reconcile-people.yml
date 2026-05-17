@@ -1,0 +1,66 @@
+name: Reconcile People
+
+# Re-derives google-accounts.json + warehouse-activity.json from the
+# latest source snapshots (staff.json + staff-activity.json + people.json)
+# and commits any changes. Runs daily 06:30 UTC, after both
+# refresh-directory (06:00) and refresh-staff-activity (typically 06:15)
+# have committed their updates.
+#
+# Idempotent: if neither file changes, no commit is made.
+
+on:
+  schedule:
+    - cron: '30 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reconcile-people
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build google-accounts.json
+        run: python3 scripts/build_google_accounts.py --apply
+
+      - name: Build warehouse-activity.json
+        run: python3 scripts/build_warehouse_activity.py --apply
+
+      - name: Commit + push if changed
+        run: |
+          set -euo pipefail
+          git config user.name  "togetherbook-bot"
+          git config user.email "richmondbot2000+bot@gmail.com"
+          if git diff --quiet google-accounts.json warehouse-activity.json; then
+            echo "No changes — nothing to commit."
+            exit 0
+          fi
+          git add google-accounts.json warehouse-activity.json
+
+          # Retry-on-rebase: another workflow may have pushed between
+          # checkout and here; rebase + retry up to three times.
+          for i in 1 2 3; do
+            git commit -m "Reconcile: refresh google-accounts + warehouse-activity (auto)" || { echo "nothing to commit on attempt $i"; exit 0; }
+            if git push; then
+              echo "✓ Pushed on attempt $i."
+              exit 0
+            fi
+            echo "Push failed on attempt $i — rebasing and retrying."
+            git pull --rebase --autostash
+          done
+          echo "!! Push still failing after 3 attempts." >&2
+          exit 1

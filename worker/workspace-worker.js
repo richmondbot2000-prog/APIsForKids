@@ -310,6 +310,27 @@ export default {
       return json(result, result.ok ? 200 : 400, req);
     }
 
+    // google-account-set / google-account-delete — admin-only,
+    // mutate google-accounts.json + keep person.json email fields in sync.
+    if (action === "google-account-set" || action === "google-account-delete") {
+      let result;
+      try {
+        result = (action === "google-account-set")
+          ? await doGoogleAccountSet(env, body, actor, isAdmin)
+          : await doGoogleAccountDelete(env, body, actor, isAdmin);
+      } catch (e) { result = { ok: false, error: e.message }; }
+      try {
+        await appendAudit(env, {
+          ts: new Date().toISOString(),
+          actor, action,
+          target: (body.email || body.id || "").toString().toLowerCase(),
+          ok: !!result.ok,
+          ...(result.ok ? {} : { error: String(result.error || "").slice(0, 300) }),
+        });
+      } catch (e) {}
+      return json(result, result.ok ? 200 : 400, req);
+    }
+
     // payroll-set — admin-only, edits a Person's most-recent PayrollData
     // record (or creates the blank shell if Person is on_payroll=true and
     // has no record yet).
@@ -1901,6 +1922,195 @@ async function doPayrollSet(env, body, actor) {
     created ? `Payroll: create blank #${rec.id} for ${person.name} (#${person.id}) + edits (by ${actor})`
             : `Payroll: edit #${rec.id} (${person.name}) (by ${actor})`);
   return { ok: true, record: rec, person_id: person.id, created };
+}
+
+/* ----------- Google accounts table (google-accounts.json) -----------
+ *
+ * One row per Google account on the system, FK person_id -> people.id.
+ * Tenant is "letme" | "together" | "external". "one of each per person"
+ * is enforced here too. Writes also keep the denormalised email fields
+ * on people.json in sync (main_google_email / alt_google_emails /
+ * external_google_email) for backwards compat with consumers that
+ * haven't migrated yet.
+ */
+const GOOGLE_ACCOUNTS_PATH = "google-accounts.json";
+const GOOGLE_ALLOWED_TENANTS = new Set(["letme", "together", "external"]);
+
+async function fetchGoogleAccountsFile(env) {
+  const ghHeaders = {
+    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "apifk-workspace-worker",
+  };
+  const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${GOOGLE_ACCOUNTS_PATH}?ref=${BRANCH}`, { headers: ghHeaders });
+  if (res.status === 404) return { sha: null, file: { schema_version: 1, updated_at: null, records: [] } };
+  if (!res.ok) throw new Error(`google-accounts.json GET failed: ${res.status}`);
+  const data = await res.json();
+  let file;
+  try {
+    const bin = atob((data.content || "").replace(/\s/g, ""));
+    file = JSON.parse(new TextDecoder("utf-8").decode(Uint8Array.from(bin, c => c.charCodeAt(0))));
+  } catch (e) { throw new Error("google-accounts.json could not be parsed: " + e.message); }
+  if (!Array.isArray(file.records)) file.records = [];
+  return { sha: data.sha, file };
+}
+
+async function commitGoogleAccountsFile(env, file, sha, message) {
+  file.schema_version = 1;
+  file.updated_at = new Date().toISOString();
+  const body = JSON.stringify(file, null, 2) + "\n";
+  const ghHeaders = {
+    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "apifk-workspace-worker",
+    "Content-Type": "application/json",
+  };
+  const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${GOOGLE_ACCOUNTS_PATH}`, {
+    method: "PUT",
+    headers: ghHeaders,
+    body: JSON.stringify({ message, content: b64Encode(body), branch: BRANCH, sha: sha || undefined }),
+  });
+  if (!res.ok) {
+    const detail = (await res.text()).slice(0, 200);
+    throw new Error(`google-accounts.json commit failed (${res.status}): ${detail}`);
+  }
+}
+
+function nextGoogleAccountId(file) {
+  let max = 0;
+  for (const r of file.records || []) {
+    const n = Number(r.id);
+    if (Number.isFinite(n) && n > max) max = n;
+  }
+  return max + 1;
+}
+
+function tenantOfEmail(email) {
+  const d = ((email || "").split("@", 2)[1] || "").toLowerCase();
+  if (d === "letme.co.uk" || d === "letme.com") return "letme";
+  if (d === "togetherloans.com")                return "together";
+  return "external";
+}
+
+// Sync the denormalised email fields on the Person from the current set
+// of google-account rows. is_primary winner becomes main_google_email;
+// other letme/together rows become alt_google_emails; external row
+// becomes external_google_email. Called after every google-account
+// mutation.
+function denormaliseEmailsToPerson(person, allAccounts) {
+  const mine = allAccounts.filter(a => String(a.person_id) === String(person.id));
+  const primary = mine.find(a => a.is_primary) || mine.find(a => a.tenant === "letme") || mine.find(a => a.tenant === "together") || mine[0];
+  person.main_google_email = primary ? primary.email : "";
+  person.alt_google_emails = mine
+    .filter(a => a !== primary && a.tenant !== "external")
+    .map(a => a.email);
+  person.external_google_email = (mine.find(a => a.tenant === "external") || {}).email || "";
+}
+
+async function doGoogleAccountSet(env, body, actor, isAdmin) {
+  if (!isAdmin) return { ok: false, error: "admin required" };
+  if (!env.GITHUB_TOKEN) return { ok: false, error: "GITHUB_TOKEN not configured" };
+  const personIdStr = body.person_id == null ? "" : String(body.person_id).trim();
+  const email = (body.email || "").toString().trim().toLowerCase();
+  const recordIdStr = body.id == null ? "" : String(body.id).trim();
+  if (!email || !email.includes("@")) return { ok: false, error: "valid email required" };
+  if (!personIdStr) return { ok: false, error: "person_id required" };
+
+  const tenant = body.tenant ? String(body.tenant).toLowerCase().trim() : tenantOfEmail(email);
+  if (!GOOGLE_ALLOWED_TENANTS.has(tenant)) return { ok: false, error: `tenant must be letme/together/external` };
+
+  const { sha: pSha, file: pFile } = await fetchPeopleFile(env);
+  const person = pFile.people.find(p => String(p.id) === personIdStr);
+  if (!person) return { ok: false, error: `person ${personIdStr} not found` };
+
+  const { sha, file } = await fetchGoogleAccountsFile(env);
+  const now = new Date().toISOString();
+
+  // Editing an existing row?
+  let rec = recordIdStr ? file.records.find(r => String(r.id) === recordIdStr) : null;
+  // ...or upserting by (person_id + email)?
+  if (!rec) rec = file.records.find(r => String(r.person_id) === personIdStr && (r.email || "").toLowerCase() === email);
+
+  // One-per-tenant enforcement (external excluded — see is_primary rules).
+  const existingSameTenant = file.records.find(r =>
+    String(r.person_id) === personIdStr &&
+    r.tenant === tenant &&
+    (rec ? r.id !== rec.id : true)
+  );
+  if (existingSameTenant) {
+    return { ok: false, error: `${person.name} already has a ${tenant} Google account (${existingSameTenant.email}). Delete or unlink that one first.` };
+  }
+
+  if (!rec) {
+    rec = {
+      id: nextGoogleAccountId(file),
+      person_id: person.id,
+      email, tenant,
+      is_primary: !!body.is_primary,
+      google_user_id: body.google_user_id || "",
+      name: body.name || "",
+      photo_url: body.photo_url || "",
+      suspended: false,
+      deletion_time: "",
+      last_login: "",
+      aliases: Array.isArray(body.aliases) ? body.aliases : [],
+      synced_at: tenant === "external" ? "" : now,
+    };
+    file.records.push(rec);
+  } else {
+    rec.email = email;
+    rec.tenant = tenant;
+    if (body.is_primary !== undefined) rec.is_primary = !!body.is_primary;
+    if (body.name      !== undefined) rec.name = body.name;
+    if (body.aliases   !== undefined) rec.aliases = body.aliases;
+    rec.synced_at = tenant === "external" ? rec.synced_at : now;
+  }
+
+  // If this row was marked primary, clear the flag on every other row.
+  if (rec.is_primary) {
+    for (const r of file.records) {
+      if (r.id !== rec.id && String(r.person_id) === personIdStr) r.is_primary = false;
+    }
+  }
+
+  await commitGoogleAccountsFile(env, file, sha,
+    `Google accounts: set ${email} (${tenant}) on ${person.name} (by ${actor})`);
+
+  // Mirror back onto people.json's denormalised email fields.
+  denormaliseEmailsToPerson(person, file.records);
+  person.updated_at = now;
+  await commitPeopleFile(env, pFile, pSha,
+    `People: sync email fields for #${person.id} after google-account change (by ${actor})`);
+
+  return { ok: true, record: rec, person: person };
+}
+
+async function doGoogleAccountDelete(env, body, actor, isAdmin) {
+  if (!isAdmin) return { ok: false, error: "admin required" };
+  if (!env.GITHUB_TOKEN) return { ok: false, error: "GITHUB_TOKEN not configured" };
+  const idStr = body.id == null ? "" : String(body.id).trim();
+  if (!idStr) return { ok: false, error: "id required" };
+
+  const { sha, file } = await fetchGoogleAccountsFile(env);
+  const rec = file.records.find(r => String(r.id) === idStr);
+  if (!rec) return { ok: true, no_op: true, message: `no google-account ${idStr}` };
+  const personId = rec.person_id;
+  file.records = file.records.filter(r => String(r.id) !== idStr);
+  await commitGoogleAccountsFile(env, file, sha,
+    `Google accounts: delete #${idStr} (${rec.email}) (by ${actor})`);
+
+  // Re-sync the denormalised fields on the affected Person.
+  if (personId != null) {
+    const { sha: pSha, file: pFile } = await fetchPeopleFile(env);
+    const person = pFile.people.find(p => String(p.id) === String(personId));
+    if (person) {
+      denormaliseEmailsToPerson(person, file.records);
+      person.updated_at = new Date().toISOString();
+      await commitPeopleFile(env, pFile, pSha,
+        `People: sync email fields for #${person.id} after google-account delete (by ${actor})`);
+    }
+  }
+  return { ok: true, deleted: idStr, person_id: personId };
 }
 
 // people-merge: collapses two Person records into one. Common case: the

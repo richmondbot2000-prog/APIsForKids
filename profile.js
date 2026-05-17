@@ -301,7 +301,22 @@
     return `
       <h2 class="up-panel-title">Accounts</h2>
       ${renderGoogleAccountsSection()}
-      ${viewerIsAdmin ? renderExternalIdentitySection() : ""}`;
+      ${viewerIsAdmin ? renderAuth0Card() : ""}`;
+  }
+  function renderAuth0Card() {
+    return `
+      <div class="up-card">
+        <div class="up-card-head">Auth0 ID <span class="up-card-hint">admin-only · used to grant access without a Workspace seat</span></div>
+        <div class="up-field" data-edit-field="auth0_id">
+          <div class="up-field-editor up-field-editor--open">
+            <input type="text" name="auth0_id" value="${escapeHtml(person.auth0_id || "")}" placeholder="auth0|abc123…">
+            <div class="up-editor-row">
+              <button type="button" class="up-btn-sm up-btn-sm--primary" data-edit-save="auth0_id">Save</button>
+              <span class="up-edit-status" data-edit-status="auth0_id"></span>
+            </div>
+          </div>
+        </div>
+      </div>`;
   }
 
   /* ─── Payroll tab — most-recent PayrollData record + editor ────── */
@@ -402,65 +417,85 @@
     if (domain === "togetherloans.com") return "togetherloans";
     return "";
   }
-  function accountState(email) {
-    const e = (email || "").toLowerCase();
-    const u = staffByEmail[e] || null;
+  function accountState(rec) {
+    // rec is a google-accounts.json row — has its own suspended /
+    // deletion_time / aliases / etc. Pending-transfer + forwarding
+    // state still come from outside (pending-transfers.json +
+    // annotations.json) since they aren't on the row yet.
+    const e = (rec.email || "").toLowerCase();
     const pending = pendingTransfersByEmail[e] || null;
     const fwd = (annotationsMap[e] || {}).forward_to || "";
     return {
-      exists:        !!u,
-      suspended:     !!(u && u.suspended),
-      deletion_time: (u && u.deletion_time) || "",
-      forwarding_to: fwd || ((u && u.suspended) ? "" : ""),
+      exists:        rec.tenant !== "external",
+      suspended:     !!rec.suspended,
+      deletion_time: rec.deletion_time || "",
+      forwarding_to: fwd,
       pending,
       admin:         adminEmails.has(e),
     };
   }
   function renderGoogleAccountsSection() {
-    const accounts = [
-      { email: person.main_google_email, role: "main" },
-      ...(person.alt_google_emails || []).map(e => ({ email: e, role: "alt" })),
-      ...(person.external_google_email ? [{ email: person.external_google_email, role: "external" }] : []),
-    ].filter(a => a.email);
-    if (!accounts.length) {
-      return `<div class="up-card"><div class="up-card-head">Google accounts</div><div class="up-empty">No Google accounts linked.</div></div>`;
-    }
-    const rows = accounts.map(a => renderAccountRow(a.email, a.role)).join("");
+    const accts = (googleByPersonId[person.id] || []).slice()
+      .sort((a, b) => {
+        // primary first, then letme, then together, then external.
+        if (a.is_primary !== b.is_primary) return a.is_primary ? -1 : 1;
+        const order = { letme: 0, together: 1, external: 2 };
+        return (order[a.tenant] ?? 9) - (order[b.tenant] ?? 9);
+      });
+    const haveLetme    = accts.some(a => a.tenant === "letme");
+    const haveTogether = accts.some(a => a.tenant === "together");
+    const haveExternal = accts.some(a => a.tenant === "external");
+
+    const rows = accts.length
+      ? accts.map(a => renderAccountRow(a)).join("")
+      : `<div class="up-empty">No Google accounts linked yet.</div>`;
+    const addButtons = !viewerIsAdmin ? "" : `
+      <div class="up-acct-add-row">
+        ${haveLetme    ? "" : `<button class="up-btn-sm" data-acc-add="letme">+ Add Letme Google</button>`}
+        ${haveTogether ? "" : `<button class="up-btn-sm" data-acc-add="together">+ Add Together Google</button>`}
+        ${haveExternal ? "" : `<button class="up-btn-sm" data-acc-add="external">+ Add external Gmail (login alternative)</button>`}
+      </div>`;
     return `
       <div class="up-card">
         <div class="up-card-head">Google accounts
-          ${viewerIsAdmin ? '<span class="up-card-hint">all admin actions live here · niche flows (rename / convert-to-group / alias-to-group) in <a href="/directory-legacy.html" style="color:inherit;text-decoration:underline;">legacy Directory</a></span>' : ""}
+          ${viewerIsAdmin ? '<span class="up-card-hint">one row per linked account · niche flows in <a href="/directory-legacy.html" style="color:inherit;text-decoration:underline;">legacy Directory</a></span>' : ""}
         </div>
         ${rows}
+        ${addButtons}
+        <div class="up-acct-add-form" id="upAcctAddForm" hidden></div>
       </div>`;
   }
-  function renderAccountRow(email, accRole) {
-    const st = accountState(email);
-    const aliases = ((staffByEmail[email.toLowerCase()] || {}).aliases || []).filter(a => a !== email);
+  function renderAccountRow(rec) {
+    const st = accountState(rec);
+    const email = rec.email;
+    const aliases = (rec.aliases || []).filter(a => a !== email);
     const aliasLine = aliases.length ? `<div class="up-acct-aliases">aliases: ${aliases.map(escapeHtml).join(", ")}</div>` : "";
     const isMine = (viewerEmail === email.toLowerCase());
 
     let badges = [];
-    if (!st.exists && accRole === "external") badges.push(`<span class="up-acct-badge up-acct-badge--ext">External</span>`);
-    else if (!st.exists)                       badges.push(`<span class="up-acct-badge up-acct-badge--missing">Not in Workspace</span>`);
+    if (rec.tenant === "external")             badges.push(`<span class="up-acct-badge up-acct-badge--ext">External Gmail</span>`);
     else if (st.deletion_time)                 badges.push(`<span class="up-acct-badge up-acct-badge--deleted">Deleted</span>`);
     else if (st.pending)                       badges.push(`<span class="up-acct-badge up-acct-badge--pending">Transferring</span>`);
     else if (st.suspended)                     badges.push(`<span class="up-acct-badge up-acct-badge--suspended">Suspended</span>`);
     else                                       badges.push(`<span class="up-acct-badge up-acct-badge--live">Live</span>`);
-    if (accRole === "main")                    badges.push(`<span class="up-acct-badge">Main</span>`);
+    if (rec.is_primary)                        badges.push(`<span class="up-acct-badge">Primary</span>`);
+    badges.push(`<span class="up-acct-badge up-acct-badge--tenant-${rec.tenant}">${escapeHtml(rec.tenant === "letme" ? "Letme" : rec.tenant === "together" ? "Together" : "Gmail")}</span>`);
     if (st.admin)                              badges.push(`<span class="up-acct-badge up-acct-badge--admin">Workspace admin</span>`);
     if (st.forwarding_to)                      badges.push(`<span class="up-acct-badge up-acct-badge--forward">→ ${escapeHtml(st.forwarding_to)}</span>`);
 
-    const actions = (viewerIsAdmin && st.exists && accRole !== "external") ? renderAccountButtons(email, st, isMine) : "";
+    const actions = (viewerIsAdmin && rec.tenant !== "external") ? renderAccountButtons(email, st, isMine) : "";
+    const adminUnlink = viewerIsAdmin
+      ? `<button class="up-acct-row-unlink" data-acc-unlink="${escapeHtml(rec.id)}" title="Remove this Google account row from the Person (does not touch the Workspace account itself)">Unlink</button>`
+      : "";
 
     return `
-      <div class="up-acct" data-acc-email="${escapeHtml(email)}">
+      <div class="up-acct" data-acc-email="${escapeHtml(email)}" data-acc-id="${escapeHtml(rec.id)}">
         <div class="up-acct-head">
           <div>
             <div class="up-acct-email">${escapeHtml(email)}</div>
             ${aliasLine}
           </div>
-          <div class="up-acct-badges">${badges.join("")}</div>
+          <div class="up-acct-badges">${badges.join("")} ${adminUnlink}</div>
         </div>
         ${actions}
         <div class="up-acct-form" hidden></div>
@@ -541,6 +576,12 @@
     });
     document.querySelectorAll("[data-acc-action]").forEach(btn => {
       btn.addEventListener("click", () => handleAccountAction(btn));
+    });
+    document.querySelectorAll("[data-acc-add]").forEach(btn => {
+      btn.addEventListener("click", () => openAccountAdd(btn.dataset.accAdd));
+    });
+    document.querySelectorAll("[data-acc-unlink]").forEach(btn => {
+      btn.addEventListener("click", () => unlinkGoogleAccount(btn.dataset.accUnlink));
     });
     document.querySelectorAll("[data-payroll-toggle]").forEach(btn => {
       btn.addEventListener("click", () => togglePayroll(btn.dataset.payrollToggle === "on"));
@@ -722,6 +763,66 @@
       if (status) { status.textContent = msg; status.className = "up-edit-status up-edit-status--err"; }
       else alert(msg);
     }
+  }
+
+  function openAccountAdd(tenant) {
+    const form = document.getElementById("upAcctAddForm");
+    if (!form) return;
+    const label = tenant === "external" ? "External Gmail (login alternative)"
+                : tenant === "letme"    ? "Letme Google account"
+                : "Together Google account";
+    const placeholder = tenant === "external" ? "jane.doe@gmail.com"
+                      : tenant === "letme"    ? "jane.doe@letme.com"
+                      : "jane.doe@togetherloans.com";
+    form.hidden = false;
+    form.innerHTML = `
+      <h4>Add ${escapeHtml(label)}</h4>
+      <input type="email" id="upAcctAddEmail" placeholder="${escapeHtml(placeholder)}">
+      <div class="up-editor-row">
+        <button class="up-btn-sm up-btn-sm--primary" id="upAcctAddSave">Link</button>
+        <button class="up-btn-sm" id="upAcctAddCancel">Cancel</button>
+        <span class="up-edit-status" id="upAcctAddStatus"></span>
+      </div>`;
+    document.getElementById("upAcctAddCancel").addEventListener("click", () => { form.hidden = true; form.innerHTML = ""; });
+    document.getElementById("upAcctAddSave").addEventListener("click", async () => {
+      const email = (document.getElementById("upAcctAddEmail").value || "").trim().toLowerCase();
+      const status = document.getElementById("upAcctAddStatus");
+      if (!email.includes("@")) {
+        status.textContent = "Enter a valid email"; status.className = "up-edit-status up-edit-status--err"; return;
+      }
+      status.textContent = "Linking…"; status.className = "up-edit-status up-edit-status--working";
+      try {
+        const res = await fetch(WORKSPACE_API, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "google-account-set", person_id: person.id, email, tenant }),
+        });
+        const out = await res.json();
+        if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
+        // Append the new row to our local index and re-render.
+        (googleByPersonId[person.id] ||= []).push(out.record);
+        Object.assign(person, out.person);
+        renderPanel();
+      } catch (err) {
+        status.textContent = "Failed — " + err.message; status.className = "up-edit-status up-edit-status--err";
+      }
+    });
+    document.getElementById("upAcctAddEmail").focus();
+  }
+
+  async function unlinkGoogleAccount(id) {
+    const acct = (googleByPersonId[person.id] || []).find(a => String(a.id) === String(id));
+    if (!acct) return;
+    if (!confirm(`Unlink ${acct.email} from this Person?\n\nThis only removes the row in google-accounts.json. The Workspace account itself isn't touched — use Suspend / Delete actions for that.`)) return;
+    try {
+      const res = await fetch(WORKSPACE_API, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "google-account-delete", id }),
+      });
+      const out = await res.json();
+      if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
+      googleByPersonId[person.id] = (googleByPersonId[person.id] || []).filter(a => String(a.id) !== String(id));
+      renderPanel();
+    } catch (err) { alert("Unlink failed: " + err.message); }
   }
 
   async function reloadAccountData() {

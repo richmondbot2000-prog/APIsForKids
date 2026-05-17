@@ -98,78 +98,36 @@
   const WORKSPACE_API = "/api/workspace";
   let people = [];
   let staffByEmail = {};
-  let payrollData = null;
-  let activity = null;
+  let allGoogleAccounts = [];
+  let allPayrollRows = [];
+  let allWarehouseRows = [];
   let isAdmin = false;
   let viewerEmail = "";
 
   function escapeHtml(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   }
-  function emailsOf(p) {
-    return [p.main_google_email, ...(p.alt_google_emails||[]), p.external_google_email]
-      .filter(Boolean).map(e => e.toLowerCase());
-  }
-  function nameKeys(p) {
-    const out = new Set();
-    const strip = s => (s || "").toLowerCase().replace(/['’.\-]/g, "").trim();
-    const add = s => { const t = (s || "").trim(); if (!t) return; out.add(t.toLowerCase()); out.add(strip(t)); };
-    if (p.given && p.family) add(`${p.given} ${p.family}`);
-    if (p.name) {
-      const parts = p.name.trim().split(/\s+/);
-      if (parts.length >= 2) add(`${parts[0]} ${parts[parts.length - 1]}`);
-      add(p.name);
-    }
-    return out;
-  }
 
+  // After table normalisation, orphans are simply rows with person_id
+  // IS NULL in the source tables, plus Workspace accounts that have
+  // appeared since the last build_google_accounts.py run.
   function findOrphans() {
-    const personEmails = new Set();
-    const personNames = new Set();
-    for (const p of people) {
-      for (const e of emailsOf(p)) personEmails.add(e);
-      for (const n of nameKeys(p)) personNames.add(n);
-    }
+    const linkedGoogleEmails = new Set(allGoogleAccounts.map(a => (a.email || "").toLowerCase()));
     const orphans = { payroll: [], letme: [], together: [], warehouse: [] };
 
-    if (payrollData) {
-      const seen = new Set();
-      const consider = (rec) => {
-        const id = `${rec.employer || ""}|${rec.employee_number || ""}|${(rec.first_name || "").toLowerCase()}|${(rec.last_name || "").toLowerCase()}`;
-        if (seen.has(id)) return;
-        seen.add(id);
-        const email = (rec.email || "").toLowerCase();
-        if (email && personEmails.has(email)) return;
-        const full  = `${rec.first_name || ""} ${rec.last_name || ""}`.trim().toLowerCase();
-        const strip = full.replace(/['’.\-]/g, "").trim();
-        if (full && (personNames.has(full) || personNames.has(strip))) return;
-        orphans.payroll.push(rec);
-      };
-      for (const lst of Object.values(payrollData.by_email || {})) for (const r of lst) consider(r);
-      for (const lst of Object.values(payrollData.by_name  || {})) for (const r of lst) consider(r);
+    for (const r of allPayrollRows) {
+      if (r.person_id == null) orphans.payroll.push(r);
     }
-
+    for (const w of allWarehouseRows) {
+      if (w.person_id == null) orphans.warehouse.push(w);
+    }
     for (const e of Object.keys(staffByEmail)) {
-      if (personEmails.has(e)) continue;
+      if (linkedGoogleEmails.has(e)) continue;
       const u = staffByEmail[e];
       if (u.suspended || u.deletion_time) continue;
       const dom = e.split("@")[1] || "";
       if (dom === "letme.co.uk" || dom === "letme.com")  orphans.letme.push(u);
       else if (dom === "togetherloans.com")              orphans.together.push(u);
-    }
-
-    if (activity) {
-      for (const e of (activity.external_users || [])) {
-        const uname = (e.username || "").toLowerCase().split("@")[0];
-        const cand = [uname, uname.replace(/\./g, " ")];
-        if (cand.some(c => personNames.has(c))) continue;
-        orphans.warehouse.push(e);
-      }
-      for (const a of (activity.active_users || [])) {
-        const em = (a.email || "").toLowerCase();
-        if (!em || personEmails.has(em)) continue;
-        if (!staffByEmail[em]) orphans.warehouse.push(a);
-      }
     }
     return orphans;
   }
@@ -339,17 +297,19 @@
   }
 
   Promise.all([
-    fetch("/api/workspace/whoami",  { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-    fetch("/people.json",           { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-    fetch("/staff.json",            { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-    fetch("/api/workspace/payroll", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-    fetch("/staff-activity.json",   { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-  ]).then(([who, peopleFile, staff, payroll, act]) => {
+    fetch("/api/workspace/whoami",    { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/people.json",             { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/staff.json",              { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/google-accounts.json",    { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/warehouse-activity.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/payroll-data.json",       { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+  ]).then(([who, peopleFile, staff, gaccounts, warehouse, payroll]) => {
     if (who) { viewerEmail = (who.email||"").toLowerCase(); isAdmin = !!who.is_admin; }
     if (staff && Array.isArray(staff.users)) for (const u of staff.users) { const k = (u.email||"").toLowerCase(); if (k) staffByEmail[k] = u; }
     if (peopleFile && Array.isArray(peopleFile.people)) people = peopleFile.people;
-    if (payroll && (payroll.by_email || payroll.by_name)) payrollData = payroll;
-    if (act && (Array.isArray(act.active_users) || Array.isArray(act.external_users))) activity = act;
+    if (gaccounts && Array.isArray(gaccounts.records))  allGoogleAccounts = gaccounts.records;
+    if (warehouse && Array.isArray(warehouse.records))  allWarehouseRows  = warehouse.records;
+    if (payroll   && Array.isArray(payroll.records))    allPayrollRows    = payroll.records;
     if (!isAdmin) {
       document.getElementById("rcGate").innerHTML = `<div class="rc-banner warn">Signed in as <strong>${escapeHtml(viewerEmail || "(unknown)")}</strong> — not a TogetherBook admin. Reconcile actions will fail.</div>`;
     }
