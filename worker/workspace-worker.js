@@ -2048,6 +2048,7 @@ async function updateGhJson(env, path, mutate, commitMsg) {
  * ============================================================ */
 
 const HOLIDAYS_PATH = "holidays.json";
+const HOLIDAYS_SEEN_PATH = "holidays-seen.json";
 const HOLIDAY_LOG_MAX = 5000;
 const HOLIDAY_STATUSES = new Set([
   "office", "wfh", "non-working", "holiday",
@@ -2218,8 +2219,9 @@ async function handleHolidays(req, env, url) {
 
   try {
     switch (action) {
-      case "set": return json(await holidaysSet(env, viewerEmail, body), 200, req);
-      default:    return json({ error: `unknown holidays action: ${action}` }, 404, req);
+      case "set":        return json(await holidaysSet(env, viewerEmail, body), 200, req);
+      case "seen-event": return json(await holidaysSeenEvent(env, viewerEmail, body), 200, req);
+      default:           return json({ error: `unknown holidays action: ${action}` }, 404, req);
     }
   } catch (e) {
     return json({ ok: false, error: e.message || String(e) }, 500, req);
@@ -2305,6 +2307,32 @@ async function holidaysSet(env, viewerEmail, body) {
   }, `Holidays: ${viewerEmail} set ${target} ${date} → ${status || "(default)"}`);
 
   return { ok: true, log_entry: logEntry, updated_at: updatedAt };
+}
+
+// Per-notification "I've seen this one" marker for the Holidays bell.
+// Stable string IDs computed client-side from log entries; persisted
+// under by_user[viewer].seen_events in holidays-seen.json. Same pattern
+// as wallSeenEvent — capped at 2000 most-recent IDs per user.
+async function holidaysSeenEvent(env, viewerEmail, body) {
+  if (!viewerEmail) throw new Error("not authenticated");
+  const evId = (body.event_id || "").toString().trim();
+  if (!evId) throw new Error("event_id required");
+  if (evId.length > 240) throw new Error("event_id too long");
+
+  await updateGhJson(env, HOLIDAYS_SEEN_PATH, doc => {
+    doc.schema_version = 1;
+    doc.by_user = doc.by_user || {};
+    const me = doc.by_user[viewerEmail] = doc.by_user[viewerEmail] || { seen_events: [] };
+    const arr = Array.isArray(me.seen_events) ? me.seen_events : [];
+    if (!arr.includes(evId)) {
+      arr.push(evId);
+      me.seen_events = arr.length > 2000 ? arr.slice(-2000) : arr;
+    } else {
+      me.seen_events = arr;
+    }
+  }, `Holidays: notif seen ${evId} by ${viewerEmail}`);
+
+  return { ok: true, event_id: evId };
 }
 
 /* ----------- helpers ----------- */

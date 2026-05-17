@@ -16,6 +16,88 @@
 <link rel="stylesheet" href="quiet-legacy.css?v=1778940663">
 <style>
   .hd-section { max-width: 1080px; margin: 0 auto; padding: 24px 0 48px; }
+
+  /* Notification bell + panel — same shape as the Wall bell.
+     Fixed-position floating button top-right; click toggles a panel. */
+  .hd-notif-anchor { position: fixed; top: 84px; right: 16px; z-index: 1000; }
+  @media (max-width: 960px) { .hd-notif-anchor { top: 76px; } }
+  @media (max-width: 480px) { .hd-notif-anchor { top: 68px; right: 12px; } }
+  .hd-notif-btn {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--paper-50, white);
+    border: 1px solid var(--brass-300, #E2BF74);
+    color: var(--ink-700);
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0;
+  }
+  .hd-notif-btn:hover { color: var(--ink-900); border-color: var(--brass-500); }
+  .hd-notif-btn::before {
+    content: "🔔";
+    font-size: 18px; line-height: 1;
+  }
+  .hd-notif-btn[data-count]:not([data-count="0"])::after {
+    content: attr(data-count);
+    position: absolute;
+    transform: translate(14px, -14px);
+    background: var(--red-500, #C0392B);
+    color: var(--paper-50, white);
+    border-radius: 999px;
+    font: 700 10px/1 var(--font-body, 'Inter', sans-serif);
+    padding: 3px 6px; min-width: 16px; text-align: center;
+  }
+  .hd-notif-panel {
+    display: none;
+    position: absolute;
+    top: 50px; right: 0;
+    width: 320px; max-height: 60vh; overflow-y: auto;
+    background: var(--paper-50, white);
+    border: 1px solid var(--ink-300);
+    z-index: 10;
+  }
+  .hd-notif-panel.is-open { display: block; }
+  .hd-notif-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--paper-300);
+    font: 600 13px/1 var(--font-body, 'Inter', sans-serif);
+    color: var(--ink-900);
+  }
+  .hd-notif-mark {
+    color: #2c6cb8; cursor: pointer;
+    font: 500 12px/1 var(--font-body);
+    background: none; border: none;
+  }
+  .hd-notif-item {
+    display: block; padding: 10px 14px;
+    border-bottom: 1px solid var(--paper-300);
+    color: var(--ink-900); text-decoration: none;
+    font: 400 13px/1.4 var(--font-body, 'Inter', sans-serif);
+    cursor: pointer;
+  }
+  .hd-notif-item:hover { background: var(--paper-100); }
+  .hd-notif-item-time {
+    font: 500 11px/1 var(--font-mono, 'JetBrains Mono', monospace);
+    color: var(--ink-500); margin-top: 4px;
+  }
+  .hd-notif-empty {
+    padding: 24px 14px; text-align: center;
+    color: var(--ink-500); font-style: italic;
+    font: italic 400 13px/1.4 var(--font-body);
+  }
+  /* Pulsing highlight for the cell the user just navigated to via a
+     ?user=&date= deep-link OR by clicking a notification. Soft brass
+     glow that fades 2 s on / 2 s off. */
+  @keyframes hd-pulse-glow {
+    0%, 100% { box-shadow: inset 0 0 0 2px var(--brass-500, #C8973F), 0 0 0 0 rgba(200,151,63,0.7); }
+    50%      { box-shadow: inset 0 0 0 2px var(--brass-500, #C8973F), 0 0 0 6px rgba(200,151,63,0); }
+  }
+  .hd-pulse-highlight, .hd-team-cell.hd-pulse-highlight {
+    animation: hd-pulse-glow 1.6s ease-in-out 4;
+    position: relative;
+    z-index: 5;
+  }
   .hd-section h1 {
     font-family: var(--font-display, 'Newsreader', serif);
     font-size: clamp(2rem, 5vw, 3rem);
@@ -880,6 +962,20 @@
 <div class="qb-nav-backdrop" onclick="document.body.classList.remove('nav-open')"></div>
 
 <main class="qb-page">
+  <!-- Floating notification bell — fixed to the top-right corner like Wall.
+       Populated client-side from holidaysDoc.log filtered by viewer/manager
+       relationship. -->
+  <div class="hd-notif-anchor">
+    <button class="hd-notif-btn" id="hdNotifBtn" data-count="0" title="Holiday change notifications" aria-label="Notifications"></button>
+    <div class="hd-notif-panel" id="hdNotifPanel">
+      <div class="hd-notif-head">
+        <span>Holiday changes</span>
+        <button class="hd-notif-mark" id="hdNotifMark">Mark all read</button>
+      </div>
+      <div id="hdNotifList"></div>
+    </div>
+  </div>
+
   <section class="hd-section">
     <div class="hd-header">
       <h1>Holidays</h1>
@@ -1018,6 +1114,11 @@
   let currentView = "own"; // "own" | "team"
 
   let holidaysDoc = null; // full holidays.json
+  // Notification events the viewer has individually clicked on. Stable
+  // string IDs computed by holidayEventId(); persisted server-side under
+  // by_user[viewer].seen_events in holidays-seen.json.
+  let seenHolidayEvents = new Set();
+  const HD_SEEN_RAW_URL = "https://raw.githubusercontent.com/richmondbot2000-prog/togetherbook/main/holidays-seen.json";
   let yearStart = new Date(2026, 3, 1);  // 1 Apr 2026 — overwritten from doc
   let yearEnd   = new Date(2027, 2, 31); // 31 Mar 2027 — overwritten from doc
   // Payroll snapshot — null until /api/workspace/payroll returns. Used
@@ -1068,7 +1169,8 @@
     fetchFreshJson("annotations.json", ANNOTATIONS_RAW_URL, { annotations: {} }),
     fetch("/api/workspace/payroll", { cache: "no-store" })
       .then(r => r.ok ? r.json() : null).catch(() => null),
-  ]).then(([who, s, ad, hd, an, pr]) => {
+    fetchFreshJson("holidays-seen.json", HD_SEEN_RAW_URL, { by_user: {} }),
+  ]).then(([who, s, ad, hd, an, pr, seen]) => {
     payrollData = pr;
     payrollByEmailLc = new Map();
     payrollByNameNorm = new Map();
@@ -1104,9 +1206,23 @@
         .map(([emp]) => emp.toLowerCase())
     );
     selectedEmail = viewerEmail.toLowerCase();
+    // Load seen-event IDs for the bell.
+    if (seen && seen.by_user && seen.by_user[viewerEmail.toLowerCase()]) {
+      seenHolidayEvents = new Set(seen.by_user[viewerEmail.toLowerCase()].seen_events || []);
+    }
     setupPicker();
     setupViewTabs();
-    renderAll();
+    setupHolidayNotifications();
+    // Deep-link: ?user=<email>&date=<YYYY-MM-DD> opens the page focused on
+    // that day with a pulsing highlight.
+    const qs = new URLSearchParams(location.search || "");
+    const deepUser = qs.get("user");
+    const deepDate = qs.get("date");
+    if (deepUser && deepDate) {
+      requestAnimationFrame(() => jumpToHolidayDay(deepUser, deepDate));
+    } else {
+      renderAll();
+    }
   }).catch(err => {
     document.getElementById("hdMeta").textContent = "Could not load: " + (err.message || err);
     document.getElementById("hdCal").innerHTML =
@@ -1131,6 +1247,140 @@
   }
 
   let viewTabsWired = false;
+  // ── Notification bell ─────────────────────────────────────────────
+  // Stable ID for a log entry. Persisted in the seen-events set.
+  function holidayEventId(e) {
+    return `h:${e.changed_at}|${(e.user_email || "").toLowerCase()}|${e.date}`;
+  }
+  function collectHolidayNotifications() {
+    if (!viewerEmail) return [];
+    const me = viewerEmail.toLowerCase();
+    const myLineMgr = (lineManagerByEmail[me] || "").toLowerCase();
+    const out = [];
+    for (const e of (holidaysDoc.log || [])) {
+      const target = (e.user_email || "").toLowerCase();
+      const by = (e.changed_by || "").toLowerCase();
+      if (!target || !by) continue;
+      if (by === me) continue;                  // skip my own changes
+      let show = false;
+      // As a line manager: changes to any direct report's calendar
+      if (directReports.has(target)) show = true;
+      // As an employee: changes my line manager made to my calendar
+      if (target === me && myLineMgr && by === myLineMgr) show = true;
+      if (!show) continue;
+      const id = holidayEventId(e);
+      if (seenHolidayEvents.has(id)) continue;
+      out.push({ ...e, id });
+    }
+    out.sort((a, b) => (a.changed_at < b.changed_at ? 1 : -1));
+    return out;
+  }
+  function renderHolidayNotifications() {
+    const events = collectHolidayNotifications();
+    const btn  = document.getElementById("hdNotifBtn");
+    const list = document.getElementById("hdNotifList");
+    if (!btn || !list) return;
+    btn.setAttribute("data-count", String(events.length));
+    if (!events.length) {
+      list.innerHTML = `<div class="hd-notif-empty">Nothing new.</div>`;
+      return;
+    }
+    list.innerHTML = events.slice(0, 30).map(ev => {
+      const dayLabel = new Date(ev.date + "T00:00:00").toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+      const from = STATUS_LABEL[ev.from] || ev.from || "default";
+      const to   = STATUS_LABEL[ev.to]   || ev.to   || "default";
+      const actor = displayName(ev.changed_by);
+      const targetEmail = (ev.user_email || "").toLowerCase();
+      const isMine = targetEmail === viewerEmail.toLowerCase();
+      const line = isMine
+        ? `<strong>${escapeHtml(actor)}</strong> changed your <strong>${escapeHtml(dayLabel)}</strong> from <em>${escapeHtml(from)}</em> to <em>${escapeHtml(to)}</em>.`
+        : `<strong>${escapeHtml(actor)}</strong> changed <strong>${escapeHtml(displayName(ev.user_email))}</strong>'s <strong>${escapeHtml(dayLabel)}</strong> from <em>${escapeHtml(from)}</em> to <em>${escapeHtml(to)}</em>.`;
+      const tsLabel = ev.changed_at ? new Date(ev.changed_at).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
+      const href = `?user=${encodeURIComponent(targetEmail)}&date=${encodeURIComponent(ev.date)}`;
+      return `<a class="hd-notif-item" href="${escapeHtml(href)}" data-notif-id="${escapeHtml(ev.id)}" data-target-email="${escapeHtml(targetEmail)}" data-target-date="${escapeHtml(ev.date)}">
+        <div>${line}</div>
+        <div class="hd-notif-item-time">${escapeHtml(tsLabel)}</div>
+      </a>`;
+    }).join("");
+    list.querySelectorAll("[data-notif-id]").forEach(a => {
+      a.addEventListener("click", e => {
+        e.preventDefault();
+        const id = a.dataset.notifId;
+        const target = a.dataset.targetEmail;
+        const date   = a.dataset.targetDate;
+        markHolidayEventSeen(id);
+        document.getElementById("hdNotifPanel").classList.remove("is-open");
+        jumpToHolidayDay(target, date);
+      });
+    });
+  }
+  async function markHolidayEventSeen(id) {
+    if (!id || seenHolidayEvents.has(id)) return;
+    seenHolidayEvents.add(id);
+    renderHolidayNotifications();
+    try {
+      await fetch(`${HD_API}/seen-event`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ event_id: id }),
+      });
+    } catch (e) { /* non-fatal */ }
+  }
+  function setupHolidayNotifications() {
+    const btn = document.getElementById("hdNotifBtn");
+    const panel = document.getElementById("hdNotifPanel");
+    const mark = document.getElementById("hdNotifMark");
+    if (!btn) return;
+    btn.addEventListener("click", e => {
+      e.stopPropagation();
+      panel.classList.toggle("is-open");
+    });
+    document.addEventListener("click", e => {
+      if (!panel.contains(e.target) && e.target !== btn) panel.classList.remove("is-open");
+    });
+    if (mark) mark.addEventListener("click", async () => {
+      const events = collectHolidayNotifications();
+      for (const ev of events) await markHolidayEventSeen(ev.id);
+    });
+    renderHolidayNotifications();
+  }
+  // Switch to the right view, select the target user, scroll the matching
+  // cell into view, add a pulsing brass highlight for ~6 s. Used by
+  // notification clicks and by the ?user=&date= deep-link.
+  function jumpToHolidayDay(email, iso) {
+    if (!email || !iso) return;
+    const target = (email || "").toLowerCase();
+    const me = viewerEmail.toLowerCase();
+    if (target === me) {
+      currentView = "own";
+      selectedEmail = me;
+    } else if (directReports.has(target)) {
+      currentView = "team";
+    } else {
+      // Admin viewing someone outside their reports — own view of that person.
+      currentView = "own";
+      selectedEmail = target;
+      const sel = document.getElementById("hdPerson");
+      if (sel) sel.value = target;
+    }
+    // Update URL without reloading
+    const url = new URL(location.href);
+    url.searchParams.set("user", target);
+    url.searchParams.set("date", iso);
+    history.replaceState({}, "", url.toString());
+    renderAll();
+    // Defer until renderAll has populated the DOM
+    requestAnimationFrame(() => {
+      const sel = `.hd-team-month-person[data-email="${target.replace(/"/g, '\\"')}"] .hd-team-cell[data-date="${iso}"], .hd-day[data-date="${iso}"]`;
+      const cells = document.querySelectorAll(sel);
+      cells.forEach(c => {
+        c.classList.add("hd-pulse-highlight");
+        c.scrollIntoView({ behavior: "smooth", block: "center" });
+        setTimeout(() => c.classList.remove("hd-pulse-highlight"), 7000);
+      });
+    });
+  }
+
   function setupViewTabs() {
     const wrap = document.getElementById("hdViewTabs");
     const count = document.getElementById("hdTeamCount");
@@ -2302,6 +2552,7 @@
         holidaysDoc.log = (holidaysDoc.log || []);
         holidaysDoc.log.push(data.log_entry);
         renderLog();
+        renderHolidayNotifications();
       }
       holidaysDoc.updated_at = data && data.updated_at || holidaysDoc.updated_at;
       banner("Saved");
