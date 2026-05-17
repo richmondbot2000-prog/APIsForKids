@@ -288,6 +288,28 @@ export default {
       return json(result, result.ok ? 200 : 400, req);
     }
 
+    // People table CRUD — no Google token needed, just GitHub.
+    if (action === "people-set" || action === "people-delete") {
+      let result;
+      try {
+        result = (action === "people-set")
+          ? await doPeopleSet(env, body, actor)
+          : await doPeopleDelete(env, body, actor);
+      } catch (e) {
+        result = { ok: false, error: e.message };
+      }
+      try {
+        await appendAudit(env, {
+          ts: new Date().toISOString(),
+          actor, action,
+          target: (body.id || body.main_google_email || "").toLowerCase(),
+          ok: !!result.ok,
+          ...(result.ok ? {} : { error: String(result.error || "").slice(0, 300) }),
+        });
+      } catch (e) {}
+      return json(result, result.ok ? 200 : 400, req);
+    }
+
     if (!env.GOOGLE_SERVICE_ACCOUNT_JSON) {
       return json({ error: "GOOGLE_SERVICE_ACCOUNT_JSON secret not configured" }, 500, req);
     }
@@ -1262,6 +1284,154 @@ async function modifyAdminList(env, action, targetRaw, actor) {
     return { ok: false, error: `failed to commit admins.json (${putRes.status}): ${detail}` };
   }
   return { ok: true, admins, target, action };
+}
+
+/* ----------- People table (people.json in repo) -----------
+ *
+ * The canonical Person record per human. Other systems (Wall, Holidays,
+ * Directory, /directory/<slug> profile pages) should resolve identity
+ * through this table rather than through raw Workspace accounts.
+ *
+ * doPeopleSet:  PATCH-or-create. body = { id, ...fields }. Missing
+ *               fields are preserved; explicit nulls clear them.
+ * doPeopleDelete: remove by id.
+ */
+const PEOPLE_PATH = "people.json";
+const PEOPLE_ALLOWED_FIELDS = new Set([
+  "name", "given", "family", "aliases",
+  "main_google_email", "alt_google_emails", "external_google_email",
+  "auth0_id",
+  "access_level", "company", "title", "department",
+  "phone", "address", "start_date",
+  "line_manager_id", "line_manager_email_raw",
+  "role", "notes",
+  "directory_photo_uploaded_at",
+  "suspended", "deletion_time",
+]);
+const PEOPLE_ACCESS_LEVELS = new Set(["admin", "staff", "agent", "outsider", "former"]);
+
+async function fetchPeopleFile(env) {
+  const ghHeaders = {
+    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "apifk-workspace-worker",
+  };
+  const res = await fetch(
+    `https://api.github.com/repos/${REPO}/contents/${PEOPLE_PATH}?ref=${BRANCH}`,
+    { headers: ghHeaders },
+  );
+  if (res.status === 404) {
+    return { sha: null, file: { schema_version: 1, updated_at: null, people: [] } };
+  }
+  if (!res.ok) throw new Error(`people.json GET failed: ${res.status}`);
+  const data = await res.json();
+  let file;
+  try {
+    const bin = atob((data.content || "").replace(/\s/g, ""));
+    file = JSON.parse(new TextDecoder("utf-8").decode(Uint8Array.from(bin, c => c.charCodeAt(0))));
+  } catch (e) {
+    throw new Error("people.json could not be parsed: " + e.message);
+  }
+  if (!Array.isArray(file.people)) file.people = [];
+  return { sha: data.sha, file };
+}
+
+async function commitPeopleFile(env, file, sha, message) {
+  file.schema_version = 1;
+  file.updated_at = new Date().toISOString();
+  file.people.sort((a, b) => ((a.name || "").toLowerCase().localeCompare((b.name || "").toLowerCase())) || (a.id || "").localeCompare(b.id || ""));
+  const body = JSON.stringify(file, null, 2) + "\n";
+  const ghHeaders = {
+    "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+    "Accept": "application/vnd.github+json",
+    "User-Agent": "apifk-workspace-worker",
+    "Content-Type": "application/json",
+  };
+  const res = await fetch(`https://api.github.com/repos/${REPO}/contents/${PEOPLE_PATH}`, {
+    method: "PUT",
+    headers: ghHeaders,
+    body: JSON.stringify({ message, content: b64Encode(body), branch: BRANCH, sha: sha || undefined }),
+  });
+  if (!res.ok) {
+    const detail = (await res.text()).slice(0, 200);
+    throw new Error(`people.json commit failed (${res.status}): ${detail}`);
+  }
+}
+
+function normalisePeoplePatch(patch) {
+  const out = {};
+  for (const k of Object.keys(patch || {})) {
+    if (!PEOPLE_ALLOWED_FIELDS.has(k)) continue;
+    let v = patch[k];
+    if (Array.isArray(v)) {
+      v = Array.from(new Set(
+        v.map(x => (x || "").toString().trim()).filter(Boolean)
+         .map(x => k.endsWith("_emails") || k.endsWith("_email") || k === "aliases" ? x.toLowerCase() : x)
+      ));
+    } else if (typeof v === "string") {
+      v = v.trim();
+      if (k.endsWith("_email") || k.endsWith("_emails") || k === "id") v = v.toLowerCase();
+    }
+    out[k] = v;
+  }
+  if (out.access_level && !PEOPLE_ACCESS_LEVELS.has(out.access_level)) {
+    throw new Error(`invalid access_level: ${out.access_level}`);
+  }
+  return out;
+}
+
+async function doPeopleSet(env, body, actor) {
+  if (!env.GITHUB_TOKEN) return { ok: false, error: "GITHUB_TOKEN not configured" };
+  const id = ((body || {}).id || "").toString().trim().toLowerCase();
+  if (!id) return { ok: false, error: "missing id" };
+
+  const patch = normalisePeoplePatch(body);
+  delete patch.id; // id is structural, not a field-patch target
+
+  const { sha, file } = await fetchPeopleFile(env);
+  const now = new Date().toISOString();
+  let person = file.people.find(p => (p.id || "").toLowerCase() === id);
+  let created = false;
+  if (!person) {
+    person = {
+      id, name: "", given: "", family: "", aliases: [],
+      main_google_email: "", alt_google_emails: [], external_google_email: "",
+      auth0_id: "", access_level: "staff", company: "",
+      title: "", department: "",
+      phone: "", address: "", start_date: "",
+      line_manager_id: "", line_manager_email_raw: "",
+      role: "", notes: "",
+      directory_photo_uploaded_at: "",
+      created_at: now, updated_at: now,
+    };
+    file.people.push(person);
+    created = true;
+  }
+  // main_google_email is required on first save.
+  if (created && !patch.main_google_email && !person.main_google_email) {
+    file.people.pop();
+    return { ok: false, error: "main_google_email is required for new people" };
+  }
+  Object.assign(person, patch, { updated_at: now });
+
+  const msg = created
+    ? `People: create ${id} (by ${actor})`
+    : `People: update ${id} (by ${actor})`;
+  await commitPeopleFile(env, file, sha, msg);
+  return { ok: true, person, created };
+}
+
+async function doPeopleDelete(env, body, actor) {
+  if (!env.GITHUB_TOKEN) return { ok: false, error: "GITHUB_TOKEN not configured" };
+  const id = ((body || {}).id || "").toString().trim().toLowerCase();
+  if (!id) return { ok: false, error: "missing id" };
+
+  const { sha, file } = await fetchPeopleFile(env);
+  const before = file.people.length;
+  file.people = file.people.filter(p => (p.id || "").toLowerCase() !== id);
+  if (file.people.length === before) return { ok: true, no_op: true, message: `no person with id ${id}` };
+  await commitPeopleFile(env, file, sha, `People: delete ${id} (by ${actor})`);
+  return { ok: true, deleted: id };
 }
 
 /* ----------- Pending Drive + Mail transfers ----------- */
