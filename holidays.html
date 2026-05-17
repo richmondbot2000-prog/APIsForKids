@@ -453,6 +453,12 @@
   .hd-team {
     margin: 0 0 24px;
     background: var(--paper-50, white);
+    /* Calendar locks to a minimum width (~2× the legacy mobile layout)
+       so every cell stays large enough to read. On screens narrower
+       than that the whole strip scrolls horizontally as one unit;
+       wider screens see the date cells expand to fill space. */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .hd-team-empty {
     padding: 18px 24px;
@@ -494,10 +500,11 @@
   .hd-team-month-dates,
   .hd-team-month-person {
     display: grid;
-    grid-template-columns: 180px repeat(42, minmax(0, 1fr));
+    grid-template-columns: 180px repeat(42, minmax(16px, 1fr));
     gap: 0;
     align-items: stretch;
     background: transparent;
+    min-width: 852px;
   }
   .hd-team-cell.is-pad,
   .hd-team-month-date.is-pad,
@@ -508,6 +515,7 @@
     display: flex; flex-direction: column;
     gap: 0;
     padding: 0;
+    min-width: 852px;
   }
   .hd-team-month:first-of-type { margin-top: 0; }
   .hd-team-month-dow {
