@@ -1728,9 +1728,21 @@
       return;
     }
 
+    // Drop off-payroll directs entirely — no row at all (the old
+    // grey-disabled placeholder added noise to the calendar). The Team
+    // tab count is rewritten here to match the filtered list.
     const reports = [...directReports]
+      .filter(e => isOnPayroll(e))
       .map(e => ({ email: e, user: staffByEmail[e] || { email: e, name: e } }))
       .sort((a, b) => (a.user.name || a.email).localeCompare(b.user.name || b.email));
+
+    const countEl = document.getElementById("hdTeamCount");
+    if (countEl) countEl.textContent = String(reports.length);
+
+    if (!reports.length) {
+      root.innerHTML = `<div class="hd-team-empty">None of your direct reports are on payroll yet.</div>`;
+      return;
+    }
 
     // Enumerate the fiscal-year months as (year, month0) pairs.
     const months = [];
