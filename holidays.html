@@ -386,78 +386,62 @@
      cells are empty pads. Because every row starts on Sunday, day-of-
      week columns line up vertically across all 12 months — column N
      is always (N % 7) day-of-week. */
+  /* Centered month title above each block — replaces the corner label.
+     Click toggles the is-collapsed state on the parent. */
+  .hd-team-month-title {
+    text-align: center;
+    font: 600 18px/1.2 var(--font-body, 'Inter', sans-serif);
+    color: var(--ink-900);
+    margin: 22px 0 10px;
+    padding: 4px 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .hd-team-month-title::before {
+    content: "▾";
+    color: var(--brass-600, #A47829);
+    margin-right: 10px;
+    font-size: 11px;
+    vertical-align: 2px;
+  }
+  .hd-team-month.is-collapsed .hd-team-month-title::before { content: "▸"; }
+  .hd-team-month.is-collapsed .hd-team-month-dow,
+  .hd-team-month.is-collapsed .hd-team-month-dates,
+  .hd-team-month.is-collapsed .hd-team-month-person { display: none; }
+  /* The grid rows themselves — no gridline backgrounds, just whitespace.
+     The first column is the person name; cells follow as a 42-column
+     calendar matrix. */
   .hd-team-month-dow,
   .hd-team-month-dates,
   .hd-team-month-person {
     display: grid;
     grid-template-columns: 180px repeat(42, minmax(0, 1fr));
-    gap: 1px;
+    gap: 0;
     align-items: stretch;
-    background: var(--ink-300, #B6BECF);
-  }
-  /* Pad cells go transparent so the month boundaries read as gaps. */
-  .hd-team-cell.is-pad,
-  .hd-team-month-date.is-pad,
-  .hd-team-month-dow .is-pad {
     background: transparent;
   }
+  .hd-team-cell.is-pad,
+  .hd-team-month-date.is-pad,
+  .hd-team-month-dow .is-pad { background: transparent; }
   .hd-team-month {
-    margin-top: 12px;
-    background: var(--ink-300, #B6BECF);
-    /* Stack child grids (DOW row, dates row, N person rows) with a
-       1 px gap so the ink-300 background shows through between every
-       row — matches the in-row gridlines for consistent ledger feel. */
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    padding: 1px 0;
+    margin-top: 8px;
+    background: transparent;
+    display: flex; flex-direction: column;
+    gap: 0;
+    padding: 0;
   }
   .hd-team-month:first-of-type { margin-top: 0; }
   .hd-team-month-dow {
-    font: 600 9px/1 var(--font-mono, 'JetBrains Mono', monospace);
-    color: var(--ink-700);
-    letter-spacing: 0.06em;
+    font: 600 10px/1 var(--font-body, 'Inter', sans-serif);
+    color: var(--ink-500);
+    letter-spacing: 0.05em;
     text-transform: uppercase;
   }
-  .hd-team-month-dow > * {
-    background: var(--paper-50, white);
-    text-align: center;
-    padding: 5px 0 3px;
-  }
+  .hd-team-month-dow > * { background: transparent; text-align: center; padding: 4px 0; }
   .hd-team-month-dow .is-weekend-dow { color: var(--brass-600, #A47829); }
-  /* Top-left cell carries the month name. Always clickable — the
-     caret toggles is-collapsed on the parent .hd-team-month block. */
-  .hd-team-month-label {
-    background: var(--paper-50, white);
-    padding: 5px 10px !important;
-    text-align: left !important;
-    font: italic 600 13px/1.2 var(--font-display, 'Newsreader', serif) !important;
-    color: var(--ink-900);
-    text-transform: none !important;
-    letter-spacing: 0 !important;
-    grid-row: span 2;
-    display: flex; align-items: center;
-    cursor: pointer;
-    user-select: none;
-  }
-  .hd-team-month-label::before {
-    content: "▾";
-    color: var(--brass-600, #A47829);
-    margin-right: 8px;
-    font-size: 10px;
-    line-height: 1;
-  }
-  .hd-team-month.is-collapsed .hd-team-month-label::before { content: "▸"; }
-  /* Collapsed state: hide the DOW cells, dates row, and person rows.
-     The label spans the full width on its own row. */
-  .hd-team-month.is-collapsed .hd-team-month-dow {
-    grid-template-columns: 1fr;
-  }
-  .hd-team-month.is-collapsed .hd-team-month-dow > *:not(.hd-team-month-label),
-  .hd-team-month.is-collapsed .hd-team-month-dates,
-  .hd-team-month.is-collapsed .hd-team-month-person {
-    display: none;
-  }
+  /* Legacy corner-label class — kept so the old JS works; visually hidden
+     since the title now lives above. */
+  .hd-team-month-label { display: none; }
   .hd-team-month-dates {
     font: 600 11px/1 var(--font-mono, 'JetBrains Mono', monospace);
     color: var(--ink-700);
@@ -474,10 +458,16 @@
   }
   .hd-team-month-name {
     padding: 4px 10px;
-    font: 500 12px/1.2 var(--font-display, 'Newsreader', serif);
+    font: 500 12px/1.2 var(--font-body, 'Inter', sans-serif);
     color: var(--ink-900);
     display: flex; align-items: center;
-    background: var(--paper-50, white);
+    background: transparent;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .hd-team-month-name .tb-profile-link {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
   /* Profile link styling — used wherever a user's name appears as a link
      to user.html (team view, activity view, changelog, page header). */
@@ -492,45 +482,52 @@
     color: #2c6cb8; text-decoration: underline;
   }
   .hd-team-cell {
-    height: 22px;
+    height: 24px;
     cursor: pointer;
     position: relative;
-    background: var(--paper-50, white);
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    font: 500 11px/1 var(--font-body, 'Inter', sans-serif);
+    color: var(--ink-700);
   }
-  .hd-team-cell.is-empty { cursor: default; background: var(--paper-50, white); }
-  .hd-team-cell:hover:not(.is-empty) {
-    outline: 2px solid var(--ink-900, #11192E); outline-offset: -2px; z-index: 1;
+  .hd-team-cell.is-empty { cursor: default; background: transparent; }
+  .hd-team-cell:hover:not(.is-empty):not(.is-pad) {
+    outline: 1px solid var(--ink-900, #11192E); outline-offset: -1px; z-index: 1;
   }
-  .hd-team-cell[data-status="office"]            { background: #6FA94A; }
-  .hd-team-cell[data-status="wfh"]               { background: #2F8F87; }
-  .hd-team-cell[data-status="non-working"]       { background: #8B95A6; }
-  .hd-team-cell[data-status="holiday"]           { background: #E8A82A; }
-  .hd-team-cell[data-status="part-paid-unpaid"]  { background: linear-gradient(180deg,#6FA94A 0 50%,#8B95A6 50% 100%); }
-  .hd-team-cell[data-status="part-holiday-paid"] { background: linear-gradient(180deg,#E8A82A 0 50%,#6FA94A 50% 100%); }
-  /* Legacy half-* statuses kept for old records. */
-  .hd-team-cell[data-status="half-am"]           { background: linear-gradient(180deg,#E8A82A 0 50%,#6FA94A 50% 100%); }
-  .hd-team-cell[data-status="half-pm"]           { background: linear-gradient(180deg,#6FA94A 0 50%,#E8A82A 50% 100%); }
-  .hd-team-cell[data-status="sick"]              { background: #C0392B; }
-  /* Maternity + Approved Holiday → yellow base + centred letter. */
-  .hd-team-cell[data-status="maternity"]         { background: #E8A82A; }
-  .hd-team-cell[data-status="approved-holiday"]  { background: #E8A82A; }
-  .hd-team-cell[data-status="maternity"]::after,
-  .hd-team-cell[data-status="approved-holiday"]::after {
-    content: attr(data-mark);
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font: 700 12px/1 var(--font-mono, 'JetBrains Mono', monospace);
-    color: var(--ink-900);
+  /* Subtle status palette — same hues as the old saturated set, mixed
+     ~55 % with paper so they sit against white space instead of
+     fighting it (per the user's "subtle colours" note). */
+  .hd-team-cell[data-status="office"]            { background: #B5CFA4; }
+  .hd-team-cell[data-status="wfh"]               { background: #97CCC8; }
+  .hd-team-cell[data-status="non-working"]       { background: #D8DCE2; color: var(--ink-500); }
+  .hd-team-cell[data-status="holiday"]           { background: #F5D89D; }
+  .hd-team-cell[data-status="part-paid-unpaid"]  { background: linear-gradient(180deg,#B5CFA4 0 50%,#D8DCE2 50% 100%); }
+  .hd-team-cell[data-status="part-holiday-paid"] { background: linear-gradient(180deg,#F5D89D 0 50%,#B5CFA4 50% 100%); }
+  .hd-team-cell[data-status="half-am"]           { background: linear-gradient(180deg,#F5D89D 0 50%,#B5CFA4 50% 100%); }
+  .hd-team-cell[data-status="half-pm"]           { background: linear-gradient(180deg,#B5CFA4 0 50%,#F5D89D 50% 100%); }
+  .hd-team-cell[data-status="sick"]              { background: #E5A8A2; }
+  .hd-team-cell[data-status="maternity"]         { background: #F5D89D; }
+  .hd-team-cell[data-status="approved-holiday"]  { background: #F5D89D; }
+  .hd-team-cell[data-default-bh="1"]             { background: #F5D89D; }
+  .hd-team-cell.is-weekend-default { background: #ECEEF1; color: var(--ink-300); }
+  .hd-team-cell.is-bh-default      { background: #F5D89D; opacity: 0.85; }
+  .hd-team-cell.is-today { box-shadow: inset 0 0 0 1.5px var(--ink-900, #11192E); }
+  /* Date number inside every in-month cell (set by JS via data-num).
+     Maternity / Approved Holiday replace the date with M / A. */
+  .hd-team-cell[data-num]::before {
+    content: attr(data-num);
+    font: 500 10px/1 var(--font-body, 'Inter', sans-serif);
+    color: var(--ink-700);
     pointer-events: none;
   }
-  .hd-team-cell[data-default-bh="1"]       { background: #E8A82A; }
-  .hd-team-cell.is-today { box-shadow: inset 0 0 0 2px var(--ink-900, #11192E); }
-  .hd-team-cell.is-weekend-default { background: #8B95A6; opacity: 0.7; }
-  .hd-team-cell.is-bh-default      { background: #E8A82A; opacity: 0.9; }
-  .hd-team-cell.has-note::before {
+  .hd-team-cell[data-status="maternity"][data-mark]::before,
+  .hd-team-cell[data-status="approved-holiday"][data-mark]::before {
+    content: attr(data-mark);
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--ink-900);
+  }
+  .hd-team-cell.has-note::after {
     content: "";
     position: absolute;
     top: 2px; right: 2px;
@@ -546,56 +543,35 @@
   }
 
   /* ── Mobile team view (≤720 px) ──────────────────────────────────
-     Keep the desktop matrix — that's the whole point of this view
-     (scan vertically down a day column to see who's in). On a phone
-     we just shrink everything: 40 px name column, 7-8 px wide day
-     cells, smaller fonts. A full month of 10 direct reports stays
-     visible in one block. Earlier per-person-stack layout dropped
-     the column-glance pattern entirely; this matrix preserves it. */
+     Same per-month matrix as desktop, just compressed. Centered title,
+     subtle colours, no gridlines — the visual cleanup applies on both
+     widths. The alternative mobile container (.hd-team-mobile) is left
+     hidden; the desktop matrix scales down. */
   .hd-team-mobile { display: none !important; }
   @media (max-width: 720px) {
     .hd-team-month-dow,
     .hd-team-month-dates,
     .hd-team-month-person {
-      grid-template-columns: 44px repeat(42, minmax(0, 1fr));
+      grid-template-columns: 56px repeat(42, minmax(0, 1fr));
     }
-    .hd-team-cell { height: 16px; }
-    .hd-team-month { margin-top: 8px; padding: 1px 0; }
-    .hd-team-month-label {
-      padding: 4px 6px !important;
-      font: italic 600 11px/1.1 var(--font-display, 'Newsreader', serif) !important;
+    .hd-team-cell { height: 18px; }
+    .hd-team-cell[data-num]::before { font-size: 8px; }
+    .hd-team-cell[data-status="maternity"][data-mark]::before,
+    .hd-team-cell[data-status="approved-holiday"][data-mark]::before { font-size: 9px; }
+    .hd-team-month-title {
+      font-size: 16px; margin: 16px 0 6px;
     }
-    .hd-team-month-label::before { font-size: 8px; margin-right: 5px; }
-    .hd-team-month-dow > * { padding: 2px 0; font-size: 8px; letter-spacing: 0; }
-    .hd-team-month-dates {
-      font: 500 8px/1 var(--font-mono, 'JetBrains Mono', monospace);
-    }
-    .hd-team-month-dates > * { padding: 1px 0; }
-    /* Names: first ~5 chars + ellipsis. Full name still in the
-       profileLink anchor's underlying text for screen readers and the
-       browser tooltip. */
+    .hd-team-month-dow > * { padding: 2px 0; font-size: 9px; }
     .hd-team-month-name {
       padding: 0 4px;
-      font: 500 10px/1.1 var(--font-display, 'Newsreader', serif);
-      overflow: hidden;
+      font-size: 10px;
     }
-    .hd-team-month-name .tb-profile-link {
-      display: block;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .hd-team-cell.has-note::before {
+    .hd-team-cell.has-note::after {
       width: 3px; height: 3px; top: 1px; right: 1px;
-    }
-    /* Status marks (A for approved-holiday, M for maternity) need to
-       shrink with the cell. */
-    .hd-team-cell[data-status="maternity"]::after,
-    .hd-team-cell[data-status="approved-holiday"]::after {
-      font-size: 8px;
     }
   }
   .hd-team-month-person.is-not-on-payroll .hd-team-cell::after { content: none !important; }
+  .hd-team-month-person.is-not-on-payroll .hd-team-cell::before { content: none !important; }
   .hd-team-month-person.is-not-on-payroll .hd-team-month-name {
     color: var(--ink-500);
     font-style: italic;
@@ -1457,15 +1433,20 @@
         return (n >= 1 && n <= daysInMonth) ? n : 0;
       };
 
-      // Row 1 — month label + DOW initials. Initials are S/M/T/W/T/F/S
-      // repeating because every row is Sunday-anchored at column 0.
+      // Centered month title above the grid — replaces the old corner
+      // label. Click toggles is-collapsed.
+      const title = document.createElement("h3");
+      title.className = "hd-team-month-title";
+      title.textContent = monthLabel;
+      title.addEventListener("click", () => block.classList.toggle("is-collapsed"));
+      block.appendChild(title);
+
+      // DOW row (S M T W T F S × 6 weeks). First column is the name
+      // spacer; subsequent 42 cells are the DOW initials.
       const dowRow = document.createElement("div");
       dowRow.className = "hd-team-month-dow";
-      const lab = document.createElement("div");
-      lab.className = "hd-team-month-label";
-      lab.textContent = monthLabel;
-      lab.addEventListener("click", () => block.classList.toggle("is-collapsed"));
-      dowRow.appendChild(lab);
+      const spacer = document.createElement("div");
+      dowRow.appendChild(spacer);
       for (let i = 0; i < COLS; i++) {
         const cell = document.createElement("div");
         const dn = dayNumForCol(i);
@@ -1479,29 +1460,6 @@
         dowRow.appendChild(cell);
       }
       block.appendChild(dowRow);
-
-      // Row 2 — date numbers. Spacer in column 1 keeps the grid aligned
-      // (the month label sat in the label slot of the DOW row above).
-      const dateRow = document.createElement("div");
-      dateRow.className = "hd-team-month-dates";
-      const spacer = document.createElement("div");
-      spacer.style.visibility = "hidden";
-      spacer.textContent = " ";
-      dateRow.appendChild(spacer);
-      for (let i = 0; i < COLS; i++) {
-        const cell = document.createElement("div");
-        cell.className = "hd-team-month-date";
-        const dn = dayNumForCol(i);
-        if (dn === 0) {
-          cell.classList.add("is-pad");
-        } else {
-          const iso = isoDate(new Date(y, m, dn));
-          cell.textContent = String(dn);
-          if (iso === todayIso) cell.classList.add("is-today");
-        }
-        dateRow.appendChild(cell);
-      }
-      block.appendChild(dateRow);
 
       // One row per direct report.
       for (const r of reports) {
@@ -1541,6 +1499,7 @@
           const isWeekend = (dow === 0 || dow === 6);
           const isBh = UK_BANK_HOLIDAYS.has(iso);
           cell.dataset.date = iso;
+          cell.dataset.num = String(dn);   // date shown inside the cell
           if (stored) {
             cell.dataset.status = stored;
             if (STATUS_MARK[stored]) cell.dataset.mark = STATUS_MARK[stored];
