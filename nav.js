@@ -57,6 +57,15 @@
   if (!bar) return;
   if (bar.querySelector('.qb-me')) return;
 
+  // Move the hamburger to the end of the topbar so it always sits as
+  // the second-to-last child, immediately before the avatar chip we're
+  // about to append. This makes the right-edge cluster a pure DOM-order
+  // arrangement instead of relying on flex `order` alone (which some
+  // mobile browsers ignore when `position: fixed` siblings are in the
+  // mix). Brand stays at the left, drawer is fixed-positioned anyway.
+  const hamburger = bar.querySelector('.qb-hamburger');
+  if (hamburger) bar.appendChild(hamburger);
+
   // One-time stylesheet — kept tiny so it doesn't fight quiet.css.
   // `order: 99` keeps the chip last in the flex bar regardless of
   // where in DOM order we appended it (so mobile + desktop both keep

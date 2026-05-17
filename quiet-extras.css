@@ -267,11 +267,12 @@ body.nav-open .qb-nav-backdrop {
 @media (max-width: 960px) {
   .qb-topbar { height: 64px; padding: 0 12px; }
   .qb-brand-logo { height: 42px; }
-  /* Hamburger anchors to the right, immediately before the avatar
-     chip (which nav.js renders last with `order: 99`). `margin-left:
-     auto` consumes the free space between brand and the right cluster
-     so the two right-edge controls sit together. */
-  .qb-hamburger { display: block; order: 98; margin-left: auto; }
+  /* Hamburger anchors to the right, immediately before the avatar.
+     nav.js re-parents the hamburger to the end of the topbar so DOM
+     order is brand → drawer (fixed) → hamburger → avatar; `margin-left:
+     auto` then eats the gap so the brand stays at the left and the
+     hamburger + avatar cluster sits flush against the right edge. */
+  .qb-hamburger { display: block !important; margin-left: auto !important; }
 
   .qb-nav-backdrop { inset: 64px 0 0 0; }
 
