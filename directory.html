@@ -485,7 +485,7 @@
     const moreAlts = (p.alt_google_emails || []).length > 2 ? ` <span class="alt">+${(p.alt_google_emails||[]).length - 2}</span>` : "";
     const altLine = alts ? `<div class="alt">${escapeHtml(alts)}${moreAlts}</div>` : "";
     return `
-      <div class="pp-row${expandedId === p.id ? " is-expanded" : ""}" data-id="${escapeHtml(p.id)}">
+      <div class="pp-row${String(expandedId) === String(p.id) ? " is-expanded" : ""}" data-id="${escapeHtml(p.id)}">
         <div class="pp-avatar">${avatarHtml(p)}</div>
         <div>
           <div class="pp-name">${escapeHtml(p.name || p.id)}</div>
@@ -498,8 +498,8 @@
         <div class="pp-src-chips">${sourceChipsHtml(p)}</div>
         <div><span class="pp-pill ${pillClass(p.access_level)}">${escapeHtml(p.access_level || "—")}</span></div>
         <div><span class="pp-pill pp-pill--${status}">${statusLabel(p)}</span></div>
-        <div><a class="pp-btn pp-btn--ghost" href="/directory/${escapeHtml(emailToSlug(p.main_google_email))}" onclick="event.stopPropagation();">Open</a></div>
-        ${expandedId === p.id ? detailHtml(p) : ""}
+        <div><a class="pp-btn pp-btn--ghost" href="/directory/${escapeHtml(p.url_slug || emailToSlug(p.main_google_email))}" onclick="event.stopPropagation();">Open</a></div>
+        ${String(expandedId) === String(p.id) ? detailHtml(p) : ""}
       </div>`;
   }
 
@@ -507,7 +507,7 @@
     if (!email) return "";
     // Per-account actions (suspend, forward, transfer, delete) now live
     // inline on the Person's page; Manage drops you straight there.
-    const ssoLink = `/directory/${encodeURIComponent(((p.main_google_email||"").split("@")[0]||"").toLowerCase())}#accounts`;
+    const ssoLink = `/directory/${encodeURIComponent(p.url_slug || ((p.main_google_email||"").split("@")[0]||"").toLowerCase())}#accounts`;
     return `
       <div class="pp-account">
         <div>
@@ -523,11 +523,11 @@
   }
 
   function detailHtml(p) {
-    const lm = people.find(x => x.id === p.line_manager_id);
+    const lm = people.find(x => String(x.id) === String(p).line_manager_id);
     const lmOptions = people
       .filter(x => x.id !== p.id)
       .sort((a,b) => (a.name||"").localeCompare(b.name||""))
-      .map(x => `<option value="${escapeHtml(x.id)}" ${x.id === p.line_manager_id ? "selected" : ""}>${escapeHtml(x.name || x.id)}</option>`)
+      .map(x => `<option value="${escapeHtml(x.id)}" ${String(x.id) === String(p).line_manager_id ? "selected" : ""}>${escapeHtml(x.name || x.id)}</option>`)
       .join("");
     const allGoogle = [p.main_google_email, ...(p.alt_google_emails||[])].filter(Boolean);
 
@@ -678,7 +678,7 @@
       row.addEventListener("click", e => {
         // Don't toggle if click was on a button/input inside the detail.
         if (e.target.closest("input,select,textarea,button,a")) return;
-        expandedId = expandedId === row.dataset.id ? null : row.dataset.id;
+        expandedId = String(expandedId) === String(row.dataset.id) ? null : row.dataset.id;
         render();
       });
     });
@@ -700,7 +700,7 @@
         const input = document.getElementById("addAlt_" + pid);
         const val = (input.value || "").trim().toLowerCase();
         if (!val || !val.includes("@")) { setStatus(pid, "Enter a valid email", true); return; }
-        const p = people.find(x => x.id === pid);
+        const p = people.find(x => String(x.id) === String(pid));
         const next = Array.from(new Set([...(p.alt_google_emails||[]), val])).filter(e => e !== p.main_google_email);
         savePersonField(pid, "alt_google_emails", next, true);
       });
@@ -720,7 +720,7 @@
   }
 
   async function toggleSuspend(pid) {
-    const p = people.find(x => x.id === pid); if (!p) return;
+    const p = people.find(x => String(x.id) === String(pid)); if (!p) return;
     const goingDown = statusOf(p) === "live";
     const verb = goingDown ? "Suspend" : "Reactivate";
     if (!confirm(`${verb} ${p.name}?\n\n${goingDown
@@ -749,7 +749,7 @@
   }
 
   async function savePersonField(pid, field, value, isArray) {
-    const p = people.find(x => x.id === pid); if (!p) return;
+    const p = people.find(x => String(x.id) === String(pid)); if (!p) return;
     let payload = { action: "people-set", id: pid };
     if (field === "aliases" && !Array.isArray(value)) {
       payload[field] = value.split(",").map(s => s.trim()).filter(Boolean);
@@ -773,7 +773,7 @@
   }
 
   async function promoteEmail(pid, email) {
-    const p = people.find(x => x.id === pid); if (!p) return;
+    const p = people.find(x => String(x.id) === String(pid)); if (!p) return;
     if (!confirm(`Make ${email} the main Google account for ${p.name}?\n\nThis is the account that gives them access. The old main (${p.main_google_email}) becomes an alt.`)) return;
     const newAlts = [...(p.alt_google_emails||[]).filter(e => e !== email)];
     if (p.main_google_email && p.main_google_email !== email) newAlts.push(p.main_google_email);
@@ -790,14 +790,14 @@
   }
 
   async function unlinkEmail(pid, email) {
-    const p = people.find(x => x.id === pid); if (!p) return;
+    const p = people.find(x => String(x.id) === String(pid)); if (!p) return;
     if (!confirm(`Remove ${email} from ${p.name}'s person record?\n\nThis does not touch the Google account itself — use Directory > Manage to suspend/delete that.`)) return;
     const newAlts = (p.alt_google_emails||[]).filter(e => e !== email);
     savePersonField(pid, "alt_google_emails", newAlts, true);
   }
 
   async function deletePerson(pid) {
-    const p = people.find(x => x.id === pid); if (!p) return;
+    const p = people.find(x => String(x.id) === String(pid)); if (!p) return;
     if (!confirm(`Delete the Person record for ${p.name}?\n\nThis does NOT delete any Google account — those stay in Workspace and can still be managed in Directory. This only removes the row from the People table.`)) return;
     try {
       const res = await fetch(WORKSPACE_API, {
@@ -831,13 +831,14 @@
       document.getElementById("newStatus").className = "pp-status err";
       return;
     }
-    const id = email.split("@")[0];
+    const url_slug = email.split("@")[0];
     document.getElementById("newStatus").textContent = "Creating…";
     document.getElementById("newStatus").className = "pp-status";
     try {
+      // No id passed — worker auto-assigns the next integer.
       const res = await fetch(WORKSPACE_API, {
         method: "POST", headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ action: "people-set", id, name, main_google_email: email, access_level: acc, company: email.split("@")[1] || "" }),
+        body: JSON.stringify({ action: "people-set", url_slug, name, main_google_email: email, access_level: acc, company: email.split("@")[1] || "" }),
       });
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);

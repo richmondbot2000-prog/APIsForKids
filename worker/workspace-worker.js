@@ -1434,6 +1434,7 @@ async function modifyAdminList(env, action, targetRaw, actor) {
 const PEOPLE_PATH = "people.json";
 const PEOPLE_ALLOWED_FIELDS = new Set([
   "name", "given", "family", "aliases",
+  "url_slug",
   "main_google_email", "alt_google_emails", "external_google_email",
   "auth0_id",
   "access_level", "company", "title", "department",
@@ -1544,33 +1545,74 @@ function normalisePeoplePatch(patch) {
   return out;
 }
 
+// Integer-id primary keys. id is server-assigned on create; url_slug is
+// derived from email local-part with -2 suffix on collision and used as
+// the human-readable URL form (/directory/<slug>). Updates pass id;
+// creates omit id (or pass id=null).
+function nextPersonId(file) {
+  let max = 0;
+  for (const p of file.people || []) {
+    const n = Number(p.id);
+    if (Number.isFinite(n) && n > max) max = n;
+  }
+  return max + 1;
+}
+function pickUrlSlug(file, baseEmail, fallbackName) {
+  const local = (baseEmail || "").toString().split("@")[0].toLowerCase().trim();
+  const fallback = (fallbackName || "").toString().toLowerCase().replace(/[^a-z0-9]+/g, ".").replace(/^\.+|\.+$/g, "");
+  const base = local || fallback || "person";
+  const taken = new Set((file.people || []).map(p => (p.url_slug || "").toLowerCase()));
+  if (!taken.has(base)) return base;
+  let n = 2;
+  while (taken.has(`${base}-${n}`)) n++;
+  return `${base}-${n}`;
+}
+
 async function doPeopleSet(env, body, actor, isAdmin) {
   if (!env.GITHUB_TOKEN) return { ok: false, error: "GITHUB_TOKEN not configured" };
-  const id = ((body || {}).id || "").toString().trim().toLowerCase();
-  if (!id) return { ok: false, error: "missing id" };
+  const rawId = (body || {}).id;
+  const idStr = rawId == null ? "" : String(rawId).trim();
 
   const patch = normalisePeoplePatch(body);
-  delete patch.id; // id is structural, not a field-patch target
+  delete patch.id; // server-managed
+  // url_slug coming from body is allowed but normalise it.
+  if (typeof patch.url_slug === "string") patch.url_slug = patch.url_slug.trim().toLowerCase();
 
   const { sha, file } = await fetchPeopleFile(env);
   const now = new Date().toISOString();
-  let person = file.people.find(p => (p.id || "").toLowerCase() === id);
+  let person = idStr
+    ? file.people.find(p => String(p.id) === idStr)
+    : null;
   let created = false;
   if (!person) {
     if (!isAdmin) return { ok: false, error: "admin required to create a new Person" };
+    if (idStr && Number.isFinite(Number(idStr))) {
+      // Caller passed an id that doesn't match — explicit error rather
+      // than silently creating with a different id.
+      return { ok: false, error: `no Person with id ${idStr}` };
+    }
+    const newId = nextPersonId(file);
+    const newSlug = patch.url_slug || pickUrlSlug(file, patch.main_google_email, patch.name);
     person = {
-      id, name: "", given: "", family: "", aliases: [],
+      id: newId,
+      url_slug: newSlug,
+      name: "", given: "", family: "", aliases: [],
       main_google_email: "", alt_google_emails: [], external_google_email: "",
       auth0_id: "", access_level: "staff", company: "",
       title: "", department: "",
       phone: "", address: "", start_date: "",
-      line_manager_id: "", line_manager_email_raw: "",
+      line_manager_id: null, line_manager_email_raw: "",
       role: "", notes: "",
       directory_photo_uploaded_at: "", cover_photo_uploaded_at: "",
+      suspended: false,
+      on_payroll: false, most_recent_payroll_id: null,
       created_at: now, updated_at: now,
     };
     file.people.push(person);
     created = true;
+    // url_slug was just set; don't let the patch overwrite it unless
+    // explicitly different.
+    if (!patch.url_slug) delete patch.url_slug;
   } else if (!isAdmin) {
     // Self-edit path: actor must own one of this Person's Google emails,
     // and the patch must touch only self-editable fields.
@@ -1581,10 +1623,9 @@ async function doPeopleSet(env, body, actor, isAdmin) {
       if (!PEOPLE_SELF_EDITABLE.has(k)) return { ok: false, error: `field "${k}" is admin-only` };
     }
   }
-  if (created && !patch.main_google_email && !person.main_google_email) {
-    file.people.pop();
-    return { ok: false, error: "main_google_email is required for new people" };
-  }
+  // main_google_email is no longer strictly required — the bulk payroll
+  // import can create a Person from a row that has no Google account
+  // yet (admin fills it in later). We leave it empty by default.
   const accessChanged =
     patch.access_level !== undefined ||
     patch.suspended    !== undefined ||
@@ -1603,9 +1644,9 @@ async function doPeopleSet(env, body, actor, isAdmin) {
   if (turningOnPayroll) {
     try {
       const { sha: paySha, file: payFile } = await fetchPayrollFile(env);
-      const rec = blankPayrollRecord(person, actor, "auto-on-flag");
+      const rec = blankPayrollRecord(person, payFile, actor, "auto-on-flag");
       payFile.records.push(rec);
-      await commitPayrollFile(env, payFile, paySha, `Payroll: auto-create blank for ${person.id} (by ${actor})`);
+      await commitPayrollFile(env, payFile, paySha, `Payroll: auto-create blank #${rec.id} for ${person.name} (#${person.id}) (by ${actor})`);
       person.most_recent_payroll_id = rec.id;
       createdPayrollRecord = rec;
     } catch (e) {
@@ -1616,8 +1657,8 @@ async function doPeopleSet(env, body, actor, isAdmin) {
   }
 
   const msg = created
-    ? `People: create ${id} (by ${actor})`
-    : `People: update ${id} (by ${actor})`;
+    ? `People: create #${person.id} ${person.name || person.url_slug} (by ${actor})`
+    : `People: update #${person.id} ${person.name || person.url_slug} (by ${actor})`;
   await commitPeopleFile(env, file, sha, msg);
 
   // If anything access-relevant changed, refresh admins.json + push the
@@ -1755,8 +1796,13 @@ async function commitPayrollFile(env, file, sha, message) {
   }
 }
 
-function newPayrollId() {
-  return "pay_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
+function nextPayrollId(file) {
+  let max = 0;
+  for (const r of file.records || []) {
+    const n = Number(r.id);
+    if (Number.isFinite(n) && n > max) max = n;
+  }
+  return max + 1;
 }
 
 function normalisePayrollPatch(patch) {
@@ -1773,9 +1819,9 @@ function normalisePayrollPatch(patch) {
 
 // Build a blank payroll record for a Person who's been flagged on_payroll
 // but has no record yet. Caller appends and links most_recent_payroll_id.
-function blankPayrollRecord(person, actor, source) {
+function blankPayrollRecord(person, file, actor, source) {
   return {
-    id: newPayrollId(),
+    id: nextPayrollId(file),
     person_id: person.id,
     employer: "",
     employee_number: "",
@@ -1804,40 +1850,37 @@ function blankPayrollRecord(person, actor, source) {
 // one and applies the patch in a single commit.
 async function doPayrollSet(env, body, actor) {
   if (!env.GITHUB_TOKEN) return { ok: false, error: "GITHUB_TOKEN not configured" };
-  const personId = ((body || {}).person_id || "").toString().trim().toLowerCase();
-  if (!personId) return { ok: false, error: "missing person_id" };
+  const personIdStr = ((body || {}).person_id == null ? "" : String(body.person_id)).trim();
+  if (!personIdStr) return { ok: false, error: "missing person_id" };
 
   const patch = normalisePayrollPatch(body);
 
-  // Load people.json to find the Person and their link.
   const { sha: pSha, file: pFile } = await fetchPeopleFile(env);
-  const person = (pFile.people || []).find(p => (p.id || "").toLowerCase() === personId);
-  if (!person) return { ok: false, error: `person ${personId} not found` };
+  const person = (pFile.people || []).find(p => String(p.id) === personIdStr);
+  if (!person) return { ok: false, error: `person ${personIdStr} not found` };
   if (!person.on_payroll) {
-    return { ok: false, error: `${person.name || personId} is not flagged on_payroll — set that to Yes first` };
+    return { ok: false, error: `${person.name || person.id} is not flagged on_payroll — set that to Yes first` };
   }
 
-  // Load payroll-data.json and find the active record.
   const { sha, file } = await fetchPayrollFile(env);
-  let rec = person.most_recent_payroll_id
-    ? file.records.find(r => r.id === person.most_recent_payroll_id)
+  let rec = (person.most_recent_payroll_id != null)
+    ? file.records.find(r => String(r.id) === String(person.most_recent_payroll_id))
     : null;
   let created = false;
   if (!rec) {
-    rec = blankPayrollRecord(person, actor, "manual");
+    rec = blankPayrollRecord(person, file, actor, "manual");
     file.records.push(rec);
     created = true;
   }
   Object.assign(rec, patch);
-  // Link the Person if we created a new record OR no link existed.
   if (created || person.most_recent_payroll_id !== rec.id) {
     person.most_recent_payroll_id = rec.id;
     person.updated_at = new Date().toISOString();
-    await commitPeopleFile(env, pFile, pSha, `People: link payroll for ${person.id} (by ${actor})`);
+    await commitPeopleFile(env, pFile, pSha, `People: link payroll for ${person.id} (${person.name}) (by ${actor})`);
   }
   await commitPayrollFile(env, file, sha,
-    created ? `Payroll: create blank for ${person.id} + edits (by ${actor})`
-            : `Payroll: edit ${rec.id} (${person.id}) (by ${actor})`);
+    created ? `Payroll: create blank #${rec.id} for ${person.name} (#${person.id}) + edits (by ${actor})`
+            : `Payroll: edit #${rec.id} (${person.name}) (by ${actor})`);
   return { ok: true, record: rec, person_id: person.id, created };
 }
 
@@ -1847,14 +1890,14 @@ async function doPayrollSet(env, body, actor) {
 // URL; loser is absorbed and deleted.
 async function doPeopleMerge(env, body, actor) {
   if (!env.GITHUB_TOKEN) return { ok: false, error: "GITHUB_TOKEN not configured" };
-  const winnerId = ((body || {}).winner_id || "").toString().trim().toLowerCase();
-  const loserId  = ((body || {}).loser_id  || "").toString().trim().toLowerCase();
+  const winnerId = ((body || {}).winner_id == null ? "" : String(body.winner_id)).trim();
+  const loserId  = ((body || {}).loser_id  == null ? "" : String(body.loser_id )).trim();
   if (!winnerId || !loserId) return { ok: false, error: "winner_id and loser_id are both required" };
   if (winnerId === loserId)   return { ok: false, error: "winner and loser must be different" };
 
   const { sha: pSha, file: pFile } = await fetchPeopleFile(env);
-  const winner = pFile.people.find(p => (p.id || "").toLowerCase() === winnerId);
-  const loser  = pFile.people.find(p => (p.id || "").toLowerCase() === loserId);
+  const winner = pFile.people.find(p => String(p.id) === winnerId);
+  const loser  = pFile.people.find(p => String(p.id) === loserId);
   if (!winner) return { ok: false, error: `winner ${winnerId} not found` };
   if (!loser)  return { ok: false, error: `loser  ${loserId}  not found` };
 
@@ -1887,13 +1930,13 @@ async function doPeopleMerge(env, body, actor) {
   winner.updated_at = new Date().toISOString();
 
   // Remove loser from people.json.
-  pFile.people = pFile.people.filter(p => (p.id || "").toLowerCase() !== loserId);
+  pFile.people = pFile.people.filter(p => String(p.id) !== loserId);
 
   // Re-point every PayrollData record from loser → winner.
   let payrollUpdated = 0;
   const { sha: paySha, file: payFile } = await fetchPayrollFile(env);
   for (const r of payFile.records) {
-    if ((r.person_id || "").toLowerCase() === loserId) {
+    if (String(r.person_id) === loserId) {
       r.person_id = winner.id;
       payrollUpdated++;
     }
@@ -1926,15 +1969,15 @@ async function doPeopleMerge(env, body, actor) {
 
 async function doPeopleDelete(env, body, actor) {
   if (!env.GITHUB_TOKEN) return { ok: false, error: "GITHUB_TOKEN not configured" };
-  const id = ((body || {}).id || "").toString().trim().toLowerCase();
-  if (!id) return { ok: false, error: "missing id" };
+  const idStr = ((body || {}).id == null ? "" : String(body.id)).trim();
+  if (!idStr) return { ok: false, error: "missing id" };
 
   const { sha, file } = await fetchPeopleFile(env);
   const before = file.people.length;
-  file.people = file.people.filter(p => (p.id || "").toLowerCase() !== id);
-  if (file.people.length === before) return { ok: true, no_op: true, message: `no person with id ${id}` };
-  await commitPeopleFile(env, file, sha, `People: delete ${id} (by ${actor})`);
-  return { ok: true, deleted: id };
+  file.people = file.people.filter(p => String(p.id) !== idStr);
+  if (file.people.length === before) return { ok: true, no_op: true, message: `no person with id ${idStr}` };
+  await commitPeopleFile(env, file, sha, `People: delete #${idStr} (by ${actor})`);
+  return { ok: true, deleted: idStr };
 }
 
 /* ----------- Pending Drive + Mail transfers ----------- */

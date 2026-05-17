@@ -217,14 +217,34 @@ def match_row(row, by_email, by_name):
 
 
 # ─── PayrollData record build ────────────────────────────────────────
-def new_payroll_id() -> str:
-    rand = "".join(random.choices(string.ascii_lowercase + string.digits, k=6))
-    return f"pay_{int(dt.datetime.now().timestamp())}{rand}"
+def next_payroll_id(payroll_file) -> int:
+    max_id = 0
+    for r in payroll_file.get("records", []):
+        try:
+            n = int(r.get("id"))
+            if n > max_id: max_id = n
+        except (TypeError, ValueError):
+            pass
+    return max_id + 1
 
 
-def build_record(row, person, source: str, actor: str) -> dict:
-    return {
-        "id":              new_payroll_id(),
+def next_person_id(people) -> int:
+    max_id = 0
+    for p in people:
+        try:
+            n = int(p.get("id"))
+            if n > max_id: max_id = n
+        except (TypeError, ValueError):
+            pass
+    return max_id + 1
+
+
+def build_record(row, person, payroll_file, source: str, actor: str) -> dict:
+    new_id = next_payroll_id(payroll_file)
+    # Reserve this id by appending a placeholder so consecutive
+    # build_record calls in the same import don't collide.
+    rec = {
+        "id":              new_id,
         "person_id":       person["id"],
         "employer":        row["employer"],
         "employee_number": row.get("employee_number") or "",
@@ -247,6 +267,22 @@ def build_record(row, person, source: str, actor: str) -> dict:
         "imported_by":     actor,
         "source":          source,
     }
+    payroll_file.setdefault("records", []).append(rec)
+    return rec
+
+
+# Identify rows already present (same person + same employer + same
+# core fields) so re-running a spreadsheet doesn't double-write.
+def existing_match(payroll_file, person_id, row):
+    for r in payroll_file.get("records", []):
+        if r.get("person_id") != person_id: continue
+        if (r.get("employer") or "") != (row.get("employer") or ""): continue
+        same = True
+        for k in ("first_name","last_name","email","employee_number","start_date","termination_date","mobile","address","date_of_birth"):
+            if (r.get(k) or "") != (row.get(k) or ""):
+                same = False; break
+        if same: return r
+    return None
 
 
 # ─── Main ────────────────────────────────────────────────────────────
@@ -312,15 +348,17 @@ def main():
     # ── Auto-create Persons for unmatched rows when --create-missing ─
     created_people = []
     if args.create_missing and unmatched:
-        existing_ids = {p["id"] for p in people}
+        existing_slugs = {p.get("url_slug") for p in people if p.get("url_slug")}
         now_iso = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         for fname, row, source in list(unmatched):
             base_slug = norm_name(f"{row['first_name']} {row['last_name']}").replace(" ", ".")
             slug, n = base_slug, 2
-            while slug in existing_ids:
+            while slug in existing_slugs:
                 slug = f"{base_slug}-{n}"; n += 1
+            new_id = next_person_id(people)
             new_person = {
-                "id":              slug,
+                "id":              new_id,
+                "url_slug":        slug,
                 "name":            f"{row['first_name']} {row['last_name']}".strip(),
                 "given":           row["first_name"],
                 "family":          row["last_name"],
@@ -336,39 +374,49 @@ def main():
                 "phone":                 row.get("mobile") or "",
                 "address":               row.get("address") or "",
                 "start_date":            row.get("start_date") or "",
-                "line_manager_id":       "",
+                "line_manager_id":       None,
                 "line_manager_email_raw": "",
                 "role":                  "",
                 "notes":                 "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
                 "directory_photo_uploaded_at": "",
                 "cover_photo_uploaded_at":     "",
                 "on_payroll":              True,
-                "most_recent_payroll_id":  "",
+                "most_recent_payroll_id":  None,
                 "suspended":               False,
                 "created_at":              now_iso,
                 "updated_at":              now_iso,
             }
             people.append(new_person)
-            existing_ids.add(slug)
+            existing_slugs.add(slug)
             created_people.append(new_person)
-            # Promote into matched so the standard flow creates the PayrollData row + relinks.
             matched.append((fname, row, new_person, "auto-created", source))
             unmatched.remove((fname, row, source))
         print(f"\n✓ Auto-created {len(created_people)} Person record(s) for unmatched rows.")
 
     # ── Apply ───────────────────────────────────────────────────────
     new_records = []
+    skipped_dupes = 0
     for fname, row, person, kind, source in matched:
-        rec = build_record(row, person, source, args.actor)
+        # Skip if an identical PayrollData record already exists for this Person.
+        existing = existing_match(payroll_file, person["id"], row)
+        if existing:
+            skipped_dupes += 1
+            # Make sure the link is correct even when we skip.
+            if person.get("most_recent_payroll_id") != existing["id"]:
+                person["most_recent_payroll_id"] = existing["id"]
+                person["on_payroll"] = True
+                person["updated_at"] = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            continue
+        rec = build_record(row, person, payroll_file, source, args.actor)
         new_records.append(rec)
-        # Relink the Person.
         person["most_recent_payroll_id"] = rec["id"]
         person["on_payroll"] = True
         person["updated_at"] = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    payroll_file["records"].extend(new_records)
     payroll_file["updated_at"] = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     payroll_file["schema_version"] = 1
+    if skipped_dupes:
+        print(f"✓ Skipped {skipped_dupes} identical record(s) already in payroll-data.json.")
 
     PAYROLL.write_text(json.dumps(payroll_file, indent=2, ensure_ascii=False) + "\n")
     people_file["updated_at"] = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")

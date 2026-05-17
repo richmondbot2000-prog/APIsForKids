@@ -278,13 +278,13 @@
       const meta = JSON.parse(btn.dataset.createGoogle);
       const slug = (meta.email.split("@")[0] || "").toLowerCase();
       const name = meta.name || meta.email;
-      createPerson({ id: slug, name, main_google_email: meta.email, company: meta.email.split("@")[1] || "" });
+      createPerson({ url_slug: slug, name, main_google_email: meta.email, company: meta.email.split("@")[1] || "" });
     }));
     document.querySelectorAll("[data-create-payroll]").forEach(btn => btn.addEventListener("click", () => {
       const meta = JSON.parse(btn.dataset.createPayroll);
       if (!meta.email) return alert("Payroll record has no email — can't auto-create a Person without one.\n\nUse the terminal: scripts/import_payroll.py <csv> --create-missing --apply --commit");
       const slug = (meta.email.split("@")[0] || "").toLowerCase();
-      createPerson({ id: slug, name: meta.name.trim(), main_google_email: meta.email, start_date: meta.start_date || "" });
+      createPerson({ url_slug: slug, name: meta.name.trim(), main_google_email: meta.email, start_date: meta.start_date || "" });
     }));
   }
 
@@ -299,7 +299,7 @@
   }
 
   async function linkEmail(pid, email) {
-    const p = people.find(x => x.id === pid); if (!p) return;
+    const p = people.find(x => String(x.id) === String(pid)); if (!p) return;
     const patch = {};
     if (!p.main_google_email) patch.main_google_email = email;
     else patch.alt_google_emails = Array.from(new Set([...(p.alt_google_emails||[]), email])).filter(e => e !== p.main_google_email);
@@ -307,7 +307,7 @@
     catch (err) { alert("Link failed: " + err.message); }
   }
   async function linkPayroll(pid, meta) {
-    const p = people.find(x => x.id === pid); if (!p) return;
+    const p = people.find(x => String(x.id) === String(pid)); if (!p) return;
     const patch = { on_payroll: true };
     if (meta.start_date && !p.start_date) patch.start_date = meta.start_date;
     if (meta.email && !emailsOf(p).includes(meta.email.toLowerCase())) {
@@ -318,16 +318,21 @@
     catch (err) { alert("Link failed: " + err.message); }
   }
   async function linkWarehouse(pid, uname) {
-    const p = people.find(x => x.id === pid); if (!p) return;
+    const p = people.find(x => String(x.id) === String(pid)); if (!p) return;
     const patch = { aliases: Array.from(new Set([...(p.aliases||[]), uname.split("@")[0].replace(/\./g, " ")])).filter(Boolean) };
     try { const out = await workspaceCall({ action: "people-set", id: pid, ...patch }); Object.assign(p, out.person); render(); }
     catch (err) { alert("Link failed: " + err.message); }
   }
   async function createPerson(fields) {
-    if (!fields.id || !fields.main_google_email) return alert("Need both id and main_google_email to create.");
+    if (!fields.main_google_email) return alert("Need main_google_email to create.");
     if (!confirm(`Create new Person ${fields.name} (${fields.main_google_email})?`)) return;
     try {
-      const out = await workspaceCall({ action: "people-set", id: fields.id, name: fields.name, main_google_email: fields.main_google_email, ...(fields.start_date ? { start_date: fields.start_date } : {}), ...(fields.company ? { company: fields.company } : {}) });
+      // No id passed — worker auto-assigns the next integer.
+      const payload = { action: "people-set", name: fields.name, main_google_email: fields.main_google_email };
+      if (fields.url_slug)   payload.url_slug   = fields.url_slug;
+      if (fields.start_date) payload.start_date = fields.start_date;
+      if (fields.company)    payload.company    = fields.company;
+      const out = await workspaceCall(payload);
       people.push(out.person);
       render();
     } catch (err) { alert("Create failed: " + err.message); }

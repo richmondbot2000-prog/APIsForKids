@@ -39,7 +39,12 @@
       .replaceAll('"', "&quot;").replaceAll("'", "&#39;");
   }
   function emailToSlug(email) { return ((email || "").split("@")[0] || "").toLowerCase(); }
+  function profileHrefForPerson(p) {
+    return p && p.url_slug ? `/directory/${p.url_slug}` : "#";
+  }
   function profileHref(email) {
+    const p = peopleByEmail[(email || "").toLowerCase()];
+    if (p && p.url_slug) return `/directory/${p.url_slug}`;
     const slug = emailToSlug(email);
     return slug ? `/directory/${slug}` : "#";
   }
@@ -138,11 +143,11 @@
   /* ─── Information panel — fields come from the Person record ──────── */
   function renderInfoPanel() {
     const editable = canEditPerson();
-    const lockedBadge = editable ? "" : `<span class="up-card-hint">read-only · sign in as ${escapeHtml(person.name || person.id)} or an admin to edit</span>`;
+    const lockedBadge = editable ? "" : `<span class="up-card-hint">read-only · sign in as ${escapeHtml(person.name || person.url_slug)} or an admin to edit</span>`;
 
-    const lineMgr = (person.line_manager_id && people.find(p => p.id === person.line_manager_id)) || null;
+    const lineMgr = (person.line_manager_id != null && people.find(p => String(p.id) === String(person.line_manager_id))) || null;
     const lineMgrDisplay = lineMgr
-      ? `<a class="up-mgr-link" href="${profileHref(lineMgr.main_google_email)}">${escapeHtml(lineMgr.name || lineMgr.id)}</a>`
+      ? `<a class="up-mgr-link" href="${profileHrefForPerson(lineMgr)}">${escapeHtml(lineMgr.name || lineMgr.url_slug)}</a>`
       : (person.line_manager_email_raw
           ? `<span>${escapeHtml(person.line_manager_email_raw)}</span>`
           : `<span class="up-empty-val">No line manager</span>`);
@@ -235,7 +240,7 @@
     return `
       <div class="up-card">
         <div class="up-card-head">Merge this Person <span class="up-card-hint">use when two Person records are the same human (e.g. a payroll-only Person + a Google-only Person)</span></div>
-        <p class="up-hint">Pick the OTHER Person below. This Person (<strong>${escapeHtml(person.name || person.id)}</strong>) will be absorbed and deleted — every Google account, alias, and PayrollData row moves to the surviving record. The chosen Person keeps its <code>/directory/&lt;slug&gt;</code> URL.</p>
+        <p class="up-hint">Pick the OTHER Person below. This Person (<strong>${escapeHtml(person.name || person.url_slug)}</strong>) will be absorbed and deleted — every Google account, alias, and PayrollData row moves to the surviving record. The chosen Person keeps its <code>/directory/&lt;slug&gt;</code> URL.</p>
         <select class="up-pay-input" id="upMergeTarget"><option value="">— pick the surviving Person —</option>${opts}</select>
         <div class="up-editor-row">
           <button type="button" class="up-btn-sm up-btn-sm--primary" id="upMergeGo">Merge into selected</button>
@@ -508,11 +513,11 @@
       status.className = "up-edit-status up-edit-status--err";
       return;
     }
-    const winner = people.find(p => p.id === winnerId);
-    if (!confirm(`Merge ${person.name || person.id} INTO ${winner.name || winner.id}?\n\n` +
-                 `- ${person.name || person.id} will be deleted.\n` +
-                 `- Their Google account(s), aliases, payroll record(s), phone/address/etc. all move to ${winner.name || winner.id}.\n` +
-                 `- ${winner.name || winner.id} keeps its /directory/${winner.id} URL.\n\n` +
+    const winner = people.find(p => String(p.id) === String(winnerId));
+    if (!confirm(`Merge ${person.name || person.url_slug} INTO ${winner.name || winner.url_slug}?\n\n` +
+                 `- ${person.name || person.url_slug} will be deleted.\n` +
+                 `- Their Google account(s), aliases, payroll record(s), phone/address/etc. all move to ${winner.name || winner.url_slug}.\n` +
+                 `- ${winner.name || winner.url_slug} keeps its /directory/${winner.url_slug} URL.\n\n` +
                  `This is permanent (well, recoverable from git history but no in-app undo).`)) return;
     status.textContent = "Merging…"; status.className = "up-edit-status up-edit-status--working";
     try {
@@ -523,7 +528,7 @@
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
       // Redirect to the surviving Person's page.
-      location.href = "/directory/" + encodeURIComponent(winnerId);
+      location.href = "/directory/" + encodeURIComponent(winner.url_slug);
     } catch (err) {
       status.textContent = "Failed — " + err.message;
       status.className = "up-edit-status up-edit-status--err";
@@ -753,7 +758,7 @@
           <div class="up-fp-head">
             <div class="up-fp-avatar">${avatarHtml}</div>
             <div>
-              <div class="up-fp-name">${escapeHtml(person.name || person.id)}</div>
+              <div class="up-fp-name">${escapeHtml(person.name || person.url_slug)}</div>
               <div class="up-fp-time">${escapeHtml(ts)}</div>
             </div>
           </div>
@@ -814,7 +819,7 @@
               ` : ""}
             </div>
             <div class="up-headline">
-              <h1 class="up-name">${escapeHtml(person.name || person.id)}</h1>
+              <h1 class="up-name">${escapeHtml(person.name || person.url_slug)}</h1>
               <div class="up-subline">${subline || `<span class="up-tenure">${escapeHtml(person.main_google_email || person.id)}</span>`}</div>
             </div>
           </div>
@@ -836,7 +841,7 @@
         <section class="up-panel" id="upPanel"></section>
       </div>`;
 
-    document.title = `${person.name || person.id} — BOOK Profile`;
+    document.title = `${person.name || person.url_slug} — BOOK Profile`;
 
     document.querySelectorAll("[data-tab]").forEach(t => {
       t.addEventListener("click", e => { e.preventDefault(); setTab(t.dataset.tab); });
@@ -948,7 +953,7 @@
     if (peopleFile && Array.isArray(peopleFile.people)) {
       people = peopleFile.people;
       for (const p of people) {
-        const slug = (p.id || emailToSlug(p.main_google_email)).toLowerCase();
+        const slug = (p.url_slug || emailToSlug(p.main_google_email)).toLowerCase();
         if (slug && !peopleBySlug[slug]) peopleBySlug[slug] = p;
         for (const e of [p.main_google_email, ...(p.alt_google_emails || []), p.external_google_email].filter(Boolean)) {
           peopleByEmail[e.toLowerCase()] = p;
