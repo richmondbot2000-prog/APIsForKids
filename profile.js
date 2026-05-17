@@ -30,6 +30,8 @@
   let adminEmails = new Set();
   let payrollRecordsById = {};   // PayrollData rows keyed by id
   let payrollByPersonId = {};    // most-recent PayrollData row per person_id
+  let googleByPersonId = {};     // pid -> [google-account rows]
+  let warehouseByPersonId = {};  // pid -> best warehouse-activity row
 
   const WORKSPACE_API = "/api/workspace";
 
@@ -243,16 +245,15 @@
       : "";
   }
   function renderLinkedSourcesCard() {
-    const emails = [person.main_google_email, ...(person.alt_google_emails || [])].filter(Boolean).map(e => e.toLowerCase());
-    const letme    = emails.find(e => e.endsWith("@letme.co.uk") || e.endsWith("@letme.com")) || "";
-    const together = emails.find(e => e.endsWith("@togetherloans.com")) || "";
-    const gmail    = person.external_google_email || "";
+    const accts = googleByPersonId[person.id] || [];
+    const letme    = (accts.find(a => a.tenant === "letme")    || {}).email || "";
+    const together = (accts.find(a => a.tenant === "together") || {}).email || "";
+    const gmail    = (accts.find(a => a.tenant === "external") || {}).email || person.external_google_email || "";
+    const wh       = warehouseByPersonId[person.id] || null;
+    const warehouseHint = wh ? (wh.email || wh.username || `record #${wh.id}`) : "";
     const payrollLabel = person.on_payroll
       ? (person.most_recent_payroll_id ? `Payroll record #${person.most_recent_payroll_id}` : "Marked on payroll · no record yet")
       : "";
-    // Warehouse usernames are not yet a first-class field on the Person
-    // (they live as aliases). Show "Linked" when there's a hint.
-    const warehouseHint = (person.aliases || []).find(a => /^[a-z]+ [a-z]+$/i.test(a)) || "";
 
     function row(kind, label, value) {
       const present = !!value;
@@ -995,7 +996,9 @@
     fetch("/admins.json",           { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch("/pending-transfers.json",{ cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch("/payroll-data.json",     { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-  ]).then(([peopleFile, staff, wallFile, payroll, who, annFile, adminsFile, pending, payrollFile]) => {
+    fetch("/google-accounts.json",  { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/warehouse-activity.json",{ cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+  ]).then(([peopleFile, staff, wallFile, payroll, who, annFile, adminsFile, pending, payrollFile, gaccounts, warehouse]) => {
     if (peopleFile && Array.isArray(peopleFile.people)) {
       people = peopleFile.people;
       for (const p of people) {
@@ -1034,11 +1037,24 @@
     }
     if (payrollFile && Array.isArray(payrollFile.records)) {
       for (const r of payrollFile.records) payrollRecordsById[r.id] = r;
-      // Person.most_recent_payroll_id is authoritative; build the per-person
-      // lookup from it (records that aren't linked are historical or orphan).
       for (const p of people) {
         if (p.most_recent_payroll_id && payrollRecordsById[p.most_recent_payroll_id]) {
           payrollByPersonId[p.id] = payrollRecordsById[p.most_recent_payroll_id];
+        }
+      }
+    }
+    if (gaccounts && Array.isArray(gaccounts.records)) {
+      for (const a of gaccounts.records) {
+        if (a.person_id == null) continue;
+        (googleByPersonId[a.person_id] ||= []).push(a);
+      }
+    }
+    if (warehouse && Array.isArray(warehouse.records)) {
+      for (const w of warehouse.records) {
+        if (w.person_id == null) continue;
+        const cur = warehouseByPersonId[w.person_id];
+        if (!cur || (w.last_active_utc || "") > (cur.last_active_utc || "")) {
+          warehouseByPersonId[w.person_id] = w;
         }
       }
     }

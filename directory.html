@@ -327,8 +327,14 @@
 
   let people = [];
   let staffByEmail = {};
-  let payrollData = null;        // { by_email:{}, by_name:{}, updated_at }
-  let activity = null;           // { active_users:[], external_users:[] }
+  // Pre-computed indexes — every source is now a real linked table, so
+  // chip rendering is a lookup, not on-the-fly matching.
+  let googleByPersonId = {};     // pid -> [google-account rows] (incl. external)
+  let warehouseByPersonId = {};  // pid -> best warehouse-activity row
+  let payrollByPersonId  = {};   // pid -> active payroll-data row (most_recent)
+  let allGoogleAccounts = [];
+  let allWarehouseRows  = [];
+  let allPayrollRows    = [];
   let isAdmin = false;
   let viewerEmail = "";
   let sortBy = "name", sortDir = 1;
@@ -362,82 +368,26 @@
 
   /* ─── Source matching (payroll / google letme / google together /
      warehouse) — computed per Person at render time, no schema change. ─ */
-  function emailsOf(p) {
-    return [p.main_google_email, ...(p.alt_google_emails||[]), p.external_google_email]
-      .filter(Boolean).map(e => e.toLowerCase());
-  }
-  function nameKeys(p) {
-    const out = new Set();
-    const strip = s => (s || "").toLowerCase().replace(/['’.\-]/g, "").trim();
-    const add = s => { const t = (s || "").trim(); if (!t) return; out.add(t.toLowerCase()); out.add(strip(t)); };
-    if (p.given && p.family) add(`${p.given} ${p.family}`);
-    if (p.name) {
-      const parts = p.name.trim().split(/\s+/);
-      if (parts.length >= 2) add(`${parts[0]} ${parts[parts.length - 1]}`);
-      add(p.name);
-    }
-    return out;
-  }
-  function payrollMatch(p) {
-    if (!payrollData) return null;
-    const emails = emailsOf(p);
-    for (const e of emails) {
-      const lst = (payrollData.by_email || {})[e];
-      if (lst && lst.length) return lst[0];
-    }
-    if (payrollData.by_name) {
-      for (const k of nameKeys(p)) {
-        const lst = payrollData.by_name[k];
-        if (lst && lst.length) return lst[0];
-      }
-    }
-    return null;
-  }
-  function googleLetmeAccounts(p) {
-    // Any Workspace account on the letme tenants.
-    return emailsOf(p).filter(e => {
-      const d = e.split("@")[1] || "";
-      return d === "letme.co.uk" || d === "letme.com";
-    }).map(e => ({ email: e, raw: staffByEmail[e] || null }));
-  }
-  function googleTogetherAccounts(p) {
-    return emailsOf(p).filter(e => (e.split("@")[1] || "") === "togetherloans.com")
-      .map(e => ({ email: e, raw: staffByEmail[e] || null }));
-  }
-  function warehouseMatch(p) {
-    if (!activity) return null;
-    const emails = emailsOf(p);
-    for (const a of (activity.active_users || [])) {
-      if (emails.includes((a.email || "").toLowerCase())) return a;
-    }
-    // External users (CRM-only): match by stripped name vs username's
-    // leading "first.last" portion.
-    const names = nameKeys(p);
-    for (const e of (activity.external_users || [])) {
-      const uname = (e.username || "").toLowerCase().split("@")[0];
-      // Try matching "first.last" or "first last" forms.
-      const candidates = new Set([uname, uname.replace(/\./g, " ")]);
-      for (const c of candidates) if (names.has(c)) return e;
-    }
-    return null;
-  }
+  // After the table normalisation, every "do they have an X?" is now a
+  // table lookup — google-accounts.json, warehouse-activity.json,
+  // payroll-data.json are all keyed by person_id. No fuzzy matching.
   function sourceMatches(p) {
-    const letme    = googleLetmeAccounts(p);
-    const together = googleTogetherAccounts(p);
-    const payroll  = payrollMatch(p);
-    const wh       = warehouseMatch(p);
+    const accts = googleByPersonId[p.id] || [];
+    const letme    = accts.filter(a => a.tenant === "letme"    && !a.suspended && !a.deletion_time).map(a => a.email);
+    const together = accts.filter(a => a.tenant === "together" && !a.suspended && !a.deletion_time).map(a => a.email);
+    const external = accts.filter(a => a.tenant === "external").map(a => a.email);
+    const payroll  = payrollByPersonId[p.id]   || null;
+    const wh       = warehouseByPersonId[p.id] || null;
     return {
-      payroll:  payroll ? { label: payroll.first_name + " " + payroll.last_name, raw: payroll } : null,
-      letme:    letme.length    ? { count: letme.length, items: letme } : null,
-      together: together.length ? { count: together.length, items: together } : null,
-      warehouse: wh ? { label: wh.email || wh.username, raw: wh } : null,
+      payroll:  payroll ? { label: ((payroll.first_name||"") + " " + (payroll.last_name||"")).trim() || `#${payroll.id}` } : null,
+      letme:    letme.length    ? { count: letme.length,    items: letme.map(e => ({ email: e })) }    : null,
+      together: together.length ? { count: together.length, items: together.map(e => ({ email: e })) } : null,
+      external: external.length ? { items: external } : null,
+      warehouse: wh ? { label: wh.email || wh.username || `#${wh.id}` } : null,
     };
   }
   function hasDeletedAccount(p) {
-    return emailsOf(p).some(e => {
-      const u = staffByEmail[e];
-      return u && (u.deletion_time || u.suspended);
-    });
+    return (googleByPersonId[p.id] || []).some(a => a.deletion_time || a.suspended);
   }
 
   // Inline SVGs for each source. Compact glyphs that read at 14px.
@@ -455,7 +405,7 @@
   }
   function sourceChipsHtml(p) {
     const m = sourceMatches(p);
-    const gmail = p.external_google_email || "";
+    const gmail = m.external ? m.external.items[0] : "";
     return `
       ${sourceChip("letme",     !!m.letme,    m.letme    ? `Google Letme: ${m.letme.items.map(x=>x.email).join(", ")}`     : "No Letme Google account")}
       ${sourceChip("together",  !!m.together, m.together ? `Google Together: ${m.together.items.map(x=>x.email).join(", ")}` : "No Together Google account")}
@@ -645,60 +595,25 @@
   }
 
   /* ─── Orphan accounts (records in a source with no Person link) ─── */
+  // Orphans = rows in a source table with person_id IS NULL. Plus any
+  // staff.json Workspace account whose email isn't in google-accounts.json
+  // (i.e. created since the last reconcile run). No fuzzy matching.
   function findOrphans() {
-    const personEmails = new Set();
-    const personNames = new Set();
-    for (const p of people) {
-      for (const e of emailsOf(p)) personEmails.add(e);
-      for (const n of nameKeys(p)) personNames.add(n);
-    }
+    const linkedGoogleEmails = new Set(allGoogleAccounts.map(a => (a.email || "").toLowerCase()));
     const orphans = { payroll: [], letme: [], together: [], warehouse: [] };
-
-    // Payroll: rows where neither email nor name match a Person.
-    if (payrollData) {
-      const seen = new Set();
-      const consider = (rec) => {
-        const id = `${rec.employer || ""}|${rec.employee_number || ""}|${(rec.first_name || "").toLowerCase()}|${(rec.last_name || "").toLowerCase()}`;
-        if (seen.has(id)) return;
-        seen.add(id);
-        const email = (rec.email || "").toLowerCase();
-        if (email && personEmails.has(email)) return;
-        const full  = `${rec.first_name || ""} ${rec.last_name || ""}`.trim().toLowerCase();
-        const strip = full.replace(/['’.\-]/g, "").trim();
-        if (full && (personNames.has(full) || personNames.has(strip))) return;
-        orphans.payroll.push(rec);
-      };
-      for (const lst of Object.values(payrollData.by_email || {})) for (const r of lst) consider(r);
-      for (const lst of Object.values(payrollData.by_name  || {})) for (const r of lst) consider(r);
+    for (const r of allPayrollRows) {
+      if (r.person_id == null) orphans.payroll.push(r);
     }
-
-    // Google accounts: any staff.json user whose email isn't on a Person.
+    for (const w of allWarehouseRows) {
+      if (w.person_id == null) orphans.warehouse.push(w);
+    }
     for (const e of Object.keys(staffByEmail)) {
-      if (personEmails.has(e)) continue;
+      if (linkedGoogleEmails.has(e)) continue;
       const u = staffByEmail[e];
-      if (u.suspended || u.deletion_time) continue; // skip already-old
+      if (u.suspended || u.deletion_time) continue;
       const dom = e.split("@")[1] || "";
       if (dom === "letme.co.uk" || dom === "letme.com")  orphans.letme.push(u);
       else if (dom === "togetherloans.com")              orphans.together.push(u);
-    }
-
-    // Warehouse: external_users (CRM-only) where username doesn't match a
-    // Person by name.
-    if (activity) {
-      for (const e of (activity.external_users || [])) {
-        const uname = (e.username || "").toLowerCase().split("@")[0];
-        const cand = [uname, uname.replace(/\./g, " ")];
-        if (cand.some(c => personNames.has(c))) continue;
-        orphans.warehouse.push(e);
-      }
-      // Also active_users whose email isn't on any Person yet (but exists
-      // in Workspace — typically these will already appear under letme/
-      // together above, but include for safety).
-      for (const a of (activity.active_users || [])) {
-        const em = (a.email || "").toLowerCase();
-        if (!em || personEmails.has(em)) continue;
-        if (!staffByEmail[em]) orphans.warehouse.push(a);
-      }
     }
     return orphans;
   }
@@ -911,19 +826,48 @@
 
   /* ─── Boot ───────────────────────────────────────────────────────── */
   Promise.all([
-    fetch("/api/workspace/whoami",  { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-    fetch("/people.json",           { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-    fetch("/staff.json",            { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-    fetch("/api/workspace/payroll", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-    fetch("/staff-activity.json",   { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
-  ]).then(([who, peopleFile, staff, payroll, act]) => {
+    fetch("/api/workspace/whoami",      { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/people.json",               { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/staff.json",                { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/google-accounts.json",      { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/warehouse-activity.json",   { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+    fetch("/payroll-data.json",         { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+  ]).then(([who, peopleFile, staff, gaccounts, warehouse, payroll]) => {
     if (who) { viewerEmail = (who.email||"").toLowerCase(); isAdmin = !!who.is_admin; }
     if (staff && Array.isArray(staff.users)) {
       for (const u of staff.users) { const k = (u.email||"").toLowerCase(); if (k) staffByEmail[k] = u; }
     }
     if (peopleFile && Array.isArray(peopleFile.people)) people = peopleFile.people;
-    if (payroll && (payroll.by_email || payroll.by_name)) payrollData = payroll;
-    if (act && (Array.isArray(act.active_users) || Array.isArray(act.external_users))) activity = act;
+
+    // Index the three linked tables by person_id.
+    if (gaccounts && Array.isArray(gaccounts.records)) {
+      allGoogleAccounts = gaccounts.records;
+      for (const a of allGoogleAccounts) {
+        if (a.person_id == null) continue;
+        (googleByPersonId[a.person_id] ||= []).push(a);
+      }
+    }
+    if (warehouse && Array.isArray(warehouse.records)) {
+      allWarehouseRows = warehouse.records;
+      for (const w of allWarehouseRows) {
+        if (w.person_id == null) continue;
+        // Keep the row with the most recent activity per person.
+        const cur = warehouseByPersonId[w.person_id];
+        if (!cur || (w.last_active_utc || "") > (cur.last_active_utc || "")) {
+          warehouseByPersonId[w.person_id] = w;
+        }
+      }
+    }
+    if (payroll && Array.isArray(payroll.records)) {
+      allPayrollRows = payroll.records;
+      const byId = {};
+      for (const r of allPayrollRows) byId[r.id] = r;
+      for (const p of people) {
+        if (p.most_recent_payroll_id != null && byId[p.most_recent_payroll_id]) {
+          payrollByPersonId[p.id] = byId[p.most_recent_payroll_id];
+        }
+      }
+    }
 
     if (!isAdmin) {
       document.getElementById("ppGate").innerHTML = `<div class="pp-banner warn">You are signed in as <strong>${escapeHtml(viewerEmail || "(unknown)")}</strong> but are not a TogetherBook admin. The page is read-only; edits + add + delete will fail.</div>`;
