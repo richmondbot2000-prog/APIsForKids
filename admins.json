@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-17T16:41:17Z",
-  "source": "regenerated from people.json (access_level=admin)",
+  "updated_at": "2026-05-17T16:56:35Z",
+  "source": "generated from people.json (access_level=admin, not suspended)",
   "admins": [
     "amber.cole@letme.com",
     "ben.gardner@letme.com",
@@ -10,6 +10,7 @@
     "igor.kravcov@letme.com",
     "igor.kravcov@togetherloans.com",
     "jack.bassilious@togetherloans.com",
+    "james.benamor@letme.co.uk",
     "james.benamor@letme.com",
     "james.benamor@togetherloans.com",
     "joseph.foard@letme.com",

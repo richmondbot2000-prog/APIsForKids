@@ -40,21 +40,24 @@ jobs:
       - name: Build warehouse-activity.json
         run: python3 scripts/build_warehouse_activity.py --apply
 
+      - name: Rebuild admins.json from people.json
+        run: python3 scripts/build_admins.py --apply
+
       - name: Commit + push if changed
         run: |
           set -euo pipefail
           git config user.name  "togetherbook-bot"
           git config user.email "richmondbot2000+bot@gmail.com"
-          if git diff --quiet google-accounts.json warehouse-activity.json; then
+          if git diff --quiet google-accounts.json warehouse-activity.json admins.json; then
             echo "No changes — nothing to commit."
             exit 0
           fi
-          git add google-accounts.json warehouse-activity.json
+          git add google-accounts.json warehouse-activity.json admins.json
 
           # Retry-on-rebase: another workflow may have pushed between
           # checkout and here; rebase + retry up to three times.
           for i in 1 2 3; do
-            git commit -m "Reconcile: refresh google-accounts + warehouse-activity (auto)" || { echo "nothing to commit on attempt $i"; exit 0; }
+            git commit -m "Reconcile: refresh google-accounts + warehouse-activity + admins (auto)" || { echo "nothing to commit on attempt $i"; exit 0; }
             if git push; then
               echo "✓ Pushed on attempt $i."
               exit 0
