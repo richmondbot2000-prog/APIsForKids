@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-17T19:59:31Z",
+  "updated_at": "2026-05-17T20:24:40.108Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -91,9 +91,13 @@
       "name": "Adnan Turken",
       "given": "Adnan",
       "family": "Turken",
-      "aliases": [],
+      "aliases": [
+        "Adnan Türken"
+      ],
       "main_google_email": "adnan.turken@togetherloans.com",
-      "alt_google_emails": [],
+      "alt_google_emails": [
+        "adnan.turken@letme.co.uk"
+      ],
       "external_google_email": "",
       "auth0_id": "",
       "access_level": "staff",
@@ -109,35 +113,8 @@
       "directory_photo_uploaded_at": "2026-05-14T09:08:51+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z",
+      "updated_at": "2026-05-17T20:24:39.859Z",
       "url_slug": "adnan.turken",
-      "most_recent_payroll_id": null
-    },
-    {
-      "id": 5,
-      "name": "Adnan Türken",
-      "given": "Adnan",
-      "family": "Türken",
-      "aliases": [],
-      "main_google_email": "adnan.turken@letme.co.uk",
-      "alt_google_emails": [],
-      "external_google_email": "",
-      "auth0_id": "",
-      "access_level": "staff",
-      "company": "letme.co.uk",
-      "title": "",
-      "department": "",
-      "phone": "",
-      "address": "",
-      "start_date": "",
-      "line_manager_id": null,
-      "line_manager_email_raw": "",
-      "role": "",
-      "directory_photo_uploaded_at": "2026-05-14T09:09:07+01:00",
-      "notes": "",
-      "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z",
-      "url_slug": "adnan.turken-2",
       "most_recent_payroll_id": null
     },
     {
