@@ -81,11 +81,11 @@
       .qb-me:hover .qb-me-avatar { border-color: var(--brass-500, #C8973F); }
       .qb-me-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
       .qb-me-avatar svg { width: 60%; height: 60%; color: var(--ink-500, #6B779A); }
-      /* On narrow screens the hamburger anchors left (next to the
-         brand); the avatar gets an auto left margin so it lands on
-         the right end of the topbar regardless of how wide the
-         hamburger or brand are. */
-      @media (max-width: 960px) { .qb-me { margin-left: auto; }
+      /* On narrow screens the hamburger and avatar form a right-edge
+         cluster: hamburger gets the auto margin so it pushes itself
+         (and the avatar trailing it) to the right of the topbar, and
+         the avatar then sits one 14 px gap away. */
+      @media (max-width: 960px) { .qb-me { margin-left: 14px; }
                                   .qb-me-avatar { width: 32px; height: 32px; font-size: 11px; } }
     `;
     document.head.appendChild(s);
@@ -150,7 +150,22 @@
     // always points at the canonical /directory/<slug> regardless of
     // which alias the viewer signed in with.
     const slug = (person && person.url_slug) || emailToSlug(email);
-    slot.href = '/directory/' + slug;
+    const profileHref = '/directory/' + slug;
+    slot.href = profileHref;
+
+    // The mobile People sub-menu carries a "Your Page" placeholder whose
+    // href we rewrite once we know the viewer's slug. The data-yourpage
+    // marker lives inside the JSON of `data-sub` on the People nav link.
+    document.querySelectorAll('.qb-nav-link[data-sub]').forEach(a => {
+      try {
+        const subs = JSON.parse(a.dataset.sub);
+        let dirty = false;
+        subs.forEach(s => {
+          if (s['data-yourpage']) { s.href = profileHref; dirty = true; }
+        });
+        if (dirty) a.dataset.sub = JSON.stringify(subs);
+      } catch (e) { /* malformed JSON — leave alone */ }
+    });
 
     let photo = '', name = (person && person.name) || email;
     // Google profile photo as the baseline — picked from whichever

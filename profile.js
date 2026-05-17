@@ -1469,10 +1469,15 @@
   }
   function postPhotoUrl(p) {
     if (!p) return "";
-    // wall.json post schema stores attached media as `photos: [path, …]`
-    // (paths relative to the site root, e.g. wall-media/img_…jpg).
-    // Older legacy variants used `p.media.url` or `p.photo_url`.
-    if (Array.isArray(p.photos) && p.photos[0]) return "/" + String(p.photos[0]).replace(/^\/+/, "");
+    // GIFs (giphy/tenor) come in as absolute https URLs — pass them
+    // through untouched. Uploaded photos are repo-root-relative paths
+    // like `wall-media/img_…jpg`; everything else falls through to
+    // legacy fields.
+    if (Array.isArray(p.photos) && p.photos[0]) {
+      const path = String(p.photos[0]);
+      if (/^https?:/i.test(path)) return path;
+      return "/" + path.replace(/^\/+/, "");
+    }
     if (p.media && p.media.url) return p.media.url;
     if (p.photo_url) return p.photo_url;
     return "";
@@ -1592,10 +1597,6 @@
               <h1 class="up-name">${escapeHtml(person.name || person.url_slug)}</h1>
               <div class="up-subline">${subline || `<span class="up-tenure">${escapeHtml(person.main_google_email || person.id)}</span>`}</div>
             </div>
-          </div>
-          <div class="up-actions">
-            <a class="up-btn" href="/org-structure.html?center=${encodeURIComponent(person.main_google_email)}">${svgIcon("org")} Org chart</a>
-            ${viewerIsAdmin ? `<a class="up-btn up-btn--primary" href="/directory.html">${svgIcon("edit")} All people</a>` : ""}
           </div>
         </div>
       </div>
