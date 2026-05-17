@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-17T19:52:23Z",
+  "updated_at": "2026-05-17T19:59:31Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -163,10 +163,11 @@
       "directory_photo_uploaded_at": "2026-05-14T09:08:15+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 46,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 10,
       "on_payroll": true,
-      "url_slug": "aerona.sheikh"
+      "url_slug": "aerona.sheikh",
+      "date_of_birth": "2003-05-18"
     },
     {
       "id": 7,
@@ -245,10 +246,11 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 37,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 1,
       "on_payroll": true,
-      "url_slug": "amber.cole"
+      "url_slug": "amber.cole",
+      "date_of_birth": "1990-04-06"
     },
     {
       "id": 11,
@@ -415,10 +417,11 @@
       "directory_photo_uploaded_at": "2026-05-14T09:05:41+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:52:23Z",
+      "updated_at": "2026-05-17T19:56:12Z",
       "url_slug": "ashwin.john",
       "most_recent_payroll_id": 73,
-      "on_payroll": true
+      "on_payroll": true,
+      "date_of_birth": "2001-09-13"
     },
     {
       "id": 19,
@@ -497,10 +500,11 @@
       "directory_photo_uploaded_at": "2026-05-14T09:02:42+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 47,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 11,
       "on_payroll": true,
-      "url_slug": "axel.horsfall"
+      "url_slug": "axel.horsfall",
+      "date_of_birth": "2004-07-27"
     },
     {
       "id": 23,
@@ -556,10 +560,11 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
+      "updated_at": "2026-05-17T19:56:12Z",
       "url_slug": "ben.gardner",
       "most_recent_payroll_id": 85,
-      "on_payroll": true
+      "on_payroll": true,
+      "date_of_birth": "1994-11-26"
     },
     {
       "id": 25,
@@ -642,8 +647,9 @@
       "most_recent_payroll_id": 86,
       "suspended": false,
       "created_at": "2026-05-17T14:06:41Z",
-      "updated_at": "2026-05-17T14:06:41Z",
-      "url_slug": "berginie.quiceno.botero"
+      "updated_at": "2026-05-17T19:56:12Z",
+      "url_slug": "berginie.quiceno.botero",
+      "date_of_birth": "1988-10-08"
     },
     {
       "id": 29,
@@ -695,10 +701,11 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 72,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 36,
       "on_payroll": true,
-      "url_slug": "brogan.hackley"
+      "url_slug": "brogan.hackley",
+      "date_of_birth": "1988-06-13"
     },
     {
       "id": 31,
@@ -752,10 +759,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:59:54+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 48,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 12,
       "on_payroll": true,
-      "url_slug": "bryony.leach"
+      "url_slug": "bryony.leach",
+      "date_of_birth": "1999-02-28"
     },
     {
       "id": 21,
@@ -1006,8 +1014,9 @@
       "most_recent_payroll_id": 87,
       "suspended": false,
       "created_at": "2026-05-17T14:06:41Z",
-      "updated_at": "2026-05-17T14:06:41Z",
-      "url_slug": "chidinma.ugwunne"
+      "updated_at": "2026-05-17T19:56:12Z",
+      "url_slug": "chidinma.ugwunne",
+      "date_of_birth": "1991-12-13"
     },
     {
       "id": 41,
@@ -1032,10 +1041,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:58:00+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 49,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 13,
       "on_payroll": true,
-      "url_slug": "christian.joseph"
+      "url_slug": "christian.joseph",
+      "date_of_birth": "2003-08-30"
     },
     {
       "id": 42,
@@ -1060,10 +1070,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:57:07+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 50,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 14,
       "on_payroll": true,
-      "url_slug": "claire.stratford"
+      "url_slug": "claire.stratford",
+      "date_of_birth": "1992-02-17"
     },
     {
       "id": 18,
@@ -1117,10 +1128,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:56:24+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 51,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 15,
       "on_payroll": true,
-      "url_slug": "clementia.dsouza"
+      "url_slug": "clementia.dsouza",
+      "date_of_birth": "1991-10-21"
     },
     {
       "id": 44,
@@ -1255,10 +1267,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:55:30+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
+      "updated_at": "2026-05-17T19:56:12Z",
       "url_slug": "dan.meineck",
       "most_recent_payroll_id": 88,
-      "on_payroll": true
+      "on_payroll": true,
+      "date_of_birth": "1980-11-25"
     },
     {
       "id": 49,
@@ -1283,10 +1296,11 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 70,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 34,
       "on_payroll": true,
-      "url_slug": "dan.sanders"
+      "url_slug": "dan.sanders",
+      "date_of_birth": "1988-11-20"
     },
     {
       "id": 50,
@@ -1340,10 +1354,11 @@
       "suspended": true,
       "deletion_time": "2026-05-12T15:31:46.000Z",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 52,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 16,
       "on_payroll": true,
-      "url_slug": "daniel.schiavinato"
+      "url_slug": "daniel.schiavinato",
+      "date_of_birth": "2003-11-18"
     },
     {
       "id": 53,
@@ -1401,8 +1416,9 @@
       "most_recent_payroll_id": 74,
       "suspended": false,
       "created_at": "2026-05-17T14:06:41Z",
-      "updated_at": "2026-05-17T14:06:41Z",
-      "url_slug": "david.benamor"
+      "updated_at": "2026-05-17T19:56:12Z",
+      "url_slug": "david.benamor",
+      "date_of_birth": "2002-08-23"
     },
     {
       "id": 55,
@@ -1427,10 +1443,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:54:40+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 38,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 2,
       "on_payroll": true,
-      "url_slug": "david.byatt"
+      "url_slug": "david.byatt",
+      "date_of_birth": "1984-09-02"
     },
     {
       "id": 56,
@@ -1513,8 +1530,9 @@
       "most_recent_payroll_id": 75,
       "suspended": false,
       "created_at": "2026-05-17T14:06:41Z",
-      "updated_at": "2026-05-17T14:06:41Z",
-      "url_slug": "david.patterson"
+      "updated_at": "2026-05-17T19:56:12Z",
+      "url_slug": "david.patterson",
+      "date_of_birth": "1940-01-01"
     },
     {
       "id": 59,
@@ -1811,10 +1829,11 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 53,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 17,
       "on_payroll": true,
-      "url_slug": "edward.heaney"
+      "url_slug": "edward.heaney",
+      "date_of_birth": "1985-07-30"
     },
     {
       "id": 70,
@@ -1895,10 +1914,11 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 39,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 3,
       "on_payroll": true,
-      "url_slug": "esther.uwadione"
+      "url_slug": "esther.uwadione",
+      "date_of_birth": "2001-04-22"
     },
     {
       "id": 73,
@@ -1927,8 +1947,9 @@
       "most_recent_payroll_id": 76,
       "suspended": false,
       "created_at": "2026-05-17T14:06:41Z",
-      "updated_at": "2026-05-17T14:06:41Z",
-      "url_slug": "fern.benamor"
+      "updated_at": "2026-05-17T19:56:12Z",
+      "url_slug": "fern.benamor",
+      "date_of_birth": "2006-12-06"
     },
     {
       "id": 74,
@@ -2038,8 +2059,9 @@
       "most_recent_payroll_id": 89,
       "suspended": false,
       "created_at": "2026-05-17T14:06:41Z",
-      "updated_at": "2026-05-17T14:06:41Z",
-      "url_slug": "gabriella.bacci"
+      "updated_at": "2026-05-17T19:56:12Z",
+      "url_slug": "gabriella.bacci",
+      "date_of_birth": "2004-01-05"
     },
     {
       "id": 78,
@@ -2172,10 +2194,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:51:43+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 54,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 18,
       "on_payroll": true,
-      "url_slug": "grainne.cranna"
+      "url_slug": "grainne.cranna",
+      "date_of_birth": "1998-11-14"
     },
     {
       "id": 83,
@@ -2229,10 +2252,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:50:53+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 55,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 19,
       "on_payroll": true,
-      "url_slug": "harriet.gregory"
+      "url_slug": "harriet.gregory",
+      "date_of_birth": "1995-09-21"
     },
     {
       "id": 85,
@@ -2288,8 +2312,9 @@
       "most_recent_payroll_id": 77,
       "suspended": false,
       "created_at": "2026-05-17T14:06:41Z",
-      "updated_at": "2026-05-17T14:06:41Z",
-      "url_slug": "ho.chun.cyrus.leung"
+      "updated_at": "2026-05-17T19:56:12Z",
+      "url_slug": "ho.chun.cyrus.leung",
+      "date_of_birth": "1995-01-16"
     },
     {
       "id": 87,
@@ -2316,10 +2341,11 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 56,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 20,
       "on_payroll": true,
-      "url_slug": "igor.kravcov"
+      "url_slug": "igor.kravcov",
+      "date_of_birth": "1979-12-23"
     },
     {
       "id": 88,
@@ -2371,10 +2397,11 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 57,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 21,
       "on_payroll": true,
-      "url_slug": "jack.bassilious"
+      "url_slug": "jack.bassilious",
+      "date_of_birth": "2002-10-15"
     },
     {
       "id": 90,
@@ -2431,10 +2458,11 @@
       "directory_photo_uploaded_at": "2026-05-14T09:11:10+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
+      "updated_at": "2026-05-17T19:56:12Z",
       "url_slug": "james.benamor",
       "most_recent_payroll_id": 83,
-      "on_payroll": true
+      "on_payroll": true,
+      "date_of_birth": "1977-05-18"
     },
     {
       "id": 92,
@@ -2459,10 +2487,11 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 58,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 22,
       "on_payroll": true,
-      "url_slug": "james.harlow"
+      "url_slug": "james.harlow",
+      "date_of_birth": "2001-08-16"
     },
     {
       "id": 93,
@@ -2489,10 +2518,11 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 59,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 23,
       "on_payroll": true,
-      "url_slug": "james.webster"
+      "url_slug": "james.webster",
+      "date_of_birth": "1996-10-20"
     },
     {
       "id": 94,
@@ -2793,10 +2823,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:45:43+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 40,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 4,
       "on_payroll": true,
-      "url_slug": "joseph.foard"
+      "url_slug": "joseph.foard",
+      "date_of_birth": "1993-09-23"
     },
     {
       "id": 105,
@@ -2875,10 +2906,11 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 60,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 24,
       "on_payroll": true,
-      "url_slug": "joshua.carless"
+      "url_slug": "joshua.carless",
+      "date_of_birth": "1995-12-22"
     },
     {
       "id": 108,
@@ -3102,8 +3134,9 @@
       "most_recent_payroll_id": 78,
       "suspended": false,
       "created_at": "2026-05-17T14:06:41Z",
-      "updated_at": "2026-05-17T14:06:41Z",
-      "url_slug": "kathaluwa.liyanage.navodi.sammani"
+      "updated_at": "2026-05-17T19:56:12Z",
+      "url_slug": "kathaluwa.liyanage.navodi.sammani",
+      "date_of_birth": "1994-05-26"
     },
     {
       "id": 116,
@@ -3186,10 +3219,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:43:02+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 61,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 25,
       "on_payroll": true,
-      "url_slug": "kelly.black"
+      "url_slug": "kelly.black",
+      "date_of_birth": "1988-01-18"
     },
     {
       "id": 119,
@@ -3355,10 +3389,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:40:26+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 62,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 26,
       "on_payroll": true,
-      "url_slug": "laura.chadbourne"
+      "url_slug": "laura.chadbourne",
+      "date_of_birth": "1999-12-21"
     },
     {
       "id": 125,
@@ -3466,10 +3501,11 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 71,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 35,
       "on_payroll": true,
-      "url_slug": "leticia.alexandre"
+      "url_slug": "leticia.alexandre",
+      "date_of_birth": "1983-11-19"
     },
     {
       "id": 158,
@@ -3577,10 +3613,11 @@
       "suspended": true,
       "deletion_time": "2026-05-13T14:31:09.000Z",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 41,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 5,
       "on_payroll": true,
-      "url_slug": "lucas.benamor.parked.1778682666"
+      "url_slug": "lucas.benamor.parked.1778682666",
+      "date_of_birth": "2004-10-22"
     },
     {
       "id": 131,
@@ -3636,10 +3673,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:34:55+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 63,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 27,
       "on_payroll": true,
-      "url_slug": "lucian.teodoroiu"
+      "url_slug": "lucian.teodoroiu",
+      "date_of_birth": "1998-08-28"
     },
     {
       "id": 133,
@@ -3693,10 +3731,11 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 64,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 28,
       "on_payroll": true,
-      "url_slug": "maisey.lapskas"
+      "url_slug": "maisey.lapskas",
+      "date_of_birth": "2002-06-29"
     },
     {
       "id": 135,
@@ -3752,8 +3791,9 @@
       "most_recent_payroll_id": 79,
       "suspended": false,
       "created_at": "2026-05-17T14:06:41Z",
-      "updated_at": "2026-05-17T14:06:41Z",
-      "url_slug": "marina.goland"
+      "updated_at": "2026-05-17T19:56:12Z",
+      "url_slug": "marina.goland",
+      "date_of_birth": "1985-05-24"
     },
     {
       "id": 137,
@@ -3865,8 +3905,9 @@
       "most_recent_payroll_id": 90,
       "suspended": false,
       "created_at": "2026-05-17T14:06:41Z",
-      "updated_at": "2026-05-17T14:06:41Z",
-      "url_slug": "marta.gallardo.casu"
+      "updated_at": "2026-05-17T19:56:12Z",
+      "url_slug": "marta.gallardo.casu",
+      "date_of_birth": "1995-02-26"
     },
     {
       "id": 141,
@@ -3893,10 +3934,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:32:50+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
+      "updated_at": "2026-05-17T19:56:12Z",
       "url_slug": "matt.brunet",
       "most_recent_payroll_id": 91,
-      "on_payroll": true
+      "on_payroll": true,
+      "date_of_birth": "1995-08-30"
     },
     {
       "id": 143,
@@ -3952,10 +3994,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:32:15+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
+      "updated_at": "2026-05-17T19:56:12Z",
       "url_slug": "max.dynowski",
       "most_recent_payroll_id": 80,
-      "on_payroll": true
+      "on_payroll": true,
+      "date_of_birth": "1998-11-09"
     },
     {
       "id": 146,
@@ -4121,10 +4164,11 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 65,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 29,
       "on_payroll": true,
-      "url_slug": "morgan.smith"
+      "url_slug": "morgan.smith",
+      "date_of_birth": "1999-06-26"
     },
     {
       "id": 152,
@@ -4152,10 +4196,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:28:48+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 66,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 30,
       "on_payroll": true,
-      "url_slug": "mourad.malki"
+      "url_slug": "mourad.malki",
+      "date_of_birth": "1979-01-06"
     },
     {
       "id": 153,
@@ -4207,10 +4252,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:27:52+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 42,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 6,
       "on_payroll": true,
-      "url_slug": "natasha.wright"
+      "url_slug": "natasha.wright",
+      "date_of_birth": "1982-04-11"
     },
     {
       "id": 155,
@@ -4343,10 +4389,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:26:37+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 67,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 31,
       "on_payroll": true,
-      "url_slug": "oliver.holmes"
+      "url_slug": "oliver.holmes",
+      "date_of_birth": "1998-02-20"
     },
     {
       "id": 161,
@@ -4458,8 +4505,9 @@
       "most_recent_payroll_id": 92,
       "suspended": false,
       "created_at": "2026-05-17T14:06:41Z",
-      "updated_at": "2026-05-17T14:06:41Z",
-      "url_slug": "paspuleti.srujana"
+      "updated_at": "2026-05-17T19:56:12Z",
+      "url_slug": "paspuleti.srujana",
+      "date_of_birth": "1987-09-26"
     },
     {
       "id": 165,
@@ -4542,8 +4590,9 @@
       "most_recent_payroll_id": 81,
       "suspended": false,
       "created_at": "2026-05-17T14:06:41Z",
-      "updated_at": "2026-05-17T14:06:41Z",
-      "url_slug": "paul.benamor"
+      "updated_at": "2026-05-17T19:56:12Z",
+      "url_slug": "paul.benamor",
+      "date_of_birth": "1955-08-04"
     },
     {
       "id": 168,
@@ -4653,8 +4702,9 @@
       "most_recent_payroll_id": 96,
       "suspended": false,
       "created_at": "2026-05-17T14:06:41Z",
-      "updated_at": "2026-05-17T14:06:41Z",
-      "url_slug": "philip.oneill"
+      "updated_at": "2026-05-17T19:56:12Z",
+      "url_slug": "philip.oneill",
+      "date_of_birth": "1969-12-03"
     },
     {
       "id": 173,
@@ -4683,8 +4733,9 @@
       "most_recent_payroll_id": 82,
       "suspended": false,
       "created_at": "2026-05-17T14:06:41Z",
-      "updated_at": "2026-05-17T14:06:41Z",
-      "url_slug": "qiyu.liu"
+      "updated_at": "2026-05-17T19:56:12Z",
+      "url_slug": "qiyu.liu",
+      "date_of_birth": "1995-05-09"
     },
     {
       "id": 175,
@@ -4767,10 +4818,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:19:11+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 43,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 7,
       "on_payroll": true,
-      "url_slug": "raveeha.ejaz"
+      "url_slug": "raveeha.ejaz",
+      "date_of_birth": "2000-10-19"
     },
     {
       "id": 177,
@@ -4878,10 +4930,11 @@
       "directory_photo_uploaded_at": "2026-05-14T08:18:33+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
+      "updated_at": "2026-05-17T19:56:12Z",
       "url_slug": "saoirse-brooke.polywka",
       "most_recent_payroll_id": 93,
-      "on_payroll": true
+      "on_payroll": true,
+      "date_of_birth": "1999-08-09"
     },
     {
       "id": 182,
@@ -4989,10 +5042,11 @@
       "directory_photo_uploaded_at": "2026-05-14T07:59:45+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 68,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 32,
       "on_payroll": true,
-      "url_slug": "sophie.polychronopulos"
+      "url_slug": "sophie.polychronopulos",
+      "date_of_birth": "2000-12-12"
     },
     {
       "id": 187,
@@ -5046,10 +5100,11 @@
       "directory_photo_uploaded_at": "2026-05-14T07:57:50+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
+      "updated_at": "2026-05-17T19:56:12Z",
       "url_slug": "stan.majerski",
       "most_recent_payroll_id": 94,
-      "on_payroll": true
+      "on_payroll": true,
+      "date_of_birth": "1972-10-28"
     },
     {
       "id": 190,
@@ -5155,10 +5210,11 @@
       "directory_photo_uploaded_at": "2026-05-14T07:55:18+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 69,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 33,
       "on_payroll": true,
-      "url_slug": "thomas.holloway"
+      "url_slug": "thomas.holloway",
+      "date_of_birth": "1997-04-11"
     },
     {
       "id": 194,
@@ -5187,8 +5243,9 @@
       "most_recent_payroll_id": 84,
       "suspended": false,
       "created_at": "2026-05-17T14:06:41Z",
-      "updated_at": "2026-05-17T14:06:41Z",
-      "url_slug": "thomas.slaughter"
+      "updated_at": "2026-05-17T19:56:12Z",
+      "url_slug": "thomas.slaughter",
+      "date_of_birth": "1990-11-14"
     },
     {
       "id": 195,
@@ -5375,10 +5432,11 @@
       "directory_photo_uploaded_at": "2026-05-14T07:52:25+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 44,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 8,
       "on_payroll": true,
-      "url_slug": "victor.igbaifua"
+      "url_slug": "victor.igbaifua",
+      "date_of_birth": "1996-12-10"
     },
     {
       "id": 201,
@@ -5434,10 +5492,11 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
+      "updated_at": "2026-05-17T19:56:12Z",
       "url_slug": "yikyu.chan",
       "most_recent_payroll_id": 95,
-      "on_payroll": true
+      "on_payroll": true,
+      "date_of_birth": "2001-10-05"
     },
     {
       "id": 204,
@@ -5462,10 +5521,11 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:48:00Z",
-      "most_recent_payroll_id": 45,
+      "updated_at": "2026-05-17T19:59:31Z",
+      "most_recent_payroll_id": 9,
       "on_payroll": true,
-      "url_slug": "zara.benamor"
+      "url_slug": "zara.benamor",
+      "date_of_birth": "1956-08-21"
     }
   ]
 }

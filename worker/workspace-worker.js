@@ -1510,7 +1510,7 @@ const PEOPLE_ALLOWED_FIELDS = new Set([
   "main_google_email", "alt_google_emails", "external_google_email",
   "auth0_id",
   "access_level", "company", "title", "department",
-  "phone", "address", "start_date",
+  "phone", "address", "start_date", "date_of_birth",
   "line_manager_id", "line_manager_email_raw",
   "role", "notes",
   "directory_photo_uploaded_at", "cover_photo_uploaded_at",
@@ -1519,9 +1519,11 @@ const PEOPLE_ALLOWED_FIELDS = new Set([
 ]);
 // Fields a person can self-edit on their own profile page without admin
 // rights. Everything else (access_level, main/alt google emails, auth0,
-// line manager, dates) is admin-only.
+// line manager, dates) is admin-only — but date_of_birth is the unique
+// disambiguator when two people share a name, so we treat it as
+// self-editable too.
 const PEOPLE_SELF_EDITABLE = new Set([
-  "phone", "address", "role", "notes",
+  "phone", "address", "role", "notes", "date_of_birth",
   "directory_photo_uploaded_at", "cover_photo_uploaded_at",
 ]);
 const PEOPLE_ACCESS_LEVELS = new Set(["admin", "staff", "agent", "outsider", "former"]);

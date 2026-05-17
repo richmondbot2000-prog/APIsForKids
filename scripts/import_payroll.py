@@ -205,15 +205,44 @@ def build_indexes(people):
     return by_email, by_name
 
 
-def match_row(row, by_email, by_name):
+def match_row(row, by_email, by_name, by_external_id, dob_by_person_id):
+    """Priority:
+      1. External Id match — a previous payroll record on a Person had
+         the same External Id. Definitive.
+      2. Email match (rare in the LetMe spreadsheets but common in the
+         Property Management one).
+      3. Name + DOB match. Same name + same DOB = same human.
+      4. Name match WITHOUT a DOB CONFLICT (one side has DOB, the other
+         doesn't, OR neither does). Best-effort link, flagged.
+      5. Name match WITH DOB CONFLICT — explicit "different human, same
+         name" signal. Returns ("conflict", existing-person) so the caller
+         creates a NEW Person record instead of linking.
+    """
+    # 1. External Id
+    ext = (row.get("external_id") or "").strip().lower()
+    if ext and ext in by_external_id:
+        return ("external_id", by_external_id[ext])
+    # 2. Email
     if row["email"]:
         hit = by_email.get(row["email"])
         if hit: return ("email", hit)
+    # 3/4/5. Name + DOB
     key = norm_name(f"{row['first_name']} {row['last_name']}")
     candidates = by_name.get(key, [])
-    if len(candidates) == 1: return ("name", candidates[0])
-    if len(candidates) > 1:  return ("ambiguous", candidates)
-    return ("none", None)
+    if not candidates: return ("none", None)
+    row_dob = (row.get("date_of_birth") or "").strip()
+    if len(candidates) == 1:
+        p = candidates[0]
+        p_dob = (dob_by_person_id.get(p["id"]) or "").strip()
+        if row_dob and p_dob:
+            if row_dob == p_dob: return ("name+dob", p)
+            return ("conflict", p)   # DIFFERENT human, same name
+        return ("name", p)           # best-effort, no conflict signal
+    # multiple candidates
+    if row_dob:
+        same_dob = [p for p in candidates if (dob_by_person_id.get(p["id"]) or "").strip() == row_dob]
+        if len(same_dob) == 1: return ("name+dob", same_dob[0])
+    return ("ambiguous", candidates)
 
 
 # ─── PayrollData record build ────────────────────────────────────────
@@ -308,17 +337,40 @@ def main():
 
     by_email, by_name = build_indexes(people)
 
-    matched, ambiguous, unmatched = [], [], []
+    # External Id index: any prior PayrollData row carries the same
+    # External Id → that row's person_id is the answer.
+    by_external_id = {}
+    for r in payroll_file["records"]:
+        ext = (r.get("employee_number") or "").strip().lower()
+        if ext and r.get("person_id") is not None:
+            by_external_id[ext] = next((p for p in people if p["id"] == r["person_id"]), None)
+    # DOB index: prefer Person.date_of_birth, fall back to the active
+    # PayrollData record's DOB.
+    dob_by_person_id = {}
+    for p in people:
+        dob = (p.get("date_of_birth") or "").strip()
+        if not dob and p.get("most_recent_payroll_id"):
+            rec = next((r for r in payroll_file["records"] if r["id"] == p["most_recent_payroll_id"]), None)
+            if rec: dob = (rec.get("date_of_birth") or "").strip()
+        if dob: dob_by_person_id[p["id"]] = dob
+
+    matched, ambiguous, unmatched, conflicts = [], [], [], []
     for csv_path in args.csv:
         if not csv_path.exists():
             print(f"!! not found: {csv_path}", file=sys.stderr); continue
         source = f"manual:{csv_path.name}:{dt.date.today().isoformat()}"
         for row in read_rows(csv_path):
-            kind, hit = match_row(row, by_email, by_name)
-            if kind == "email" or kind == "name":
+            row["external_id"] = row.get("employee_number") or ""
+            kind, hit = match_row(row, by_email, by_name, by_external_id, dob_by_person_id)
+            if kind in ("external_id", "email", "name", "name+dob"):
                 matched.append((csv_path.name, row, hit, kind, source))
             elif kind == "ambiguous":
                 ambiguous.append((csv_path.name, row, hit, source))
+            elif kind == "conflict":
+                # Same name, different DOB → different human. Promote to
+                # unmatched so --create-missing makes a new Person.
+                conflicts.append((csv_path.name, row, hit, source))
+                unmatched.append((csv_path.name, row, source))
             else:
                 unmatched.append((csv_path.name, row, source))
 
@@ -326,16 +378,26 @@ def main():
     print(f"\n=== Match report — {sum(1 for _ in args.csv)} file(s) ===\n")
     print(f"  matched:    {len(matched)}")
     print(f"  ambiguous:  {len(ambiguous)}")
+    print(f"  conflicts:  {len(conflicts)}  (same name, different DOB → NEW Person)")
     print(f"  unmatched:  {len(unmatched)}\n")
     if matched:
+        # Sort so high-confidence matches (external_id / name+dob) come first.
+        rank = {"external_id": 0, "email": 1, "name+dob": 2, "name": 3}
+        matched.sort(key=lambda m: rank.get(m[3], 9))
         print("Matched (will create + relink):")
         for fname, row, person, kind, _ in matched:
-            print(f"  [{kind:5}]  {row['first_name']} {row['last_name']:<22}  ->  {person['id']:<24}  ({person.get('name','')})")
+            tag = f"[{kind:11}]"
+            warn = "  ← name-only, verify" if kind == "name" else ""
+            print(f"  {tag} {row['first_name']} {row['last_name']:<22}  →  #{person['id']:<4} {person.get('name','')}{warn}")
+    if conflicts:
+        print("\nName conflicts (different DOB — auto-create a new Person):")
+        for fname, row, existing, _ in conflicts:
+            print(f"  {row['first_name']} {row['last_name']:<22}  DOB={row.get('date_of_birth','?'):<11}  collides with #{existing['id']} (DOB={dob_by_person_id.get(existing['id'],'?')}) — new Person will be created if --create-missing")
     if ambiguous:
         print("\nAmbiguous (skipped — pick one manually first):")
         for fname, row, hits, _ in ambiguous:
-            ids = ", ".join(h["id"] for h in hits)
-            print(f"  {row['first_name']} {row['last_name']}  ->  {ids}")
+            ids = ", ".join(str(h["id"]) for h in hits)
+            print(f"  {row['first_name']} {row['last_name']}  →  #{ids}")
     if unmatched:
         print("\nUnmatched (skipped — create the Person first, or add an alias):")
         for fname, row, _ in unmatched:
@@ -374,6 +436,7 @@ def main():
                 "phone":                 row.get("mobile") or "",
                 "address":               row.get("address") or "",
                 "start_date":            row.get("start_date") or "",
+                "date_of_birth":         row.get("date_of_birth") or "",
                 "line_manager_id":       None,
                 "line_manager_email_raw": "",
                 "role":                  "",
