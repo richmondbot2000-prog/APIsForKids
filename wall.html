@@ -114,6 +114,11 @@
     transition: background-color 140ms ease, color 140ms ease;
   }
   .wl-attach-btn:hover { color: var(--brass-600, #A47829); background: var(--paper-100); }
+  .wl-attach-btn.is-active {
+    background: var(--ink-900, #11192E);
+    color: var(--paper-50, white);
+  }
+  .wl-attach-btn.is-active:hover { background: var(--ink-700, #2C3E66); color: var(--paper-50, white); }
   .wl-attach-btn .wl-icon { width: 22px; height: 22px; }
   .wl-attach-btn input[type=file] { display: none; }
   .wl-compose-previews { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
@@ -1111,6 +1116,9 @@
           <button type="button" class="wl-attach-btn" id="wlComposeGifBtn" title="Pick a GIF / meme" aria-label="Add a GIF">
             <span id="wlIconGif"></span>
           </button>
+          <button type="button" class="wl-attach-btn" id="wlComposeBoldBtn" title="Bold (anything you type while this is on becomes bold)" aria-label="Bold" aria-pressed="false">
+            <span id="wlIconBold"></span>
+          </button>
         </div>
         <span class="wl-char-count" id="wlCharCount">0 / 10,000</span>
         <button class="wl-btn-post" id="wlPostBtn" disabled>Post</button>
@@ -1238,6 +1246,11 @@
       outline: `<path d="M4 8v12h14V14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 8h8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M14 4l6 6-9 9H5v-6l9-9z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`,
       filled:  `<path d="M4 8v12h14V14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 8h8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M14 4l6 6-9 9H5v-6l9-9z" fill="currentColor" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>`,
     },
+    bold: {
+      // Capital A with a baseline underline — matches the reference screenshot.
+      outline: `<path d="M5 18 L12 5 L19 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M8 13 L16 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M5 21 L19 21" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>`,
+      filled:  `<path d="M5 18 L12 5 L19 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M8 13 L16 13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M5 21 L19 21" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>`,
+    },
   };
   function icon(name, active) {
     const i = ICONS[name];
@@ -1344,6 +1357,7 @@
   document.getElementById("wlIconPhoto").innerHTML = icon("photo", false);
   document.getElementById("wlIconVideo").innerHTML = icon("video", false);
   document.getElementById("wlIconGif").innerHTML   = icon("gif",   false);
+  document.getElementById("wlIconBold").innerHTML  = icon("bold",  false);
 
   document.getElementById("wlComposePhotoInput").addEventListener("change", e => {
     handleFilePick(Array.from(e.target.files || []), "photo");
@@ -1358,6 +1372,40 @@
       composeAttachments.push({ path: gif.url, kind: "gif", preview: gif.preview });
       renderComposePreviews(); refreshComposeState();
     });
+  });
+
+  // Bold toggle. While "on" the textarea has an open `**` waiting for a
+  // close; the next toggle inserts the closing `**`. So anything the user
+  // types between the two clicks gets wrapped as **bold**. Rendering
+  // (in renderPostCompact / renderPostExpanded) turns `**foo**` into
+  // <strong>foo</strong>. Same Slack / WhatsApp pattern.
+  let composeBoldOn = false;
+  const boldBtn = document.getElementById("wlComposeBoldBtn");
+  boldBtn.addEventListener("click", () => {
+    const t = composeText;
+    const start = t.selectionStart ?? t.value.length;
+    const end   = t.selectionEnd   ?? start;
+    const before = t.value.slice(0, start);
+    const sel    = t.value.slice(start, end);
+    const after  = t.value.slice(end);
+    if (sel.length > 0) {
+      // Wrap the current selection — leaves bold OFF since both stars
+      // are placed atomically; user can keep typing in plain.
+      t.value = before + "**" + sel + "**" + after;
+      const cursor = start + 2 + sel.length + 2;
+      t.setSelectionRange(cursor, cursor);
+      composeBoldOn = false;
+    } else {
+      // Insert the open or close marker at the cursor.
+      t.value = before + "**" + after;
+      const cursor = start + 2;
+      t.setSelectionRange(cursor, cursor);
+      composeBoldOn = !composeBoldOn;
+    }
+    boldBtn.classList.toggle("is-active", composeBoldOn);
+    boldBtn.setAttribute("aria-pressed", composeBoldOn ? "true" : "false");
+    t.focus();
+    t.dispatchEvent(new Event("input", { bubbles: true }));
   });
 
   async function handleFilePick(files, kind) {
@@ -1437,6 +1485,9 @@
       composeText.value = "";
       fitCompose();
       composeAttachments = [];
+      composeBoldOn = false;
+      boldBtn.classList.remove("is-active");
+      boldBtn.setAttribute("aria-pressed", "false");
       renderComposePreviews();
       charCount.textContent = "0 / 10,000";
       showBanner("Posted");
@@ -1640,7 +1691,7 @@
         ${renderPostHead(post)}
         ${editingKey === `post:${post.id}`
           ? `<textarea class="wl-edit-input" data-edit-save="post:${escapeHtml(post.id)}" maxlength="10000" data-stop-card-click>${escapeHtml(post.body || "")}</textarea>`
-          : `<div class="wl-post-body wl-post-body--teaser">${enrichBody(body250)}</div>`}
+          : `<div class="wl-post-body wl-post-body--teaser">${enrichBody(body250, { bold: true })}</div>`}
         ${photoStrip}
         ${linkBlocks}
         <div class="wl-compact-meta">
@@ -1667,7 +1718,7 @@
 
   function renderPostExpanded(post) {
     const bodyText = post.body || "";
-    const bodyHtml = enrichBody(bodyText);
+    const bodyHtml = enrichBody(bodyText, { bold: true });
     const linkBlocks = renderLinkBlocks(bodyText, post.id);
     const photos = renderPhotos(post.photos || [], post.id);
     const reactions = renderReactionPills(post.reactions || {}, post.id, "post");
@@ -1731,8 +1782,20 @@
       return `<a class="wl-post-link" href="${safe}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();">${m}</a>`;
     });
   }
-  function enrichBody(rawText) {
-    return renderMentionsInHtml(linkifyBody(escapeHtml(rawText || "")));
+  function enrichBody(rawText, opts) {
+    let html = renderMentionsInHtml(linkifyBody(escapeHtml(rawText || "")));
+    // Bold (**foo**) is a post-only feature — comments/replies render
+    // the literal `**foo**` so the markdown isn't accidentally honoured
+    // in chat. Pass {bold:true} from post renderers only.
+    if (opts && opts.bold) html = renderBoldInHtml(html);
+    return html;
+  }
+  // Markdown bold (**…**) → <strong>…</strong>. Runs on already-escaped
+  // HTML so `**` is unchanged from the user's input. The non-greedy
+  // [^*] inner pattern means consecutive bold spans don't merge and a
+  // single dangling `**` stays as literal.
+  function renderBoldInHtml(html) {
+    return html.replace(/\*\*([^*\n][^*\n]*?)\*\*/g, '<strong>$1</strong>');
   }
 
   // === @-mentions ===========================================================
