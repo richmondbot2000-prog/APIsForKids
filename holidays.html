@@ -672,6 +672,46 @@
   .hd-act-refresh:hover { color: var(--red-500, #b14040); border-bottom-color: var(--red-500); }
   .hd-act-refresh:disabled { color: var(--ink-300); cursor: default; border-bottom-color: transparent; }
 
+  /* "What's counted" disclosure — explicit list of the warehouse events
+     each tick on the bar represents. Closed by default so it doesn't
+     clutter; expand to audit the rule that produced the picture. */
+  .hd-act-sources {
+    flex: 1 1 100%;
+    margin: 4px 0 0;
+    font: 400 12px/1.4 var(--font-display, 'Newsreader', serif);
+    color: var(--ink-700);
+  }
+  .hd-act-sources summary {
+    cursor: pointer;
+    color: var(--ink-500);
+    font-style: italic;
+    list-style: none;
+    user-select: none;
+  }
+  .hd-act-sources summary::before { content: "› "; color: var(--brass-500, #B8923F); }
+  .hd-act-sources[open] summary::before { content: "⌄ "; }
+  .hd-act-sources ul { list-style: none; margin: 8px 0 4px; padding: 0; }
+  .hd-act-sources li {
+    margin: 0 0 10px;
+    padding: 6px 10px;
+    background: var(--paper-100, #F6EFD9);
+    border-left: 2px solid var(--brass-300, #E2BF74);
+  }
+  .hd-act-sources .src-label {
+    font: 600 12px/1.3 var(--font-display, 'Newsreader', serif);
+    color: var(--ink-900);
+  }
+  .hd-act-sources .src-filter {
+    font: 500 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: var(--ink-700);
+    background: var(--paper-200, #ECDFB6);
+    padding: 1px 5px;
+    border-radius: 2px;
+    display: inline-block;
+    margin: 2px 0;
+  }
+  .hd-act-sources .src-desc { color: var(--ink-500); margin-top: 4px; }
+
   /* Activity view — one row per direct report. Each row shows N day-
      columns. Each day is a thin vertical 24-hour bar; horizontal
      hairlines mark the 15-min windows where the user actually wrote
@@ -1038,6 +1078,10 @@
       <div class="hd-act-toolbar">
         <p class="hd-meta" id="hdActivityMeta">Loading activity…</p>
         <button type="button" id="hdActRefresh" class="hd-act-refresh" style="display:none;">Refresh data (this month)</button>
+        <details class="hd-act-sources" id="hdActSources">
+          <summary>What's counted on this view</summary>
+          <div id="hdActSourcesBody"><em>Loading source list…</em></div>
+        </details>
       </div>
       <div class="hd-act" id="hdAct" aria-label="Team data-warehouse activity"></div>
     </div>
@@ -1832,6 +1876,37 @@
   // detail event the warehouse captured for that user-day.
   let activityData = null;     // D1-backed via /api/workspace/activity
   let activityFocus = null;    // { email, iso } currently expanded
+  let activitySources = null;  // { sources: [...] } from /scripts/activity_sources.json
+
+  async function ensureActivitySources() {
+    if (activitySources !== null) return activitySources;
+    try {
+      // Path is relative to root so it works at both book.togetherbook.net
+      // and the github.io mirror. ?v= cache-bust on each load so an edit
+      // to the whitelist becomes visible to admins without a hard refresh.
+      const r = await fetch(`/scripts/activity_sources.json?v=${Date.now()}`, { cache: "no-store" });
+      activitySources = r.ok ? await r.json() : { sources: [] };
+    } catch { activitySources = { sources: [] }; }
+    return activitySources;
+  }
+
+  function renderActivitySources(cfg) {
+    const body = document.getElementById("hdActSourcesBody");
+    if (!body) return;
+    const sources = (cfg && cfg.sources) || [];
+    if (!sources.length) { body.innerHTML = `<em>No source whitelist loaded.</em>`; return; }
+    body.innerHTML = `
+      <p style="margin:6px 0 10px">A 15-min slot lights up here only if one of these events fired during it for this person. Everything else in the warehouse is deliberately ignored.</p>
+      <ul>
+        ${sources.map(s => `
+          <li>
+            <div class="src-label">${escapeHtml(s.label)} <span style="color:var(--ink-500);font-weight:400">— ${escapeHtml(s.database)}.${escapeHtml(s.schema)}.${escapeHtml(s.table)}</span></div>
+            <div><span class="src-filter">${escapeHtml(s.human_filter)}</span></div>
+            ${s.description ? `<div class="src-desc">${escapeHtml(s.description)}</div>` : ""}
+          </li>`).join("")}
+      </ul>
+      <p style="color:var(--ink-500);font-style:italic;margin:6px 0 0">Source: <code>scripts/activity_sources.json</code>.</p>`;
+  }
 
   async function ensureActivityData() {
     if (activityData !== null) return activityData;
@@ -1860,7 +1935,8 @@
       return;
     }
 
-    const data = await ensureActivityData();
+    const [data, srcCfg] = await Promise.all([ensureActivityData(), ensureActivitySources()]);
+    renderActivitySources(srcCfg);
     const byEmail = (data && data.by_email) || {};
     const pulled  = (data && data.pulled)   || {};
     const lastPullAt = data && data.last_pull_at ? new Date(data.last_pull_at).toLocaleString("en-GB") : null;

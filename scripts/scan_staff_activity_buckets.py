@@ -1,35 +1,28 @@
 """
-Per-user, per-15-min-bucket activity. Accumulates into a permanent
-`staff-activity-buckets.json` — each scan only re-pulls the date range
-the caller asked for (default: yesterday only), so older data never
-gets overwritten unless an admin explicitly refreshes a month.
+Per-user, per-15-min-bucket activity scanner.
+
+Rebuilt 2026-05-18: previously this script auto-discovered every warehouse
+table with a ClientUsername column and counted any row as "the human was
+active at that bucket". That caught a lot of bot writes credited to humans
+(messaging factories, robot responders, scheduler IDs reusing an agent's
+username, etc.) — visible symptom was people lit up 24/7 in the Holidays
+Activity bar.
+
+The replacement is intentionally narrow: read `scripts/activity_sources.json`
+(the canonical whitelist) and ONLY scan those sources, applying each
+source's explicit `human_filter` verbatim. If the Activity bar looks wrong,
+the rule belongs in `activity_sources.json` — not buried in here.
+
+Output is unchanged so the front-end / D1 mirror keep working:
+  - `staff-activity-buckets.json` at the repo root
+  - same shape (schema_version: 2, by_email: {email: {buckets, events}})
+  - same merge-window semantics
+  - same D1 sync into `activity_buckets` + `activity_events`
 
 Date-range envvars (optional):
   ACTIVITY_START_DATE  YYYY-MM-DD  — first day to scan (inclusive)
   ACTIVITY_END_DATE    YYYY-MM-DD  — last day to scan (inclusive)
-Default: both = yesterday UTC. Caller sets these via the
-refresh-staff-activity workflow's workflow_dispatch inputs.
-
-Output: `staff-activity-buckets.json` at the repo root.
-
-Shape:
-```
-{
-  "schema_version": 1,
-  "snapshot_at":    "<ISO>",
-  "window_days":    14,
-  "cutoff_utc":     "<ISO at start of window>",
-  "by_email": {
-    "alice@letme.com": {
-      "2026-05-15": [32, 33, 34, 35, 60, 61, 62, 63],   // bucket indices (0=00:00, 95=23:45 UTC)
-      "2026-05-16": [ ... ]
-    },
-    ...
-  }
-}
-```
-
-Bucket indexing: `bucket = hour*4 + minute/15`. UTC.
+Default: both = yesterday UTC.
 
 Required env vars: FABRIC_SQL_ENDPOINT, FABRIC_TENANT_ID, FABRIC_CLIENT_ID, FABRIC_CLIENT_SECRET
 """
@@ -49,29 +42,8 @@ from pathlib import Path
 import pyodbc
 
 
-DATABASES = [
-    "ReportingApplications",
-    "ReportingBrokers",
-    "ReportingCentralCrm",
-    "ReportingCommunications",
-    "ReportingLoanbook",
-    "ReportingPayments",
-    "Whitebox",
-]
-
-DEFAULT_LOOKBACK_DAYS = 1  # scheduled run pulls yesterday only
-
-TS_DATA_TYPES = ('datetime', 'datetime2', 'datetimeoffset', 'smalldatetime', 'date')
-
-TS_NAME_PREF = (
-    "DateTimeUTC", "DateTimeUtc", "UTCTime", "UtcTime",
-    "EventDateUTC", "CreatedDateUTC", "CreatedAtUTC",
-    "EventDateTime", "DateTime", "EventDate", "Created", "CreatedAt",
-    "ModifiedDateUTC", "ModifiedAtUTC", "ModifiedDate", "ModifiedAt",
-    "InsertDateUTC", "InsertedAt", "Stamp", "Timestamp", "EventTime",
-    "StatusTime", "ReceivedAt", "ReceivedUtc", "SentAt", "SentUtc",
-)
-
+SOURCES_FILE = Path(__file__).parent / "activity_sources.json"
+DEFAULT_LOOKBACK_DAYS = 1
 QUERY_TIMEOUT = 240
 
 
@@ -94,51 +66,37 @@ def conn_str(database: str) -> str:
     )
 
 
-def find_tables_and_timestamp(cur, database: str):
-    """Same logic as scan_staff_activity.py: every table with ClientUsername
-    + a datetime column, picking the most semantic timestamp column."""
-    cur.execute("""
-        SELECT TABLE_SCHEMA, TABLE_NAME
-        FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE COLUMN_NAME = 'ClientUsername'
-    """)
-    cu_tables = {(s, t) for s, t in cur.fetchall()}
-    if not cu_tables:
-        return []
-
-    placeholders = ",".join(["?"] * len(TS_DATA_TYPES))
-    cur.execute(
-        f"""
-        SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, DATA_TYPE
-        FROM INFORMATION_SCHEMA.COLUMNS
-        WHERE DATA_TYPE IN ({placeholders})
-        """,
-        list(TS_DATA_TYPES),
-    )
-    ts_by_table = defaultdict(list)
-    for s, t, c, _ in cur.fetchall():
-        ts_by_table[(s, t)].append(c)
-
-    out = []
-    for st in cu_tables:
-        cols = ts_by_table.get(st, [])
-        if not cols:
-            continue
-        chosen = next((p for p in TS_NAME_PREF if p in cols), None)
-        if not chosen:
-            chosen = cols[0]
-        out.append((st[0], st[1], chosen))
-    return out
+def load_sources():
+    if not SOURCES_FILE.exists():
+        sys.exit(f"error: {SOURCES_FILE} missing — the activity scanner needs an explicit whitelist")
+    cfg = json.loads(SOURCES_FILE.read_text())
+    srcs = cfg.get("sources") or []
+    if not srcs:
+        sys.exit("error: activity_sources.json has no `sources` entries — nothing to scan")
+    for s in srcs:
+        for key in ("database", "schema", "table", "ts_col", "user_col", "human_filter", "label"):
+            if not s.get(key):
+                sys.exit(f"error: activity_sources.json entry missing `{key}`: {s}")
+    return srcs
 
 
-def scan_database(database: str, start: datetime.datetime, end_exclusive: datetime.datetime, buckets_out, events_out):
-    """For each table in `database` that has ClientUsername + timestamp,
-    scan rows in [start, end_exclusive) and:
-       - aggregate 15-min buckets into `buckets_out[un][iso] = set(bucket_idx)`
-       - aggregate per-(un, date, source, bucket) write count into
-         `events_out` keyed (un, iso, src, bucket) → row.
-    """
-    print(f"# {database}", flush=True)
+def scan_source(src, start: datetime.datetime, end_exclusive: datetime.datetime, buckets_out, events_out):
+    """Run the source's whitelisted query and aggregate into the shared dicts.
+    Per-source key (used as `src` in the events doc) is `<db-short>.<table>`
+    where db-short = database minus 'Reporting' prefix, lower-cased — matches
+    the existing shape so the front-end keeps rendering."""
+    database = src["database"]
+    schema   = src["schema"]
+    table    = src["table"]
+    ts       = src["ts_col"]
+    user_col = src["user_col"]
+    where    = src["human_filter"]
+    label    = src["label"]
+    db_short = database.removeprefix("Reporting").lower()
+    src_key  = f"{db_short}.{table}"
+
+    print(f"# {label} — {database}.{schema}.{table}  (filter: {where})", flush=True)
+
     try:
         c = pyodbc.connect(conn_str(database), timeout=20)
         c.timeout = QUERY_TIMEOUT
@@ -147,101 +105,64 @@ def scan_database(database: str, start: datetime.datetime, end_exclusive: dateti
         print(f"  ! connect failed: {e}", flush=True)
         return
 
-    try:
-        targets = find_tables_and_timestamp(cur, database)
-        print(f"  - {len(targets)} table(s) with ClientUsername + timestamp", flush=True)
-        for s, t, ts in targets:
-            print(f"    · {s}.{t} (ts={ts})", flush=True)
-    except Exception as e:
-        print(f"  ! schema scan failed: {e}", flush=True)
-        try: c.close()
-        except: pass
-        return
-
     start_str = start.strftime("%Y-%m-%d %H:%M:%S")
     end_str   = end_exclusive.strftime("%Y-%m-%d %H:%M:%S")
-    db_short = database.removeprefix("Reporting").lower()
 
-    for schema, table, ts in targets:
-        src = f"{db_short}.{table}"
-        try:
-            # Filter: ClientUsername must look like a person identifier —
-            # either email-form (contains @) or dotted-name form (e.g.
-            # `jack.bassilious`). The dotted form matters for
-            # ReportingCommunications.dbo.Messages where agent usernames
-            # are stored as bare local-parts (no @<domain>), so the
-            # original @-only filter was silently dropping every comm
-            # sent by an employee.
-            #
-            # Extra Messages-only clause: also require ClientType LIKE '%CRM%'.
-            # Without it, bot-sent messages tagged with a human's username
-            # (MessageFactory, Whitebox, RobotResponder, AiResponder,
-            # LoanbookMonitorRobotV2, UIVR, ApplyWebsite1, …) get credited
-            # to that human's activity bar. The CRM tag is the canonical
-            # human-agent signal — it also covers TogetherLoansCRM_Dialler,
-            # RapidaCRM, LendingMateCRM, MoneymasCRM. Other warehouse tables
-            # don't have this confusion (no bots write loanbook.Events under
-            # a person's name) so we leave them untouched.
-            is_comm_messages = (
-                database == "ReportingCommunications"
-                and schema.lower() == "dbo"
-                and table == "Messages"
-            )
-            extra_where = " AND ClientType LIKE '%CRM%' " if is_comm_messages else ""
-            q = (
-                f"SELECT LOWER(ClientUsername) AS un, "
-                f"       CAST([{ts}] AS DATE) AS dt, "
-                f"       (DATEPART(HOUR, [{ts}]) * 4 + DATEPART(MINUTE, [{ts}]) / 15) AS bucket, "
-                f"       COUNT_BIG(*) AS writes, "
-                f"       MIN([{ts}]) AS first_at, "
-                f"       MAX([{ts}]) AS last_at "
-                f"FROM [{schema}].[{table}] "
-                f"WHERE [{ts}] >= ? AND [{ts}] < ? "
-                f"  AND ClientUsername IS NOT NULL "
-                f"  AND (ClientUsername LIKE '%@%' OR ClientUsername LIKE '%.%') "
-                f"{extra_where}"
-                f"GROUP BY LOWER(ClientUsername), CAST([{ts}] AS DATE), "
-                f"         (DATEPART(HOUR, [{ts}]) * 4 + DATEPART(MINUTE, [{ts}]) / 15)"
-            )
-            cur.execute(q, [start_str, end_str])
-            for un, dt, bucket, writes, first_at, last_at in cur.fetchall():
-                iso = dt.isoformat() if dt else None
-                if not iso or bucket is None:
-                    continue
-                buckets_out[un][iso].add(int(bucket))
-                # Per-event entry — one row per (user, date, source,
-                # bucket). Carries write count + min/max timestamps so
-                # the manager-side drill-down can show e.g. "23 writes
-                # to loanbook.Payment 09:00–09:14 UTC".
-                key = (un, iso, src, int(bucket))
-                ev = events_out.get(key)
-                if ev is None:
-                    events_out[key] = {
-                        "src": src,
-                        "bucket": int(bucket),
-                        "writes": int(writes or 0),
-                        "first_at": first_at.isoformat() if first_at else None,
-                        "last_at":  last_at.isoformat()  if last_at  else None,
-                    }
-                else:
-                    ev["writes"] += int(writes or 0)
-                    if first_at and (not ev["first_at"] or first_at.isoformat() < ev["first_at"]): ev["first_at"] = first_at.isoformat()
-                    if last_at  and (not ev["last_at"]  or last_at.isoformat()  > ev["last_at"]):  ev["last_at"]  = last_at.isoformat()
-        except Exception as e:
-            print(f"  ! {schema}.{table}: {e}", flush=True)
-            continue
-    try: c.close()
-    except: pass
+    try:
+        # Same person-shape gate as before: ClientUsername must look like an
+        # email (contains @) or dotted local-part (contains .). Both forms
+        # appear in CRM logs depending on whether the agent was signed in
+        # via SSO email or bare username.
+        q = (
+            f"SELECT LOWER([{user_col}]) AS un, "
+            f"       CAST([{ts}] AS DATE) AS dt, "
+            f"       (DATEPART(HOUR, [{ts}]) * 4 + DATEPART(MINUTE, [{ts}]) / 15) AS bucket, "
+            f"       COUNT_BIG(*) AS writes, "
+            f"       MIN([{ts}]) AS first_at, "
+            f"       MAX([{ts}]) AS last_at "
+            f"FROM [{schema}].[{table}] "
+            f"WHERE [{ts}] >= ? AND [{ts}] < ? "
+            f"  AND [{user_col}] IS NOT NULL "
+            f"  AND ([{user_col}] LIKE '%@%' OR [{user_col}] LIKE '%.%') "
+            f"  AND ({where}) "
+            f"GROUP BY LOWER([{user_col}]), CAST([{ts}] AS DATE), "
+            f"         (DATEPART(HOUR, [{ts}]) * 4 + DATEPART(MINUTE, [{ts}]) / 15)"
+        )
+        cur.execute(q, [start_str, end_str])
+        rows_seen = 0
+        for un, dt, bucket, writes, first_at, last_at in cur.fetchall():
+            iso = dt.isoformat() if dt else None
+            if not iso or bucket is None:
+                continue
+            buckets_out[un][iso].add(int(bucket))
+            key = (un, iso, src_key, int(bucket))
+            ev = events_out.get(key)
+            if ev is None:
+                events_out[key] = {
+                    "src":      src_key,
+                    "label":    label,
+                    "bucket":   int(bucket),
+                    "writes":   int(writes or 0),
+                    "first_at": first_at.isoformat() if first_at else None,
+                    "last_at":  last_at.isoformat()  if last_at  else None,
+                }
+            else:
+                ev["writes"] += int(writes or 0)
+                if first_at and (not ev["first_at"] or first_at.isoformat() < ev["first_at"]): ev["first_at"] = first_at.isoformat()
+                if last_at  and (not ev["last_at"]  or last_at.isoformat()  > ev["last_at"]):  ev["last_at"]  = last_at.isoformat()
+            rows_seen += 1
+        print(f"  · {rows_seen:,} (user, day, bucket) groups returned", flush=True)
+    except Exception as e:
+        print(f"  ! {schema}.{table}: {e}", flush=True)
+    finally:
+        try: c.close()
+        except: pass
 
 
 def domain_local_variants(workspace_email: str):
     """Every ClientUsername form this Workspace user might appear under.
-    Includes:
-      - the Workspace email itself
-      - local-part @ every known tenant domain
-      - the bare local-part (no @) — Communications.Messages stores
-        agent usernames in this form for outbound CRM messages
-    """
+    Unchanged from the old scanner — CRM stores agent identifiers as either
+    a full SSO email, a tenant-local email, or a bare local-part."""
     local = workspace_email.split("@")[0].lower()
     domains = [
         "rgroup.co.uk", "letme.co.uk", "letme.com",
@@ -252,7 +173,7 @@ def domain_local_variants(workspace_email: str):
     ]
     s = {f"{local}@{d}" for d in domains}
     s.add(workspace_email.lower())
-    s.add(local)  # bare local-part (Comms agent username form)
+    s.add(local)
     return s
 
 
@@ -274,14 +195,13 @@ def main() -> None:
         yesterday.year, yesterday.month, yesterday.day, tzinfo=datetime.timezone.utc)
     end_inclusive = parse_date(os.environ.get("ACTIVITY_END_DATE")) or datetime.datetime(
         yesterday.year, yesterday.month, yesterday.day, tzinfo=datetime.timezone.utc)
-    # Scan filter is [start, end_exclusive) where end_exclusive = end+1d.
     end_exclusive = end_inclusive + datetime.timedelta(days=1)
 
+    sources = load_sources()
     print(f"# scan_staff_activity_buckets start {started.isoformat()}", flush=True)
-    print(f"# range: {start.date().isoformat()} → {end_inclusive.date().isoformat()} (inclusive)", flush=True)
+    print(f"# range:   {start.date().isoformat()} → {end_inclusive.date().isoformat()} (inclusive)", flush=True)
+    print(f"# sources: {len(sources)} whitelisted (see scripts/activity_sources.json)", flush=True)
 
-    # All ISO dates inside the requested window — we'll wipe these from
-    # the existing doc before merging so a forced refresh is idempotent.
     dates_in_window = []
     d = start.date()
     while d <= end_inclusive.date():
@@ -289,13 +209,11 @@ def main() -> None:
         d = d + datetime.timedelta(days=1)
     window_set = set(dates_in_window)
 
-    all_buckets = defaultdict(lambda: defaultdict(set))   # un → iso → set(bucket)
-    all_events  = {}                                       # (un, iso, src, bucket) → row
-    for db in DATABASES:
-        scan_database(db, start, end_exclusive, all_buckets, all_events)
+    all_buckets = defaultdict(lambda: defaultdict(set))
+    all_events  = {}
+    for src in sources:
+        scan_source(src, start, end_exclusive, all_buckets, all_events)
 
-    # Roll each staff member's ClientUsername variants into the Workspace
-    # email. staff.json gives us the canonical list.
     staff_path = Path("staff.json")
     if not staff_path.exists():
         sys.exit("staff.json missing — cannot map ClientUsernames to staff")
@@ -311,11 +229,10 @@ def main() -> None:
             if un in all_buckets:
                 for iso, buckets in all_buckets[un].items():
                     rolled_buckets[email][iso] |= buckets
-        for (un, iso, src, bucket), row in all_events.items():
+        for (un, iso, src_key, bucket), row in all_events.items():
             if un in variants:
                 rolled_events[email][iso].append(row)
 
-    # Load existing doc so we MERGE rather than overwrite.
     out_path = Path("staff-activity-buckets.json").resolve()
     if out_path.exists():
         try:
@@ -326,21 +243,17 @@ def main() -> None:
         existing = {}
     by_email = existing.get("by_email") or {}
 
-    # Step 1 — wipe the requested window from every existing user. A
-    # forced refresh of a month should not leave stale entries from a
-    # prior scan with different filters.
     for email, rec in by_email.items():
         for iso in dates_in_window:
             if rec.get("buckets") and iso in rec["buckets"]: del rec["buckets"][iso]
             if rec.get("events")  and iso in rec["events"]:  del rec["events"][iso]
 
-    # Step 2 — merge fresh data for the window.
     for email, dates in rolled_buckets.items():
         rec = by_email.setdefault(email, {"buckets": {}, "events": {}})
         rec.setdefault("buckets", {})
         rec.setdefault("events", {})
         for iso, buckets in dates.items():
-            if iso not in window_set: continue  # safety
+            if iso not in window_set: continue
             rec["buckets"][iso] = sorted(buckets)
     for email, dates in rolled_events.items():
         rec = by_email.setdefault(email, {"buckets": {}, "events": {}})
@@ -348,15 +261,17 @@ def main() -> None:
         for iso, evs in dates.items():
             if iso not in window_set: continue
             evs.sort(key=lambda e: e.get("first_at") or "")
-            rec["events"][iso] = evs[:200]   # cap
+            rec["events"][iso] = evs[:200]
 
     existing["schema_version"] = 2
     existing["last_pull_at"]   = started.isoformat()
     existing["by_email"]       = by_email
     existing["active_count"]   = len(by_email)
-    # Append a row to a per-day-pulled log so we know which dates have
-    # been scanned at least once (the page can show "last refreshed
-    # YYYY-MM-DD" + grey out dates we haven't pulled yet).
+    existing["sources"]        = [
+        {"label": s["label"], "src": f"{s['database'].removeprefix('Reporting').lower()}.{s['table']}",
+         "filter": s["human_filter"], "description": s.get("description", "")}
+        for s in sources
+    ]
     pulled = existing.setdefault("pulled", {})
     for iso in dates_in_window:
         pulled[iso] = started.isoformat()
@@ -364,11 +279,6 @@ def main() -> None:
     out_path.write_text(json.dumps(existing, indent=2))
     print(f"# wrote {out_path} — merged {len(rolled_buckets)} users across {len(dates_in_window)} day(s)", flush=True)
 
-    # Mirror the fresh window into D1 so the worker's GET /api/workspace/activity
-    # — which reads from activity_buckets + activity_events — actually reflects
-    # what the JSON now says. Until this step existed, the bucket scanner only
-    # wrote to JSON and the D1 tables drifted (silently serving old data,
-    # including the bot-vs-human filter applied here).
     cf_account = os.environ.get("CLOUDFLARE_ACCOUNT_ID")
     cf_token   = os.environ.get("CLOUDFLARE_API_TOKEN")
     cf_db      = os.environ.get("D1_ACTIVITY_DB_ID")
@@ -393,14 +303,10 @@ def _d1_query(account, token, db_id, sql, params=None):
 
 def sync_to_d1(account, token, db_id, rolled_buckets, rolled_events, dates_in_window):
     """Idempotent DELETE-then-INSERT of the window into D1's activity_buckets +
-    activity_events. D1 caps each statement at 100 SQL variables; the two-col
-    bucket rows fit ~40/batch, three+col event rows fit ~14/batch. Parallelised
-    with a small thread pool, same pattern as scan_comm_items.py."""
+    activity_events."""
     print(f"# D1 sync: {len(dates_in_window)} day(s) × buckets={sum(len(v) for v in rolled_buckets.values())} events={sum(len(d) for v in rolled_events.values() for d in v.values())}", flush=True)
     t0 = time.time()
 
-    # Step 1 — wipe the window. One DELETE per (table, date) so the row scan
-    # stays bounded even if a wide range is being refreshed.
     for iso in dates_in_window:
         for tbl in ("activity_buckets", "activity_events"):
             out = _d1_query(account, token, db_id,
@@ -409,15 +315,14 @@ def sync_to_d1(account, token, db_id, rolled_buckets, rolled_events, dates_in_wi
                 print(f"  ! delete {tbl} {iso} failed: {out.get('errors')}", flush=True)
                 return
 
-    # Step 2 — build the row lists, then INSERT in batches.
-    bucket_rows = []   # (email, iso, bucket)
+    bucket_rows = []
     for email, dates in rolled_buckets.items():
         for iso, bset in dates.items():
             if iso not in set(dates_in_window):
                 continue
             for b in bset:
                 bucket_rows.append((email, iso, int(b)))
-    event_rows = []    # (email, iso, bucket, src, writes, first_at, last_at, kind)
+    event_rows = []
     for email, dates in rolled_events.items():
         for iso, evs in dates.items():
             if iso not in set(dates_in_window):
@@ -454,8 +359,6 @@ def sync_to_d1(account, token, db_id, rolled_buckets, rolled_events, dates_in_wi
             print(f"    ! {len(failed)} batch(es) failed; first error: {json.dumps(failed[0])[:300]}", flush=True)
         print(f"    {ok:,}/{len(rows):,} rows inserted into {table}", flush=True)
 
-    # Bucket table is 3 columns → 33 rows/batch (≤ 99 vars). Event table is
-    # 8 columns → 12 rows/batch.
     _batch_insert("activity_buckets", ["email","iso_date","bucket"], bucket_rows, 33)
     _batch_insert("activity_events",  ["email","iso_date","bucket","src","writes","first_at","last_at","kind"], event_rows, 12)
     print(f"# D1 sync done in {time.time()-t0:.1f}s", flush=True)

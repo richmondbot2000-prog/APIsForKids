@@ -1,0 +1,32 @@
+{
+  "_README": [
+    "Canonical list of warehouse events that count as 'a human was actively working at this moment'.",
+    "Every source listed here is an explicit, audit-able event-type-with-filter — not a 'whatever shows up'.",
+    "The scanners (scan_staff_activity.py + scan_staff_activity_buckets.py) read THIS file and ignore",
+    "every other warehouse table. If the resulting Activity bar looks wrong, the rule belongs in here, not buried in the scanner.",
+    "Adding a new source: append an entry below + re-run the scanner. The Holidays Activity tab will document it automatically."
+  ],
+  "schema_version": 1,
+  "sources": [
+    {
+      "label": "Application opened in CRM",
+      "database": "ReportingApplications",
+      "schema": "dbo",
+      "table": "Events",
+      "ts_col": "EventDateTime",
+      "user_col": "ClientUsername",
+      "human_filter": "EventTypeId = 14 AND ClientType LIKE '%CRM%'",
+      "description": "Written when a CRM agent navigates into an application (BRW / prospect) record in /Payout/Caseview. The row is triggered by SmartLook starting a screen recording at the moment of view. EventTypeId 14 = 'ApplicationOpened' (per the wiki /Central_CRM.md and the feed-filter spec which classifies this as a 'View'). ClientType=CRM% scopes to clicks-from-an-agent and excludes any system caller using the same username."
+    },
+    {
+      "label": "Loan case opened in CRM",
+      "database": "ReportingLoanbook",
+      "schema": "dbo",
+      "table": "Events",
+      "ts_col": "EventDateTime",
+      "user_col": "ClientUsername",
+      "human_filter": "EventTypeId = 11 AND ClientType LIKE '%CRM%'",
+      "description": "Written when a CRM agent navigates into an existing loan case in /Collections/Caseview. SmartLook trigger, same shape as the application-side view. EventTypeId 11 = 'CaseOpened' (per Central_CRM.md and the feed-filter spec which classifies this as a 'View'). ClientType=CRM% scopes to agent clicks."
+    }
+  ]
+}
