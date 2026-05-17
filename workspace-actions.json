@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-17T20:24:41.152Z",
+  "updated_at": "2026-05-17T20:53:21.500Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -2354,6 +2354,13 @@
       "actor": "james.benamor@letme.com",
       "action": "people-merge",
       "target": "5 → 4",
+      "ok": true
+    },
+    {
+      "ts": "2026-05-17T20:53:21.500Z",
+      "actor": "james.benamor@letme.com",
+      "action": "people-merge",
+      "target": "40 → 184",
       "ok": true
     }
   ]
