@@ -203,6 +203,14 @@
    days list every person. Falls back silently if people.json is
    missing or no one has today as their date_of_birth. */
 (function () {
+  // Suppress entirely inside iframes — the profile page embeds
+  // holidays.html in an iframe for the Calendar tab; the iframed copy
+  // of nav.js was rendering the celebratory strip across the calendar
+  // grid (the outer page already shows the banner directly above it).
+  let inIframe = false;
+  try { inIframe = window.self !== window.top; } catch (_) { inIframe = true; }
+  if (inIframe) return;
+
   const bar = document.querySelector('.qb-topbar');
   if (!bar || document.querySelector('.qb-birthday-banner')) return;
 
