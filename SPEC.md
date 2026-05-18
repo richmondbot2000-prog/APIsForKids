@@ -2,7 +2,7 @@
 
 _The source-of-truth document for `togetherbook.net` / `richmondbot2000-prog/togetherbook`. Lives in this repo so future maintainers find it next to the code. **A successor Claude or engineer should be able to pick this up cold and operate the site competently.**_
 
-**Last reviewed:** 2026-05-18 (afternoon) — major Person-merge hardening pass + birthday celebration system + access-policy widening. Headline changes since the previous session: (1) merge-safety test suite (`scripts/test_merge_safety.py`, wired to CI via `.github/workflows/test-merge-safety.yml`, see §15.5); (2) wall.html, directory.html, profile.js now walk all of a Person's linked emails for photo/cover/cross-reference lookups so merged Persons render correctly; (3) the `agent` access level was retired (was a duplicate of `staff` / Standard user), worker silently coerces stale payloads; (4) Cloudflare Access policy widened from `@letme.com`-only to all three main RG Workspace domains (`@letme.com`, `@togetherloans.com`, `@letme.co.uk`) so non-Letme staff can sign in without admin status; (5) birthday celebration system — top banner, decorated logo swap, daily wall post by `TogetherBook` with rotating GIFs + messages, balloon emojis on team calendar (see §11.x.birthday). Earlier today: rebuilt the Activity bar around an explicit `scripts/activity_sources.json` whitelist; added "What's counted" panel on Holidays Activity tab. Previous reviews: 2026-05-17 (six-layer reliability stack for identity tables, write-time schema validators, per-Person audit-log card, RECOVERY.md runbook), 2026-05-15 (Wall compact-feed / pagination / YouTube + OG link previews / Share deep-links; Payouts three-range tabs; Holidays page + Line Manager + manager team view + Approved Holiday status), 2026-05-12 (source-quality analysis, brandwatch email notifications, multi-tenant Directory, Cloudflare Access).
+**Last reviewed:** 2026-05-18 (afternoon) — major Person-merge hardening pass + birthday celebration system + access-policy widening. Headline changes since the previous session: (1) merge-safety test suite (`scripts/test_merge_safety.py`, wired to CI via `.github/workflows/test-merge-safety.yml`, see §15.5); (2) wall.html, directory.html, profile.js now walk all of a Person's linked emails for photo/cover/cross-reference lookups so merged Persons render correctly; (3) the `agent` access level was retired (was a duplicate of `staff` / Standard user), worker silently coerces stale payloads; (4) Cloudflare Access policy widened from `@letme.com`-only to all three main RG Workspace domains (`@letme.com`, `@togetherloans.com`, `@letme.co.uk`) so non-Letme staff can sign in without admin status; (5) birthday celebration system — top banner, decorated logo swap, daily wall post by `TogetherBook` with rotating GIFs + messages, balloon emojis on team calendar (see §11.10). Earlier today: rebuilt the Activity bar around an explicit `scripts/activity_sources.json` whitelist; added "What's counted" panel on Holidays Activity tab. Previous reviews: 2026-05-17 (five-layer reliability stack for identity tables, write-time schema validators, per-Person audit-log card, RECOVERY.md runbook), 2026-05-15 (Wall compact-feed / pagination / YouTube + OG link previews / Share deep-links; Payouts three-range tabs; Holidays page + Line Manager + manager team view + Approved Holiday status), 2026-05-12 (source-quality analysis, brandwatch email notifications, multi-tenant Directory, Cloudflare Access).
 
 ## Contents
 
@@ -78,16 +78,17 @@ This rule is mechanically enforceable: `grep -nE "FROM dbo\.(Messages|Loan|Appli
 
 **Identity provider for the gate**: plain Google IdP (not Workspace). OAuth client lives in the Brandwatch GCP project. Authorised redirect URI: `https://togetherbook.cloudflareaccess.com/cdn-cgi/access/callback`.
 
-**Access policies on app `book`** (configured 2026-05-11, both Allow policies — they OR together):
+**Access policies on app `book`** (current state — single Allow policy, maintained programmatically by the worker; see §11.1.7c for the auto-sync):
 
 | Policy | Include | Require | Effect |
 |---|---|---|---|
-| Letme staff | Email ending in `@letme.com` | — | Lets any Letme employee in from anywhere |
-| RG group from office | Email ending in `@transformcredit.com` OR `@togetherloans.com` OR `@rgroup.co.uk` | IP range `62.254.12.244/32` | Lets the wider Richmond Group team in **only from the office static IP** |
+| RG staff + Directory admins | `email_domain` rule for each entry in `ACCESS_DOMAIN_RULES = [letme.com, togetherloans.com, letme.co.uk]` **plus** explicit `email` entries for every admin in `admins.json` whose address doesn't already match a domain rule | — | Lets staff at any of the three main RG Workspace tenants sign in from anywhere; extra admins (e.g. `mourad.malki@clearloans.com.au`) are included by name |
 
-To edit: Zero Trust dashboard (`one.dash.cloudflare.com`) → **Access → Applications → `book` → Configure → Policies**.
+To edit: Zero Trust dashboard (`one.dash.cloudflare.com`) → **Access → Applications → `book` → Configure → Policies**. **Don't hand-edit** — the workspace worker's `syncAccessAllowlist()` rewrites the include list on every `admin-add` / `admin-remove` and on demand from the Directory page's "Sync access" button. Constants live in `worker/workspace-worker.js`: `ACCESS_DOMAIN_RULES`, `ACCESS_POLICY_NAME`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ACCESS_APP_ID`. The widening from `@letme.com`-only to the three current domains shipped 2026-05-18 — history kept in §11.1.7c.
 
-Identity-provider note for policy 2: all three additional domains (`transformcredit.com`, `togetherloans.com`, `rgroup.co.uk`) are also on Google Workspace, so Google login authenticates them too. No OTP fallback IdP is needed. If those Workspaces ever migrate away from Google, add a one-time-PIN IdP and re-test.
+Identity-provider note: all three RG-tenant domains in `ACCESS_DOMAIN_RULES` are on Google Workspace, so Google login authenticates them. No OTP fallback IdP is needed. If those Workspaces ever migrate away from Google, add a one-time-PIN IdP and re-test.
+
+**Earlier 2-policy structure** (Letme staff + "RG group from office" gated by office IP) was retired 2026-05-13 once the admin-driven sync became the source of truth.
 
 ---
 
@@ -128,7 +129,9 @@ The site is a flat set of HTML files. **No router, no SPA, no build step.** Each
 
 "Your Page" is the marker entry — `nav.js` rewrites its `href` to `/directory/<signed-in-viewer's-slug>` at render time so the link always lands on the viewer's own profile.
 
-The secondary row is sticky and only renders on pages inside a section that has sub-pages. On narrow viewports (≤960px) the hamburger drawer collapses the secondary row into an inline accordion — a top-level item with sub-pages expands its children on the first tap and navigates on the second. Logic lives in `nav.js` (shared script, included once per page); markup is driven by a `data-sub` JSON attribute on the parent link.
+The secondary row is sticky and only renders on pages inside a section that has sub-pages. On narrow viewports (≤960px) the hamburger drawer (`.qb-hamburger`) sits flush-right against the avatar chip — `nav.js` re-parents it to the end of the topbar so DOM order is brand → drawer (fixed) → hamburger → avatar; `margin-left: auto` then eats the gap so the brand stays at the left and the hamburger + avatar cluster sits flush against the right edge.
+
+The drawer renders **all** sub-page items eagerly (no accordion), so its visible height never changes when sub-items expand/collapse. This is deliberate: an earlier accordion model meant the drawer resized as the user tapped, which caused the page beneath to jump. Now every sub-page is visible the moment the drawer opens. Logic lives in `nav.js` (shared script, included once per page); markup is driven by a `data-sub` JSON attribute on the parent link.
 
 **Top-right of every topbar:** the viewer's circular avatar chip. `nav.js` resolves the signed-in email via `/api/workspace/whoami`, looks up the matching `people.json` record, and links the chip to `/directory/<slug>`. Renders a generic icon as fallback if whoami is unavailable (public mirror or transient failure) — never silently removes itself.
 
@@ -194,7 +197,7 @@ All refresh workflows live in `.github/workflows/refresh-*.yml`. They share a co
 | `refresh-discord.yml` | hourly :45 | `discord-mentions.json` | Public Discord servers via discord.py | `DISCORD_TOKEN` (dormant until set) |
 | `refresh-hibp.yml` | every 6h :20 | `security-alerts.json` (hibp section) | Have I Been Pwned domain API | `HIBP_API_KEY` (dormant until set) |
 | `refresh-lookalike.yml` | daily 05:00 | `security-alerts.json` (lookalikes + ct sections) | DNSTwist + crt.sh | no secret required (gated on watchlist having domains) |
-| `refresh-auth0.yml` | hourly :00 | `auth0.json` | rgcore.auth0.com Management API | `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET` (currently dormant — see §17). |
+| `refresh-auth0.yml` | hourly :00 | `auth0-users.json` | rgcore.auth0.com Management API | `AUTH0_CLIENT_ID`, `AUTH0_CLIENT_SECRET` (currently dormant — see §17). |
 | `refresh-groups.yml` | hourly :20 | `groups.json` | Google Workspace Admin SDK (Groups + Members) | `WORKSPACE_SERVICE_ACCOUNT_JSON`, `WORKSPACE_DELEGATE_USER` |
 | `refresh-pending-conversions.yml` | daily 06:30 UTC | `annotations.json` (clears `pending_conversion`) + new forwarding Groups | Google Workspace Admin SDK | same as `refresh-directory.yml`. After Google's 20-day address-reuse lockout expires the script creates the forwarding-only Group at the freed address and clears the annotation. |
 | `process-pending-transfers.yml` | hourly :40 | `pending-transfers.json` (drains) + completes leaver flow on Google | Gmail API (`messages.list` / `messages.get` raw / `messages.insert`) + Admin SDK | `WORKSPACE_SERVICE_ACCOUNT_JSON` + `WORKSPACE_DELEGATE_USER`. Walks every Gmail message in the source mailbox into the target, then either deletes the source (no-forward path) or renames + deletes + writes a `pending_conversion` annotation (forward path). See §11.1.1. |
@@ -257,11 +260,11 @@ Each refresh workflow runs one Python script under `scripts/`. They all read env
 | `scan_comm_items.py` | `ReportingCommunications.dbo.Messages` filtered to `Description IN (5,6,7)` (outbound SMS / Email / Call) | D1 (`activity_items`) | Per-message detail powering the Activity-tab drill-down. Stores `body_excerpt`, `client_type`, `external_address`, `campaign_name`, `auto_processed`. Wipes-and-replaces per day for idempotency. |
 | `scan_google_workspace_activity.py` | Google Workspace Reports API — login, gmail, drive, meet, chat, calendar, admin activities | merges into `staff-activity-buckets.json` (kind: "google") | Needs `admin.reports.audit.readonly` scope on the service account. Non-fatal on 403 — leaves the JSON as the warehouse scanner produced it. |
 | `scan_comms_response.py` | `Communications.Messages` (inbound + paired replies) | `comms.json` + `comms-full.csv` | Powers the Comms response-time tracker. Positive-list reply rule (`%CRM%` / `%Responder%` ClientTypes only). 14-day data-maturity cutoff. |
-| `scan_auth0.py` | rgcore.auth0.com Management API | `auth0.json` | Dormant pending `AUTH0_CLIENT_ID` + `AUTH0_CLIENT_SECRET`. When live, surfaces an Auth0 chip on the Directory + Person profile. |
+| `scan_auth0.py` | rgcore.auth0.com Management API | `auth0-users.json` | Dormant pending `AUTH0_CLIENT_ID` + `AUTH0_CLIENT_SECRET`. When live, surfaces an Auth0 chip on the Directory + Person profile. |
 | `scan_groups.py` | Workspace Admin SDK (Groups + Members) | `groups.json` | Used by the Directory page to surface group-membership chips per row. |
 | `scan_payroll.py` | the two HR CSVs in `~/Desktop/wiki/Payroll/` | local JSON pasted into `PAYROLL_KV` (Cloudflare KV) AND `payroll-data.json` (committed) | **Manual** — admin runs whenever HR sends a refreshed CSV. The committed `payroll-data.json` is consumed by the Person Payroll tab + reconcile flow. Stale-payroll banner if `updated_at` > 40 days old. |
 | `scan_payouts_history.py` | `Loanbook.LoanAtInception` over a 1-year window | `payouts-week.json` + `payouts-year.json` | Backfills the Payouts page's Last-Week + Last-Year tabs. |
-| `birthday_post.py` | `people.json[].date_of_birth` + `wall-media/birthday/` | appends to `wall.json` | Idempotent via stable per-year post IDs. Pool of 7 self-hosted GIFs, ~20 thoughtful message templates; rotation logic prevents the same gif/message repeating within a 7-day window. See §11.13. |
+| `birthday_post.py` | `people.json[].date_of_birth` + `wall-media/birthday/` | appends to `wall.json` | Idempotent via stable per-year post IDs. Pool of 7 self-hosted GIFs + 9 hand-picked message templates; rotation logic prevents the same gif/message repeating within a 7-day window. See §11.10. |
 | **Reliability + build scripts** (run by `reconcile-people.yml` daily, or manually with `--apply`): | | | |
 | `build_google_accounts.py` | `staff.json` + `people.json` | `google-accounts.json` (one row per Google account, FK to Person via email match) | Without `--apply` it dry-runs and prints the diff. |
 | `build_warehouse_activity.py` | `staff-activity.json` + `people.json` | `warehouse-activity.json` (one row per warehouse-username, FK to Person via email/name match) | Same flag convention. |
@@ -684,6 +687,18 @@ The detail card drives Cloudflare Worker `apifk-workspace-worker2` at `book.toge
 - `list-admins` — admin-only. Returns the admin email list.
 - `admin-add` `{ target_email }` — admin-only. Adds to `admins.json` via GitHub Contents API. **Also auto-syncs** the Cloudflare Access allowlist (see §11.1.7c).
 - `admin-remove` `{ target_email }` — admin-only. The owner cannot be removed. Auto-syncs allowlist.
+- `people-sync-access` — admin-only. Re-derives `admins.json` from `people.json` (every Person with `access_level === "admin"`) and pushes the resulting include list to Cloudflare Access. The Directory page's "Sync access" button hits this directly so an admin can force a sync without round-tripping through `admin-add`/`admin-remove`.
+
+**Person-table CRUD (the four canonical identity tables):**
+- `people-set` `{ patch }` — partial-update a Person record. Admin-only by default; the self-edit carve-out (`PEOPLE_SELF_EDITABLE`) lets a Person edit a fixed subset of their own row (see §11.10). Validates `access_level` against `PEOPLE_ACCESS_LEVELS = ["admin", "staff", "outsider", "former"]`; legacy `agent` payloads are silently coerced to `staff` (the value was retired 2026-05-18). Returns the updated record.
+- `people-delete` `{ id }` — admin-only. Removes the Person and re-points or null-clears every FK in the linked tables. Use `people-merge` instead when the Person should be folded into an existing one.
+- `people-merge` `{ winner_id, loser_id }` — admin-only. Re-points `payroll-data`, `google-accounts`, `warehouse-activity` rows from the loser to the winner; promotes the loser's emails into the winner's `alt_google_emails`; deletes the loser. Returns `{ payroll_records_repointed, google_accounts_repointed, warehouse_rows_repointed, line_manager_refs_repointed }` so the page can surface a one-line audit note. See §15.5 for the merge-safety policy that follows from this — every email-keyed lookup downstream must walk the resulting linked-email list.
+- `google-account-set` `{ patch }` / `google-account-delete` `{ id }` — admin-only. CRUD over the `google-accounts.json` linked table that maps Google addresses to Person IDs.
+- `payroll-set` `{ patch }` — admin-only. Updates a payroll record (changes flow back into the live KV at the next ingestion cycle; see §11.1.9).
+
+**Cover-photo assets (do NOT touch Workspace):**
+- `cover-photo-upload` `{ user_email, photo_b64 }` — commits the JPEG to `assets/covers/<email-safe>.jpg`. Person-record field `cover_photo_uploaded_at` is set as a cache-bust.
+- `cover-photo-remove` `{ user_email }` — deletes the file from `assets/covers/` and clears the field.
 
 **Cross-tenant routing.** Each action body may include `tenant`. The page's `workspaceAction` helper auto-injects it from either (a) the staff entry matching `body.email`, or (b) the group entry in `allGroups` matching `body.group_email`. The worker maps `tenant === "togetherloans"` to `env.IMPERSONATE_USER_TOGETHERLOANS`; everything else falls back to `env.IMPERSONATE_USER` (letme tenant). Without this, group operations on Together Loans groups return 403 from Google.
 
@@ -787,15 +802,17 @@ The Directory page also manages **Google Groups** — email addresses like `fina
 
 - **Storage:** `annotations.json` at the repo root. Shape `{ schema_version, updated_at, annotations: { "<email-or-username>": { ... } } }`.
 - **Writes:** `book.togetherbook.net/api/annotations` → Worker `apifk-annotations-worker` (Cloudflare Worker name on the dashboard is the auto-generated `shiny-heart-00f8`). The Worker reads the current file via GitHub Contents API, merges in the new value (or deletes the key when all fields are empty), and commits back to `main`. **Field-by-field preservation:** missing fields in the payload are kept; empty-string fields are cleared; values overwrite. Lets callers do partial updates.
-- **Recognised fields** (each preserved independently):
+- **Recognised fields** (each preserved independently — full whitelist in `worker/annotations-worker.js`):
   - `phone` — string. Manual override over payroll's mobile.
   - `start_date` — `YYYY-MM-DD`. Manual override over payroll's start_date.
   - `address` — string. Manual override over payroll's address.
+  - `role` — string. Manual override of role / job title.
+  - `line_manager` — string (email). The reporting relationship key. Used by Directory + Holidays Team tab + Org Structure to compute direct-report sets. Edits here propagate everywhere that reads `line_manager`.
   - `forward_to` — string. Forwarding target for a suspended account. Set by `suspend-and-route` / `add-forwarding` flows. Used by the page to render the `→ chip` even when the audit log is incomplete.
   - `payroll_match` — object `{ employer, employee_number, first_name, last_name }`. Manual payroll-link override when name-matching can't find the right record.
   - `rename_decay` — object `{ old_address, renamed_at }`. Set when the page renames a user. Triggers the 21-day countdown shown under the name.
   - `pending_conversion` — object `{ forward_to, scheduled_for, parked_at, deleted_at }`. Set when convert-to-group runs. The daily cron clears this once the group is created.
-  - `directory_photo_uploaded_at` — ISO timestamp. Set when a Directory profile photo is uploaded; used as cache-bust on the override URL.
+  - `directory_photo_uploaded_at` — ISO timestamp. Set when a Directory profile photo is uploaded; used as cache-bust on the override URL. (Cover photo timestamps `cover_photo_uploaded_at` are stored on the Person record in `people.json`, not here.)
 - **github.io fallback:** the public github.io URL can read `annotations.json` but cannot write — the Worker route only exists on `book.togetherbook.net`.
 
 #### 11.1.9 Payroll CSV ingestion (the manual process)
@@ -876,7 +893,7 @@ If the Workers / KV / DWD ever need to be re-created:
    - `apifk-workspace-worker2` — route `book.togetherbook.net/api/workspace/*`. Secrets: `GOOGLE_SERVICE_ACCOUNT_JSON`, `GITHUB_TOKEN`, `CLOUDFLARE_API_TOKEN`. Vars: `IMPERSONATE_USER` (`james.benamor@letme.co.uk`), `IMPERSONATE_USER_TOGETHERLOANS` (a TL super-admin). KV binding `PAYROLL_KV` → `apifk-payroll` namespace. Code: `worker/workspace-worker.js`.
    - `shiny-heart-00f8` (annotations) — route `book.togetherbook.net/api/annotations*`. Bindings: `GITHUB_TOKEN`. Code: `worker/annotations-worker.js`.
    - **Note:** `ADMIN_EMAILS` env var is **decommissioned** as of 2026-05-13. Don't re-add it. Admin list lives in `admins.json` in the repo.
-6. **Cloudflare Access** application on the `togetherbook.net` zone for `book.togetherbook.net/*`. One Allow policy named `Letme staff + Directory admins` with include rules: `email_domain: letme.com` + an explicit `email` entry for every non-`@letme.com` admin. **Auto-synced** by the workspace worker on every `admin-add` / `admin-remove`. Do not edit manually after initial setup — the next admin change will overwrite.
+6. **Cloudflare Access** application on the `togetherbook.net` zone for `book.togetherbook.net/*`. One Allow policy named `RG staff + Directory admins` with include rules: one `email_domain` entry for each domain in `ACCESS_DOMAIN_RULES = [letme.com, togetherloans.com, letme.co.uk]` + an explicit `email` entry for every admin whose address doesn't match one of those domains. **Auto-synced** by the workspace worker on every `admin-add` / `admin-remove` and on demand from the Directory page's "Sync access" button. Do not edit manually after initial setup — the next admin change will overwrite.
 7. **GitHub Actions secrets** for the hourly refresh: `WORKSPACE_SERVICE_ACCOUNT_JSON`, `WORKSPACE_DELEGATE_USER`, `FABRIC_CLIENT_*`, `SMTP_USERNAME` / `SMTP_PASSWORD` (for the monthly payroll-request email).
 
 Full setup walkthroughs:
@@ -1533,7 +1550,10 @@ Log is FIFO-trimmed at 5000 entries.
 - Legend strip below the header (Quiet-Edition swatches matching the table above). Each status hue is in its own family (sage / teal / amber / red / mauve / brass / slate) so two never get confused.
 - When the viewer has ≥1 direct report, a **My calendar / Team — N** tab strip appears below the legend. Tab visibility updates dynamically — clicking Team re-fetches `annotations.json` from raw GH so a freshly-set Line Manager appears without a reload; a window-focus refresh (30 s debounced) catches the same case on tab-return.
   - **My calendar** view: 52 weekly rows × 7 day cells (Sun → Sat), 100 px sticky week-label column on the left. Cells are ~64 px tall. Click any in-year day → popover picker. Day numerals flip to paper (`#FDFBF4`) on saturated status fills for legibility.
-  - **Team** view: a **Sunday-anchored calendar grid**. ONE shared DOW header at the top (Week of · Sun Mon Tue Wed Thu Fri Sat). Beneath it, 52-ish week blocks, each carrying its own date strip and one row per direct report. Day-of-week columns are fixed; months stagger so the 1st of each month falls in whichever DOW column it actually occupies (rendered with the month abbreviation under the date number). Every cell sits on `--paper-50` inside an `--ink-300` grid container with a 1 px gap so cell-to-cell separation is consistent regardless of adjacent colour. Scanning down a column shows e.g. "all of Sarah's Tuesdays" stacked.
+  - **Team** view: a **Sunday-anchored calendar grid**. ONE shared DOW header at the top (Week of · Sun Mon Tue Wed Thu Fri Sat). Beneath it, 52-ish week blocks, each carrying its own date strip and one row per direct report. Day-of-week columns are fixed; months stagger so the 1st of each month falls in whichever DOW column it actually occupies (rendered with the month abbreviation under the date number). Every cell sits on `--paper-50` inside an `--ink-300` grid container with a 1 px gap so cell-to-cell separation is consistent regardless of adjacent colour. Scanning down a column shows e.g. "all of Sarah's Tuesdays" stacked. Birthday cells carry a 🎈 emoji overlay (see §11.10).
+    - **Merge-aware dedup** (added 2026-05-18): `directReports` is collapsed to one row per Person, not one per email. A direct report with multiple linked emails (e.g. Kelly Black on `@letme.com` + `@togetherloans.com`) renders once; her `dayMap` and `noteMap` are the union of overrides recorded under any of her linked emails. The picker also collapses to one option per Person at `main_google_email`.
+    - **Off-payroll filter** (added 2026-05-18): direct reports without a current payroll record are dropped from the Team grid entirely rather than rendered as grey rows. Reasoning: the visual goal of the grid is "what is my team doing this week" — staff who left the company shouldn't take up vertical space.
+    - **2× minimum width** (added 2026-05-18): the team grid's inner wrapper carries `min-width: 852px` so date columns stay readable even on narrow viewports; the outer container becomes horizontally scrollable below that. Without the wrapper the columns squished to ~10 px and the dates became unreadable.
 - Status picker popover sits over the clicked cell. Options are the 8 self-settable statuses + (manager edits only) **Approved Holiday** + a "Reset to default" item that deletes the override.
 - Change log section at the bottom shows every change as `<time> · <date> · <from> → <to> · by <name>`. In Team view, log entries label both the target person and the actor explicitly; filter is the union of (viewer's own days) ∪ (changes the viewer made to a direct report's day).
 - Edits are optimistic — paint the new cell, POST `/api/holidays/set`, roll back + banner on error.
@@ -1630,7 +1650,7 @@ The canonical view of a single person — the front door that replaced the old i
 
 | Tab | What it shows | Editable by |
 |---|---|---|
-| **Calendar** | An embedded iframe of `/holidays.html?embedded=1&email=<addr>` — this Person's full Apr→Mar attendance strip. Read-only inside the iframe; clicking opens the full Holidays page. | n/a |
+| **Calendar** | An embedded iframe of `/holidays.html?user=<email>&view=own&embed=1` — this Person's full Apr→Mar attendance strip (one row per week × 7 day cells, ~52 rows). The `embed=1` flag suppresses the topbar and birthday banner inside the iframe; the outer profile page already supplies both. Read-only inside the iframe; clicking opens the full Holidays page. | n/a |
 | **Info** | The default tab. Three cards: (a) **Linked sources** — chips for each of the four canonical sources (Google Letme, Google Together, External Gmail, Warehouse CRM, Payroll) showing the matched address or "not linked"; (b) **Editable fields** — Role, Phone, Address, Date of birth, Start date, Line manager (typeahead → Person), Access level, Auth0 id, External Google email, Notes; (c) **Recent activity** — last 20 entries from `workspace-actions.json` filtered to this Person, rendered as one-line audit rows. | self (own row) for limited fields; admin for all |
 | **Accounts** | One row per Google account with tenant chip + suspend/delete state. Admin can add an alt account, mark which is `main_google_email`, or detach a sibling. | admin |
 | **Payroll** | DOB, home address, mobile, employer, employee number, start date, termination date, plus a chronological pay-history table. Backed by `payroll-data.json` (committed) and `PAYROLL_KV` (off-repo for live HR snapshot). | admin or owner — gated server-side |
@@ -1638,12 +1658,12 @@ The canonical view of a single person — the front door that replaced the old i
 
 **Avatar + cover photo uploaders.** Below the cover, an avatar circle + camera-icon overlay opens a cropper for the avatar (400×400 JPEG); the cover band opens an aspect-preserving cropper for the cover (1600 × 400 JPEG). Both ship base64 to the worker and commit to `assets/photos/<email-safe>.jpg` and `assets/covers/<email-safe>.jpg`. Cache-bust via the annotation `directory_photo_uploaded_at` / `cover_photo_uploaded_at`. localStorage write-through (5 min TTL) renders the new image immediately even before GitHub Pages publishes — see Reliability layer 4 at the foot of this doc.
 
-**Save UX.** Every field uses the same six-layer reliability stack (see footer of this doc). On save: status flips to `Saving…`, then to `Saved at HH:MM:SS` (persistent badge that doesn't fade). A small green `✓ Saved HH:MM` badge sits next to the field label while the LS entry is unexpired (5 min). Refresh-proof.
+**Save UX.** Every field uses the same five-layer reliability stack (see footer of this doc). On save: status flips to `Saving…`, then to `Saved at HH:MM:SS` (persistent badge that doesn't fade). A small green `✓ Saved HH:MM` badge sits next to the field label while the LS entry is unexpired (5 min). Refresh-proof.
 
 **Auth gate.**
 
 - Read: any Cloudflare-Access-allowed viewer can read any Person.
-- Self-edit: a Person can edit a limited subset of their own row (`PEOPLE_SELF_EDITABLE` in `workspace-worker.js`: phone, address, photo, notes, start_date, role). Worker enforces.
+- Self-edit: a Person can edit a limited subset of their own row. `PEOPLE_SELF_EDITABLE` in `workspace-worker.js` is `{ phone, address, role, notes, date_of_birth, directory_photo_uploaded_at, cover_photo_uploaded_at }`. The worker enforces — any other field requires admin. `start_date` is admin-only because HR/payroll relies on it staying authoritative; `date_of_birth` is self-editable since it drives the birthday celebrations and should be quick to correct.
 - Admin-edit: anything in `PEOPLE_ALLOWED_FIELDS` is mutable by admins. Owner-only for owner's own admin-flag / suspended state.
 - Worker write path: `POST /api/workspace/people-set` with `{ id, patch }`. Validators in `validatePeopleFile` are the first statement of the commit helper so bad data can't land.
 
@@ -1704,7 +1724,7 @@ When today's date matches any active Person's `date_of_birth` (UK local time), f
    - **GIF rotation** — `BIRTHDAY_GIFS` lists 7 self-hosted GIFs at `wall-media/birthday/gif1-7.gif`. `pick_unused_gif()` skips any GIF used by a birthday post in the past 7 days, falling back to least-recently-used if the pool is exhausted; within a single run (multi-birthday days) the script also avoids picking the same GIF twice. All 7 GIFs were visually verified as actual Happy Birthday content — the original 12-GIF Giphy pool included several non-birthday clips that got swapped out, and we now self-host so upstream Giphy removals can't replace them with the "THIS CONTENT IS NOT AVAILABLE" placeholder.
    - **Message rotation** — `MESSAGES` lists 9 hand-picked templates with a `{name}` slot. `pick_unused_message()` skips any template whose fingerprint (last 40 chars, independent of `{name}`) appears in a birthday post from the past 7 days, again falling back to least-recently-used.
 
-4. **Team calendar balloon.** Holidays page `renderTeam()` adds a balloon emoji 🎈 to each cell that matches a direct report's birthday, with tooltip `"<First>'s birthday"`. CSS rule: `.hd-team-cell.is-birthday::before { content: "🎈" }` in `quiet-extras.css`.
+4. **Team calendar balloon.** Holidays page `renderTeam()` adds a balloon emoji 🎈 to each cell that matches a direct report's birthday, with tooltip `"<First>'s birthday"`. CSS rule: `.hd-team-cell.is-birthday::before { content: "🎈" }` lives inline in `holidays.html` (around line 628; kept page-local because the rule is meaningful only on that view).
 
 **Data source.** All four touches read `date_of_birth` directly from `people.json`. The field is editable from the Directory profile page (admins only). Format: `YYYY-MM-DD`; only `MM-DD` is compared.
 
