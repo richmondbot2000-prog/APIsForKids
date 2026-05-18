@@ -41,8 +41,13 @@ const BRANCH = "main";
 // so they live here as constants; the API token is a secret env var.
 const CLOUDFLARE_ACCOUNT_ID = "012bbf0ed36f984997fe0854612fcb01";
 const CLOUDFLARE_ACCESS_APP_ID = "cd685a63-7765-47ff-98da-26ed5a57951a";
-const ACCESS_POLICY_NAME = "Letme staff + Directory admins";
-const ACCESS_DOMAIN_RULE = "letme.com";
+const ACCESS_POLICY_NAME = "RG staff + Directory admins";
+// Every RG-owned Workspace domain. Anyone with a Google account on any
+// of these domains can sign into book.togetherbook.net. Outside-RG
+// admins are added separately via the extras list. clearloans.com.au
+// is intentionally NOT here — its tiny user list (3 active) can be
+// covered by admins.json explicit entries when needed.
+const ACCESS_DOMAIN_RULES = ["letme.com", "togetherloans.com", "letme.co.uk"];
 
 // The Owner is a special hardcoded admin who:
 //   1. Is always treated as an admin even if absent from admins.json
@@ -1394,21 +1399,23 @@ async function commitFile(env, path, b64Content, message) {
 /* ----------- Cloudflare Access allowlist sync ----------- */
 
 // Push the current admin list to the Cloudflare Access app's allow policy.
-// Build the include list as: every email in `letme.com` (covers any current
-// or future @letme.com staff) + every non-@letme.com admin explicitly.
+// Build the include list as: every RG Workspace domain (covers any
+// current or future staff in those tenants) + every admin whose email
+// doesn't already match one of those domains, listed explicitly.
 // Non-fatal: if the token isn't set or the PUT fails, the admin change
 // itself still succeeded — we just log + return a warning.
 async function syncAccessAllowlist(env, admins) {
   if (!env.CLOUDFLARE_API_TOKEN) {
     return { ok: false, error: "CLOUDFLARE_API_TOKEN secret not configured — allowlist not synced" };
   }
+  const domainSuffixes = ACCESS_DOMAIN_RULES.map(d => "@" + d);
   const extras = Array.from(new Set(
     (admins || [])
       .map(e => (e || "").toString().trim().toLowerCase())
-      .filter(e => e && !e.endsWith("@" + ACCESS_DOMAIN_RULE)),
+      .filter(e => e && !domainSuffixes.some(s => e.endsWith(s))),
   )).sort();
   const include = [
-    { email_domain: { domain: ACCESS_DOMAIN_RULE } },
+    ...ACCESS_DOMAIN_RULES.map(d => ({ email_domain: { domain: d } })),
     ...extras.map(e => ({ email: { email: e } })),
   ];
 
