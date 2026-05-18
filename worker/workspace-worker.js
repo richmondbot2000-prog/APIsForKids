@@ -499,16 +499,26 @@ export default {
       return json({ error: "IMPERSONATE_USER var not configured" }, 500, req);
     }
 
-    // Tenant-aware impersonation: the page sends body.tenant for any
-    // user-targeting action. Together Loans uses a different super-admin
-    // because each Workspace customer has its own admin set. SA is shared.
-    const tenant = (body.tenant || "").toLowerCase();
-    let impersonate = env.IMPERSONATE_USER;
-    if (tenant === "togetherloans") {
-      if (!env.IMPERSONATE_USER_TOGETHERLOANS) {
-        return json({ error: "IMPERSONATE_USER_TOGETHERLOANS var not configured (needed for Together Loans actions)" }, 500, req);
-      }
-      impersonate = env.IMPERSONATE_USER_TOGETHERLOANS;
+    // Per-tenant impersonation. Each Workspace customer (letme.com,
+    // letme.co.uk, togetherloans.com) has its own super-admin set + its
+    // own DWD grant on the shared service account, so we route by the
+    // domain of the email being acted on. Falls back to body.tenant for
+    // group/legacy actions that don't carry a user_email.
+    const routingEmail = (body.user_email || body.group_email || body.email || "").toLowerCase();
+    const routingDomain = routingEmail.includes("@") ? routingEmail.split("@")[1] : "";
+    const tenantImpersonators = {
+      "letme.com":         env.IMPERSONATE_USER,
+      "letme.co.uk":       env.IMPERSONATE_USER_LETMECOUK,
+      "togetherloans.com": env.IMPERSONATE_USER_TOGETHERLOANS,
+    };
+    let impersonate = tenantImpersonators[routingDomain];
+    if (!impersonate) {
+      const legacyTenant = (body.tenant || "").toLowerCase();
+      if (legacyTenant === "togetherloans") impersonate = env.IMPERSONATE_USER_TOGETHERLOANS;
+      else impersonate = env.IMPERSONATE_USER;
+    }
+    if (!impersonate) {
+      return json({ error: `no impersonator configured for domain ${routingDomain || "(unknown)"} — set IMPERSONATE_USER_${(routingDomain || "").toUpperCase().replace(/\./g, "")} on the worker` }, 500, req);
     }
 
     let adminToken;
