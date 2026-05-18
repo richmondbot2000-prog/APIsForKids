@@ -35,36 +35,28 @@ BIRTHDAY_GIFS = [
     "wall-media/birthday/gif3.gif",
     "wall-media/birthday/gif4.gif",
     "wall-media/birthday/gif5.gif",
+    "wall-media/birthday/gif6.gif",
+    "wall-media/birthday/gif7.gif",
 ]
 
 SYSTEM_EMAIL = "togetherbook@system"
 SYSTEM_NAME = "TogetherBook"
 
-# Twenty thoughtful birthday messages. The script picks one at random
-# per person, skipping any template whose fingerprint (last 40 chars)
-# already appears in a birthday post from the past 7 days. {name} is
+# Nine thoughtful birthday messages, hand-picked by the user from a
+# longer candidate set. The script picks one at random per person,
+# skipping any template whose fingerprint (last 40 chars) already
+# appears in a birthday post from the past 7 days. {name} is
 # substituted in at post time.
 MESSAGES = [
-    "Happy Birthday {name}! \U0001F382 Hope today brings everything you wish for and a little more besides. Have a brilliant day.",
-    "Wishing you the happiest of birthdays, {name}! \U0001F388 Take a moment today to do something just for you — you've earned it.",
-    "Happy Birthday {name}! \U0001F389 Another year of being completely irreplaceable around here. Enjoy every minute of your day.",
     "{name}, happy birthday! \U0001F973 Hoping today is filled with cake, laughter, and at least one moment that makes you grin from ear to ear.",
-    "Happy Birthday {name}! \U0001F382 The whole team is glad you were born — work would be far less fun without you. Have a great one.",
     "Wishing you a wonderful birthday, {name}! \U0001F388 May the year ahead bring good news, good company, and plenty of reasons to celebrate.",
-    "Happy Birthday {name}! \U0001F389 Don't worry about getting older — you're still way ahead of where most of us were at your age. Enjoy the day.",
     "{name}, have a brilliant birthday! \U0001F382 Here's to another year of you doing your thing and making the rest of us look good in the process.",
     "Happy Birthday {name}! \U0001F388 May your inbox stay quiet, your coffee stay hot, and your day be everything you hope for.",
     "Wishing you a fantastic birthday, {name}! \U0001F973 We're lucky to have you on the team — hope today is as great as you are.",
-    "Happy Birthday {name}! \U0001F382 Step away from the laptop for a bit today. The work will still be here tomorrow; your birthday won't.",
     "{name}, happy birthday! \U0001F389 Sending you cake-shaped wishes and a hope that the year ahead is your best one yet.",
     "Happy Birthday {name}! \U0001F388 Hope your day is filled with all the things you love and none of the things you don't.",
     "Wishing you a very happy birthday, {name}! \U0001F382 Thank you for being part of what makes this team brilliant. Have a great one.",
-    "Happy Birthday {name}! \U0001F973 Take the long lunch. Leave early. Order the second slice. Today's the day for all of it.",
-    "{name}, happy birthday! \U0001F389 Wishing you twelve months of fortunate timing, kind colleagues, and an absurd amount of luck.",
-    "Happy Birthday {name}! \U0001F388 Hope someone you love bakes you something delicious today, and that it's exactly the right kind of sweet.",
     "Wishing you a wonderful birthday, {name}! \U0001F382 Whatever you're up to, here's hoping it's everything you wanted and nothing you didn't.",
-    "Happy Birthday {name}! \U0001F973 The whole team is sending you a quiet, slightly off-key chorus of Happy Birthday from across the wall. Have a great one.",
-    "{name}, happy birthday! \U0001F389 A year wiser, a year warmer, a year nearer to whatever brilliant thing you're working toward. Enjoy the day.",
 ]
 
 
