@@ -1704,8 +1704,8 @@
           <a class="up-tab" data-tab="wall"     href="?tab=wall">${svgIcon("feed")}<span>Wall</span></a>
           <a class="up-tab" data-tab="info"     href="?tab=info">${svgIcon("info")}<span>Info</span></a>
           <a class="up-tab" data-tab="accounts" href="?tab=accounts">${svgIcon("org")}<span>Accounts</span></a>
-          <a class="up-tab" data-tab="calendar" href="?tab=calendar">${svgIcon("calendar")}<span>Calendar</span></a>
           <a class="up-tab" data-tab="payroll"  href="?tab=payroll">${svgIcon("info")}<span>Payroll</span></a>
+          <a class="up-tab" data-tab="calendar" href="?tab=calendar">${svgIcon("calendar")}<span>Calendar</span></a>
         </nav>
         <section class="up-panel" id="upPanel"></section>
       </div>`;
@@ -1716,7 +1716,7 @@
       t.addEventListener("click", e => { e.preventDefault(); setTab(t.dataset.tab); });
     });
     if (editable) wirePhotoUploads();
-    setTab(["wall","info","accounts","calendar","payroll"].includes(initialTab) ? initialTab : "wall");
+    setTab(["wall","info","accounts","payroll","calendar"].includes(initialTab) ? initialTab : "wall");
   }
 
   /* ─── Photo uploads (avatar + cover) ──────────────────────────────── */
