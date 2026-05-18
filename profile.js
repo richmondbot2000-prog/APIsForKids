@@ -254,9 +254,6 @@
                                 ? '<span class="up-pill up-pill--suspended">Suspended</span>'
                                 : '<span class="up-pill up-pill--live">Live</span>'],
       ["Department",          u.department ? escapeHtml(u.department) : (person.department ? escapeHtml(person.department) : '<span class="up-empty-val">—</span>')],
-      ["Start date",          person.start_date
-                                ? escapeHtml(new Date(person.start_date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }))
-                                : '<span class="up-empty-val">—</span>'],
     ];
     const readOnlyHtml = readOnly.map(([label, value]) => `
       <div class="up-field">
@@ -373,6 +370,7 @@
         ${editableRow("phone",      "Phone",        "tel",      person.phone)}
         ${editableRow("address",    "Address",      "textarea", person.address)}
         ${editableRow("start_date", "Start date",   "date",     person.start_date)}
+        ${editableRow("end_date",   "End date",     "date",     person.end_date, "Leave blank if still employed — Holiday Plan logic uses this to cap accrual")}
         ${editableRow("notes",      "Notes",        "textarea", person.notes)}
         <div class="up-field" data-edit-field="line_manager_id">
           <div class="up-field-label">Line manager</div>

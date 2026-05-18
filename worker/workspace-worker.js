@@ -1568,12 +1568,13 @@ const PEOPLE_ALLOWED_FIELDS = new Set([
   "main_google_email", "alt_google_emails", "external_google_email",
   "auth0_id",
   "access_level", "company", "title", "department",
-  "phone", "address", "start_date", "date_of_birth",
+  "phone", "address", "start_date", "end_date", "date_of_birth",
   "line_manager_id", "line_manager_email_raw",
   "role", "notes",
   "directory_photo_uploaded_at", "cover_photo_uploaded_at",
   "suspended", "deletion_time",
   "on_payroll", "most_recent_payroll_id",
+  "holiday_plan",
 ]);
 // Fields a person can self-edit on their own profile page without admin
 // rights. Everything else (access_level, main/alt google emails, auth0,
