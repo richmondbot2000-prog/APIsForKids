@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-18T09:41:23.968Z",
+  "updated_at": "2026-05-18T12:14:36.130Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -1042,11 +1042,11 @@
       "start_date": "2024-01-01",
       "line_manager_id": null,
       "line_manager_email_raw": "",
-      "role": "",
+      "role": "CFO",
       "directory_photo_uploaded_at": "2026-05-14T08:56:24+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:59:31Z",
+      "updated_at": "2026-05-18T12:14:36.130Z",
       "most_recent_payroll_id": 15,
       "on_payroll": true,
       "url_slug": "clementia.dsouza",
