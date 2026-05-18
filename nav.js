@@ -197,3 +197,89 @@
   }).catch(() => { /* keep the fallback icon */ });
 })();
 
+/* Birthday banner — when today is anyone's birthday (UK local date),
+   drop a celebratory strip in just under the topbar with balloons, a
+   short happy-birthday GIF, and the person's name. Multi-birthday
+   days list every person. Falls back silently if people.json is
+   missing or no one has today as their date_of_birth. */
+(function () {
+  const bar = document.querySelector('.qb-topbar');
+  if (!bar || document.querySelector('.qb-birthday-banner')) return;
+
+  fetch('/people.json', { cache: 'no-store' })
+    .then(r => r.ok ? r.json() : null)
+    .catch(() => null)
+    .then(doc => {
+      if (!doc || !Array.isArray(doc.people)) return;
+      const now = new Date();
+      const md = String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                 String(now.getDate()).padStart(2, '0');
+      const birthdays = doc.people.filter(p => {
+        if (p.suspended || p.deletion_time) return false;
+        const dob = p.date_of_birth || '';
+        return dob.length >= 10 && dob.slice(5, 10) === md;
+      });
+      if (!birthdays.length) return;
+
+      // Inject styles once.
+      if (!document.getElementById('qbBirthdayStyle')) {
+        const s = document.createElement('style');
+        s.id = 'qbBirthdayStyle';
+        s.textContent = `
+          .qb-birthday-banner {
+            display: flex; align-items: center; justify-content: center;
+            gap: 14px; padding: 10px 18px;
+            background: linear-gradient(90deg,#FFE7C2 0%,#FBD89A 50%,#FFE7C2 100%);
+            border-bottom: 1px solid var(--brass-500, #C8973F);
+            font: 600 16px/1.2 var(--font-display, 'Newsreader', serif);
+            color: var(--ink-900, #11192E);
+            position: sticky; top: 72px; z-index: 999;
+          }
+          @media (max-width: 960px) { .qb-birthday-banner { top: 64px; font-size: 14px; padding: 8px 12px; gap: 8px; } }
+          @media (max-width: 480px) { .qb-birthday-banner { top: 56px; } }
+          .qb-bd-balloon {
+            display: inline-block; font-size: 22px;
+            animation: qbBalloon 2.4s ease-in-out infinite alternate;
+            transform-origin: bottom center;
+          }
+          .qb-bd-balloon:nth-child(2) { animation-delay: 0.6s; }
+          .qb-bd-balloon:nth-child(3) { animation-delay: 1.2s; }
+          @keyframes qbBalloon {
+            0%   { transform: translateY(0) rotate(-3deg); }
+            100% { transform: translateY(-6px) rotate(3deg); }
+          }
+          .qb-bd-gif { height: 28px; width: auto; border-radius: 4px; }
+          .qb-bd-text a {
+            color: inherit; text-decoration: none;
+            border-bottom: 1px dotted var(--brass-600, #A47829);
+          }
+          .qb-bd-text a:hover { border-bottom-style: solid; }
+        `;
+        document.head.appendChild(s);
+      }
+
+      // Build the names list — link each to their /directory/<slug>
+      // so the banner doubles as a quick way to post on their wall.
+      const namePieces = birthdays.map(p => {
+        const slug = p.url_slug || (p.main_google_email || '').split('@')[0].toLowerCase();
+        const href = '/directory/' + slug;
+        const safe = (p.name || slug).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+        return `<a href="${href}">${safe}</a>`;
+      });
+      const namesHtml = namePieces.length === 1 ? namePieces[0]
+        : namePieces.slice(0, -1).join(', ') + ' and ' + namePieces[namePieces.length - 1];
+
+      const banner = document.createElement('div');
+      banner.className = 'qb-birthday-banner';
+      banner.setAttribute('role', 'note');
+      banner.innerHTML =
+        '<span class="qb-bd-balloon" aria-hidden="true">🎈</span>' +
+        '<span class="qb-bd-balloon" aria-hidden="true">🎂</span>' +
+        '<img class="qb-bd-gif" alt="" src="https://media.giphy.com/media/g5R9dok94mrIvplmZd/giphy.gif">' +
+        '<span class="qb-bd-text">Happy Birthday ' + namesHtml + '!</span>' +
+        '<span class="qb-bd-balloon" aria-hidden="true">🎉</span>';
+
+      bar.parentNode.insertBefore(banner, bar.nextSibling);
+    });
+})();
+

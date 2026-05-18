@@ -1,0 +1,47 @@
+name: Daily birthday posts
+
+# 06:00 UK every day: scan people.json for anyone whose date_of_birth's
+# month+day matches today, and add a "Happy Birthday <name>" post
+# (authored by TogetherBook) to wall.json. The script is idempotent
+# via stable per-year post IDs, so manual re-runs / cron overlap are
+# safe.
+
+on:
+  schedule:
+    - cron: '0 5 * * *'   # 05:00 UTC = 06:00 BST / 05:00 GMT
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: birthday-posts
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Generate birthday posts
+        run: python scripts/birthday_post.py
+      - name: Commit if wall.json changed
+        run: |
+          set -euo pipefail
+          git add wall.json
+          if git diff --cached --quiet -- wall.json; then
+            echo "no changes — no birthdays today or already posted"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "Birthday posts: $(date -u +%Y-%m-%d)"
+          for attempt in 1 2 3; do
+            if git push; then break; fi
+            if [ "$attempt" -eq 3 ]; then echo "::error::Push failed"; exit 1; fi
+            git fetch origin main && git rebase origin/main
+          done

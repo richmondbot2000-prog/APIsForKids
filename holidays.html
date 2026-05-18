@@ -623,6 +623,18 @@
     font-size: 11px;
     color: var(--ink-900);
   }
+  /* Birthday balloon — replaces the date glyph in the cell. Bobs
+     gently up + down so it draws the eye when the calendar's open. */
+  .hd-team-cell.is-birthday::before {
+    content: "🎈";
+    font-size: 14px;
+    animation: hdBalloon 2.4s ease-in-out infinite alternate;
+    transform-origin: bottom center;
+  }
+  @keyframes hdBalloon {
+    0%   { transform: translateY(0) rotate(-4deg); }
+    100% { transform: translateY(-2px) rotate(4deg); }
+  }
   .hd-team-cell.has-note::after {
     content: "";
     position: absolute;
@@ -1795,7 +1807,14 @@
       }
       const user = staffByEmail[repEmail] || staffByEmail[e] ||
                    (person ? { email: repEmail, name: person.name } : { email: e, name: e });
-      reports.push({ email: repEmail, user, dayMap: mergedDays, noteMap: mergedNotes });
+      const dobMd = (person && person.date_of_birth || "").slice(5, 10);  // "MM-DD"
+      const givenName = (person && person.given) ||
+                        ((person && person.name) || user.name || "").split(/\s+/)[0] ||
+                        repEmail;
+      reports.push({
+        email: repEmail, user, dayMap: mergedDays, noteMap: mergedNotes,
+        dobMd, givenName,
+      });
     }
     reports.sort((a, b) => (a.user.name || a.email).localeCompare(b.user.name || b.email));
 
@@ -1927,11 +1946,17 @@
           }
           if (noteMap[iso]) cell.classList.add("has-note");
           if (iso === todayIso) cell.classList.add("is-today");
+          // Balloon on this person's birthday cell — overrides the
+          // calendar date glyph, native tooltip says "<First>'s birthday".
+          const cellMd = iso.slice(5, 10);
+          const isBirthday = r.dobMd && cellMd === r.dobMd;
+          if (isBirthday) cell.classList.add("is-birthday");
           const human = d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
           cell.title = `${r.user.name || r.email} · ${human}` +
             (stored ? ` · ${STATUS_LABEL[stored] || stored}` :
               (isBh ? " · UK Bank Holiday" :
                 (isWeekend ? " · Weekend" : ""))) +
+            (isBirthday ? `\n${r.givenName}'s birthday` : "") +
             (noteMap[iso] ? `\nNote: ${noteMap[iso]}` : "");
           if (onPayroll) {
             cell.addEventListener("click", e => {
@@ -2789,7 +2814,7 @@
     a.addEventListener('click', () => document.body.classList.remove('nav-open'))
   );
 </script>
-<script src="nav.js?v=1779059756" defer></script>
+<script src="nav.js?v=1779083629" defer></script>
 
 <script>
   // Embed-mode height reporter — the parent /directory/<slug> page listens
