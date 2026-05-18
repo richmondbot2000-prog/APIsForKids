@@ -1679,27 +1679,43 @@
     // email gets a record so mentions like @james.benamor resolve via the
     // Person table first. Synthesize a staff-shaped record for Persons whose
     // email isn't in Workspace (e.g. external Google or auth0-only users).
+    if (annFile && annFile.annotations && typeof annFile.annotations === "object") {
+      annotationsMap = annFile.annotations;
+    }
     if (peopleFile && Array.isArray(peopleFile.people)) {
       for (const p of peopleFile.people) {
-        const emails = [p.main_google_email, ...(p.alt_google_emails || []), p.external_google_email].filter(Boolean);
-        for (const eRaw of emails) {
-          const e = eRaw.toLowerCase();
+        const emails = [p.main_google_email, ...(p.alt_google_emails || []), p.external_google_email].filter(Boolean).map(e => e.toLowerCase());
+        // Photos are stored at /assets/photos/<email>_at_<host>.jpg, keyed by
+        // whichever email the photo was uploaded under. For merged Persons the
+        // upload email is often an alt (e.g. @togetherloans.com) while the
+        // current main_google_email is @letme.com — so we have to find which
+        // of this Person's linked emails actually has an annotation entry,
+        // and use that one to build the override path for ALL their emails.
+        let photoEmail = "";
+        let photoUploadedAt = "";
+        for (const e of emails) {
+          const ann = annotationsMap[e];
+          if (ann && ann.directory_photo_uploaded_at) {
+            photoEmail = e;
+            photoUploadedAt = ann.directory_photo_uploaded_at;
+            break;
+          }
+        }
+        for (const e of emails) {
           personByEmail[e] = p;
           if (!staffByEmail[e]) {
             staffByEmail[e] = { email: e, name: p.name || p.id, photo_url: "", tenant: (p.company || "").includes("togetherloans") ? "togetherloans" : "letme.co.uk" };
           }
-          // If this Person has an uploaded avatar, prefer it over the raw
-          // Workspace photo so the Wall + mentions stay consistent.
-          if (p.directory_photo_uploaded_at) {
-            staffByEmail[e].directory_photo_override = `/assets/photos/${e.replace(/@/g, "_at_")}.jpg?v=${encodeURIComponent(p.directory_photo_uploaded_at)}`;
+          // Apply the same override (built from the linked email that actually
+          // has the file) to every email on this Person, so wall posts authored
+          // under any linked address resolve to the same photo.
+          if (photoEmail) {
+            staffByEmail[e].directory_photo_override = `/assets/photos/${photoEmail.replace(/@/g, "_at_")}.jpg?v=${encodeURIComponent(photoUploadedAt)}`;
           }
         }
       }
     }
     buildStaffByLocal();
-    if (annFile && annFile.annotations && typeof annFile.annotations === "object") {
-      annotationsMap = annFile.annotations;
-    }
     if (who && who.email) {
       viewerEmail = who.email.toLowerCase();
       const me = staffByEmail[viewerEmail];
