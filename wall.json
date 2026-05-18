@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-18T08:52:25.428Z",
+  "updated_at": "2026-05-18T09:24:07.592Z",
   "posts": [
     {
       "id": "post_mpaytpuv_p51jep",
@@ -26,7 +26,20 @@
       ],
       "channel": null,
       "reactions": {},
-      "comments": []
+      "comments": [
+        {
+          "id": "com_mpazyy6j_ep37mi",
+          "parent_comment_id": null,
+          "author_email": "mourad.malki@letme.com",
+          "author_name": "mourad.malki",
+          "created_at": "2026-05-18T09:24:07.435Z",
+          "body": "Happy Birthday @james.benamor",
+          "photos": [
+            "https://media1.giphy.com/media/v1.Y2lkPWYzOWU3YTk3cnJ4ZXc5azFmemIxZW5wcnh2MWttcnlsdDRhMThkdXU0MXhqeWN3OCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/WmJTjWGbhaSYfoEUaN/giphy.gif"
+          ],
+          "reactions": {}
+        }
+      ]
     },
     {
       "id": "post_birthday_2026_aerona.sheikh",
