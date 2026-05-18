@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "snapshot_date": "2026-05-17",
-  "updated_at": "2026-05-17T07:43:13Z",
+  "snapshot_date": "2026-05-18",
+  "updated_at": "2026-05-18T12:05:22Z",
   "brands": [
     "Together Loans",
     "TransformCredit"
@@ -11,24 +11,24 @@
     "by_source": {
       "trustpilot": 297,
       "bbb": 21,
-      "reddit": 25,
+      "reddit": 26,
       "bluesky": 0,
       "lemmy": 0,
       "hackernews": 0,
       "courtlistener": 0,
-      "google_news": 1,
+      "google_news": 0,
       "cfpb": 6,
       "youtube": 13
     },
     "by_brand": {
-      "together_loans": 342,
-      "transform_credit": 21
+      "together_loans": 343,
+      "transform_credit": 20
     }
   },
   "source_status": {
     "trustpilot": {
       "ok": true,
-      "fetched": 2,
+      "fetched": 0,
       "error": null
     },
     "bbb": {
@@ -63,7 +63,7 @@
     },
     "google_news": {
       "ok": true,
-      "fetched": 68,
+      "fetched": 65,
       "error": null
     },
     "cfpb": {
@@ -78,6 +78,20 @@
     }
   },
   "mentions": [
+    {
+      "source": "reddit",
+      "brand": "together_loans",
+      "id": "rd-1tfwr5e",
+      "title": "I need a cosigner for a $3000 loan",
+      "snippet": "I was recently approved for a $3000 loan from Together loans, but I need a co-signer that is over the age of 23, has a credit score for over 700/or is a homeowner, and is willing to sign the the agree…",
+      "url": "https://www.reddit.com/r/findacosigner/comments/1tfwr5e/i_need_a_cosigner_for_a_3000_loan/",
+      "date": "2026-05-17",
+      "author": "u/La-Reine-des-Enfers",
+      "score": 2,
+      "score_max": null,
+      "site_name": "r/findacosigner",
+      "site_domain": "reddit.com"
+    },
     {
       "source": "trustpilot",
       "brand": "together_loans",
@@ -4595,7 +4609,7 @@
       "url": "https://www.reddit.com/r/Scams/comments/1r8j5km/us_tcrdt_com_stkgpbbbg_phishingsmishing_scam/",
       "date": "2026-02-18",
       "author": "u/ImplementLong5304",
-      "score": 4,
+      "score": 2,
       "score_max": null,
       "site_name": "r/Scams",
       "site_domain": "reddit.com"
@@ -4959,7 +4973,7 @@
       "url": "https://www.reddit.com/r/findacosigner/comments/1oh5p65/co_sign/",
       "date": "2025-10-27",
       "author": "u/Flimsy_Suspect3208",
-      "score": 3,
+      "score": 2,
       "score_max": null,
       "site_name": "r/findacosigner",
       "site_domain": "reddit.com"
@@ -5075,20 +5089,6 @@
       "score_max": 5,
       "site_name": "Trustpilot",
       "site_domain": "trustpilot.com"
-    },
-    {
-      "source": "google_news",
-      "brand": "transform_credit",
-      "id": "gn-VoWDlPdmJ4eW4xLXpucFY2QmZMMXlCaW53VWxqUQ",
-      "title": "TransformCredit Review – Is it Safe and Legit? (April 2026) - Traders Union",
-      "snippet": "TransformCredit Review – Is it Safe and Legit? (April 2026) Traders Union",
-      "url": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE1iYk9KVV9PMVdfYXdhTFA5bXlrazlXZlhzRG5zNjByOGh2YXB4OU1HRW5PVGpnMkx5cktPMjdxUHZ1b0VPXzVoWDlPdmJ4eW4xLXpucFY2QmZMMXlCaW53VWxqUQ?oc=5",
-      "date": "2025-02-05",
-      "author": null,
-      "score": null,
-      "score_max": null,
-      "site_name": "Traders Union",
-      "site_domain": "tradersunion.com"
     },
     {
       "source": "youtube",
