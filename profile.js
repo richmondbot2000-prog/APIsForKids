@@ -10,7 +10,7 @@
 */
 (function () {
   const qs = new URLSearchParams(location.search || "");
-  const initialTab = (qs.get("tab") || "calendar").toLowerCase();
+  const initialTab = (qs.get("tab") || "wall").toLowerCase();
 
   let targetEmail = (window.__profileEmail || qs.get("email") || "").toLowerCase().trim();
   let targetSlug  = (window.__profileSlug  || "").toLowerCase().trim();
@@ -189,7 +189,7 @@
   function setTab(tab) {
     currentTab = tab;
     const url = new URL(location.href);
-    if (tab && tab !== "info") url.searchParams.set("tab", tab);
+    if (tab && tab !== "wall") url.searchParams.set("tab", tab);
     else url.searchParams.delete("tab");
     history.replaceState({}, "", url.toString());
     document.querySelectorAll("[data-tab]").forEach(t => t.classList.toggle("is-active", t.dataset.tab === tab));
@@ -1679,11 +1679,11 @@
 
       <div class="up-body">
         <nav class="up-tabs" aria-label="Profile sections">
-          <a class="up-tab" data-tab="calendar" href="?tab=calendar">${svgIcon("calendar")}<span>Calendar</span></a>
+          <a class="up-tab" data-tab="wall"     href="?tab=wall">${svgIcon("feed")}<span>Wall</span></a>
           <a class="up-tab" data-tab="info"     href="?tab=info">${svgIcon("info")}<span>Info</span></a>
           <a class="up-tab" data-tab="accounts" href="?tab=accounts">${svgIcon("org")}<span>Accounts</span></a>
+          <a class="up-tab" data-tab="calendar" href="?tab=calendar">${svgIcon("calendar")}<span>Calendar</span></a>
           <a class="up-tab" data-tab="payroll"  href="?tab=payroll">${svgIcon("info")}<span>Payroll</span></a>
-          <a class="up-tab" data-tab="wall"     href="?tab=wall">${svgIcon("feed")}<span>Wall</span></a>
         </nav>
         <section class="up-panel" id="upPanel"></section>
       </div>`;
@@ -1694,7 +1694,7 @@
       t.addEventListener("click", e => { e.preventDefault(); setTab(t.dataset.tab); });
     });
     if (editable) wirePhotoUploads();
-    setTab(["info","wall","calendar","accounts","payroll"].includes(initialTab) ? initialTab : "calendar");
+    setTab(["wall","info","accounts","calendar","payroll"].includes(initialTab) ? initialTab : "wall");
   }
 
   /* ─── Photo uploads (avatar + cover) ──────────────────────────────── */
