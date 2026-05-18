@@ -49,6 +49,36 @@ The Brokers / Sources / Campaigns / SourceRef hierarchy is the most error-prone 
 - **gh CLI:** `gh run view <id> --log` for full output. `gh workflow run <name>.yml --ref main` to trigger. `gh secret list` / `set`. Always cd'd in the repo so `--repo` is implicit.
 - **Don't set JSON secrets via stdin** — heredoc escaping is brittle. GitHub Web UI for those.
 
+## 6a. Cross-session coordination (two Claude Code sessions share this repo)
+
+There are typically **two Claude Code sessions** working on TogetherBook at any time, sharing this repo + SPEC.md + the wiki. Coordination rules:
+
+1. **On sit-down, run `/session-start`** (skill at `.claude/skills/session-start/SKILL.md`). Generates a 6-char session ID, claims a scope in `_inflight.md`, and pulls latest. Cheap; ~10s.
+
+2. **Read `_inflight.md` first.** If the other session is touching what you're about to touch, work on something else or coordinate before proceeding.
+
+3. **Tag every commit with `Session-Id: <id>`** in the footer, alongside the Co-Authored-By line. The ID is the 6-char value from `/session-start`. Example:
+   ```
+   git commit -m "$(cat <<'EOF'
+   <subject>
+
+   <body>
+
+   Session-Id: abc123
+   Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+   EOF
+   )"
+   ```
+   Then `git log --grep='Session-Id: abc123'` shows exactly what this session shipped.
+
+4. **On sign-off, run `/session-end`.** Removes your `_inflight.md` row + commits. Skill at `.claude/skills/session-end/SKILL.md`.
+
+5. **Auto-resolve repeated conflicts:** `git rerere.enabled` is set true in `.git/config` for this repo so the same merge conflicts you've resolved before auto-resolve next time.
+
+6. **Worker deploys are serialized** by `~/.togetherbook/deploy_worker.py` — it refuses to deploy if local `worker/workspace-worker.js` is behind `origin/main`. Pull first.
+
+7. **Auto-generated blocks have markers** — `<!-- AUTO:* BEGIN/END -->` for the SPEC tables (rewritten by `scripts/generate_canonical_tables.py`) and `<!-- PENDING:BEGIN/END -->` for pending lists (rewritten by `scripts/render_pending.py`). Never hand-edit between markers; the next render clobbers it. Change the source (`.github/workflows/`, `worker/workspace-worker.js`, `pending.yaml`) and re-run the script.
+
 ## 7. Documentation responsibilities — the nightly directive
 
 Every overnight session, before signing off, you MUST:
