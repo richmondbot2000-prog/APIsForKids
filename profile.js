@@ -973,24 +973,31 @@
   }
 
   /* ─── Account action handlers (call workspace worker inline) ───── */
-  // List every known mailbox (main + alts + external) across all Persons,
-  // excluding only the address being acted on. Same-Person addresses must
-  // stay in the list — forwarding "my work account → my other work account"
-  // is a routine flow when consolidating.
+  // List every linked Google account on every Person (from google-accounts.json
+  // via googleByPersonId), plus any external Gmail tracked on the Person record
+  // but not in google-accounts. Excludes only the address being acted on —
+  // same-Person addresses must stay in the list because "forward my work
+  // account → my other work account" is a routine consolidation flow.
   function colleagueDatalist(excludeEmail) {
     const exclude = (excludeEmail || "").toLowerCase();
+    const tenantLabel = { letme: "Letme", together: "Together", external: "Gmail" };
     const rows = [];
+    const seen = new Set();
     for (const p of people) {
       const name = p.name || p.id;
-      const emails = [
-        p.main_google_email,
-        ...(p.alt_google_emails || []),
-        p.external_google_email,
-      ].filter(Boolean);
-      for (const e of emails) {
-        if (e.toLowerCase() === exclude) continue;
-        const isMain = e === p.main_google_email;
-        rows.push({ email: e, name, label: isMain ? name : `${name} (alt)` });
+      const accts = googleByPersonId[p.id] || [];
+      for (const a of accts) {
+        const e = (a.email || "").toLowerCase();
+        if (!e || e === exclude || seen.has(e)) continue;
+        seen.add(e);
+        const tag = tenantLabel[a.tenant] || a.tenant || "";
+        rows.push({ email: a.email, name, label: tag ? `${name} · ${tag}` : name });
+      }
+      // External Gmail can live on the Person record without a google-accounts row.
+      const ext = p.external_google_email;
+      if (ext && !seen.has(ext.toLowerCase()) && ext.toLowerCase() !== exclude) {
+        seen.add(ext.toLowerCase());
+        rows.push({ email: ext, name, label: `${name} · Gmail` });
       }
     }
     rows.sort((a, b) => a.name.localeCompare(b.name) || a.email.localeCompare(b.email));
