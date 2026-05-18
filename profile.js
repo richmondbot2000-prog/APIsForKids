@@ -973,11 +973,28 @@
   }
 
   /* ─── Account action handlers (call workspace worker inline) ───── */
-  function colleagueDatalist() {
-    return people
-      .filter(p => p.id !== person.id && p.main_google_email)
-      .sort((a, b) => (a.name || "").localeCompare(b.name || ""))
-      .map(p => `<option value="${escapeHtml(p.main_google_email)}">${escapeHtml(p.name || p.id)}</option>`).join("");
+  // List every known mailbox (main + alts + external) across all Persons,
+  // excluding only the address being acted on. Same-Person addresses must
+  // stay in the list — forwarding "my work account → my other work account"
+  // is a routine flow when consolidating.
+  function colleagueDatalist(excludeEmail) {
+    const exclude = (excludeEmail || "").toLowerCase();
+    const rows = [];
+    for (const p of people) {
+      const name = p.name || p.id;
+      const emails = [
+        p.main_google_email,
+        ...(p.alt_google_emails || []),
+        p.external_google_email,
+      ].filter(Boolean);
+      for (const e of emails) {
+        if (e.toLowerCase() === exclude) continue;
+        const isMain = e === p.main_google_email;
+        rows.push({ email: e, name, label: isMain ? name : `${name} (alt)` });
+      }
+    }
+    rows.sort((a, b) => a.name.localeCompare(b.name) || a.email.localeCompare(b.email));
+    return rows.map(r => `<option value="${escapeHtml(r.email)}">${escapeHtml(r.label)}</option>`).join("");
   }
   async function handleAccountAction(btn) {
     const card = btn.closest(".up-acct");
@@ -1000,7 +1017,7 @@
         <h4>${escapeHtml(labels[0])}</h4>
         <p class="up-hint">${escapeHtml(labels[1])}</p>
         <input type="email" list="upAccTargets" placeholder="colleague.email@…" data-acc-target>
-        <datalist id="upAccTargets">${colleagueDatalist()}</datalist>
+        <datalist id="upAccTargets">${colleagueDatalist(email)}</datalist>
         <div class="up-editor-row">
           <button class="up-btn-sm up-btn-sm--primary" data-acc-confirm>Confirm</button>
           <button class="up-btn-sm" data-acc-cancel>Cancel</button>
@@ -1036,7 +1053,7 @@
         <input type="email" list="upAccTargets" placeholder="handover.colleague@…" data-acc-target>
         <label class="up-field-label" style="margin-top:6px;">Forward future mail to (the group's member)</label>
         <input type="email" list="upAccTargets" placeholder="forward.target@…" data-acc-forward>
-        <datalist id="upAccTargets">${colleagueDatalist()}</datalist>
+        <datalist id="upAccTargets">${colleagueDatalist(email)}</datalist>
         <div class="up-editor-row">
           <button class="up-btn-sm up-btn-sm--primary" data-acc-confirm>Queue it</button>
           <button class="up-btn-sm" data-acc-cancel>Cancel</button>
@@ -1070,7 +1087,7 @@
         <p class="up-hint">The user account is deleted; Google holds the address for 20 days, then a Group is auto-created at the same address with the colleague below as the first member. Add more members in admin.google.com afterwards.</p>
         <label class="up-field-label">Forward future mail to</label>
         <input type="email" list="upAccTargets" placeholder="colleague.email@…" data-acc-forward>
-        <datalist id="upAccTargets">${colleagueDatalist()}</datalist>
+        <datalist id="upAccTargets">${colleagueDatalist(email)}</datalist>
         <div class="up-editor-row">
           <button class="up-btn-sm up-btn-sm--primary" data-acc-confirm>Convert</button>
           <button class="up-btn-sm" data-acc-cancel>Cancel</button>
