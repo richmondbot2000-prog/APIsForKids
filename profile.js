@@ -238,7 +238,7 @@
     // Editable block (Role, Phone, Address). Line manager + access_level
     // are admin-only — we show them as read-only here and admins use
     // /people.html for the deeper edits.
-    function editableRow(field, label, type, value, hint) {
+    function editableRow(field, label, type, value, hint, suggestions) {
       const readonly = !editable;
       const savedLabel = LS.savedLabel(person.id, field);
       const savedBadge = savedLabel
@@ -251,13 +251,18 @@
             <div class="up-field-value ${value ? "" : "up-empty-val"}" style="white-space:pre-wrap;">${escapeHtml(value) || "Not set"}</div>
           </div>`;
       }
-      // Editable: input + a Save button at the end. Save is disabled
-      // until the value differs from the saved baseline (data-orig),
-      // and re-disables itself on a successful save without disturbing
-      // any other field's in-flight edit.
+      // If suggestions are supplied, emit a native <datalist> the
+      // browser uses for inline autocomplete — as the user types,
+      // matching values from existing records on other Persons drop
+      // down beneath the input.
+      const listId = suggestions && suggestions.length ? `upSuggest-${field}` : "";
+      const datalistHtml = listId
+        ? `<datalist id="${listId}">${suggestions.map(s => `<option value="${escapeHtml(s)}"></option>`).join("")}</datalist>`
+        : "";
+      const listAttr = listId ? ` list="${listId}"` : "";
       const editor = type === "textarea"
         ? `<textarea name="${field}" rows="3" data-orig="${escapeHtml(value || "")}">${escapeHtml(value || "")}</textarea>`
-        : `<input type="${type}" name="${field}" value="${escapeHtml(value || "")}" data-orig="${escapeHtml(value || "")}">`;
+        : `<input type="${type}" name="${field}" value="${escapeHtml(value || "")}" data-orig="${escapeHtml(value || "")}"${listAttr}>`;
       return `
         <div class="up-field" data-edit-field="${field}">
           <div class="up-field-label">${escapeHtml(label)} ${savedBadge}</div>
@@ -266,9 +271,24 @@
             <button type="button" class="up-btn-sm up-btn-sm--primary" data-edit-save="${field}" disabled>Save</button>
             <span class="up-edit-status" data-edit-status="${field}"></span>
           </div>
+          ${datalistHtml}
           ${hint ? `<p class="up-hint">${hint}</p>` : ""}
         </div>`;
     }
+
+    // Distinct values that already exist for Role + Team across every
+    // other Person record, sorted alphabetically. The datalist on those
+    // two fields uses these as suggestions so HR can re-use canonical
+    // role/team names without retyping them. Excludes the current
+    // Person so editing your own row doesn't suggest your own value.
+    const distinctOnPeople = (key) => Array.from(new Set(
+      (people || [])
+        .filter(p => p.id !== person.id)
+        .map(p => (p[key] || "").trim())
+        .filter(Boolean)
+    )).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+    const roleSuggestions = distinctOnPeople("role");
+    const teamSuggestions = distinctOnPeople("team");
 
     // Line-manager picker (admin only). The display falls back to the
     // read-only chip / "No line manager" when the viewer isn't admin.
@@ -337,10 +357,10 @@
           <div class="up-field-label">Line manager</div>
           ${editable ? lineMgrEditor : `<div class="up-field-value">${lineMgrDisplay}</div>`}
         </div>
-        ${editableRow("team",       "Team",         "text",     person.team)}
+        ${editableRow("team",       "Team",         "text",     person.team,  null, teamSuggestions)}
         ${editableRow("name",       "Display name", "text",     person.name)}
         ${editableRow("aliases",    "Aliases",      "text",     (person.aliases || []).join(", "), "Comma-separated — used in name search + mentions")}
-        ${editableRow("role",       "Role",         "text",     person.role)}
+        ${editableRow("role",       "Role",         "text",     person.role,  null, roleSuggestions)}
         ${editableRow("phone",      "Phone",        "tel",      person.phone)}
         ${editableRow("address",    "Address",      "textarea", person.address)}
         ${editableRow("start_date", "Start date",   "date",     person.start_date)}
