@@ -64,6 +64,10 @@
     border: 1px solid var(--ink-300);
     overflow: hidden;
   }
+  .pp-table-footer {
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    margin-top: 14px;
+  }
   .pp-thead, .pp-row {
     display: grid;
     grid-template-columns: 44px minmax(80px, 0.9fr) minmax(80px, 0.9fr) minmax(130px, 1.4fr) minmax(110px, 1fr) 200px 110px;
@@ -332,21 +336,7 @@
     </div>
     <div class="pp-tools">
       <input class="pp-search" id="ppSearch" placeholder="Search name, email, role…" autocomplete="off">
-      <select class="pp-filter" id="ppAccess">
-        <option value="">All access levels</option>
-        <option value="admin">Admin</option>
-        <option value="staff">Standard user</option>
-        <option value="outsider">Outsider</option>
-        <option value="former">Former</option>
-      </select>
-      <select class="pp-filter" id="ppStatus">
-        <option value="">All statuses</option>
-        <option value="live">Live</option>
-        <option value="suspended">Suspended</option>
-      </select>
-      <a class="pp-btn pp-btn--ghost" id="ppReconcile" href="/reconcile.html" title="Open the Reconcile page to see records in Payroll / Google / Warehouse that aren't yet linked to a Person">Reconcile sources <span id="ppReconcileCount"></span></a>
       <button class="pp-btn pp-btn--ghost" id="ppSync" title="Re-derive admins.json from people.json and push the allow-list to Cloudflare Access">Sync access</button>
-      <button class="pp-btn" id="ppAdd">+ Add person</button>
     </div>
   </div>
 
@@ -354,6 +344,11 @@
   <div class="pp-freshness" id="ppFreshness" title="People table is read directly from the GitHub Contents API at HEAD of main — no cache, no publish lag. Hit refresh to re-read."></div>
   <div id="ppGate"></div>
   <div class="pp-table" id="ppTable"></div>
+
+  <div class="pp-table-footer">
+    <a class="pp-btn pp-btn--ghost" id="ppReconcile" href="/reconcile.html" title="Open the Reconcile page to see records in Payroll / Google / Warehouse that aren't yet linked to a Person">Reconcile sources <span id="ppReconcileCount"></span></a>
+    <button class="pp-btn" id="ppAdd">+ Add person</button>
+  </div>
 </main>
 
 <div class="pp-modal-bg" id="ppModalBg">
@@ -571,8 +566,6 @@
 
   function getVisible() {
     const q = (document.getElementById("ppSearch").value || "").toLowerCase().trim();
-    const af = document.getElementById("ppAccess").value;
-    const sf = document.getElementById("ppStatus").value;
     let rows = people.slice();
     if (statFilters.size > 0) {
       // AND across active filter chips — a row must match every one.
@@ -583,8 +576,6 @@
         return true;
       });
     }
-    if (af) rows = rows.filter(p => p.access_level === af);
-    if (sf) rows = rows.filter(p => statusOf(p) === sf);
     if (q)  rows = rows.filter(p => {
       const hay = [p.name, p.role, p.main_google_email, ...(p.alt_google_emails||[]), p.external_google_email, p.title, p.department].join(" ").toLowerCase();
       return hay.includes(q);
