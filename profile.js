@@ -499,28 +499,116 @@
       </div>`;
   }
 
-  /* ─── Accounts tab — Google accounts + external identities ─────── */
+  /* ─── Accounts tab — 6 source boxes, collapsed by default ─────── */
+  // Each linked-source row is its own <details> box: summary always
+  // visible (label · value), body expands on click. Six fixed boxes:
+  // Google Letme, Google Together, External Gmail, Warehouse CRM,
+  // Payroll, Auth0 ID — placeholder shown when the source is unlinked
+  // so the layout stays stable.
   function renderAccountsPanel() {
     return `
       <h2 class="up-panel-title">Accounts</h2>
-      ${renderLinkedSourcesCard()}
-      ${renderGoogleAccountsSection()}
-      ${viewerIsAdmin ? renderAuth0Card() : ""}`;
+      <div class="up-src-boxes">
+        ${renderGoogleBox("letme",    "Google · Letme")}
+        ${renderGoogleBox("together", "Google · Together")}
+        ${renderGoogleBox("external", "External Gmail")}
+        ${renderWarehouseBox()}
+        ${renderPayrollBox()}
+        ${renderAuth0Box()}
+      </div>
+      <div class="up-acct-add-form" id="upAcctAddForm" hidden></div>
+    `;
   }
-  function renderAuth0Card() {
+
+  function renderGoogleBox(tenant, label) {
+    const acct = (googleByPersonId[person.id] || []).find(a => a.tenant === tenant && (a.is_primary || a.google_user_id || tenant === "external"));
+    if (acct) return renderAccountRow(acct);
+    // Unlinked placeholder.
+    const addBtn = viewerIsAdmin
+      ? `<button class="up-btn-sm" data-acc-add="${tenant}">+ Add ${escapeHtml(label.replace(/^Google · /, ""))}</button>`
+      : "";
     return `
-      <div class="up-card">
-        <div class="up-card-head">Auth0 ID <span class="up-card-hint">admin-only · used to grant access without a Workspace seat</span></div>
-        <div class="up-field" data-edit-field="auth0_id">
-          <div class="up-field-editor up-field-editor--open">
-            <input type="text" name="auth0_id" value="${escapeHtml(person.auth0_id || "")}" placeholder="auth0|abc123…">
-            <div class="up-editor-row">
-              <button type="button" class="up-btn-sm up-btn-sm--primary" data-edit-save="auth0_id">Save</button>
-              <span class="up-edit-status" data-edit-status="auth0_id"></span>
-            </div>
+      <details class="up-src-box up-src-box--empty">
+        <summary class="up-src-box-summary">
+          <span class="up-src-box-label">${escapeHtml(label)}</span>
+          <span class="up-src-box-value"><span class="up-empty-val">not linked</span></span>
+        </summary>
+        <div class="up-src-box-body">
+          <p class="up-hint">No ${escapeHtml(label)} account is linked to this Person.</p>
+          ${addBtn}
+        </div>
+      </details>`;
+  }
+
+  function renderWarehouseBox() {
+    const wh = warehouseByPersonId[person.id] || null;
+    const summary = wh
+      ? `<span>${escapeHtml(wh.email || wh.username || `record #${wh.id}`)}</span>${wh.last_active_utc ? ` <span class="up-card-hint">· last active ${escapeHtml(wh.last_active_utc.slice(0, 10))}</span>` : ""}`
+      : `<span class="up-empty-val">not linked</span>`;
+    const body = wh ? `
+      <div class="up-fields-grid">
+        ${wh.id        ? `<div class="up-field"><div class="up-field-label">Record ID</div><div class="up-field-value">#${escapeHtml(wh.id)}</div></div>` : ""}
+        ${wh.email     ? `<div class="up-field"><div class="up-field-label">Email</div><div class="up-field-value">${escapeHtml(wh.email)}</div></div>` : ""}
+        ${wh.username  ? `<div class="up-field"><div class="up-field-label">Username</div><div class="up-field-value">${escapeHtml(wh.username)}</div></div>` : ""}
+        ${wh.last_active_utc ? `<div class="up-field"><div class="up-field-label">Last active (UTC)</div><div class="up-field-value">${escapeHtml(wh.last_active_utc)}</div></div>` : ""}
+      </div>
+      <p class="up-hint">Warehouse CRM identity — sourced from the nightly Fabric mirror. Read-only here.</p>
+    ` : `<p class="up-hint">No Warehouse CRM record matched to this Person yet. Matching is by email — verify the linked Google addresses cover what's in the warehouse.</p>`;
+    return `
+      <details class="up-src-box up-src-box--warehouse${wh ? "" : " up-src-box--empty"}">
+        <summary class="up-src-box-summary">
+          <span class="up-src-box-label">Warehouse CRM</span>
+          <span class="up-src-box-value">${summary}</span>
+        </summary>
+        <div class="up-src-box-body">${body}</div>
+      </details>`;
+  }
+
+  function renderPayrollBox() {
+    const linked = !!person.on_payroll;
+    const recId = person.most_recent_payroll_id;
+    const summary = linked
+      ? `<span>Payroll record ${recId ? `#${escapeHtml(recId)}` : "(no record yet)"}</span>`
+      : `<span class="up-empty-val">not on payroll</span>`;
+    const body = linked
+      ? `<p class="up-hint">This Person is flagged on payroll. Salary, NI number, holiday entitlement etc. are managed on the <a href="?tab=payroll">Payroll tab →</a></p>`
+      : `<p class="up-hint">Not currently on payroll. Toggle this on the <a href="?tab=payroll">Payroll tab →</a> to start a record (admin only).</p>`;
+    return `
+      <details class="up-src-box up-src-box--payroll${linked ? "" : " up-src-box--empty"}">
+        <summary class="up-src-box-summary">
+          <span class="up-src-box-label">Payroll</span>
+          <span class="up-src-box-value">${summary}</span>
+        </summary>
+        <div class="up-src-box-body">${body}</div>
+      </details>`;
+  }
+
+  function renderAuth0Box() {
+    const id = person.auth0_id || "";
+    const summary = id
+      ? `<span><code>${escapeHtml(id)}</code></span>`
+      : `<span class="up-empty-val">not set</span>`;
+    const editor = viewerIsAdmin ? `
+      <div class="up-field" data-edit-field="auth0_id">
+        <div class="up-field-editor up-field-editor--open">
+          <input type="text" name="auth0_id" value="${escapeHtml(id)}" placeholder="auth0|abc123…">
+          <div class="up-editor-row">
+            <button type="button" class="up-btn-sm up-btn-sm--primary" data-edit-save="auth0_id">Save</button>
+            <span class="up-edit-status" data-edit-status="auth0_id"></span>
           </div>
         </div>
-      </div>`;
+      </div>` : `<p class="up-hint">${id ? `<code>${escapeHtml(id)}</code>` : "Not set."} Admin-only to edit.</p>`;
+    return `
+      <details class="up-src-box up-src-box--auth0${id ? "" : " up-src-box--empty"}">
+        <summary class="up-src-box-summary">
+          <span class="up-src-box-label">Auth0 ID</span>
+          <span class="up-src-box-value">${summary}</span>
+        </summary>
+        <div class="up-src-box-body">
+          <p class="up-hint">Auth0 grants access to CRM / Admin Site / Reporting / VVC without consuming a Workspace seat. Useful for outsiders.</p>
+          ${editor}
+        </div>
+      </details>`;
   }
 
   /* ─── Payroll tab — most-recent PayrollData record + editor ────── */
@@ -749,17 +837,27 @@
       : "";
 
     return `
-      <div class="up-acct" data-acc-email="${escapeHtml(email)}" data-acc-id="${escapeHtml(rec.id)}" data-acc-is-primary="${rec.is_primary ? "1" : "0"}">
-        <div class="up-acct-head">
-          <div>
-            <div class="up-acct-email">${escapeHtml(email)}</div>
-          </div>
-          <div class="up-acct-badges">${badges.join("")} ${adminUnlink}</div>
+      <details class="up-src-box up-acct" data-acc-email="${escapeHtml(email)}" data-acc-id="${escapeHtml(rec.id)}" data-acc-is-primary="${rec.is_primary ? "1" : "0"}">
+        <summary class="up-src-box-summary">
+          <span class="up-src-box-label">${escapeHtml(srcBoxLabel(rec.tenant))}</span>
+          <span class="up-src-box-value">
+            <span class="up-acct-email">${escapeHtml(email)}</span>
+            <span class="up-acct-badges">${badges.join("")} ${adminUnlink}</span>
+          </span>
+        </summary>
+        <div class="up-src-box-body">
+          ${aliasBlock}
+          ${actions}
+          <div class="up-acct-form" hidden></div>
         </div>
-        ${aliasBlock}
-        ${actions}
-        <div class="up-acct-form" hidden></div>
-      </div>`;
+      </details>`;
+  }
+
+  function srcBoxLabel(tenant) {
+    if (tenant === "letme")    return "Google · Letme";
+    if (tenant === "together") return "Google · Together";
+    if (tenant === "external") return "External Gmail";
+    return "Google";
   }
   function renderAccountButtons(email, st, isMine, rec) {
     // Each entry is [button-html, one-line rationale]. The rationale
@@ -956,7 +1054,13 @@
       btn.addEventListener("click", () => openAccountAdd(btn.dataset.accAdd));
     });
     document.querySelectorAll("[data-acc-unlink]").forEach(btn => {
-      btn.addEventListener("click", () => unlinkGoogleAccount(btn.dataset.accUnlink));
+      // Unlink button lives inside the <summary> — preventDefault keeps
+      // the box from toggling open/closed when this is clicked.
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        unlinkGoogleAccount(btn.dataset.accUnlink);
+      });
     });
     document.querySelectorAll("[data-acc-alias-add]").forEach(btn => {
       btn.addEventListener("click", () => handleAliasAction(btn, "add"));

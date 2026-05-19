@@ -462,14 +462,61 @@ a.up-fp-open:hover { text-decoration: underline; }
 .up-pay-input:focus { outline: 0; border-color: var(--brass-500); }
 textarea.up-pay-input { resize: vertical; min-height: 50px; font-family: var(--font-body); }
 
-/* ─── Google accounts section (inline per-account actions) ───────── */
-.up-acct {
+/* ─── Linked-source boxes (one collapsible <details> per source) ─── */
+.up-src-boxes { display: flex; flex-direction: column; gap: 8px; }
+.up-src-box {
   border: 1px solid var(--ink-300);
-  margin-bottom: 10px;
-  padding: 10px 12px;
   background: var(--paper-50);
+  overflow: hidden;
 }
-.up-acct:last-of-type { margin-bottom: 0; }
+.up-src-box-summary {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  list-style: none;
+  font: 500 13px/1.3 var(--font-body);
+  color: var(--ink-800);
+  user-select: none;
+}
+.up-src-box-summary::-webkit-details-marker { display: none; }
+.up-src-box-summary::before {
+  content: "▸";
+  color: var(--ink-500); font-size: 11px;
+  transition: transform 120ms ease;
+  flex: 0 0 auto;
+}
+.up-src-box[open] > .up-src-box-summary::before { transform: rotate(90deg); }
+.up-src-box-label {
+  font: 600 12px/1 var(--font-body);
+  letter-spacing: 0.02em;
+  color: var(--ink-700);
+  flex: 0 0 auto;
+  min-width: 130px;
+}
+.up-src-box-value {
+  flex: 1 1 auto;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  color: var(--ink-900);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.up-src-box-value code {
+  font: 500 11px/1 var(--font-mono); color: var(--ink-700);
+}
+.up-src-box-body {
+  padding: 8px 14px 14px;
+  border-top: 1px dashed var(--paper-300);
+}
+.up-src-box--empty .up-src-box-body { color: var(--ink-500); }
+@media (max-width: 600px) {
+  .up-src-box-summary { flex-wrap: wrap; }
+  .up-src-box-label { min-width: 0; flex-basis: 100%; }
+}
+
+/* ─── Google accounts (per-account actions live inside a box body) ─ */
+.up-acct {
+  /* now a <details>; layout handled by .up-src-box rules above */
+}
 .up-acct-head {
   display: flex; justify-content: space-between; align-items: flex-start;
   gap: 12px; flex-wrap: wrap;
