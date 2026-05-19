@@ -110,6 +110,11 @@ export default {
     if (url0.pathname.startsWith("/api/holidays/")) {
       return await handleHolidays(req, env, url0);
     }
+    // /api/bookr/* — read/write rg-bookr Firebase Realtime DB without
+    // touching the existing BookR app or its AirBnB/Guesty syncs.
+    if (url0.pathname.startsWith("/api/bookr/")) {
+      return await handleBookr(req, env, url0);
+    }
 
     // GET /api/workspace/payroll — returns the payroll JSON stored in the
     // PAYROLL_KV namespace under the key `current`. Behind Cloudflare Access
@@ -3643,3 +3648,198 @@ function b64Encode(s) {
   for (const b of bytes) bin += String.fromCharCode(b);
   return btoa(bin);
 }
+
+/* BookR: read+write rg-bookr Realtime DB. See SPEC for endpoints. */
+const BOOKR_DB_URL = "https://rg-bookr.firebaseio.com";
+let _bookrToken = { value: null, exp: 0 };
+
+async function handleBookr(req, env, url) {
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(req) });
+  if (!req.headers.get("Cf-Access-Jwt-Assertion")) return json({ error: "not authenticated via Cloudflare Access" }, 401, req);
+  if (!env.BOOKR_SERVICE_ACCOUNT_JSON) return json({ error: "BOOKR_SERVICE_ACCOUNT_JSON not configured on worker" }, 503, req);
+  const viewerEmail = (req.headers.get("Cf-Access-Authenticated-User-Email") || "").toLowerCase();
+  const action = url.pathname.replace(/^\/api\/bookr\/?/, "").split("/")[0];
+  try {
+    if (action === "whoami")   return json(await bookrWhoami(env, viewerEmail), 200, req);
+    if (action === "users")    return json(await bookrUsers(env), 200, req);
+    if (action === "assets")   return json(await bookrAssets(env), 200, req);
+    if (action === "bookings") {
+      const t  = url.searchParams.get("type");
+      const id = url.searchParams.get("asset");
+      const f  = url.searchParams.get("from");
+      const tt = url.searchParams.get("to");
+      return json(await bookrBookingsRange(env, t, id, f, tt), 200, req);
+    }
+    if (req.method !== "POST") return json({ error: "method not allowed" }, 405, req);
+    let body = {};
+    try { body = await req.json(); } catch (e) { return json({ error: "bad JSON body" }, 400, req); }
+    if (action === "book")   return json(await bookrBook(env, viewerEmail, body),   200, req);
+    if (action === "cancel") return json(await bookrCancel(env, viewerEmail, body), 200, req);
+    return json({ error: `unknown bookr action: ${action}` }, 404, req);
+  } catch (e) {
+    return json({ ok: false, error: e.message || String(e) }, 500, req);
+  }
+}
+
+async function getBookrAccessToken(env) {
+  const now = Math.floor(Date.now() / 1000);
+  if (_bookrToken.value && now < _bookrToken.exp - 60) return _bookrToken.value;
+  const sa = JSON.parse(env.BOOKR_SERVICE_ACCOUNT_JSON);
+  if (!sa.client_email || !sa.private_key) throw new Error("BOOKR_SERVICE_ACCOUNT_JSON missing client_email / private_key");
+  const header = { alg: "RS256", typ: "JWT", kid: sa.private_key_id };
+  const claims = {
+    iss: sa.client_email,
+    aud: "https://oauth2.googleapis.com/token",
+    scope: "https://www.googleapis.com/auth/firebase.database https://www.googleapis.com/auth/userinfo.email",
+    iat: now,
+    exp: now + 3600,
+  };
+  const enc = o => base64url(new TextEncoder().encode(JSON.stringify(o)));
+  const signingInput = `${enc(header)}.${enc(claims)}`;
+  const pemBody = sa.private_key
+    .replace(/-----BEGIN PRIVATE KEY-----/g, "")
+    .replace(/-----END PRIVATE KEY-----/g, "")
+    .replace(/\s+/g, "");
+  const keyBytes = Uint8Array.from(atob(pemBody), c => c.charCodeAt(0));
+  const key = await crypto.subtle.importKey(
+    "pkcs8", keyBytes, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["sign"],
+  );
+  const sig = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", key, new TextEncoder().encode(signingInput));
+  const jwt = `${signingInput}.${base64url(new Uint8Array(sig))}`;
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer", assertion: jwt }),
+  });
+  if (!res.ok) throw new Error(`bookr token exchange ${res.status}: ${(await res.text()).slice(0, 300)}`);
+  const tok = (await res.json()).access_token;
+  _bookrToken = { value: tok, exp: now + 3500 };
+  return tok;
+}
+
+async function bookrFetch(env, path, init = {}) {
+  const token = await getBookrAccessToken(env);
+  const u = `${BOOKR_DB_URL}${path}${path.includes("?") ? "&" : "?"}access_token=${encodeURIComponent(token)}`;
+  const res = await fetch(u, init);
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(`Firebase ${init.method || "GET"} ${path}: ${res.status} ${t.slice(0, 200)}`);
+  }
+  const txt = await res.text();
+  if (!txt) return null;
+  try { return JSON.parse(txt); } catch (e) { return txt; }
+}
+
+async function bookrFindUidByEmail(env, candidateEmails) {
+  const all = await bookrFetch(env, "/users.json");
+  const lowered = candidateEmails.filter(Boolean).map(e => e.toLowerCase());
+  for (const [uid, u] of Object.entries(all || {})) {
+    const e = ((u && u.email) || "").toLowerCase();
+    if (e && lowered.includes(e)) {
+      return { uid, name: (u && u.name) || "", email: (u && u.email) || "", suspended: !!(u && u.suspended) };
+    }
+  }
+  return null;
+}
+
+async function bookrWhoami(env, viewerEmail) {
+  if (!viewerEmail) return { ok: true, email: "", uid: null, error: "no Cf-Access email" };
+  const candidates = [viewerEmail];
+  try {
+    const { file } = await fetchPeopleFile(env);
+    const ve = viewerEmail.toLowerCase();
+    const person = (file.people || []).find(p =>
+      [p.main_google_email, ...(p.alt_google_emails || []), p.external_google_email]
+        .filter(Boolean).map(e => e.toLowerCase()).includes(ve)
+    );
+    if (person) candidates.push(person.main_google_email, ...(person.alt_google_emails || []), person.external_google_email);
+  } catch (e) { /* best-effort */ }
+  const hit = await bookrFindUidByEmail(env, candidates);
+  if (hit) return { ok: true, email: viewerEmail, uid: hit.uid, name: hit.name, suspended: hit.suspended };
+  return { ok: true, email: viewerEmail, uid: null, error: "no BookR user with a matching email" };
+}
+
+async function bookrUsers(env) {
+  const all = await bookrFetch(env, "/users.json");
+  const out = {};
+  for (const [uid, u] of Object.entries(all || {})) {
+    out[uid] = { name: (u && u.name) || "", email: (u && u.email) || "", suspended: !!(u && u.suspended) };
+  }
+  return { ok: true, users: out };
+}
+
+async function bookrAssets(env) {
+  const [cars, props] = await Promise.all([
+    bookrFetch(env, "/cars.json"),
+    bookrFetch(env, "/properties.json"),
+  ]);
+  const flatten = (kind, dict) => Object.entries(dict || {}).map(([id, a]) => ({
+    id, type: kind,
+    title: a.title || "", sub_title: a.sub_title || "", address: a.address || "",
+    code: a.code || "", description: a.description || "", key_information: a.key_information || "",
+    latitude: a.latitude || "", longitude: a.longitude || "",
+    notice: a.notice || "", safe: a.safe || "",
+    listing_id: a.listing_id || a.listingId || "",
+    minimum_age: a.minimum_age || "",
+    price: (a.price === undefined ? null : a.price),
+  }));
+  return { ok: true, cars: flatten("cars", cars), properties: flatten("properties", props) };
+}
+
+async function bookrBookingsRange(env, type, id, from, to) {
+  if (!["cars", "properties"].includes(type)) throw new Error(`type must be cars|properties, got ${type}`);
+  if (!id) throw new Error("missing asset");
+  const all = (await bookrFetch(env, `/${type}/${encodeURIComponent(id)}/bookings.json`)) || {};
+  const out = {};
+  for (const [date, value] of Object.entries(all)) {
+    if (from && date < from) continue;
+    if (to   && date > to)   continue;
+    out[date] = value;
+  }
+  return { ok: true, bookings: out };
+}
+
+async function bookrResolveTargetUid(env, viewerEmail, body) {
+  const admins = await fetchAdmins();
+  const isAdmin = admins.includes(viewerEmail);
+  if (isAdmin && body.target_user_uid) return body.target_user_uid;
+  if (isAdmin && body.target_email) {
+    const who = await bookrWhoami(env, body.target_email);
+    if (!who.uid) throw new Error(`no BookR user matches ${body.target_email}`);
+    return who.uid;
+  }
+  const own = await bookrWhoami(env, viewerEmail);
+  if (!own.uid) throw new Error("your TogetherBook email isn't linked to a BookR user");
+  return own.uid;
+}
+
+async function bookrBook(env, viewerEmail, body) {
+  const type = body.type, asset = body.asset, date = body.date;
+  if (!["cars", "properties"].includes(type)) throw new Error("type must be cars|properties");
+  if (!asset) throw new Error("missing asset");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("date must be YYYY-MM-DD");
+  const uid = await bookrResolveTargetUid(env, viewerEmail, body);
+  const path = `/${type}/${encodeURIComponent(asset)}/bookings/${date}.json`;
+  await bookrFetch(env, path, { method: "PUT", body: JSON.stringify(uid), headers: { "Content-Type": "application/json" } });
+  return { ok: true, type, asset, date, uid };
+}
+
+async function bookrCancel(env, viewerEmail, body) {
+  const type = body.type, asset = body.asset, date = body.date;
+  if (!["cars", "properties"].includes(type)) throw new Error("type must be cars|properties");
+  if (!asset) throw new Error("missing asset");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("date must be YYYY-MM-DD");
+  const admins = await fetchAdmins();
+  const isAdmin = admins.includes(viewerEmail);
+  const path = `/${type}/${encodeURIComponent(asset)}/bookings/${date}.json`;
+  if (!isAdmin) {
+    const own = await bookrWhoami(env, viewerEmail);
+    if (!own.uid) throw new Error("your TogetherBook email isn't linked to a BookR user");
+    const current = await bookrFetch(env, path);
+    if (current !== own.uid) throw new Error("you can only cancel your own bookings");
+  }
+  // Match BookR's existing convention: cancellations set the date to "free".
+  await bookrFetch(env, path, { method: "PUT", body: JSON.stringify("free"), headers: { "Content-Type": "application/json" } });
+  return { ok: true, type, asset, date };
+}
+
