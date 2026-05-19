@@ -1,0 +1,46 @@
+name: Backfill BookR users
+
+# Manual trigger only. Walks people.json, matches each Person against the
+# rg-bookr /users tree by email, and mints a fresh BookR user (push-key
+# uid) for any Person with no match. Writes bookr_uid back into
+# people.json and commits the diff if anything changed.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install cryptography
+        run: pip install --quiet cryptography
+
+      - name: Backfill
+        env:
+          BOOKR_SERVICE_ACCOUNT_JSON: ${{ secrets.BOOKR_SERVICE_ACCOUNT_JSON }}
+        run: python3 scripts/backfill_bookr_users.py
+
+      - name: Commit changes (if any)
+        run: |
+          if git diff --quiet -- people.json; then
+            echo "no changes to people.json"
+            exit 0
+          fi
+          matched=$(git diff -- people.json | grep -c '"bookr_uid":' || true)
+          git config user.email "richmondbot2000@gmail.com"
+          git config user.name  "richmondbot2000-prog"
+          git add people.json
+          git commit -m "BookR backfill: link ${matched} Persons (matched + created)"
+          git push
