@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-19T16:09:14.720Z",
+  "updated_at": "2026-05-19T16:33:34.928Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -2503,6 +2503,13 @@
     },
     {
       "ts": "2026-05-19T16:09:14.720Z",
+      "actor": "james.benamor@letme.com",
+      "action": "user-alias-add",
+      "target": "",
+      "ok": true
+    },
+    {
+      "ts": "2026-05-19T16:33:34.928Z",
       "actor": "james.benamor@letme.com",
       "action": "user-alias-add",
       "target": "",
