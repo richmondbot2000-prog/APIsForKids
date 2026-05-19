@@ -273,19 +273,26 @@
 
   async function loadAll() {
     setStatus("Loading…");
-    let whoami = null, assets = null;
-    const usersP = getJSON("/api/bookr/users").then(u => (u && u.users) || {}).catch(() => ({}));
+    let whoami = null, assets = null, assetsErr = null, whoamiErr = null, usersErr = null;
+    const usersP = getJSON("/api/bookr/users")
+      .then(u => (u && u.users) || {})
+      .catch(e => { usersErr = e && e.message || String(e); return {}; });
     const adminP = getJSON("/api/workspace/whoami").then(w => !!(w && (w.is_admin || w.is_togetherbook_admin))).catch(() => false);
-    try {
-      const both = await Promise.all([
-        getJSON("/api/bookr/whoami").catch(() => null),
-        getJSON("/api/bookr/assets").catch(() => null),
-      ]);
-      whoami = both[0]; assets = both[1];
-    } catch (e) {}
+    const [w, a] = await Promise.all([
+      getJSON("/api/bookr/whoami").catch(e => { whoamiErr = e && e.message || String(e); return null; }),
+      getJSON("/api/bookr/assets").catch(e => { assetsErr = e && e.message || String(e); return null; }),
+    ]);
+    whoami = w; assets = a;
     STATE.whoami = whoami;
     STATE.cars = (assets && assets.cars) || [];
     STATE.properties = (assets && assets.properties) || [];
+    // Surface the real reason the list is empty so this doesn't read
+    // as "0 ASSETS" for users — distinguishing a worker error, an
+    // empty-but-valid response, and rules-denying-the-read.
+    const total = STATE.cars.length + STATE.properties.length;
+    if (total === 0 || assetsErr || whoamiErr) {
+      renderBookrDiagnostic({ whoami, whoamiErr, assets, assetsErr, usersErr });
+    }
     STATE.bookings = {};
     STATE.pendingDates = new Set();
     const { days } = dateRange();
@@ -329,6 +336,56 @@
     if (!el) return;
     el.textContent = msg || "";
     el.style.display = msg ? "" : "none";
+  }
+
+  // Surfaces the actual reason a load returned nothing — error message
+  // from the worker, or "valid response but empty" (which on Firebase
+  // RTDB almost always means the service account lacks the IAM role
+  // that bypasses security rules). Inserted just above the calendar.
+  function renderBookrDiagnostic(info) {
+    let existing = document.getElementById("bkDiag");
+    if (!existing) {
+      existing = document.createElement("div");
+      existing.id = "bkDiag";
+      existing.style.cssText = "margin: 12px 0; padding: 12px 14px; background: var(--paper-100, #faf3e3); border-left: 3px solid var(--brass-500, #C8973F); font: 400 12px/1.5 var(--font-body); color: var(--ink-800);";
+      const main = document.querySelector("main") || document.body;
+      const grid = document.querySelector("#bkGrid") || document.querySelector(".bk-tabs") || main.firstChild;
+      (grid && grid.parentElement || main).insertBefore(existing, grid || null);
+    }
+    const lines = [];
+    lines.push("<strong>BookR diagnostics</strong>");
+    if (info.whoamiErr) {
+      lines.push(`whoami: <span style="color:var(--red-600,#b3261e);">${escapeHtml(info.whoamiErr)}</span>`);
+    } else if (info.whoami) {
+      lines.push("whoami: " + escapeHtml(JSON.stringify(info.whoami)));
+    }
+    if (info.assetsErr) {
+      lines.push(`assets: <span style="color:var(--red-600,#b3261e);">${escapeHtml(info.assetsErr)}</span>`);
+    } else if (info.assets) {
+      const cn = (info.assets.cars || []).length;
+      const pn = (info.assets.properties || []).length;
+      lines.push(`assets: <code>{cars: ${cn}, properties: ${pn}}</code>`);
+      if (cn === 0 && pn === 0) {
+        lines.push(
+          '<em>Worker reached Firebase and got an empty list. Almost always means ' +
+          'security rules are silently denying the service-account read. Fix: in ' +
+          '<a href="https://console.firebase.google.com" target="_blank">Firebase console</a> → ' +
+          'rg-bookr project → Realtime Database → Rules, ensure <code>cars</code>, <code>properties</code>, ' +
+          '<code>users</code> are readable by service accounts; OR grant the service account the ' +
+          '<strong>Firebase Realtime Database Admin</strong> IAM role at ' +
+          '<a href="https://console.cloud.google.com/iam-admin/iam?project=rg-bookr" target="_blank">' +
+          'console.cloud.google.com/iam-admin/iam?project=rg-bookr</a> (service-account email is ' +
+          'inside BOOKR_SERVICE_ACCOUNT_JSON on the worker).</em>'
+        );
+      }
+    }
+    if (info.usersErr) {
+      lines.push(`users: <span style="color:var(--red-600,#b3261e);">${escapeHtml(info.usersErr)}</span>`);
+    }
+    existing.innerHTML = lines.join("<br>");
+  }
+  function escapeHtml(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   }
   function renderTopChrome() {
     const pill = document.querySelector("#bkLinkPill");
