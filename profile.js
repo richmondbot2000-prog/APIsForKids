@@ -235,31 +235,6 @@
           ? `<span>${escapeHtml(person.line_manager_email_raw)}</span>`
           : `<span class="up-empty-val">No line manager</span>`);
 
-    // Read-only "Workspace" fields summarised from the Person record + the
-    // raw Workspace row.
-    const u = staffByEmail[(person.main_google_email || "").toLowerCase()] || {};
-    const tenants = (person.alt_google_emails || []).length
-      ? `${person.main_google_email} · ${person.alt_google_emails.join(" · ")}`
-      : person.main_google_email;
-    const readOnly = [
-      ["Main Google account", escapeHtml(person.main_google_email || "—")],
-      ["Alt Google accounts", (person.alt_google_emails || []).length
-                                ? escapeHtml(person.alt_google_emails.join(", "))
-                                : '<span class="up-empty-val">—</span>'],
-      ["External Google",     person.external_google_email ? escapeHtml(person.external_google_email) : '<span class="up-empty-val">—</span>'],
-      ["Auth0 ID",            person.auth0_id ? `<code>${escapeHtml(person.auth0_id)}</code>` : '<span class="up-empty-val">—</span>'],
-      ["Access level",        `<span class="up-pill up-pill--${escapeHtml(person.access_level || "staff")}">${escapeHtml(person.access_level || "staff")}</span>`],
-      ["Status",              person.suspended || person.access_level === "former"
-                                ? '<span class="up-pill up-pill--suspended">Suspended</span>'
-                                : '<span class="up-pill up-pill--live">Live</span>'],
-      ["Department",          u.department ? escapeHtml(u.department) : (person.department ? escapeHtml(person.department) : '<span class="up-empty-val">—</span>')],
-    ];
-    const readOnlyHtml = readOnly.map(([label, value]) => `
-      <div class="up-field">
-        <div class="up-field-label">${escapeHtml(label)}</div>
-        <div class="up-field-value">${value}</div>
-      </div>`).join("");
-
     // Editable block (Role, Phone, Address). Line manager + access_level
     // are admin-only — we show them as read-only here and admins use
     // /people.html for the deeper edits.
@@ -376,11 +351,6 @@
             <button type="button" class="up-btn-sm" data-card-cancel>Cancel</button>
             <span class="up-edit-status" data-card-status></span>
           </div>` : ""}
-      </div>
-
-      <div class="up-card">
-        <div class="up-card-head">Identity & access</div>
-        <div class="up-fields-grid">${readOnlyHtml}</div>
       </div>
 
       ${adminControls}
