@@ -1087,6 +1087,20 @@
     rows.sort((a, b) => a.name.localeCompare(b.name) || a.email.localeCompare(b.email));
     return rows.map(r => `<option value="${escapeHtml(r.email)}">${escapeHtml(r.label)}</option>`).join("");
   }
+  // Cryptographically-strong password generator for the Reset-password
+  // action. 16 chars from a base62 + symbol alphabet, drawn from crypto
+  // getRandomValues. Worker requires the caller to supply the password so
+  // the page can show it to the admin exactly once at the same moment it
+  // takes effect on Google's side.
+  function generateAccountPassword() {
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*-_";
+    const out = new Array(16);
+    const buf = new Uint32Array(16);
+    crypto.getRandomValues(buf);
+    for (let i = 0; i < 16; i++) out[i] = alphabet[buf[i] % alphabet.length];
+    return out.join("");
+  }
+
   async function handleAccountAction(btn) {
     const card = btn.closest(".up-acct");
     const email = card && card.dataset.accEmail;
@@ -1094,6 +1108,10 @@
     const action = btn.dataset.accAction;
     const form = card.querySelector(".up-acct-form");
     const t = tenantFor(email);
+    // Resolve the underlying google-accounts row so handlers that need the
+    // immutable google_user_id (Recover) can pull from it without re-fetching.
+    const accId = card && card.dataset.accId;
+    const rec = (googleByPersonId[person.id] || []).find(a => String(a.id) === String(accId)) || null;
 
     // Single-target prompt actions: forward / transfer-drive.
     const NEEDS_TARGET = new Set(["forward", "transfer-drive"]);
@@ -1217,7 +1235,8 @@
       "recover":            { msg: `Recover ${email}?\n\nRestores the deleted account to live, billed £11/month from today.` },
     }[action];
     if (CONFIRM && !confirm(CONFIRM.msg)) return;
-    runAccountAction(null, email, action, null, t);
+    const extra = action === "recover" ? { user_id: rec && rec.google_user_id || "" } : undefined;
+    runAccountAction(null, email, action, null, t, extra);
   }
 
   async function runAccountAction(form, email, action, target, tenant, extra) {
@@ -1225,6 +1244,10 @@
     if (status) { status.textContent = "Working…"; status.className = "up-edit-status up-edit-status--working"; }
     // Action → [worker route, body]. `extra` lets callers slot extra
     // fields onto the body without rewriting the map.
+    // reset-password is the only action that needs a value plumbed through
+    // the map; compute it before the map literal so it's in scope when
+    // the args object is constructed.
+    const generatedPw = action === "reset-password" ? generateAccountPassword() : "";
     const map = {
       "forward":            ["add-forwarding",     { email, route_to: target }],
       "cancel-forwarding":  ["cancel-forwarding",  { email }],
@@ -1233,7 +1256,14 @@
       "unsuspend":          ["unsuspend",          { email }],
       "delete-now":         ["delete-account",     { email }],
       "transfer-drive":     ["data-transfer",      { email, target_email: target }],
-      "reset-password":     ["reset-password",     { email }],
+      // reset-password: worker installs `password` on the account; the page
+      // shows the same string to the admin via the `new_password` field on
+      // the success response (see post-success branch below).
+      "reset-password":     ["reset-password",     { email, password: generatedPw }],
+      // recover needs the immutable Google id (email may have been recycled
+      // during the 20-day window). The caller passes it via extra from
+      // handleAccountAction, which already has the google-accounts row in
+      // scope.
       "recover":            ["recover",            { email }],
       // Convert primary email to a forwarding Group. `forward_to`
       // arrives via `extra` from the convert-to-group form below.
@@ -1252,8 +1282,14 @@
       });
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
-      if (act === "reset-password" && out.new_password) {
-        alert(`Password for ${email}:\n\n${out.new_password}\n\nCopy now — it's only shown once.`);
+      if (act === "reset-password") {
+        // Worker accepts the caller-supplied password and forces a change
+        // on next login. Show the string we just sent so the admin can
+        // pass it to the user; the worker may also echo it as
+        // `out.new_password` for compatibility with any future
+        // server-generated variant.
+        const shown = out.new_password || generatedPw;
+        if (shown) alert(`Password for ${email}:\n\n${shown}\n\nCopy now — it's only shown once.`);
       }
       // Refresh data from origin so badges reflect the change.
       await reloadAccountData();
