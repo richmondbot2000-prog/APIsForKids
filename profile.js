@@ -357,7 +357,6 @@
         ${editableRow("phone",      "Phone",        "tel",      person.phone)}
         ${editableRow("address",    "Address",      "textarea", person.address)}
         ${editableRow("start_date", "Start date",   "date",     person.start_date)}
-        ${editableRow("end_date",   "End date",     "date",     person.end_date, "Leave blank if still employed — Holiday Plan logic uses this to cap accrual")}
         ${editableRow("notes",      "Notes",        "textarea", person.notes)}
         <div class="up-field" data-edit-field="line_manager_id">
           <div class="up-field-label">Line manager</div>
