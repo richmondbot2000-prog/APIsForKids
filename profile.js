@@ -347,12 +347,6 @@
 
       <div class="up-card">
         <div class="up-card-head">Editable details ${lockedBadge}</div>
-        <div class="up-field" data-edit-field="access_level">
-          <div class="up-field-label">Access level</div>
-          ${editable
-            ? accessLevelEditor
-            : `<div class="up-field-value"><span class="up-pill up-pill--${escapeHtml(person.access_level || "staff")}">${escapeHtml(person.access_level || "staff")}</span></div>`}
-        </div>
         <div class="up-field" data-edit-field="line_manager_id">
           <div class="up-field-label">Line manager</div>
           ${editable ? lineMgrEditor : `<div class="up-field-value">${lineMgrDisplay}</div>`}
@@ -364,6 +358,12 @@
         ${editableRow("phone",      "Phone",        "tel",      person.phone)}
         ${editableRow("address",    "Address",      "textarea", person.address)}
         ${editableRow("start_date", "Start date",   "date",     person.start_date)}
+        <div class="up-field" data-edit-field="access_level">
+          <div class="up-field-label">Access level</div>
+          ${editable
+            ? accessLevelEditor
+            : `<div class="up-field-value"><span class="up-pill up-pill--${escapeHtml(person.access_level || "staff")}">${escapeHtml(person.access_level || "staff")}</span></div>`}
+        </div>
       </div>
 
       ${adminControls}`;
