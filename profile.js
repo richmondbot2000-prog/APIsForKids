@@ -257,27 +257,29 @@
             <div class="up-field-value ${value ? "" : "up-empty-val"}" style="white-space:pre-wrap;">${escapeHtml(value) || "Not set"}</div>
           </div>`;
       }
-      // If suggestions are supplied, emit a native <datalist> the
-      // browser uses for inline autocomplete — as the user types,
-      // matching values from existing records on other Persons drop
-      // down beneath the input.
-      const listId = suggestions && suggestions.length ? `upSuggest-${field}` : "";
-      const datalistHtml = listId
-        ? `<datalist id="${listId}">${suggestions.map(s => `<option value="${escapeHtml(s)}"></option>`).join("")}</datalist>`
+      // Custom prefix-matched autocomplete. Native <datalist> was
+      // substring-matched (typing "c" returned "Director") and styled
+      // itself to the OS. We replace with a Google-style dropdown
+      // attached directly below the input — full width, prefix match,
+      // keyboard nav — wired up by wireAutocompletes() after render.
+      const hasSuggest = suggestions && suggestions.length && type !== "textarea";
+      const optionsAttr = hasSuggest
+        ? ` data-autocomplete-options='${escapeHtml(JSON.stringify(suggestions))}'`
         : "";
-      const listAttr = listId ? ` list="${listId}"` : "";
-      const editor = type === "textarea"
+      const inputHtml = type === "textarea"
         ? `<textarea name="${field}" rows="3" data-orig="${escapeHtml(value || "")}">${escapeHtml(value || "")}</textarea>`
-        : `<input type="${type}" name="${field}" value="${escapeHtml(value || "")}" data-orig="${escapeHtml(value || "")}"${listAttr}>`;
+        : `<input type="${type}" name="${field}" value="${escapeHtml(value || "")}" data-orig="${escapeHtml(value || "")}"${optionsAttr} autocomplete="off">`;
+      const wrappedEditor = hasSuggest
+        ? `<div class="up-ac-wrap">${inputHtml}<div class="up-ac-list" hidden role="listbox"></div></div>`
+        : inputHtml;
       return `
         <div class="up-field" data-edit-field="${field}">
           <div class="up-field-label">${escapeHtml(label)} ${savedBadge}</div>
           <div class="up-field-editor-row">
-            ${editor}
+            ${wrappedEditor}
             <button type="button" class="up-btn-sm up-btn-sm--primary" data-edit-save="${field}" disabled>Save</button>
             <span class="up-edit-status" data-edit-status="${field}"></span>
           </div>
-          ${datalistHtml}
           ${hint ? `<p class="up-hint">${hint}</p>` : ""}
         </div>`;
     }
@@ -1111,6 +1113,68 @@
     return html.join("");
   }
 
+  // Google-style autocomplete: prefix-matched, full-width dropdown
+  // directly below the input. Driven by data-autocomplete-options
+  // (JSON array of suggestion strings) baked onto the <input> at
+  // render time. Keyboard nav (↑/↓/Enter/Esc), click to select,
+  // blur to dismiss, no match → hidden.
+  function wireAutocompletes() {
+    document.querySelectorAll("input[data-autocomplete-options]").forEach(inp => {
+      let options;
+      try { options = JSON.parse(inp.dataset.autocompleteOptions || "[]"); }
+      catch (e) { options = []; }
+      const list = inp.parentElement && inp.parentElement.querySelector(".up-ac-list");
+      if (!list || !options.length) return;
+      let active = -1;
+      let matches = [];
+
+      const renderMatches = () => {
+        const q = (inp.value || "").toLowerCase().trim();
+        matches = q
+          ? options.filter(o => o.toLowerCase().startsWith(q))
+          : options.slice(0, 8);
+        if (!matches.length) { list.hidden = true; list.innerHTML = ""; active = -1; return; }
+        list.innerHTML = matches.map((m, i) => {
+          const q2 = (inp.value || "");
+          const safe = escapeHtml(m);
+          const bold = q2 && m.toLowerCase().startsWith(q2.toLowerCase())
+            ? `<strong>${escapeHtml(m.slice(0, q2.length))}</strong>${escapeHtml(m.slice(q2.length))}`
+            : safe;
+          return `<div class="up-ac-item${i === active ? " is-active" : ""}" data-i="${i}" role="option">${bold}</div>`;
+        }).join("");
+        list.hidden = false;
+      };
+
+      const pick = (i) => {
+        if (i < 0 || i >= matches.length) return;
+        inp.value = matches[i];
+        inp.dispatchEvent(new Event("input",  { bubbles: true }));
+        inp.dispatchEvent(new Event("change", { bubbles: true }));
+        list.hidden = true; list.innerHTML = ""; active = -1;
+        inp.focus();
+      };
+
+      inp.addEventListener("focus", renderMatches);
+      inp.addEventListener("input", () => { active = -1; renderMatches(); });
+      inp.addEventListener("blur",  () => { setTimeout(() => { list.hidden = true; }, 120); });
+      inp.addEventListener("keydown", (e) => {
+        if (list.hidden) return;
+        if (e.key === "ArrowDown") { e.preventDefault(); active = Math.min(matches.length - 1, active + 1); renderMatches(); }
+        else if (e.key === "ArrowUp")   { e.preventDefault(); active = Math.max(0, active - 1);            renderMatches(); }
+        else if (e.key === "Enter" && active >= 0) { e.preventDefault(); pick(active); }
+        else if (e.key === "Escape") { list.hidden = true; active = -1; }
+      });
+      // mousedown (not click) — fires before the input's blur
+      // so the value can be applied before the dropdown is hidden.
+      list.addEventListener("mousedown", (e) => {
+        const item = e.target.closest(".up-ac-item");
+        if (!item) return;
+        e.preventDefault();
+        pick(Number(item.dataset.i));
+      });
+    });
+  }
+
   function wirePanel() {
     // Per-field Edit/Save/Cancel still used by the Auth0 ID + external-Gmail
     // fields in Other identities (one field per editor, no card-level batch).
@@ -1135,6 +1199,7 @@
       }
       btn.addEventListener("click", () => savePersonField(field));
     });
+    wireAutocompletes();
     document.querySelectorAll("[data-holiday-plan-select]").forEach(sel => {
       sel.addEventListener("change", () => {
         const hint = sel.closest(".up-field").querySelector("[data-holiday-plan-hint]");

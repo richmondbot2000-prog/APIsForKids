@@ -333,6 +333,28 @@ body { background: var(--paper-100, #FBF6E9); }
   background: var(--paper-100); color: var(--ink-500); border-color: var(--paper-300);
 }
 
+/* Google-style autocomplete dropdown: prefix-matched suggestions
+   shown directly below the input, full width of the input. */
+.up-ac-wrap { position: relative; flex: 1 1 0; min-width: 160px; display: flex; }
+.up-ac-wrap > input { flex: 1 1 auto; min-width: 0; }
+.up-ac-list {
+  position: absolute;
+  top: calc(100% + 2px); left: 0; right: 0;
+  z-index: 50;
+  max-height: 240px; overflow-y: auto;
+  background: var(--paper-50, #FFFFFF);
+  border: 1px solid var(--ink-300);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+.up-ac-item {
+  padding: 8px 12px;
+  font: 400 13px/1.3 var(--font-body);
+  color: var(--ink-800);
+  cursor: pointer;
+}
+.up-ac-item strong { font-weight: 700; color: var(--ink-900); }
+.up-ac-item:hover, .up-ac-item.is-active { background: var(--paper-100); }
+
 .up-btn-sm {
   font: 600 12px/1 var(--font-body);
   padding: 7px 12px;
