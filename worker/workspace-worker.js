@@ -1604,7 +1604,7 @@ const PEOPLE_ALLOWED_FIELDS = new Set([
   "url_slug",
   "main_google_email", "alt_google_emails", "external_google_email",
   "auth0_id",
-  "access_level", "company", "title", "department",
+  "access_level", "company", "title", "department", "team",
   "phone", "address", "start_date", "end_date", "date_of_birth",
   "line_manager_id", "line_manager_email_raw",
   "role", "notes",

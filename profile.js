@@ -351,17 +351,6 @@
           Editable details ${lockedBadge}
           ${editable ? `<button type="button" class="up-link-btn up-card-edit-toggle" data-card-edit>Edit</button>` : ""}
         </div>
-        ${editableRow("name",       "Display name", "text",     person.name)}
-        ${editableRow("aliases",    "Aliases",      "text",     (person.aliases || []).join(", "), "Comma-separated — used in name search + mentions")}
-        ${editableRow("role",       "Role",         "text",     person.role)}
-        ${editableRow("phone",      "Phone",        "tel",      person.phone)}
-        ${editableRow("address",    "Address",      "textarea", person.address)}
-        ${editableRow("start_date", "Start date",   "date",     person.start_date)}
-        <div class="up-field" data-edit-field="line_manager_id">
-          <div class="up-field-label">Line manager</div>
-          <div class="up-field-display">${lineMgrDisplay}</div>
-          ${lineMgrEditor}
-        </div>
         <div class="up-field" data-edit-field="access_level">
           <div class="up-field-label">Access level</div>
           <div class="up-field-display">
@@ -369,6 +358,18 @@
           </div>
           ${accessLevelEditor}
         </div>
+        <div class="up-field" data-edit-field="line_manager_id">
+          <div class="up-field-label">Line manager</div>
+          <div class="up-field-display">${lineMgrDisplay}</div>
+          ${lineMgrEditor}
+        </div>
+        ${editableRow("team",       "Team",         "text",     person.team)}
+        ${editableRow("name",       "Display name", "text",     person.name)}
+        ${editableRow("aliases",    "Aliases",      "text",     (person.aliases || []).join(", "), "Comma-separated — used in name search + mentions")}
+        ${editableRow("role",       "Role",         "text",     person.role)}
+        ${editableRow("phone",      "Phone",        "tel",      person.phone)}
+        ${editableRow("address",    "Address",      "textarea", person.address)}
+        ${editableRow("start_date", "Start date",   "date",     person.start_date)}
         ${editable ? `
           <div class="up-card-edit-footer" hidden>
             <button type="button" class="up-btn-sm up-btn-sm--primary" data-card-save>Save</button>
