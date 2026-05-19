@@ -1,0 +1,64 @@
+name: Nightly doc refresh
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Skip the 02:00 UK gate (manual run)."
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout togetherbook
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Checkout wiki (optional, requires WIKI_PUSH_TOKEN)
+        id: wiki_checkout
+        env:
+          WIKI_PUSH_TOKEN: ${{ secrets.WIKI_PUSH_TOKEN }}
+        run: |
+          if [ -z "$WIKI_PUSH_TOKEN" ]; then
+            echo "WIKI_PUSH_TOKEN not set — skipping wiki updates this run."
+            echo "wiki_path=" >> "$GITHUB_OUTPUT"
+          else
+            git clone --depth=1 \
+              "https://x-access-token:${WIKI_PUSH_TOKEN}@github.com/richmondbot2000-prog/wiki.git" \
+              /tmp/wiki
+            git -C /tmp/wiki config user.email "richmondbot2000@gmail.com"
+            git -C /tmp/wiki config user.name  "richmondbot2000-prog"
+            echo "wiki_path=/tmp/wiki" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Configure togetherbook git identity
+        run: |
+          git config user.email "richmondbot2000@gmail.com"
+          git config user.name  "richmondbot2000-prog"
+
+      - name: Run nightly doc refresh
+        env:
+          FORCE: ${{ github.event_name == 'workflow_dispatch' && inputs.force }}
+          WIKI_PATH: ${{ steps.wiki_checkout.outputs.wiki_path }}
+        run: |
+          ARGS=(--togetherbook "$GITHUB_WORKSPACE")
+          if [ -n "$WIKI_PATH" ]; then ARGS+=(--wiki "$WIKI_PATH"); fi
+          if [ "$FORCE" = "true" ]; then ARGS+=(--force); fi
+          python3 scripts/nightly_doc_refresh.py "${ARGS[@]}"
