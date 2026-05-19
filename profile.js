@@ -322,20 +322,19 @@
         <span class="up-edit-status" data-edit-status="access_level"></span>
       </div>` : "";
 
-    // Combined Admin actions card. Three serious buttons at the top —
+    // Combined Admin actions card. Two serious buttons at the top —
     // each just a label, no explanation — so the card reads visually as
     // "things you wouldn't click by accident". Click one and a detail
     // pane expands below with a non-technical explanation of what'll
     // happen, any extra controls (e.g. the Merge picker), and a final
     // "Definitely do this" button. The actual mutation only fires from
-    // that final button.
-    const isCurrentlyAdmin = (person.access_level || "") === "admin";
+    // that final button. Demotion from admin happens by editing the
+    // Access level field in Editable details, not as a separate action.
     const adminControls = viewerIsAdmin ? `
       <div class="up-card up-card--danger" id="upAdminActions">
         <div class="up-card-head">Admin actions</div>
         <p class="up-hint">Each of these has lasting consequences. Tap one to see what'll happen, then confirm.</p>
         <div class="up-admin-buttons">
-          ${isCurrentlyAdmin ? `<button type="button" class="up-btn-sm up-btn-sm--danger" data-admin-action="unadmin">Un-Admin</button>` : ""}
           <button type="button" class="up-btn-sm up-btn-sm--danger" data-admin-action="merge">Merge with another record</button>
           <button type="button" class="up-btn-sm up-btn-sm--danger" data-admin-action="delete">Delete this Person</button>
         </div>
