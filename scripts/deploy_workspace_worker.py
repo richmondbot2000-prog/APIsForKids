@@ -22,7 +22,7 @@ import uuid
 import urllib.error
 import urllib.request
 
-REPO_ROOT = pathlib.Path("/Users/richmondrobot/Desktop/togetherbook")
+REPO_ROOT = pathlib.Path(os.environ.get("GITHUB_WORKSPACE") or "/Users/richmondrobot/Desktop/togetherbook")
 SOURCE = REPO_ROOT / "worker" / "workspace-worker.js"
 
 FORCE = "--force" in sys.argv or os.environ.get("CI") == "true"
