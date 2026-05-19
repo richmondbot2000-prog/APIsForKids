@@ -985,10 +985,15 @@
   document.getElementById("newCreate").addEventListener("click", createPerson);
   document.getElementById("ppModalBg").addEventListener("click", e => { if (e.target.id === "ppModalBg") closeCreate(); });
 
-  ["ppSearch","ppAccess","ppStatus"].forEach(id => {
-    document.getElementById(id).addEventListener("input", render);
-    document.getElementById(id).addEventListener("change", render);
-  });
+  // Only the search input remains in the toolbar — the All access
+  // levels / All statuses dropdowns were removed when the chip-row
+  // filters landed. Leaving them in this loop threw and halted the
+  // boot below, leaving the page empty.
+  const searchInput = document.getElementById("ppSearch");
+  if (searchInput) {
+    searchInput.addEventListener("input",  render);
+    searchInput.addEventListener("change", render);
+  }
 
   /* ─── Boot ───────────────────────────────────────────────────────── */
   Promise.all([
