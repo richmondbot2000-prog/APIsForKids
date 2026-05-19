@@ -85,6 +85,14 @@
   .bk-cell.is-booked { background: rgba(44, 62, 102, 0.10); cursor: pointer; color: var(--ink-900); }
   .bk-cell.is-mine { background: rgba(200, 151, 63, 0.18); }
   .bk-cell.is-pending { opacity: 0.55; cursor: progress; }
+  .bk-cell.is-loading { position: relative; cursor: progress; background: var(--paper-100); }
+  .bk-cell.is-loading::after {
+    content: ""; position: absolute; top: 50%; left: 50%; width: 10px; height: 10px;
+    margin: -5px 0 0 -5px; border-radius: 50%;
+    border: 1.5px solid var(--brass-300, #d4b87a); border-top-color: transparent;
+    animation: bk-spin 0.7s linear infinite;
+  }
+  @keyframes bk-spin { to { transform: rotate(360deg); } }
   /* Sticky asset column on the left edge. */
   .bk-asset-cell {
     position: sticky; left: 0; z-index: 2;
@@ -230,6 +238,7 @@
     isAdmin: false,
     targetEmail: null, /* admin booking-on-behalf-of override */
     tab: "calendar",
+    pendingDates: new Set(),
   };
 
   /* Date helpers — everything in UK local. */
@@ -264,25 +273,57 @@
 
   async function loadAll() {
     setStatus("Loading…");
-    let whoami = null, users = {}, assets = null;
-    try { whoami = await getJSON("/api/bookr/whoami"); } catch (e) {}
-    try { const u = await getJSON("/api/bookr/users"); users = (u && u.users) || {}; } catch (e) {}
-    try { assets = await getJSON("/api/bookr/assets"); } catch (e) {}
+    let whoami = null, assets = null;
+    const usersP = getJSON("/api/bookr/users").then(u => (u && u.users) || {}).catch(() => ({}));
+    const adminP = getJSON("/api/workspace/whoami").then(w => !!(w && (w.is_admin || w.is_togetherbook_admin))).catch(() => false);
+    try {
+      const both = await Promise.all([
+        getJSON("/api/bookr/whoami").catch(() => null),
+        getJSON("/api/bookr/assets").catch(() => null),
+      ]);
+      whoami = both[0]; assets = both[1];
+    } catch (e) {}
     STATE.whoami = whoami;
-    STATE.users = users;
     STATE.cars = (assets && assets.cars) || [];
     STATE.properties = (assets && assets.properties) || [];
-    /* Cheap admin check: workspace/whoami carries an is_admin flag on every page already.
-       Falling back to direct fetch of the workspace whoami here. */
-    try {
-      const w = await getJSON("/api/workspace/whoami");
-      STATE.isAdmin = !!(w && (w.is_admin || w.is_togetherbook_admin));
-    } catch (e) {}
+    STATE.bookings = {};
+    STATE.pendingDates = new Set();
+    const { days } = dateRange();
+    days.forEach(d => STATE.pendingDates.add(ymd(d)));
     renderTopChrome();
-    renderUserPicker();
-    await refreshAllBookings();
     render();
+    usersP.then(u => { STATE.users = u; if (STATE.tab === "calendar") renderGrid(); });
+    adminP.then(a => { STATE.isAdmin = a; renderUserPicker(); });
+    loadBookingsProgressively();
   }
+
+  async function loadBookingsProgressively() {
+    const { days } = dateRange();
+    const chunks = [];
+    for (let i = 0; i < days.length; i += 7) chunks.push(days.slice(i, i + 7));
+    for (const chunk of chunks) {
+      const from = ymd(chunk[0]);
+      const to   = ymd(chunk[chunk.length - 1]);
+      const params = "type=" + encodeURIComponent(STATE.filter || "all") +
+                     "&from=" + from + "&to=" + to;
+      try {
+        const res = await getJSON("/api/bookr/all-bookings?" + params);
+        const tree = (res && res.bookings) || { cars: {}, properties: {} };
+        for (const kind of ["cars", "properties"]) {
+          for (const [id, dates] of Object.entries(tree[kind] || {})) {
+            const key = kind + ":" + id;
+            STATE.bookings[key] = Object.assign(STATE.bookings[key] || {}, dates);
+          }
+        }
+      } catch (e) {
+        console.warn("bookr week fetch failed", from, to, e);
+      }
+      chunk.forEach(d => STATE.pendingDates.delete(ymd(d)));
+      if (STATE.tab === "calendar") renderGrid();
+    }
+    setStatus("");
+  }
+
   function setStatus(msg) {
     const el = document.querySelector("#bkStatus");
     if (!el) return;
@@ -340,18 +381,6 @@
     for (let i = 0; i < STATE.zoom; i++) days.push(addDays(start, i));
     return { start: start, end: addDays(start, STATE.zoom - 1), days: days };
   }
-  async function refreshAllBookings() {
-    const { start, end } = dateRange();
-    const from = ymd(start), to = ymd(end);
-    const assets = visibleAssets();
-    const results = await Promise.all(assets.map(a =>
-      getJSON("/api/bookr/bookings?type=" + encodeURIComponent(a.type) + "&asset=" + encodeURIComponent(a.id) + "&from=" + from + "&to=" + to)
-        .then(r => ({ key: a.type + ":" + a.id, b: (r && r.bookings) || {} }))
-        .catch(() => ({ key: a.type + ":" + a.id, b: {} }))));
-    STATE.bookings = {};
-    results.forEach(r => { STATE.bookings[r.key] = r.b; });
-  }
-
   function render() {
     /* Switch the calendar/mine panels. */
     document.querySelector("#bkCalendarPanel").style.display = (STATE.tab === "calendar") ? "" : "none";
@@ -405,6 +434,15 @@
     const bookings = STATE.bookings[a.type + ":" + a.id] || {};
     const value = bookings[dy];
     const myUid = STATE.whoami && STATE.whoami.uid;
+    if (STATE.pendingDates && STATE.pendingDates.has(dy)) {
+      el.classList.add("is-loading");
+      el.setAttribute("aria-busy", "true");
+      el.dataset.kind = "loading";
+      el.dataset.type = a.type;
+      el.dataset.asset = a.id;
+      el.dataset.date = dy;
+      return el;
+    }
     if (value && value !== "free") {
       const u = STATE.users[value];
       const fullName = (u && u.name) || value;
@@ -583,10 +621,10 @@
     panel.innerHTML = "";
     const myUid = STATE.whoami && STATE.whoami.uid;
     if (!myUid) {
-      panel.innerHTML = "<div class=""bk-mine-empty"">You are not linked to a BookR user yet, so there are no bookings to list.</div>";
+      panel.innerHTML = '<div class="bk-mine-empty">You are not linked to a BookR user yet, so there are no bookings to list.</div>';
       return;
     }
-    panel.innerHTML = "<div class=""bk-status"">Loading your bookings…</div>";
+    panel.innerHTML = '<div class="bk-status">Loading your bookings…</div>';
     const since = ymd(fiscalStart());
     const assets = [
       ...STATE.cars.map(a => Object.assign({}, a, { type: "cars" })),
@@ -614,7 +652,7 @@
     });
     panel.innerHTML = "";
     if (!groups.length) {
-      panel.innerHTML = "<div class=""bk-mine-empty"">No bookings since " + since + ".</div>";
+      panel.innerHTML = '<div class="bk-mine-empty">No bookings since ' + since + '.</div>';
       return;
     }
     const todayY = ymd(todayMidnight());

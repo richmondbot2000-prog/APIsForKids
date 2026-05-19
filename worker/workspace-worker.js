@@ -3663,6 +3663,12 @@ async function handleBookr(req, env, url) {
     if (action === "whoami")   return json(await bookrWhoami(env, viewerEmail), 200, req);
     if (action === "users")    return json(await bookrUsers(env), 200, req);
     if (action === "assets")   return json(await bookrAssets(env), 200, req);
+    if (action === "all-bookings") {
+      const filter = url.searchParams.get("type");
+      const f      = url.searchParams.get("from");
+      const tt     = url.searchParams.get("to");
+      return json(await bookrAllBookings(env, filter, f, tt), 200, req);
+    }
     if (action === "bookings") {
       const t  = url.searchParams.get("type");
       const id = url.searchParams.get("asset");
@@ -3899,4 +3905,26 @@ async function bookrComment(env, viewerEmail, body) {
   return { ok: true, type, asset, comment: { id: (res && res.name) || "", ...entry } };
 }
 
+async function bookrAllBookings(env, filter, from, to) {
+  const want = (!filter || filter === "all") ? ["cars", "properties"]
+    : filter === "cars" ? ["cars"]
+    : filter === "properties" ? ["properties"]
+    : null;
+  if (!want) throw new Error("type must be all|cars|properties");
+  const out = { cars: {}, properties: {} };
+  for (const kind of want) {
+    const branch = (await bookrFetch(env, `/${kind}.json`)) || {};
+    for (const [id, asset] of Object.entries(branch)) {
+      const all = (asset && asset.bookings) || {};
+      const slice = {};
+      for (const [date, value] of Object.entries(all)) {
+        if (from && date < from) continue;
+        if (to   && date > to)   continue;
+        slice[date] = value;
+      }
+      out[kind][id] = slice;
+    }
+  }
+  return { ok: true, bookings: out };
+}
 

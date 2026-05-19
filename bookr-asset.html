@@ -186,11 +186,11 @@
     row("Identifier", a.id, { code: true });
     if (a.address) {
       const link = mapsLink(a.address, a.latitude, a.longitude);
-      if (link) row("Address", "<a class=""ba-loc"" target=""_blank"" rel=""noopener"" href="" + escAttr(link) + "">" + escAttr(a.address) + "</a>", { html: true });
+      if (link) row("Address", '<a class="ba-loc" target="_blank" rel="noopener" href="' + escAttr(link) + '">' + escAttr(a.address) + '</a>', { html: true });
       else row("Address", a.address);
     } else if (a.latitude && a.longitude) {
       const link = mapsLink("", a.latitude, a.longitude);
-      row("Coordinates", "<a target=""_blank"" rel=""noopener"" href="" + escAttr(link) + "">" + a.latitude + ", " + a.longitude + "</a>", { html: true });
+      row("Coordinates", '<a target="_blank" rel="noopener" href="' + escAttr(link) + '">' + a.latitude + ", " + a.longitude + '</a>', { html: true });
     }
     row("Code", a.code, { code: true });
     row("Safe", a.safe, { code: true });
