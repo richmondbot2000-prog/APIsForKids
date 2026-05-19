@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-17T22:41:52Z",
+  "updated_at": "2026-05-19T06:23:14Z",
   "records": [
     {
       "id": 1,
@@ -15,7 +15,8 @@
       "deletion_time": "",
       "last_login": "2026-05-09T14:17:20.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 2,
@@ -30,7 +31,8 @@
       "deletion_time": "2026-05-15T13:46:34.000Z",
       "last_login": "2026-05-14T10:25:30.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 3,
@@ -45,7 +47,8 @@
       "deletion_time": "",
       "last_login": "2026-05-12T17:38:35.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 4,
@@ -60,7 +63,8 @@
       "deletion_time": "",
       "last_login": "2026-05-12T10:38:30.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 5,
@@ -81,7 +85,10 @@
         "adnan.turken@mail.letme.co.uk",
         "adnan.turken@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "adnan.turken@letme.com"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 6,
@@ -96,7 +103,8 @@
       "deletion_time": "",
       "last_login": "2026-05-11T08:19:36.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 7,
@@ -111,7 +119,8 @@
       "deletion_time": "",
       "last_login": "2026-05-15T13:11:09.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 8,
@@ -126,7 +135,8 @@
       "deletion_time": "",
       "last_login": "2026-05-15T09:20:13.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 9,
@@ -153,7 +163,12 @@
         "femi.omotoso@mail.letme.co.uk",
         "femi.omotoso@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "amber.cole@letme.co.uk",
+        "femi.omotoso@letme.co.uk",
+        "femi.omotoso@letme.com"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 10,
@@ -168,7 +183,8 @@
       "deletion_time": "",
       "last_login": "2026-02-05T13:50:14.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 11,
@@ -181,9 +197,10 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-13T19:43:29.000Z",
+      "last_login": "2026-05-15T19:29:25.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 12,
@@ -198,7 +215,8 @@
       "deletion_time": "2026-05-12T21:44:12.000Z",
       "last_login": "2026-05-04T15:06:51.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 13,
@@ -213,7 +231,8 @@
       "deletion_time": "",
       "last_login": "1970-01-01T00:00:00.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 14,
@@ -228,7 +247,8 @@
       "deletion_time": "",
       "last_login": "2026-05-08T17:30:08.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 15,
@@ -241,9 +261,10 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-12T14:16:22.000Z",
+      "last_login": "2026-05-14T12:39:08.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 16,
@@ -263,7 +284,13 @@
         "customers.letters.generator@rapidamoney.pl",
         "rapida.windykacja@rapidamoney.pl"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "communications.collector@rapidamoney.pl",
+        "contracts@rapidamoney.pl",
+        "customers.letters.generator@rapidamoney.pl",
+        "rapida.windykacja@rapidamoney.pl"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 17,
@@ -288,7 +315,18 @@
         "hello@togetherloans.com",
         "pre.litigation@togetherloans.com"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "airesponder@togetherloans.com",
+        "appeals@togetherloans.com",
+        "collections@togetherloans.com",
+        "complaints@togetherloans.com",
+        "contact@togetherloans.com",
+        "contactus@togetherloans.com",
+        "docs@togetherloans.com",
+        "hello@togetherloans.com",
+        "pre.litigation@togetherloans.com"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 18,
@@ -303,7 +341,8 @@
       "deletion_time": "",
       "last_login": "2026-05-08T15:11:34.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 19,
@@ -324,7 +363,10 @@
         "azure@mail.letme.co.uk",
         "azure@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "azure@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 20,
@@ -346,7 +388,11 @@
         "ben.gardner@rgroup.co.uk",
         "richmondgroup@letme.com"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "ben.gardner@letme.co.uk",
+        "richmondgroup@letme.com"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 21,
@@ -361,7 +407,8 @@
       "deletion_time": "",
       "last_login": "2026-05-11T10:45:52.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 22,
@@ -376,7 +423,8 @@
       "deletion_time": "",
       "last_login": "1970-01-01T00:00:00.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 23,
@@ -391,7 +439,8 @@
       "deletion_time": "",
       "last_login": "2026-05-14T17:07:00.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 24,
@@ -406,7 +455,8 @@
       "deletion_time": "",
       "last_login": "2026-05-07T16:46:40.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 25,
@@ -421,7 +471,8 @@
       "deletion_time": "",
       "last_login": "2026-05-05T12:47:46.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 26,
@@ -436,7 +487,8 @@
       "deletion_time": "2026-05-12T09:26:48.000Z",
       "last_login": "1970-01-01T00:00:00.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 27,
@@ -451,7 +503,8 @@
       "deletion_time": "",
       "last_login": "2026-05-11T13:53:24.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 28,
@@ -466,7 +519,8 @@
       "deletion_time": "2026-05-14T22:19:51.000Z",
       "last_login": "2022-02-10T18:15:12.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 29,
@@ -481,7 +535,8 @@
       "deletion_time": "",
       "last_login": "2026-05-15T07:32:37.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 30,
@@ -496,7 +551,8 @@
       "deletion_time": "",
       "last_login": "1970-01-01T00:00:00.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 31,
@@ -511,7 +567,8 @@
       "deletion_time": "2026-05-14T16:05:15.000Z",
       "last_login": "2026-05-13T12:34:54.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 32,
@@ -526,7 +583,8 @@
       "deletion_time": "2026-05-15T13:46:34.000Z",
       "last_login": "2025-06-30T08:18:20.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 33,
@@ -541,7 +599,8 @@
       "deletion_time": "",
       "last_login": "2026-05-08T22:42:04.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 34,
@@ -556,7 +615,8 @@
       "deletion_time": "",
       "last_login": "2026-05-01T15:45:57.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 35,
@@ -577,7 +637,10 @@
         "cherry.liu@mail.letme.co.uk",
         "cherry.liu@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "cherry.liu@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 36,
@@ -590,9 +653,10 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-04T10:07:41.000Z",
+      "last_login": "2026-05-15T21:52:36.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 37,
@@ -607,7 +671,8 @@
       "deletion_time": "",
       "last_login": "2026-05-14T16:01:19.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 38,
@@ -638,7 +703,16 @@
         "makeacomplaint@rgroup.co.uk",
         "noreply@clearloans.com.au"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "automessaging@clearloans.com.au",
+        "cash.payments@clearloans.com.au",
+        "collections@clearloans.com.au",
+        "communications.collector@clearloans.com.au",
+        "help@letme.co.uk",
+        "makeacomplaint@letme.co.uk",
+        "noreply@clearloans.com.au"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 39,
@@ -659,7 +733,10 @@
         "clementia.dsouza@mail.letme.co.uk",
         "clementia.dsouza@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "clementia.dsouza@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 40,
@@ -674,7 +751,8 @@
       "deletion_time": "",
       "last_login": "2026-05-15T09:41:40.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 41,
@@ -689,7 +767,8 @@
       "deletion_time": "",
       "last_login": "2026-05-13T15:32:18.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 42,
@@ -709,7 +788,8 @@
         "customer.letters@mail.letme.co.uk",
         "customer.letters@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 43,
@@ -730,7 +810,10 @@
         "cyrus.leung@mail.letme.co.uk",
         "cyrus.leung@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "cyrus.leung@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 44,
@@ -753,7 +836,12 @@
         "dan.bennett@mail.letme.co.uk",
         "dan.bennett@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "dan.bennett@alerts.clearloans.com.au",
+        "dan.bennett@letme.co.uk",
+        "dan.bennett@letme.com"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 45,
@@ -768,7 +856,8 @@
       "deletion_time": "",
       "last_login": "2026-05-11T11:38:58.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 46,
@@ -781,9 +870,10 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-14T13:47:49.000Z",
+      "last_login": "2026-05-16T13:55:52.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 47,
@@ -796,9 +886,10 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2025-10-21T15:47:17.000Z",
+      "last_login": "2026-05-18T11:01:15.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 48,
@@ -813,7 +904,8 @@
       "deletion_time": "2026-05-12T15:31:46.000Z",
       "last_login": "2026-05-01T00:42:10.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 49,
@@ -828,7 +920,8 @@
       "deletion_time": "2026-04-29T14:34:09.000Z",
       "last_login": "2026-04-27T21:23:01.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 50,
@@ -849,7 +942,10 @@
         "david.byatt@mail.letme.co.uk",
         "david.byatt@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "david.byatt@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 51,
@@ -862,9 +958,10 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-11T18:37:39.000Z",
+      "last_login": "2026-05-16T10:46:32.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 52,
@@ -879,7 +976,8 @@
       "deletion_time": "",
       "last_login": "2026-05-12T04:58:03.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 53,
@@ -894,7 +992,8 @@
       "deletion_time": "",
       "last_login": "2026-05-14T16:45:40.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 54,
@@ -909,7 +1008,8 @@
       "deletion_time": "",
       "last_login": "2026-05-14T21:14:20.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 55,
@@ -924,7 +1024,8 @@
       "deletion_time": "",
       "last_login": "2026-05-12T18:53:49.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 56,
@@ -939,7 +1040,8 @@
       "deletion_time": "",
       "last_login": "2026-04-13T16:31:14.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 57,
@@ -954,7 +1056,8 @@
       "deletion_time": "2026-05-05T10:17:20.000Z",
       "last_login": "2026-05-01T01:00:46.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 58,
@@ -969,7 +1072,8 @@
       "deletion_time": "",
       "last_login": "2026-05-13T13:03:07.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 59,
@@ -1004,7 +1108,24 @@
         "ugoda@rapidamoney.pl",
         "wniosek@rapidamoney.pl"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "adrianna.gostol@letme.com",
+        "adrianna.gostol@mail.rapidamoney.pl",
+        "adrianna.gostol@rapidamoney.pl",
+        "dorota.kazmierczyk@mail.rapidamoney.pl",
+        "dorota.kazmierczyk@rapidamoney.pl",
+        "elzbieta.olender@letme.com",
+        "elzbieta.olender@mail.rapidamoney.pl",
+        "elzbieta.olender@rapidamoney.pl",
+        "kamen.totev@letme.co.uk",
+        "kamen.totev@rapidamoney.pl",
+        "modesta.przybylek@rapidamoney.pl",
+        "radoslaw.wojnarski@letme.com",
+        "radoslaw.wojnarski@rapidamoney.pl",
+        "ugoda@rapidamoney.pl",
+        "wniosek@rapidamoney.pl"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 60,
@@ -1019,7 +1140,8 @@
       "deletion_time": "",
       "last_login": "2026-02-23T18:59:57.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 61,
@@ -1032,9 +1154,10 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-06T08:02:05.000Z",
+      "last_login": "2026-05-15T14:59:19.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 62,
@@ -1049,7 +1172,8 @@
       "deletion_time": "",
       "last_login": "2026-05-15T22:52:44.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 63,
@@ -1070,7 +1194,10 @@
         "edward.heaney@mail.letme.co.uk",
         "edward.heaney@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "edward.heaney@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 64,
@@ -1085,7 +1212,8 @@
       "deletion_time": "",
       "last_login": "2026-05-10T20:08:02.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 65,
@@ -1100,7 +1228,8 @@
       "deletion_time": "",
       "last_login": "2026-05-13T09:36:23.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 66,
@@ -1117,7 +1246,10 @@
       "aliases": [
         "emily.synder@togetherloans.com"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "emily.synder@togetherloans.com"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 67,
@@ -1138,7 +1270,10 @@
         "esther.uwadione@mail.letme.co.uk",
         "esther.uwadione@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "esther.uwadione@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 68,
@@ -1153,7 +1288,8 @@
       "deletion_time": "",
       "last_login": "2026-05-14T16:20:19.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 69,
@@ -1168,7 +1304,8 @@
       "deletion_time": "",
       "last_login": "2026-05-11T13:24:58.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 70,
@@ -1183,7 +1320,8 @@
       "deletion_time": "",
       "last_login": "2026-05-11T17:33:54.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 71,
@@ -1196,9 +1334,10 @@
       "photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjXyEHtLP3EOOIh16pjLBnNo1wR0KHh0wQb4Byjq0-HGUirlXtA=s96-c",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-14T15:05:39.000Z",
+      "last_login": "2026-05-18T09:05:50.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 72,
@@ -1224,7 +1363,11 @@
         "george.roche@mail.letme.co.uk",
         "george.roche@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "george.roche@letme.co.uk",
+        "george.roche@letme.com"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 73,
@@ -1239,7 +1382,8 @@
       "deletion_time": "",
       "last_login": "2026-04-15T18:34:25.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 74,
@@ -1254,7 +1398,8 @@
       "deletion_time": "",
       "last_login": "2026-05-09T13:48:48.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 75,
@@ -1269,7 +1414,8 @@
       "deletion_time": "",
       "last_login": "2026-05-14T20:39:58.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 76,
@@ -1284,7 +1430,8 @@
       "deletion_time": "2026-04-30T09:37:40.000Z",
       "last_login": "2026-04-21T13:03:45.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 77,
@@ -1299,7 +1446,8 @@
       "deletion_time": "",
       "last_login": "1970-01-01T00:00:00.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 78,
@@ -1312,7 +1460,7 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-04-30T14:02:17.000Z",
+      "last_login": "2026-05-18T10:59:04.000Z",
       "aliases": [
         "adrianna.przybylska@letme.com",
         "adrianna.przybylska@rapidamoney.pl",
@@ -1353,7 +1501,23 @@
         "shelby.barefoot@mail.letme.co.uk",
         "shelby.barefoot@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "adrianna.przybylska@letme.com",
+        "adrianna.przybylska@rapidamoney.pl",
+        "elliott.santana@letme.co.uk",
+        "elliott.santana@letme.com",
+        "irena.lipinska@letme.co.uk",
+        "irena.lipinska@letme.com",
+        "irena.lipinska@mail.rapidamoney.pl",
+        "patryk.brandeburski@letme.co.uk",
+        "patryk.brandeburski@letme.com",
+        "patryk.brandeburski@rapidamoney.bg",
+        "patryk.brandeburski@rapidamoney.pl",
+        "sam.lissen@letme.co.uk",
+        "sam.lissen@letme.com",
+        "shelby.barefoot@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 79,
@@ -1374,7 +1538,10 @@
         "igor.kravcov@mail.letme.co.uk",
         "igor.kravcov@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "igor.kravcov@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 80,
@@ -1389,7 +1556,8 @@
       "deletion_time": "",
       "last_login": "2026-05-11T20:26:00.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 81,
@@ -1404,7 +1572,8 @@
       "deletion_time": "",
       "last_login": "2026-05-15T22:54:07.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 82,
@@ -1419,7 +1588,8 @@
       "deletion_time": "",
       "last_login": "2026-05-14T14:54:35.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 83,
@@ -1434,7 +1604,8 @@
       "deletion_time": "",
       "last_login": "2026-05-15T12:44:36.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 84,
@@ -1447,7 +1618,7 @@
       "photo_url": "https://lh3.googleusercontent.com/a/ACg8ocLBKolneK43dqPG956vMwdslyMLyiXQe1901SPGTCXB4YnCIJ0=s96-c",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-14T12:55:39.000Z",
+      "last_login": "2026-05-16T15:16:56.000Z",
       "aliases": [
         "james.b@letme.com",
         "james.benamor@grenwich-clearloans.com",
@@ -1463,7 +1634,14 @@
         "paul.benamor@mail.letme.co.uk",
         "paul.benamor@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "james.b@letme.com",
+        "james.benamor@letme.co.uk",
+        "james.benamor@memini.co.uk",
+        "paul.benamor@letme.co.uk",
+        "paul.benamor@letme.com"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 85,
@@ -1478,7 +1656,8 @@
       "deletion_time": "",
       "last_login": "2026-05-13T14:46:18.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 86,
@@ -1493,6 +1672,7 @@
       "deletion_time": "",
       "last_login": "",
       "aliases": [],
+      "aliases_editable": [],
       "synced_at": ""
     },
     {
@@ -1508,7 +1688,8 @@
       "deletion_time": "",
       "last_login": "2026-05-04T08:30:59.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 88,
@@ -1529,7 +1710,10 @@
         "james.webster@mail.letme.co.uk",
         "james.webster@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "james.webster@letme.com"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 89,
@@ -1544,7 +1728,8 @@
       "deletion_time": "",
       "last_login": "2026-05-14T21:49:47.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 90,
@@ -1559,7 +1744,8 @@
       "deletion_time": "",
       "last_login": "2026-05-16T00:38:33.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 91,
@@ -1574,7 +1760,8 @@
       "deletion_time": "2026-05-07T09:06:04.000Z",
       "last_login": "1970-01-01T00:00:00.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 92,
@@ -1589,7 +1776,8 @@
       "deletion_time": "2026-04-30T17:44:20.000Z",
       "last_login": "2026-04-23T13:31:42.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 93,
@@ -1604,7 +1792,8 @@
       "deletion_time": "2026-05-12T14:22:38.000Z",
       "last_login": "2026-04-08T05:54:00.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 94,
@@ -1619,7 +1808,8 @@
       "deletion_time": "",
       "last_login": "1970-01-01T00:00:00.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 95,
@@ -1634,7 +1824,8 @@
       "deletion_time": "",
       "last_login": "2026-05-06T16:24:11.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 96,
@@ -1649,7 +1840,8 @@
       "deletion_time": "",
       "last_login": "2026-04-27T19:08:39.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 97,
@@ -1664,7 +1856,8 @@
       "deletion_time": "",
       "last_login": "2026-05-11T14:44:43.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 98,
@@ -1679,7 +1872,8 @@
       "deletion_time": "",
       "last_login": "2026-05-13T17:07:02.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 99,
@@ -1694,7 +1888,8 @@
       "deletion_time": "",
       "last_login": "2026-05-15T13:02:41.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 100,
@@ -1715,7 +1910,10 @@
         "joseph.foard@mail.letme.co.uk",
         "joseph.foard@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "joseph.foard@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 101,
@@ -1730,7 +1928,8 @@
       "deletion_time": "",
       "last_login": "2026-05-11T07:25:52.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 102,
@@ -1743,9 +1942,10 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-11T08:38:18.000Z",
+      "last_login": "2026-05-14T11:35:35.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 103,
@@ -1765,7 +1965,8 @@
         "joshua.carless@mail.letme.co.uk",
         "joshua.carless@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 104,
@@ -1780,7 +1981,8 @@
       "deletion_time": "2026-05-15T14:21:00.000Z",
       "last_login": "2026-05-14T15:55:34.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 105,
@@ -1795,7 +1997,8 @@
       "deletion_time": "",
       "last_login": "2026-04-28T00:10:59.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 106,
@@ -1810,7 +2013,8 @@
       "deletion_time": "",
       "last_login": "2026-05-08T16:42:23.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 107,
@@ -1853,7 +2057,16 @@
         "sian.burton@mail.letme.co.uk",
         "sian.burton@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "andrew.allen@letme.co.uk",
+        "andrew.allen@letme.com",
+        "julian@letme.co.uk",
+        "properties@letme.co.uk",
+        "properties@letme.com",
+        "sian.burton@letme.co.uk",
+        "sian.burton@letme.com"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 108,
@@ -1874,7 +2087,10 @@
         "kamran.kamaei@mail.letme.co.uk",
         "kamran.kamaei@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "kamran.kamaei@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 109,
@@ -1889,7 +2105,8 @@
       "deletion_time": "",
       "last_login": "2026-05-15T00:53:46.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 110,
@@ -1904,7 +2121,8 @@
       "deletion_time": "2026-04-29T13:19:54.000Z",
       "last_login": "2026-04-29T13:09:41.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 111,
@@ -1917,9 +2135,10 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-14T14:07:48.000Z",
+      "last_login": "2026-05-14T16:39:00.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 112,
@@ -1934,7 +2153,8 @@
       "deletion_time": "",
       "last_login": "1970-01-01T00:00:00.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 113,
@@ -1949,7 +2169,8 @@
       "deletion_time": "2026-04-29T21:13:24.000Z",
       "last_login": "2026-04-28T23:04:06.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 114,
@@ -1981,7 +2202,13 @@
         "liam.keighley@mail.letme.co.uk",
         "liam.keighley@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "alexandra.wellings@letme.co.uk",
+        "alexandra.wellings@letme.com",
+        "kelly.black@letme.co.uk",
+        "liam.keighley@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 115,
@@ -1996,7 +2223,8 @@
       "deletion_time": "",
       "last_login": "2026-05-13T21:30:02.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 116,
@@ -2011,7 +2239,8 @@
       "deletion_time": "",
       "last_login": "2026-05-13T20:12:25.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 117,
@@ -2026,7 +2255,8 @@
       "deletion_time": "2026-05-15T13:46:34.000Z",
       "last_login": "2026-05-14T10:46:32.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 118,
@@ -2041,7 +2271,8 @@
       "deletion_time": "2026-05-15T19:45:52.000Z",
       "last_login": "2026-05-12T17:45:10.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 119,
@@ -2056,7 +2287,8 @@
       "deletion_time": "",
       "last_login": "2026-05-11T13:04:17.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 120,
@@ -2073,7 +2305,10 @@
       "aliases": [
         "kyle.barret@letme.com"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "kyle.barret@letme.com"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 121,
@@ -2086,7 +2321,7 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-12T08:11:19.000Z",
+      "last_login": "2026-05-15T08:37:21.000Z",
       "aliases": [
         "laura.chadbourne@grenwich-clearloans.com",
         "laura.chadbourne@letme.com",
@@ -2094,7 +2329,10 @@
         "laura.chadbourne@mail.letme.co.uk",
         "laura.chadbourne@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "laura.chadbourne@letme.com"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 122,
@@ -2109,7 +2347,8 @@
       "deletion_time": "",
       "last_login": "2026-05-15T21:13:12.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 123,
@@ -2124,7 +2363,8 @@
       "deletion_time": "",
       "last_login": "2026-05-15T12:06:28.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 124,
@@ -2139,7 +2379,8 @@
       "deletion_time": "",
       "last_login": "2022-01-05T11:47:36.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 125,
@@ -2154,7 +2395,8 @@
       "deletion_time": "2026-05-08T13:31:44.000Z",
       "last_login": "2026-05-08T13:01:07.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 126,
@@ -2169,7 +2411,8 @@
       "deletion_time": "",
       "last_login": "2026-05-14T11:47:00.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 127,
@@ -2184,7 +2427,8 @@
       "deletion_time": "",
       "last_login": "2026-05-01T08:50:41.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 128,
@@ -2199,7 +2443,8 @@
       "deletion_time": "",
       "last_login": "2026-03-18T11:29:09.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 129,
@@ -2214,7 +2459,8 @@
       "deletion_time": "",
       "last_login": "1970-01-01T00:00:00.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 130,
@@ -2229,7 +2475,8 @@
       "deletion_time": "2026-05-13T14:31:09.000Z",
       "last_login": "2026-04-30T10:02:01.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 131,
@@ -2244,7 +2491,8 @@
       "deletion_time": "2026-05-14T17:07:32.000Z",
       "last_login": "2026-05-14T13:15:11.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 132,
@@ -2257,7 +2505,7 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-09T11:46:00.000Z",
+      "last_login": "2026-05-15T17:47:40.000Z",
       "aliases": [
         "lucian.teodoroiu@grenwich-clearloans.com",
         "lucian.teodoroiu@letme.com",
@@ -2265,7 +2513,10 @@
         "lucian.teodoroiu@mail.letme.co.uk",
         "lucian.teodoroiu@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "lucian.teodoroiu@letme.com"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 133,
@@ -2280,7 +2531,8 @@
       "deletion_time": "",
       "last_login": "2026-05-15T10:31:33.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 134,
@@ -2295,7 +2547,8 @@
       "deletion_time": "2026-05-08T19:20:26.000Z",
       "last_login": "2026-05-04T13:28:42.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 135,
@@ -2310,7 +2563,8 @@
       "deletion_time": "",
       "last_login": "2026-05-10T20:41:30.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 136,
@@ -2325,7 +2579,8 @@
       "deletion_time": "",
       "last_login": "2026-05-11T13:04:08.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 137,
@@ -2340,7 +2595,8 @@
       "deletion_time": "",
       "last_login": "2026-05-11T13:17:26.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 138,
@@ -2355,7 +2611,8 @@
       "deletion_time": "2026-05-13T14:31:56.000Z",
       "last_login": "2024-03-08T11:44:10.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 139,
@@ -2370,7 +2627,8 @@
       "deletion_time": "",
       "last_login": "2026-05-12T12:18:20.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 140,
@@ -2385,7 +2643,8 @@
       "deletion_time": "",
       "last_login": "2026-05-07T10:54:26.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 141,
@@ -2400,7 +2659,8 @@
       "deletion_time": "2026-05-14T16:36:42.000Z",
       "last_login": "2026-05-14T10:34:15.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 142,
@@ -2413,14 +2673,15 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-11T15:51:28.000Z",
+      "last_login": "2026-05-16T16:05:52.000Z",
       "aliases": [
         "max.dynowski@grenwich-clearloans.com",
         "max.dynowski@mail.amigohome.co.uk",
         "max.dynowski@mail.letme.co.uk",
         "max.dynowski@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 143,
@@ -2435,7 +2696,8 @@
       "deletion_time": "2026-05-12T11:32:33.000Z",
       "last_login": "2026-05-04T13:46:33.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 144,
@@ -2450,7 +2712,8 @@
       "deletion_time": "",
       "last_login": "2026-04-17T05:13:14.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 145,
@@ -2465,7 +2728,8 @@
       "deletion_time": "",
       "last_login": "2026-05-12T13:13:08.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 146,
@@ -2480,7 +2744,8 @@
       "deletion_time": "2026-05-11T13:33:25.000Z",
       "last_login": "2026-05-06T16:00:13.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 147,
@@ -2493,7 +2758,7 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-05T07:58:58.000Z",
+      "last_login": "2026-05-15T11:53:48.000Z",
       "aliases": [
         "mike.pursey@grenwich-clearloans.com",
         "mike.pursey@letme.co.uk",
@@ -2501,7 +2766,10 @@
         "mike.pursey@mail.letme.co.uk",
         "mike.pursey@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "mike.pursey@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 148,
@@ -2514,7 +2782,7 @@
       "photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjV8OQomsiOYz2Ofc3ZdR-WjkDoY403_Fw4uc_UQkwI-7h_wkjg=s96-c",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-07T10:28:39.000Z",
+      "last_login": "2026-05-15T12:35:21.000Z",
       "aliases": [
         "jade.reynolds@grenwich-clearloans.com",
         "jade.reynolds@letme.co.uk",
@@ -2528,7 +2796,12 @@
         "morgan.smith@mail.letme.co.uk",
         "morgan.smith@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "jade.reynolds@letme.co.uk",
+        "jade.reynolds@letme.com",
+        "morgan.smith@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 149,
@@ -2543,7 +2816,8 @@
       "deletion_time": "",
       "last_login": "2026-05-12T17:23:07.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 150,
@@ -2556,7 +2830,7 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-04-30T12:27:20.000Z",
+      "last_login": "2026-05-14T12:41:55.000Z",
       "aliases": [
         "mourad.malki@grenwich-clearloans.com",
         "mourad.malki@letme.co.uk",
@@ -2566,7 +2840,12 @@
         "mourad.malki@rapidamoney.pl",
         "mourad.malki@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "mourad.malki@letme.co.uk",
+        "mourad.malki@mail.rapidamoney.pl",
+        "mourad.malki@rapidamoney.pl"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 151,
@@ -2583,7 +2862,10 @@
       "aliases": [
         "mourad.malki@mail.clearloans.com.au"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "mourad.malki@mail.clearloans.com.au"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 152,
@@ -2598,7 +2880,8 @@
       "deletion_time": "",
       "last_login": "2026-05-13T12:04:02.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 153,
@@ -2611,9 +2894,10 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-14T10:30:00.000Z",
+      "last_login": "2026-05-14T16:40:45.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 154,
@@ -2633,7 +2917,8 @@
         "natasha.wright@mail.letme.co.uk",
         "natasha.wright@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 155,
@@ -2648,7 +2933,8 @@
       "deletion_time": "",
       "last_login": "2026-05-13T21:55:17.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 156,
@@ -2663,7 +2949,8 @@
       "deletion_time": "",
       "last_login": "2026-05-08T12:43:20.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 157,
@@ -2683,7 +2970,8 @@
         "printer@mail.letme.co.uk",
         "printer@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 158,
@@ -2698,7 +2986,8 @@
       "deletion_time": "",
       "last_login": "2025-08-28T09:02:48.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 159,
@@ -2713,7 +3002,8 @@
       "deletion_time": "",
       "last_login": "2026-05-04T12:02:29.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 160,
@@ -2728,7 +3018,8 @@
       "deletion_time": "",
       "last_login": "1970-01-01T00:00:00.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 161,
@@ -2743,7 +3034,8 @@
       "deletion_time": "2026-04-30T14:40:32.000Z",
       "last_login": "2026-04-27T12:53:46.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 162,
@@ -2758,7 +3050,8 @@
       "deletion_time": "",
       "last_login": "2025-12-11T13:56:25.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 163,
@@ -2773,7 +3066,8 @@
       "deletion_time": "",
       "last_login": "2026-02-04T08:35:29.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 164,
@@ -2788,7 +3082,8 @@
       "deletion_time": "",
       "last_login": "2026-05-11T12:09:11.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 165,
@@ -2803,7 +3098,8 @@
       "deletion_time": "",
       "last_login": "2026-05-13T14:38:01.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 166,
@@ -2828,7 +3124,10 @@
         "phil.oniell@mail.letme.co.uk",
         "phil.oniell@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "phil.oniell@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 167,
@@ -2843,7 +3142,8 @@
       "deletion_time": "",
       "last_login": "2026-04-22T07:14:15.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 168,
@@ -2858,6 +3158,7 @@
       "deletion_time": "",
       "last_login": "",
       "aliases": [],
+      "aliases_editable": [],
       "synced_at": ""
     },
     {
@@ -2873,7 +3174,8 @@
       "deletion_time": "2026-04-30T09:33:07.000Z",
       "last_login": "2026-04-27T13:32:32.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 170,
@@ -2890,7 +3192,10 @@
       "aliases": [
         "skanpoczta@rapidamoney.pl"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "skanpoczta@rapidamoney.pl"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 171,
@@ -2912,7 +3217,11 @@
         "raveeha.ejaz@rgroup.co.uk",
         "raveeha@letme.com"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "raveeha.ejaz@letme.co.uk",
+        "raveeha@letme.com"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 172,
@@ -2927,7 +3236,8 @@
       "deletion_time": "",
       "last_login": "2026-05-12T13:28:51.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 173,
@@ -2942,7 +3252,8 @@
       "deletion_time": "",
       "last_login": "2026-05-12T13:06:24.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 174,
@@ -2957,7 +3268,8 @@
       "deletion_time": "",
       "last_login": "2026-05-15T08:34:29.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 175,
@@ -2972,7 +3284,8 @@
       "deletion_time": "",
       "last_login": "1970-01-01T00:00:00.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 176,
@@ -2987,7 +3300,8 @@
       "deletion_time": "",
       "last_login": "2026-05-11T10:03:26.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 177,
@@ -3002,7 +3316,8 @@
       "deletion_time": "",
       "last_login": "2026-05-12T22:59:44.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 178,
@@ -3023,7 +3338,10 @@
         "sophia.ugwunne@mail.letme.co.uk",
         "sophia.ugwunne@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "sophia.ugwunne@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 179,
@@ -3038,7 +3356,8 @@
       "deletion_time": "",
       "last_login": "2026-05-14T11:23:30.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 180,
@@ -3053,7 +3372,8 @@
       "deletion_time": "",
       "last_login": "2026-05-11T17:11:05.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 181,
@@ -3068,7 +3388,8 @@
       "deletion_time": "",
       "last_login": "2026-05-15T09:24:10.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 182,
@@ -3081,9 +3402,10 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-05T08:10:00.000Z",
+      "last_login": "2026-05-15T12:59:10.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 183,
@@ -3098,7 +3420,8 @@
       "deletion_time": "",
       "last_login": "2026-05-15T12:54:15.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 184,
@@ -3119,7 +3442,10 @@
         "tarek.benamor@mail.letme.co.uk",
         "tarek.benamor@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "tarek.benamor@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 185,
@@ -3134,7 +3460,8 @@
       "deletion_time": "",
       "last_login": "2026-05-07T01:49:32.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 186,
@@ -3149,7 +3476,8 @@
       "deletion_time": "",
       "last_login": "2026-02-27T17:00:24.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 187,
@@ -3162,9 +3490,10 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-12T16:31:21.000Z",
+      "last_login": "2026-05-16T09:39:01.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 188,
@@ -3179,7 +3508,8 @@
       "deletion_time": "",
       "last_login": "2026-05-08T01:36:33.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 189,
@@ -3192,9 +3522,10 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-04-29T12:56:45.000Z",
+      "last_login": "2026-05-15T14:56:50.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 190,
@@ -3209,7 +3540,8 @@
       "deletion_time": "",
       "last_login": "2026-01-06T16:18:50.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 191,
@@ -3230,7 +3562,10 @@
         "tom.slaughter@mail.letme.co.uk",
         "tom.slaughter@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "tom.slaughter@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 192,
@@ -3247,7 +3582,10 @@
       "aliases": [
         "tomasz.schwertner@rapidamoney.pl"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "tomasz.schwertner@rapidamoney.pl"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 193,
@@ -3262,7 +3600,8 @@
       "deletion_time": "",
       "last_login": "2026-05-16T16:13:41.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 194,
@@ -3275,7 +3614,7 @@
       "photo_url": "",
       "suspended": false,
       "deletion_time": "",
-      "last_login": "2026-05-14T07:08:02.000Z",
+      "last_login": "2026-05-17T21:04:08.000Z",
       "aliases": [
         "victor.igbaifua@grenwich-clearloans.com",
         "victor.igbaifua@letme.co.uk",
@@ -3283,7 +3622,10 @@
         "victor.igbaifua@mail.letme.co.uk",
         "victor.igbaifua@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "victor.igbaifua@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 195,
@@ -3298,7 +3640,8 @@
       "deletion_time": "2026-05-07T09:04:45.000Z",
       "last_login": "2026-05-04T16:56:17.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 196,
@@ -3313,7 +3656,8 @@
       "deletion_time": "",
       "last_login": "2026-05-10T20:17:07.000Z",
       "aliases": [],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [],
+      "synced_at": "2026-05-19T06:23:14Z"
     },
     {
       "id": 197,
@@ -3335,7 +3679,11 @@
         "zara.benamor@mail.letme.co.uk",
         "zara.benamor@rgroup.co.uk"
       ],
-      "synced_at": "2026-05-17T22:41:52Z"
+      "aliases_editable": [
+        "zara.benamor.parked.1778682691@letme.com",
+        "zara.benamor@letme.co.uk"
+      ],
+      "synced_at": "2026-05-19T06:23:14Z"
     }
   ]
 }

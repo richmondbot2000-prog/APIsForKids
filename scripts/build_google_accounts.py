@@ -99,8 +99,13 @@ def main():
                 "suspended":      bool(u.get("suspended")) if u else False,
                 "deletion_time":  u.get("deletion_time", "") or "",
                 "last_login":     u.get("last_login", "") or "",
-                "aliases":        list(u.get("aliases") or []),
-                "synced_at":      now if u else "",
+                "aliases":           list(u.get("aliases") or []),
+                # User-removable subset of aliases. Non-editable aliases are
+                # auto-created by Workspace when a secondary domain is attached
+                # and can't be removed via the Admin SDK; the UI hides × and
+                # → group on chips that aren't in this list.
+                "aliases_editable":  list(u.get("aliases_editable") or []),
+                "synced_at":         now if u else "",
             }
             records.append(rec)
             by_email[email] = rec
