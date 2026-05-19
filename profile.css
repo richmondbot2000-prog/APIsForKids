@@ -504,18 +504,33 @@ textarea.up-pay-input { resize: vertical; min-height: 50px; font-family: var(--f
 }
 .up-src-box[open] > .up-src-box-summary::before { transform: rotate(90deg); }
 .up-src-box-label {
+  display: inline-flex; align-items: center; gap: 8px;
   font: 600 12px/1 var(--font-body);
   letter-spacing: 0.02em;
   color: var(--ink-700);
   flex: 0 0 auto;
   min-width: 130px;
 }
+.up-src-logo { width: 20px; height: 20px; flex: 0 0 auto; display: block; }
+.up-src-label-text { display: inline-block; }
 .up-src-box-value {
   flex: 1 1 auto;
   display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
   color: var(--ink-900);
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.up-acct-unlink-link {
+  flex: 0 0 auto;
+  margin-left: auto;
+  font: 500 12px/1 var(--font-body);
+  color: #1a5fc0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.up-acct-unlink-link:hover { color: #0d4090; }
+@media (max-width: 600px) {
+  .up-acct-unlink-link { margin-left: 0; }
 }
 .up-src-box-value code {
   font: 500 11px/1 var(--font-mono); color: var(--ink-700);

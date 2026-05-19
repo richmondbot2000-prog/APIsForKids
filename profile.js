@@ -529,7 +529,7 @@
     return `
       <details class="up-src-box up-src-box--empty">
         <summary class="up-src-box-summary">
-          <span class="up-src-box-label">${escapeHtml(label)}</span>
+          <span class="up-src-box-label">${srcBoxLogo(tenant)}<span class="up-src-label-text">${escapeHtml(label)}</span></span>
           <span class="up-src-box-value"><span class="up-empty-val">not linked</span></span>
         </summary>
         <div class="up-src-box-body">
@@ -883,30 +883,32 @@
         ${aliasChips}
       </div>` : "";
 
+    // Status / state badges only — tenant identity is conveyed by the
+    // coloured Google / Gmail logo on the left of the summary, so the
+    // old "LETME" / "TOGETHER" / "EXTERNAL" pill is gone.
     let badges = [];
-    if (rec.tenant === "external")             badges.push(`<span class="up-acct-badge up-acct-badge--ext">External Gmail</span>`);
-    else if (st.deletion_time)                 badges.push(`<span class="up-acct-badge up-acct-badge--deleted">Deleted</span>`);
+    if (st.deletion_time)                      badges.push(`<span class="up-acct-badge up-acct-badge--deleted">Deleted</span>`);
     else if (st.pending)                       badges.push(`<span class="up-acct-badge up-acct-badge--pending">Transferring</span>`);
     else if (st.suspended)                     badges.push(`<span class="up-acct-badge up-acct-badge--suspended">Suspended</span>`);
     else                                       badges.push(`<span class="up-acct-badge up-acct-badge--live">Live</span>`);
     if (rec.is_primary)                        badges.push(`<span class="up-acct-badge">Primary</span>`);
-    badges.push(`<span class="up-acct-badge up-acct-badge--tenant-${rec.tenant}">${escapeHtml(rec.tenant === "letme" ? "Letme" : rec.tenant === "together" ? "Together" : "Gmail")}</span>`);
     if (st.admin)                              badges.push(`<span class="up-acct-badge up-acct-badge--admin">Workspace admin</span>`);
     if (st.forwarding_to)                      badges.push(`<span class="up-acct-badge up-acct-badge--forward">→ ${escapeHtml(st.forwarding_to)}</span>`);
 
     const actions = (viewerIsAdmin && rec.tenant !== "external") ? renderAccountButtons(email, st, isMine, rec) : "";
     const adminUnlink = viewerIsAdmin
-      ? `<button class="up-acct-row-unlink" data-acc-unlink="${escapeHtml(rec.id)}" title="Remove this Google account row from the Person (does not touch the Workspace account itself)">Unlink</button>`
+      ? `<a href="#" class="up-acct-unlink-link" data-acc-unlink="${escapeHtml(rec.id)}" title="Remove this Google account row from the Person (does not touch the Workspace account itself)">Unlink</a>`
       : "";
 
     return `
       <details class="up-src-box up-acct" data-acc-email="${escapeHtml(email)}" data-acc-id="${escapeHtml(rec.id)}" data-acc-is-primary="${rec.is_primary ? "1" : "0"}">
         <summary class="up-src-box-summary">
-          <span class="up-src-box-label">${escapeHtml(srcBoxLabel(rec.tenant))}</span>
+          <span class="up-src-box-label">${srcBoxLogo(rec.tenant)}<span class="up-src-label-text">${escapeHtml(srcBoxLabel(rec.tenant))}</span></span>
           <span class="up-src-box-value">
             <span class="up-acct-email">${escapeHtml(email)}</span>
-            <span class="up-acct-badges">${badges.join("")} ${adminUnlink}</span>
+            <span class="up-acct-badges">${badges.join("")}</span>
           </span>
+          ${adminUnlink}
         </summary>
         <div class="up-src-box-body">
           ${aliasBlock}
@@ -916,6 +918,26 @@
       </details>`;
   }
 
+  // Brand-coloured logos used in the per-source box labels. Inline SVG
+  // so they stay crisp at any DPI without an extra network request.
+  const GOOGLE_WORKSPACE_LOGO = `<svg class="up-src-logo" viewBox="0 0 48 48" aria-hidden="true">
+    <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
+    <path fill="#FF3D00" d="M6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
+    <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
+    <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.003-.002 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
+  </svg>`;
+  const GMAIL_LOGO = `<svg class="up-src-logo" viewBox="0 0 48 48" aria-hidden="true">
+    <path fill="#4CAF50" d="M45 16.2l-5 2.75-5 4.75V40h7a3 3 0 0 0 3-3V16.2z"/>
+    <path fill="#1E88E5" d="M3 16.2l3.614 1.71L13 19.75V40H6a3 3 0 0 1-3-3V16.2z"/>
+    <polygon fill="#E53935" points="35,11.2 24,19.45 13,11.2 12,17 13,22.75 24,31 35,22.75 36,17"/>
+    <path fill="#C62828" d="M3 12.298V16.2l10 7.55V11.2L9.876 8.859A4.298 4.298 0 0 0 3 12.298z"/>
+    <path fill="#FBC02D" d="M45 12.298V16.2l-10 7.55V11.2l3.124-2.341A4.298 4.298 0 0 1 45 12.298z"/>
+  </svg>`;
+  function srcBoxLogo(tenant) {
+    if (tenant === "letme" || tenant === "together") return GOOGLE_WORKSPACE_LOGO;
+    if (tenant === "external") return GMAIL_LOGO;
+    return "";
+  }
   function srcBoxLabel(tenant) {
     if (tenant === "letme")    return "Google · Letme";
     if (tenant === "together") return "Google · Together";
