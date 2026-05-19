@@ -731,13 +731,14 @@
         ${actions}
       </span>`;
     }).join("");
-    const aliasAdd = (viewerIsAdmin && rec.tenant !== "external" && !st.deletion_time) ? `
-      <button class="up-acct-alias-add" data-acc-alias-add="1">+ Add alias</button>` : "";
-    const aliasBlock = (aliases.length || aliasAdd) ? `
+    // "+ Add alias" used to live inline at the end of the chip list, which
+    // was unfindable on accounts with many chips. It's now the first
+    // button in the action row below so it sits with the other
+    // account-level actions.
+    const aliasBlock = aliases.length ? `
       <div class="up-acct-aliases">
-        ${aliases.length ? '<span class="up-acct-aliases-label">Aliases:</span>' : ""}
+        <span class="up-acct-aliases-label">Aliases:</span>
         ${aliasChips}
-        ${aliasAdd}
       </div>` : "";
 
     let badges = [];
@@ -771,6 +772,11 @@
   }
   function renderAccountButtons(email, st, isMine, rec) {
     const buttons = [];
+    // Add-alias sits at the top of the action row across all non-deleted
+    // states so it's always visible and never buried in a long chip list.
+    if (!st.deletion_time) {
+      buttons.push(`<button data-acc-alias-add="1">+ Add alias</button>`);
+    }
     if (st.deletion_time) {
       buttons.push(`<button data-acc-action="recover">Recover</button>`);
     } else if (st.suspended) {
