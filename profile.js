@@ -360,8 +360,6 @@
     return `
       <h2 class="up-panel-title">Information</h2>
 
-      ${renderLinkedSourcesCard()}
-
       <div class="up-card">
         <div class="up-card-head">Editable details ${lockedBadge}</div>
         ${editableRow("name",       "Display name", "text",     person.name)}
@@ -513,6 +511,7 @@
   function renderAccountsPanel() {
     return `
       <h2 class="up-panel-title">Accounts</h2>
+      ${renderLinkedSourcesCard()}
       ${renderGoogleAccountsSection()}
       ${viewerIsAdmin ? renderAuth0Card() : ""}`;
   }
