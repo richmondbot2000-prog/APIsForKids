@@ -48,7 +48,14 @@
   .pp-btn--danger { background: var(--paper-50); color: var(--red-600, #b3261e); border-color: var(--red-200, #f3c8c4); }
   .pp-btn--danger:hover { background: var(--red-50, #fcf0ee); border-color: var(--red-500); }
 
-  .pp-stats { display: flex; gap: 14px; font: 500 12px/1.3 var(--font-body); color: var(--ink-600); margin-bottom: 6px; flex-wrap: wrap; }
+  .pp-stats { display: flex; gap: 8px; font: 500 12px/1.3 var(--font-body); color: var(--ink-600); margin-bottom: 6px; flex-wrap: wrap; align-items: center; }
+  .pp-stats-divider {
+    align-self: stretch;
+    width: 1px; min-height: 22px;
+    background: var(--paper-300);
+    margin: 0 4px;
+    flex: 0 0 auto;
+  }
   .pp-stat strong { color: var(--ink-900); font-weight: 700; }
   .pp-freshness { font: 400 11px/1.2 var(--font-body); color: var(--ink-500); margin-bottom: 12px; cursor: help; }
 
@@ -59,10 +66,17 @@
   }
   .pp-thead, .pp-row {
     display: grid;
-    grid-template-columns: 44px minmax(110px, 1.1fr) minmax(110px, 1.1fr) minmax(110px, 1fr) minmax(120px, 1fr) 200px 110px;
+    grid-template-columns: 44px minmax(80px, 0.9fr) minmax(80px, 0.9fr) minmax(130px, 1.4fr) minmax(110px, 1fr) 200px 110px;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     padding: 10px 14px;
+  }
+  @media (max-width: 600px) {
+    .pp-thead, .pp-row {
+      grid-template-columns: 36px minmax(60px, 0.8fr) minmax(60px, 0.8fr) minmax(110px, 1.4fr) minmax(80px, 1fr) 200px 90px;
+      gap: 6px;
+      padding: 8px 10px;
+    }
   }
   .pp-company { font: 500 13px/1.3 var(--font-body); color: var(--ink-700); overflow-wrap: anywhere; }
   .pp-first   { font: 500 14px/1.3 var(--font-body); color: var(--ink-900); overflow-wrap: anywhere; }
@@ -71,20 +85,30 @@
   .pp-linemgr a { color: inherit; text-decoration: none; }
   .pp-linemgr a:hover { color: var(--ink-900); text-decoration: underline; }
 
-  /* Stats / filter chips. Click toggles the filter, click again clears. */
+  /* Filter chips. "All" sits on the left; the rest are individually
+     toggleable and combine with AND. All chips look like buttons by
+     default so it's obvious they're tappable. */
   .pp-stat {
-    display: inline-flex; align-items: baseline; gap: 5px;
-    padding: 5px 10px; border-radius: 4px;
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px; border-radius: 4px;
     font: 500 12px/1 var(--font-body); color: var(--ink-700);
-    background: transparent; border: 1px solid transparent;
+    background: var(--paper-50);
+    border: 1px solid var(--ink-300);
     cursor: pointer;
+    transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
   }
-  .pp-stat strong { color: var(--ink-900); font-weight: 700; }
-  .pp-stat:hover  { background: var(--paper-100); border-color: var(--paper-300); }
+  .pp-stat:hover { border-color: var(--brass-500); color: var(--ink-900); }
   .pp-stat.is-active {
-    background: #fbf3e1; border-color: var(--brass-500); color: var(--ink-900);
+    background: #fbf3e1; border-color: var(--brass-500); color: var(--ink-900); font-weight: 600;
   }
-  .pp-stat.is-active strong { color: #835F1F; }
+  /* "All" is the exclusive default — visually distinct from the toggle
+     chips so it reads as a separate mode (filled when active). */
+  .pp-stat--all {
+    font-weight: 600;
+  }
+  .pp-stat--all.is-active {
+    background: var(--brass-500); color: var(--paper-50); border-color: var(--brass-500);
+  }
   .pp-stats-count {
     flex-basis: 100%;
     margin-top: 6px;
@@ -501,12 +525,15 @@
     const allActive = statFilters.size === 0;
     const chip = (key, label) => {
       const active = key === "all" ? allActive : statFilters.has(key);
-      return `<button class="pp-stat${active ? " is-active" : ""}" data-stat="${key}">${escapeHtml(label)}</button>`;
+      const extra = key === "all" ? " pp-stat--all" : "";
+      return `<button class="pp-stat${extra}${active ? " is-active" : ""}" data-stat="${key}">${escapeHtml(label)}</button>`;
     };
-    // Order: All first, then the five named filters in the order the
-    // user specified (Payroll · Together · LetMe · Live · on CRM).
+    // Order: All first (exclusive), then the five named filters
+    // (Payroll · Together · LetMe · Live · on CRM). A divider sits
+    // between the two groups to read as "this OR any of these".
     document.getElementById("ppStats").innerHTML = `
       ${chip("all",       "All")}
+      <span class="pp-stats-divider" aria-hidden="true"></span>
       ${chip("payroll",   "Payroll")}
       ${chip("together",  "Together")}
       ${chip("letme",     "LetMe")}
