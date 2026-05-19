@@ -82,6 +82,7 @@
   let payrollByPersonId = {};    // most-recent PayrollData row per person_id
   let googleByPersonId = {};     // pid -> [google-account rows]
   let warehouseByPersonId = {};  // pid -> best warehouse-activity row
+  let holidayPlans = null;       // /holiday-plans.json — named plans + defaults
 
   const WORKSPACE_API = "/api/workspace";
 
@@ -335,6 +336,64 @@
     // "Definitely do this" button. The actual mutation only fires from
     // that final button. Demotion from admin happens by editing the
     // Access level field in Editable details, not as a separate action.
+    // Holiday-plan picker. Admin-only because plan assignment is an HR
+    // decision; non-admins see read-only label + description. The hint
+    // below the field updates live on change (listener in wirePanel)
+    // so admins preview a plan rules before committing the Save.
+    function holidayPlanRow() {
+      const plans = (holidayPlans && holidayPlans.plans) || [];
+      const defaultId = (holidayPlans && holidayPlans.default_plan) || "";
+      const current = person.holiday_plan || "";
+      const savedLabel = LS.savedLabel(person.id, "holiday_plan");
+      const savedBadge = savedLabel
+        ? `<span class="up-saved-badge" title="Your last edit to this field — overlaid from local cache for 5 min so it cannot appear to revert">✓ ${escapeHtml(savedLabel)}</span>`
+        : "";
+      const planFor = (id) => plans.find(p => p.id === id) || null;
+      const describe = (id) => {
+        if (!id) {
+          const def = planFor(defaultId);
+          return def
+            ? `Defaults to <strong>${escapeHtml(def.label || def.id)}</strong> — ${escapeHtml(def.description || "")}`
+            : "No plan selected; the company default will apply.";
+        }
+        const pl = planFor(id);
+        if (!pl) return `Unknown plan id <code>${escapeHtml(id)}</code>.`;
+        const cap = pl.annual_max_days >= 365 ? "uncapped" : `${pl.annual_max_days} days/year`;
+        return `<strong>${escapeHtml(pl.label || pl.id)}</strong> — ${cap}. ${escapeHtml(pl.description || "")}`;
+      };
+      if (!plans.length) {
+        return `
+          <div class="up-field" data-edit-field="holiday_plan">
+            <div class="up-field-label">Holiday plan ${savedBadge}</div>
+            <div class="up-field-value up-empty-val">Plans file not loaded.</div>
+          </div>`;
+      }
+      if (!viewerIsAdmin) {
+        return `
+          <div class="up-field" data-edit-field="holiday_plan">
+            <div class="up-field-label">Holiday plan ${savedBadge}</div>
+            <div class="up-field-value">${(planFor(current || defaultId) || {}).label || (current || defaultId) || "—"}</div>
+            <p class="up-hint" data-holiday-plan-hint>${describe(current)}</p>
+          </div>`;
+      }
+      const opts = [
+        `<option value="" ${current === "" ? "selected" : ""}>Default (${escapeHtml((planFor(defaultId) || {}).label || defaultId || "company default")})</option>`,
+        ...plans.map(pl => `<option value="${escapeHtml(pl.id)}" ${current === pl.id ? "selected" : ""}>${escapeHtml(pl.label || pl.id)}</option>`),
+      ].join("");
+      return `
+        <div class="up-field" data-edit-field="holiday_plan">
+          <div class="up-field-label">Holiday plan ${savedBadge}</div>
+          <div class="up-field-editor-row">
+            <select name="holiday_plan" data-orig="${escapeHtml(current)}" data-holiday-plan-select>
+              ${opts}
+            </select>
+            <button type="button" class="up-btn-sm up-btn-sm--primary" data-edit-save="holiday_plan" disabled>Save</button>
+            <span class="up-edit-status" data-edit-status="holiday_plan"></span>
+          </div>
+          <p class="up-hint" data-holiday-plan-hint>${describe(current)}</p>
+        </div>`;
+    }
+
     const adminControls = viewerIsAdmin ? `
       <div class="up-card up-card--danger" id="upAdminActions">
         <div class="up-card-head">Admin actions</div>
@@ -358,6 +417,7 @@
           ${viewerIsAdmin ? lineMgrEditor : `<div class="up-field-value">${lineMgrDisplay}</div>`}
         </div>
         ${editableRow("start_date", "Start date",   "date",     person.start_date, null, null, /*adminOnly*/ true)}
+        ${holidayPlanRow()}
         ${editableRow("name",       "Display name", "text",     person.name)}
         ${editableRow("aliases",    "Aliases",      "text",     (person.aliases || []).join(", "), "Comma-separated — used in name search + mentions")}
         ${editableRow("phone",      "Phone",        "tel",      person.phone)}
@@ -1075,6 +1135,25 @@
       }
       btn.addEventListener("click", () => savePersonField(field));
     });
+    document.querySelectorAll("[data-holiday-plan-select]").forEach(sel => {
+      sel.addEventListener("change", () => {
+        const hint = sel.closest(".up-field").querySelector("[data-holiday-plan-hint]");
+        if (!hint || !holidayPlans) return;
+        const id = sel.value;
+        const pl = (holidayPlans.plans || []).find(x => x.id === id) || null;
+        const defId = holidayPlans.default_plan || "";
+        const defPl = (holidayPlans.plans || []).find(x => x.id === defId) || null;
+        if (!id && defPl) {
+          hint.innerHTML = `Defaults to <strong>${escapeHtml(defPl.label || defPl.id)}</strong> — ${escapeHtml(defPl.description || "")}`;
+        } else if (pl) {
+          const cap = pl.annual_max_days >= 365 ? "uncapped" : `${pl.annual_max_days} days/year`;
+          hint.innerHTML = `<strong>${escapeHtml(pl.label || pl.id)}</strong> — ${cap}. ${escapeHtml(pl.description || "")}`;
+        } else {
+          hint.textContent = "No plan selected; the company default will apply.";
+        }
+      });
+    });
+
     document.querySelectorAll("[data-acc-action]").forEach(btn => {
       btn.addEventListener("click", () => handleAccountAction(btn));
     });
@@ -2389,7 +2468,8 @@
     fetch("/api/workspace/table?file=google-accounts",  { cache: "no-store", headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" } }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch("/api/workspace/table?file=warehouse-activity",{ cache: "no-store", headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" } }).then(r => r.ok ? r.json() : null).catch(() => null),
     fetch("/workspace-actions.json", { cache: "no-store", headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" } }).then(r => r.ok ? r.json() : null).catch(() => null),
-  ]).then(([peopleFile, staff, wallFile, payroll, who, annFile, adminsFile, pending, payrollFile, gaccounts, warehouse, auditFile]) => {
+    fetch("/holiday-plans.json",      { cache: "no-store", headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" } }).then(r => r.ok ? r.json() : null).catch(() => null),
+  ]).then(([peopleFile, staff, wallFile, payroll, who, annFile, adminsFile, pending, payrollFile, gaccounts, warehouse, auditFile, holidayPlansFile]) => {
     if (peopleFile && Array.isArray(peopleFile.people)) {
       people = peopleFile.people;
       for (const p of people) {
@@ -2450,6 +2530,7 @@
       }
     }
     if (auditFile && Array.isArray(auditFile.actions)) auditActions = auditFile.actions;
+    if (holidayPlansFile && Array.isArray(holidayPlansFile.plans)) holidayPlans = holidayPlansFile;
     renderProfile();
   }).catch(err => renderEmpty("Failed to load: " + String(err)));
 })();
