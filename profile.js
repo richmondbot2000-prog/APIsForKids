@@ -238,8 +238,13 @@
     // Editable block (Role, Phone, Address). Line manager + access_level
     // are admin-only — we show them as read-only here and admins use
     // /people.html for the deeper edits.
-    function editableRow(field, label, type, value, hint, suggestions) {
-      const readonly = !editable;
+    function editableRow(field, label, type, value, hint, suggestions, adminOnly) {
+      // adminOnly = true gates the edit on viewerIsAdmin even when the
+      // viewer would normally be allowed to edit their own row.
+      // The four self-editable fields (name, aliases, phone, address)
+      // pass adminOnly=false (the default); everything else passes true.
+      const isFieldEditable = adminOnly ? viewerIsAdmin : editable;
+      const readonly = !isFieldEditable;
       const savedLabel = LS.savedLabel(person.id, field);
       const savedBadge = savedLabel
         ? `<span class="up-saved-badge" title="Your last edit to this field — overlaid from local cache for 5 min so it can't appear to revert">✓ ${escapeHtml(savedLabel)}</span>`
@@ -346,20 +351,20 @@
 
       <div class="up-card">
         <div class="up-card-head">Editable details ${lockedBadge}</div>
+        ${editableRow("team",       "Team",         "text",     person.team,  null, teamSuggestions, /*adminOnly*/ true)}
+        ${editableRow("role",       "Role",         "text",     person.role,  null, roleSuggestions, /*adminOnly*/ true)}
         <div class="up-field" data-edit-field="line_manager_id">
           <div class="up-field-label">Line manager</div>
-          ${editable ? lineMgrEditor : `<div class="up-field-value">${lineMgrDisplay}</div>`}
+          ${viewerIsAdmin ? lineMgrEditor : `<div class="up-field-value">${lineMgrDisplay}</div>`}
         </div>
-        ${editableRow("team",       "Team",         "text",     person.team,  null, teamSuggestions)}
+        ${editableRow("start_date", "Start date",   "date",     person.start_date, null, null, /*adminOnly*/ true)}
         ${editableRow("name",       "Display name", "text",     person.name)}
         ${editableRow("aliases",    "Aliases",      "text",     (person.aliases || []).join(", "), "Comma-separated — used in name search + mentions")}
-        ${editableRow("role",       "Role",         "text",     person.role,  null, roleSuggestions)}
         ${editableRow("phone",      "Phone",        "tel",      person.phone)}
         ${editableRow("address",    "Address",      "textarea", person.address)}
-        ${editableRow("start_date", "Start date",   "date",     person.start_date)}
         <div class="up-field" data-edit-field="access_level">
           <div class="up-field-label">Access level</div>
-          ${editable
+          ${viewerIsAdmin
             ? accessLevelEditor
             : `<div class="up-field-value"><span class="up-pill up-pill--${escapeHtml(person.access_level || "staff")}">${escapeHtml(person.access_level || "staff")}</span></div>`}
         </div>
