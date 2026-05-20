@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T09:51:45.341Z",
+  "updated_at": "2026-05-20T09:53:55.755Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -2512,14 +2512,15 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:59:31Z",
+      "updated_at": "2026-05-20T09:53:55.755Z",
       "most_recent_payroll_id": 23,
       "on_payroll": true,
       "url_slug": "james.webster",
       "date_of_birth": "1996-10-20",
       "bookr_uids": [
         "imXJC0EqD2O15v7fB97vYZxnfhX2"
-      ]
+      ],
+      "holiday_plan": "Unlimited"
     },
     {
       "id": 94,
