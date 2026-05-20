@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T19:37:10.216Z",
+  "updated_at": "2026-05-20T21:02:59.952Z",
   "posts": [
     {
       "id": "post_mpdsge97_z03sf8",
@@ -15,7 +15,6 @@
       "reactions": {
         "❤️": [
           "mourad.malki@letme.com",
-          "kelly.black@togetherloans.com",
           "ashwin.john@togetherloans.com",
           "joseph.foard@letme.com"
         ],
@@ -181,6 +180,14 @@
           "target_id": "post_mpdsge97_z03sf8",
           "at": "2026-05-20T19:37:09.675Z",
           "kind": "added"
+        },
+        {
+          "actor_email": "kelly.black@togetherloans.com",
+          "emoji": "❤️",
+          "target_kind": "post",
+          "target_id": "post_mpdsge97_z03sf8",
+          "at": "2026-05-20T21:02:59.746Z",
+          "kind": "removed"
         }
       ]
     },
