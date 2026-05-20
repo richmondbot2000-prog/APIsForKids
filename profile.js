@@ -89,6 +89,21 @@
 
   const WORKSPACE_API = "/api/workspace";
 
+  // Serialize every people-set call so two rapid field-saves don't race
+  // each other on GitHub. Each commit to people.json carries the SHA
+  // the worker saw at fetch time; if a second commit lands before the
+  // first one's SHA propagates, GitHub returns 409. The worker has a
+  // 5-attempt retry with backoff but a fast-clicking user can still
+  // exhaust it (typing Team + Role + Line manager + Company in 7s did,
+  // 2026-05-20). Chaining everything through a single promise queues
+  // the saves end-to-end at the cost of slightly slower batch updates.
+  let peopleSaveQueue = Promise.resolve();
+  function queuePeopleSave(fn) {
+    const next = peopleSaveQueue.then(() => fn(), () => fn());
+    peopleSaveQueue = next.catch(() => {}); // never let the chain reject
+    return next;
+  }
+
   function escapeHtml(s) {
     return String(s == null ? "" : s)
       .replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
@@ -1792,10 +1807,10 @@
     const status = document.querySelector('[data-edit-status="unadmin"]');
     if (status) { status.textContent = "Saving…"; status.className = "up-edit-status up-edit-status--working"; }
     try {
-      const res = await fetch(WORKSPACE_API + "/people-set", {
+      const res = await queuePeopleSave(() => fetch(WORKSPACE_API + "/people-set", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: person.id, access_level: "staff" }),
-      });
+      }));
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
       Object.assign(person, out.person);
@@ -1841,10 +1856,10 @@
     const status = document.querySelector('[data-edit-status="on_payroll"]');
     if (status) { status.textContent = "Saving…"; status.className = "up-edit-status up-edit-status--working"; }
     try {
-      const res = await fetch(WORKSPACE_API + "/people-set", {
+      const res = await queuePeopleSave(() => fetch(WORKSPACE_API + "/people-set", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: person.id, on_payroll: turnOn  }),
-      });
+      }));
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
       Object.assign(person, out.person);
@@ -2417,10 +2432,10 @@
     }
     if (status) { status.textContent = "Saving…"; status.className = "up-edit-status up-edit-status--working"; }
     try {
-      const res = await fetch(WORKSPACE_API + "/people-set", {
+      const res = await queuePeopleSave(() => fetch(WORKSPACE_API + "/people-set", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: person.id, ...changes }),
-      });
+      }));
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
       Object.assign(person, out.person);
@@ -2476,10 +2491,12 @@
     let res = null;
     let rawBody = "";
     try {
-      res = await fetch(WORKSPACE_API + "/people-set", {
+      // queuePeopleSave serializes every per-field save into one chain
+      // so a quick burst of clicks doesn't fire concurrent commits.
+      res = await queuePeopleSave(() => fetch(WORKSPACE_API + "/people-set", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: person.id, [field]: payloadValue  }),
-      });
+      }));
       // Read the body as text first so a non-JSON / empty / truncated
       // response surfaces a useful error instead of a generic JSON parse
       // exception that swallows the worker's actual reply.
@@ -2534,10 +2551,10 @@
     const status = document.querySelector('[data-edit-status="suspended"]');
     if (status) { status.textContent = "Working…"; status.className = "up-edit-status up-edit-status--working"; }
     try {
-      const res = await fetch(WORKSPACE_API + "/people-set", {
+      const res = await queuePeopleSave(() => fetch(WORKSPACE_API + "/people-set", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: person.id, suspended: turnOn }),
-      });
+      }));
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
       Object.assign(person, out.person);
@@ -2993,10 +3010,10 @@
       for (let attempt = 1; attempt <= 3; attempt++) {
         step = `POST /api/workspace/people-set ${field} (try ${attempt}/3)`;
         try {
-          const setRes = await fetch(WORKSPACE_API + "/people-set", {
+          const setRes = await queuePeopleSave(() => fetch(WORKSPACE_API + "/people-set", {
             method: "POST", headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ action: "people-set", id: person.id, [field]: stamp }),
-          });
+          }));
           const txt = await setRes.text();
           let parsed; try { parsed = JSON.parse(txt); } catch (e) { throw new Error(`non-JSON response: ${txt.slice(0,120)}`); }
           if (!setRes.ok || !parsed.ok) throw new Error(parsed.error || `HTTP ${setRes.status}`);
