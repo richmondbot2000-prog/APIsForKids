@@ -698,6 +698,21 @@
     const uid = (person.bookr_uid || "").trim();
     const usersDict = (bookrUsersById && bookrUsersById.users) || null;
     const linkedUser = uid && usersDict ? usersDict[uid] : null;
+    const candEmails = [person.main_google_email, ...(person.alt_google_emails || []), person.external_google_email].filter(Boolean).map(e => e.toLowerCase());
+    let options = "";
+    if (usersDict) {
+      const entries = Object.entries(usersDict).map(([u, x]) => ({ uid: u, email: (x.email || "").toLowerCase(), name: x.name || "" }));
+      entries.sort((a, b) => {
+        const ap = candEmails.includes(a.email) ? 0 : 1;
+        const bp = candEmails.includes(b.email) ? 0 : 1;
+        if (ap !== bp) return ap - bp;
+        return (a.email || a.name).localeCompare(b.email || b.name);
+      });
+      options = entries.map(e => {
+        const star = candEmails.includes(e.email) ? "* " : "";
+        return `<option value="${escapeHtml(e.uid)}">${escapeHtml(star + (e.email || "(no email)"))} &middot; ${escapeHtml(e.name || "(no name)")} &middot; ${escapeHtml(e.uid)}</option>`;
+      }).join("");
+    }
     let summary;
     if (!uid) {
       summary = `<span class="up-empty-val">not linked</span>`;
@@ -706,21 +721,6 @@
     } else if (usersDict) {
       summary = `<span><code>${escapeHtml(uid)}</code> &middot; <em>unknown</em> &middot; re-link required</span>`;
     } else {
-      const candEmails = [person.main_google_email, ...(person.alt_google_emails || []), person.external_google_email].filter(Boolean).map(e => e.toLowerCase());
-      let options = "";
-      if (usersDict) {
-        const entries = Object.entries(usersDict).map(([u, x]) => ({ uid: u, email: (x.email || "").toLowerCase(), name: x.name || "" }));
-        entries.sort((a, b) => {
-          const ap = candEmails.includes(a.email) ? 0 : 1;
-          const bp = candEmails.includes(b.email) ? 0 : 1;
-          if (ap !== bp) return ap - bp;
-          return (a.email || a.name).localeCompare(b.email || b.name);
-        });
-        options = entries.map(e => {
-          const star = candEmails.includes(e.email) ? "* " : "";
-          return `<option value="${escapeHtml(e.uid)}">${escapeHtml(star + (e.email || "(no email)"))} &middot; ${escapeHtml(e.name || "(no name)")} &middot; ${escapeHtml(e.uid)}</option>`;
-        }).join("");
-      }
       summary = `<span><code>${escapeHtml(uid)}</code> &middot; <span class="up-card-hint">loading&hellip;</span></span>`;
     }
     const provenance = `
