@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T15:24:32.078Z",
+  "updated_at": "2026-05-20T15:26:38.635Z",
   "posts": [
     {
       "id": "post_mpdsge97_z03sf8",
@@ -28,6 +28,16 @@
           "author_name": "kelly.black",
           "created_at": "2026-05-20T11:56:07.196Z",
           "body": "I had to click the heart emjo twice for it to work. The first time it just got bigger. Also Gifs seem to be cut off",
+          "photos": [],
+          "reactions": {}
+        },
+        {
+          "id": "reply_mpe7sulr_ozouh5",
+          "parent_comment_id": "com_mpe0a4d8_59wug6",
+          "author_email": "james.benamor@letme.com",
+          "author_name": "james.benamor",
+          "created_at": "2026-05-20T15:26:38.319Z",
+          "body": "Ok I think the emoji bug is sorted now. Test it somewhere if you can and we’ll see. On GIFs Claude has ‘fixed’ it but I think what you were seeing was a post in preview mode, when it isn’t a post that you have clicked to view. All posts shrink down when they are not the main post on a screen because otherwise it would take ages to scroll down the feed.",
           "photos": [],
           "reactions": {}
         }
