@@ -1,0 +1,27 @@
+name: Audit BookR link
+
+# Read-only inventory of (a) Directory Persons without a BookR match and
+# (b) BookR users with future bookings but no Directory match. Prints
+# both lists in the run log; never mutates anything.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      BOOKR_SERVICE_ACCOUNT_JSON: ${{ secrets.BOOKR_SERVICE_ACCOUNT_JSON }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install crypto
+        run: pip install --quiet cryptography
+      - name: Run audit
+        run: python3 scripts/audit_bookr_link.py
