@@ -10,11 +10,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1779282315">
-<link rel="stylesheet" href="quiet-tokens.css?v=1779282315">
-<link rel="stylesheet" href="quiet.css?v=1779282315">
-<link rel="stylesheet" href="quiet-extras.css?v=1779282315">
-<link rel="stylesheet" href="quiet-legacy.css?v=1779282315">
+<link rel="stylesheet" href="style.css?v=1779282376">
+<link rel="stylesheet" href="quiet-tokens.css?v=1779282376">
+<link rel="stylesheet" href="quiet.css?v=1779282376">
+<link rel="stylesheet" href="quiet-extras.css?v=1779282376">
+<link rel="stylesheet" href="quiet-legacy.css?v=1779282376">
 <style>
   .bk-section { max-width: 100%; margin: 0 auto; padding: 18px 16px 48px; }
   .bk-section h1 {
@@ -239,7 +239,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="/wall.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779282315" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779282376" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -371,6 +371,18 @@
       renderUserPicker();
       const el = document.querySelector("#bkAdminLink");
       if (el) el.hidden = !a;
+      // 360-day zoom is admin-only — pulling a full year of bookings is
+      // heavy and only useful for ops. Non-admins cap at 90.
+      if (!a) {
+        const sel = document.querySelector("#bkZoom");
+        const opt360 = sel && sel.querySelector('option[value="360"]');
+        if (opt360) opt360.remove();
+        if (STATE.zoom > 90) {
+          STATE.zoom = 90;
+          if (sel) sel.value = "90";
+          refreshAllBookings();
+        }
+      }
     });
     /* Pull people.json via the worker, not /people.json directly, so we
        see the just-committed bookr_uids without GH Pages CDN lag. Also
@@ -1076,6 +1088,6 @@
   loadAll();
 })();
 </script>
-<script src="nav.js?v=1779282315"></script>
+<script src="nav.js?v=1779282376"></script>
 </body>
 </html>
