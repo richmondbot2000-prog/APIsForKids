@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T14:38:35.746Z",
+  "updated_at": "2026-05-20T14:39:51.095Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -2338,7 +2338,7 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-20T14:38:35.746Z",
+      "updated_at": "2026-05-20T14:39:51.095Z",
       "most_recent_payroll_id": 20,
       "on_payroll": true,
       "url_slug": "igor.kravcov",
@@ -2346,7 +2346,8 @@
       "bookr_uids": [
         "0j4WpECYNbTqLBUOZryPMxrUMq22",
         "Z7EDk1jQ6xcDEzeTzVZRuiOeFQR2"
-      ]
+      ],
+      "holiday_plan": "Unlimited"
     },
     {
       "id": 88,
