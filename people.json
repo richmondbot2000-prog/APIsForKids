@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T14:41:02.770Z",
+  "updated_at": "2026-05-20T14:41:16.807Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -1179,12 +1179,13 @@
       "directory_photo_uploaded_at": "",
       "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-20T14:41:02.770Z",
+      "updated_at": "2026-05-20T14:41:16.807Z",
       "url_slug": "cyrus.leung",
       "most_recent_payroll_id": 77,
       "team": "Paralegal",
       "on_payroll": true,
-      "holiday_plan": "Unlimited"
+      "holiday_plan": "Unlimited",
+      "date_of_birth": "1995-01-16"
     },
     {
       "id": 47,
