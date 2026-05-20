@@ -1,1 +1,6 @@
-{}
+{
+  "cars": {
+    "megatron": false
+  },
+  "properties": {}
+}
