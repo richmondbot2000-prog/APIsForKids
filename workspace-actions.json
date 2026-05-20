@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T14:27:35.668Z",
+  "updated_at": "2026-05-20T14:40:50.266Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -2529,6 +2529,13 @@
       "target": "46 → 86",
       "ok": false,
       "error": "people.json commit failed (409): {\"message\":\"is at 0057462c7fd175480215c10abc700a6ce8042e95 but expected 9f2b258d9a502faccd77c11c17689d9ef89dcd53\",\"documentation_url\":\"https://docs.github.com/rest/repos/contents#create-or-update-file"
+    },
+    {
+      "ts": "2026-05-20T14:40:50.266Z",
+      "actor": "amber.cole@letme.com",
+      "action": "people-merge",
+      "target": "86 → 46",
+      "ok": true
     }
   ]
 }
