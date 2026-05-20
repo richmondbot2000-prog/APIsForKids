@@ -176,9 +176,11 @@
   @keyframes bk-spin { to { transform: rotate(360deg); } }
   /* Sticky asset column on the left edge. */
   .bk-asset-cell {
-    position: sticky; left: 0; z-index: 2;
+    position: sticky; left: 0; top: 0; z-index: 2;
     background: var(--paper-50);
     border-right: 2px solid #000;
+    will-change: left;
+    transform: translateZ(0);
     padding: 3px 5px; min-width: 75px; max-width: 75px;
     border-bottom: 1px solid #ffffff;
     display: flex; flex-direction: column; gap: 0;
