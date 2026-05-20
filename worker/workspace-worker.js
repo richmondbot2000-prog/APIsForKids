@@ -4011,16 +4011,37 @@ async function bookrCancel(env, viewerEmail, body) {
     const myUids = new Set(own.uids || []);
     if (current && !myUids.has(current)) throw new Error("you can only cancel your own bookings");
   }
-  // DELETE the date key entirely — more reliable than PUT "free", which
-  // silently no-ops in some setups (and reads the same shape from the
-  // client either way: a missing key renders as a free cell). Also do a
-  // post-write verify GET so the worker reply confirms Firebase actually
-  // cleared the value — that lets the client log a real diagnostic if
-  // something is preventing the write rather than appearing to succeed.
-  await bookrFetch(env, path, { method: "DELETE" });
-  let verify = null;
-  try { verify = await bookrFetch(env, path); } catch (e) { /* fall through */ }
-  return { ok: true, type, asset, date, after: verify };
+  // Multi-strategy clear — some Firebase rule setups silently reject the
+  // method that should "obviously" work, so we try every reasonable way
+  // to vacate the slot and report each step back to the client. After
+  // each write we GET the path to confirm Firebase actually accepted it.
+  const steps = [];
+  async function tryWrite(method, body) {
+    const init = { method };
+    if (body !== undefined) {
+      init.body = body;
+      init.headers = { "Content-Type": "application/json" };
+    }
+    let writeErr = null;
+    try { await bookrFetch(env, path, init); }
+    catch (e) { writeErr = String(e.message || e); }
+    let after = null;
+    try { after = await bookrFetch(env, path); }
+    catch (e) { after = `read-failed: ${e.message || e}`; }
+    steps.push({ method, body: body === undefined ? null : body, write_error: writeErr, after });
+    return after;
+  }
+  let after = await tryWrite("DELETE");
+  if (after != null && after !== "free") after = await tryWrite("PUT", "null");
+  if (after != null && after !== "free") after = await tryWrite("PUT", JSON.stringify("free"));
+  // Also dump the asset's full bookings dict so we can see whether the
+  // slot we deleted is the slot the calendar is reading. If a booking is
+  // still showing in the UI but our `after` reads null, the data lives at
+  // a different leaf.
+  let bookings = null;
+  try { bookings = await bookrFetch(env, `/${type}/${encodeURIComponent(asset)}/bookings.json`); }
+  catch (e) { bookings = `read-failed: ${e.message || e}`; }
+  return { ok: true, type, asset, date, after, steps, bookings_after: bookings };
 }
 
 async function bookrComments(env, type, id) {

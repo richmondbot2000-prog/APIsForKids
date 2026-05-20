@@ -10,11 +10,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1779305958">
-<link rel="stylesheet" href="quiet-tokens.css?v=1779305958">
-<link rel="stylesheet" href="quiet.css?v=1779305958">
-<link rel="stylesheet" href="quiet-extras.css?v=1779305958">
-<link rel="stylesheet" href="quiet-legacy.css?v=1779305958">
+<link rel="stylesheet" href="style.css?v=1779306678">
+<link rel="stylesheet" href="quiet-tokens.css?v=1779306678">
+<link rel="stylesheet" href="quiet.css?v=1779306678">
+<link rel="stylesheet" href="quiet-extras.css?v=1779306678">
+<link rel="stylesheet" href="quiet-legacy.css?v=1779306678">
 <style>
   .bk-section { max-width: 100%; margin: 0 auto; padding: 18px 16px 48px; }
   .bk-section h1 {
@@ -306,7 +306,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="/wall.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779305958" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779306678" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1192,12 +1192,14 @@
       const r = await fetch("/api/bookr/cancel", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: type, asset: asset, date: date }), cache: "no-store" });
       const j = await r.json();
       if (!r.ok || !j.ok) throw new Error(j.error || r.statusText);
-      // Worker now returns { after: <value at the date after delete> }.
-      // If after is non-null, Firebase still has someone booked on that
-      // day (rules rejected the delete, or there's a different writer).
-      // Surface that loudly rather than silently leaving the avatar.
+      // Worker now reports every clear strategy it tried + the value at
+      // the date afterwards + the asset's full bookings dict. Log so the
+      // diagnostic is grabbable from Safari's console; surface a clear
+      // error if the slot is still held by someone after all retries.
+      console.log("[bookr] cancel result", j);
       if (j.after != null && j.after !== "free") {
-        throw new Error(`Firebase still shows the day booked (value: ${JSON.stringify(j.after)}). Ask an admin to inspect the BookR rules for this asset.`);
+        const tried = (j.steps || []).map(s => `${s.method} ${s.body || ""} → ${JSON.stringify(s.after)}${s.write_error ? " (err: " + s.write_error + ")" : ""}`).join(" | ");
+        throw new Error(`Firebase still holds the booking after every clear attempt.\nValue now: ${JSON.stringify(j.after)}.\nTried: ${tried}`);
       }
       const key = type + ":" + asset;
       STATE.bookings[key] = STATE.bookings[key] || {};
@@ -1406,6 +1408,6 @@
   loadAll();
 })();
 </script>
-<script src="nav.js?v=1779305958"></script>
+<script src="nav.js?v=1779306678"></script>
 </body>
 </html>
