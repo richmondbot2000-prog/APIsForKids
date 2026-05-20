@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T15:24:35.352Z",
+  "updated_at": "2026-05-20T15:25:00.640Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -3837,13 +3837,13 @@
       "phone": "07375483489",
       "address": "Flat 3\n9 Talbot Avenue\nBournemouth\nDorset\nBH3 7HR",
       "start_date": "2025-05-13",
-      "line_manager_id": null,
+      "line_manager_id": "118",
       "line_manager_email_raw": "",
       "role": "",
       "directory_photo_uploaded_at": "2026-05-14T08:32:50+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:56:12Z",
+      "updated_at": "2026-05-20T15:25:00.640Z",
       "url_slug": "matt.brunet",
       "most_recent_payroll_id": 91,
       "on_payroll": true,
