@@ -1,26 +1,26 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-19T08:48:00.692388Z",
-  "snapshot_date": "2026-05-19",
+  "updated_at": "2026-05-20T19:35:20.569794Z",
+  "snapshot_date": "2026-05-20",
   "window_months": 3,
   "totals": {
-    "items": 124,
+    "items": 126,
     "by_lender": {
-      "Together Loans / TransformCredit": 124
+      "Together Loans / TransformCredit": 126
     },
     "by_role": {
-      "BRW": 122,
+      "BRW": 124,
       "GT": 2
     }
   },
   "word_cloud": [
     [
       "payment",
-      104
+      105
     ],
     [
       "loan",
-      75
+      78
     ],
     [
       "together",
@@ -32,71 +32,95 @@
     ],
     [
       "account",
-      56
+      58
     ],
     [
       "statement",
-      30
+      29
     ],
     [
       "credit",
-      29
+      28
     ],
     [
       "card",
       26
     ],
     [
-      "transform",
-      20
-    ],
-    [
-      "date",
+      "bank",
       19
     ],
     [
-      "bank",
+      "transform",
+      19
+    ],
+    [
+      "date",
       18
     ],
     [
-      "due",
-      17
+      "paid",
+      16
+    ],
+    [
+      "back",
+      16
+    ],
+    [
+      "information",
+      16
     ],
     [
       "update",
       16
     ],
     [
-      "information",
-      15
-    ],
-    [
-      "paid",
-      15
+      "due",
+      16
     ],
     [
       "number",
       15
     ],
     [
-      "method",
-      14
-    ],
-    [
-      "back",
+      "required",
       14
     ],
     [
       "time",
-      13
+      14
+    ],
+    [
+      "method",
+      14
     ],
     [
       "payments",
       13
     ],
     [
-      "required",
-      13
+      "get",
+      12
+    ],
+    [
+      "ach",
+      12
+    ],
+    [
+      "action",
+      12
+    ],
+    [
+      "bounced",
+      12
+    ],
+    [
+      "payout",
+      12
+    ],
+    [
+      "request",
+      12
     ],
     [
       "made",
@@ -107,23 +131,15 @@
       12
     ],
     [
-      "ach",
-      12
+      "unsuccessful",
+      11
+    ],
+    [
+      "may",
+      11
     ],
     [
       "receipt",
-      11
-    ],
-    [
-      "action",
-      11
-    ],
-    [
-      "bounced",
-      11
-    ],
-    [
-      "payout",
       11
     ],
     [
@@ -131,19 +147,7 @@
       11
     ],
     [
-      "unsuccessful",
-      11
-    ],
-    [
-      "request",
-      11
-    ],
-    [
-      "get",
-      11
-    ],
-    [
-      "may",
+      "pay",
       10
     ],
     [
@@ -151,20 +155,8 @@
       10
     ],
     [
-      "month",
-      10
-    ],
-    [
-      "app",
-      10
-    ],
-    [
       "today",
       10
-    ],
-    [
-      "pay",
-      9
     ],
     [
       "change",
@@ -175,8 +167,20 @@
       9
     ],
     [
+      "month",
+      9
+    ],
+    [
+      "app",
+      9
+    ],
+    [
       "mail",
       9
+    ],
+    [
+      "good",
+      8
     ],
     [
       "new",
@@ -195,20 +199,24 @@
       8
     ],
     [
-      "message",
-      8
-    ],
-    [
       "phone",
-      8
-    ],
-    [
-      "one",
       8
     ],
     [
       "april",
       8
+    ],
+    [
+      "correct",
+      7
+    ],
+    [
+      "currently",
+      7
+    ],
+    [
+      "call",
+      7
     ],
     [
       "sure",
@@ -223,7 +231,7 @@
       7
     ],
     [
-      "good",
+      "message",
       7
     ],
     [
@@ -231,15 +239,11 @@
       7
     ],
     [
-      "call",
-      7
-    ],
-    [
       "charge",
       7
     ],
     [
-      "correct",
+      "one",
       7
     ],
     [
@@ -263,6 +267,26 @@
       7
     ],
     [
+      "don't",
+      6
+    ],
+    [
+      "understand",
+      6
+    ],
+    [
+      "www",
+      6
+    ],
+    [
+      "funds",
+      6
+    ],
+    [
+      "appreciate",
+      6
+    ],
+    [
       "sent",
       6
     ],
@@ -283,10 +307,6 @@
       6
     ],
     [
-      "currently",
-      6
-    ],
-    [
       "future",
       6
     ],
@@ -299,15 +319,31 @@
       6
     ],
     [
+      "schedule",
+      5
+    ],
+    [
+      "signed",
+      5
+    ],
+    [
+      "going",
+      5
+    ],
+    [
+      "taking",
+      5
+    ],
+    [
+      "regarding",
+      5
+    ],
+    [
       "primary",
       5
     ],
     [
       "changed",
-      5
-    ],
-    [
-      "appreciate",
       5
     ],
     [
@@ -332,10 +368,6 @@
     ],
     [
       "morning",
-      5
-    ],
-    [
-      "funds",
       5
     ],
     [
@@ -403,11 +435,35 @@
       5
     ],
     [
-      "regarding",
+      "amount",
+      4
+    ],
+    [
+      "tried",
+      4
+    ],
+    [
+      "deposit",
+      4
+    ],
+    [
+      "returned",
       4
     ],
     [
       "trying",
+      4
+    ],
+    [
+      "financial",
+      4
+    ],
+    [
+      "set",
+      4
+    ],
+    [
+      "transfer",
       4
     ],
     [
@@ -427,10 +483,6 @@
       4
     ],
     [
-      "signed",
-      4
-    ],
-    [
       "see",
       4
     ],
@@ -440,10 +492,6 @@
     ],
     [
       "reference",
-      4
-    ],
-    [
-      "understand",
       4
     ],
     [
@@ -459,14 +507,6 @@
       4
     ],
     [
-      "going",
-      4
-    ],
-    [
-      "taking",
-      4
-    ],
-    [
       "still",
       4
     ],
@@ -476,10 +516,6 @@
     ],
     [
       "coming",
-      4
-    ],
-    [
-      "schedule",
       4
     ],
     [
@@ -497,6 +533,58 @@
     [
       "recipient",
       4
+    ],
+    [
+      "pumc",
+      3
+    ],
+    [
+      "com",
+      3
+    ],
+    [
+      "worship",
+      3
+    ],
+    [
+      "every",
+      3
+    ],
+    [
+      "disbursement",
+      3
+    ],
+    [
+      "informed",
+      3
+    ],
+    [
+      "recent",
+      3
+    ],
+    [
+      "deposited",
+      3
+    ],
+    [
+      "personal",
+      3
+    ],
+    [
+      "caused",
+      3
+    ],
+    [
+      "possible",
+      3
+    ],
+    [
+      "assistance",
+      3
+    ],
+    [
+      "order",
+      3
     ],
     [
       "checking",
@@ -523,99 +611,56 @@
       3
     ],
     [
-      "every",
-      3
-    ],
-    [
       "cosigner",
-      3
-    ],
-    [
-      "stop",
-      3
-    ],
-    [
-      "www",
-      3
-    ],
-    [
-      "however",
-      3
-    ],
-    [
-      "signer",
-      3
-    ],
-    [
-      "always",
-      3
-    ],
-    [
-      "check",
-      3
-    ],
-    [
-      "later",
-      3
-    ],
-    [
-      "line",
-      3
-    ],
-    [
-      "tried",
-      3
-    ],
-    [
-      "doesn't",
-      3
-    ],
-    [
-      "old",
-      3
-    ],
-    [
-      "set",
-      3
-    ],
-    [
-      "third",
-      3
-    ],
-    [
-      "keep",
-      3
-    ],
-    [
-      "don't",
-      3
-    ],
-    [
-      "yet",
-      3
-    ],
-    [
-      "right",
-      3
-    ],
-    [
-      "yall",
-      3
-    ],
-    [
-      "give",
-      3
-    ],
-    [
-      "requesting",
-      3
-    ],
-    [
-      "reported",
       3
     ]
   ],
   "items": [
+    {
+      "received_utc": "2026-05-20T05:27:43",
+      "received_date": "2026-05-20",
+      "days_after_payout": 58,
+      "role": "BRW",
+      "lender_name": "Together Loans / TransformCredit",
+      "subject": "Payment Schedule Change - ****",
+      "body": "Hello I Don't Get Paid Till The 3rd And Why The Higher AMOUNT??? That IS NOT WHAT I SIGNED UP FOR !!!! You BETTER CORRECT IT !!!! Thank You"
+    },
+    {
+      "received_utc": "2026-05-19T19:42:43",
+      "received_date": "2026-05-19",
+      "days_after_payout": 32,
+      "role": "BRW",
+      "lender_name": "Together Loans / TransformCredit",
+      "subject": "Unsuccessful ACH payment - ****",
+      "body": "I don't understand what is going on. I need to speak to a person. I have no problem with you taking money out of my account. I don't understand if you tried or not. Who can I talk to to resolve this? Thanls **** **** *Associate Pastor of Missions and Older Adult Ministries* **** Plainfield United Methodist Church www.pumc.org • www.facebook.com/PlainfieldUMC • **** Join PUMC for worship this Sunday! Classic Worship at 8:45 and 10:00 a.m.; NewDay Praise Worship at 9:00 and 10:00 a.m. every Sunday means there’s a place for you. Learn more at www.pumc.org."
+    },
+    {
+      "received_utc": "2026-05-19T17:28:44",
+      "received_date": "2026-05-19",
+      "days_after_payout": 4,
+      "role": "BRW",
+      "lender_name": "Together Loans / TransformCredit",
+      "subject": "Action Required: **** Bounced Loan Payout",
+      "body": "Good Afternoon, I was reaching out regarding my loan disbursement. I was informed that the recent deposit was returned, and I wanted to request that the loan funds please be deposited into my personal bank account instead. I am currently trying to pay off existing debts and handle important financial obligations, and the delay caused by the returned deposit has set me back further. If possible, I would appreciate assistance updating the disbursement account and ensuring the transfer can be completed successfully. Please let me know what information or verification you may need from me in order to proceed. Thanks, **** ****"
+    },
+    {
+      "received_utc": "2026-05-19T16:12:59",
+      "received_date": "2026-05-19",
+      "days_after_payout": 78,
+      "role": "BRW",
+      "lender_name": "Together Loans / TransformCredit",
+      "subject": "Your Together Loans Loan : ****",
+      "body": "I will call you back at [TIME].9:15"
+    },
+    {
+      "received_utc": "2026-05-19T12:33:06",
+      "received_date": "2026-05-19",
+      "days_after_payout": 21,
+      "role": "BRW",
+      "lender_name": "Together Loans / TransformCredit",
+      "subject": "**** epocs",
+      "body": ""
+    },
     {
       "received_utc": "2026-05-18T19:55:13",
       "received_date": "2026-05-18",
@@ -968,15 +1013,6 @@
       "body": "Hello, I would like a receipt for today's payment please. If you can email it to me, I would really appreciate it. Have a blessed day! Thank you."
     },
     {
-      "received_utc": "2026-05-02T00:47:38",
-      "received_date": "2026-05-02",
-      "days_after_payout": 72,
-      "role": "BRW",
-      "lender_name": "Together Loans / TransformCredit",
-      "subject": "Your Together Loans Loan : ****",
-      "body": "Yes that is correct I be giving her that money so it comes out of her account"
-    },
-    {
       "received_utc": "2026-05-01T23:21:08",
       "received_date": "2026-05-01",
       "days_after_payout": 57,
@@ -1218,15 +1254,6 @@
       "lender_name": "Together Loans / TransformCredit",
       "subject": "Action Required: **** Bounced Loan Payout",
       "body": "Yahoo Mail: Search, Organize, Conquer"
-    },
-    {
-      "received_utc": "2026-04-23T01:11:56",
-      "received_date": "2026-04-23",
-      "days_after_payout": 63,
-      "role": "BRW",
-      "lender_name": "Together Loans / TransformCredit",
-      "subject": "Unsuccessful ACH payment - ****",
-      "body": "My son is having a problem with your app"
     },
     {
       "received_utc": "2026-04-22T16:29:24",
@@ -1596,15 +1623,6 @@
       "lender_name": "Together Loans / TransformCredit",
       "subject": "**** - Your Transform Credit Statement",
       "body": "Thank you for the statement. ****"
-    },
-    {
-      "received_utc": "2026-03-27T19:18:52",
-      "received_date": "2026-03-27",
-      "days_after_payout": 36,
-      "role": "BRW",
-      "lender_name": "Together Loans / TransformCredit",
-      "subject": "**** - Your Transform Credit Statement",
-      "body": "Can we change due date of 3rd of every month please? **** and I both have been trying to reach you. **** has left a message and no one returns her call. **** **** ****"
     },
     {
       "received_utc": "2026-03-27T16:41:37",
