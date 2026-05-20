@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-18T21:52:26.878Z",
+  "updated_at": "2026-05-20T08:46:21.830Z",
   "source": "synced from people.json",
   "admins": [
     "amber.cole@letme.com",
@@ -26,6 +26,8 @@
     "mourad.malki@letme.com",
     "mourad.malki@togetherloans.com",
     "natasha.wright@letme.co.uk",
+    "sophia.ugwunne@letme.com",
+    "sophia.ugwunne@togetherloans.com",
     "victor.igbaifua@letme.com"
   ]
 }
