@@ -7,9 +7,9 @@
 <title>TogetherBOOK — Wall</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1779291524">
-<link rel="stylesheet" href="quiet.css?v=1779291524">
-<link rel="stylesheet" href="quiet-extras.css?v=1779291524">
+<link rel="stylesheet" href="quiet-tokens.css?v=1779292490">
+<link rel="stylesheet" href="quiet.css?v=1779292490">
+<link rel="stylesheet" href="quiet-extras.css?v=1779292490">
 <style>
   /* 648 px column — sweet spot per editorial line-length research
      (60–75 chars per line at 15 px body). Wider feels marketing-y. */
@@ -686,6 +686,28 @@
     background: white;
   }
   .wl-comment-composer input.wl-comment-input:focus { outline: 1px solid var(--brass-500); }
+  /* Explicit Post button on every comment + reply composer. The form
+     only submits when this is clicked — Enter still works on desktop
+     as a shortcut, but field exit / autocomplete-accept must NOT
+     submit (iOS users were losing replies that way). Disabled until
+     the input has trimmed content. */
+  .wl-comment-post {
+    flex: 0 0 auto;
+    background: var(--brass-500); color: var(--paper-50);
+    border: 1px solid var(--brass-600);
+    border-radius: 14px;
+    padding: 5px 14px;
+    font: 600 12px/1.2 var(--font-body);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 120ms ease, opacity 120ms ease;
+  }
+  .wl-comment-post:hover { background: var(--brass-600); }
+  .wl-comment-post[disabled] {
+    background: var(--paper-200); color: var(--ink-500);
+    border-color: var(--paper-300);
+    cursor: not-allowed;
+  }
 
   /* Delete (trash) icon button shown next to each post/comment/reply when
      the viewer is the author or an admin. */
@@ -1419,7 +1441,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="/wall.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779291524" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779292490" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1501,7 +1523,7 @@
   </section>
 </main>
 
-<script src="nav.js?v=1779291524" defer></script>
+<script src="nav.js?v=1779292490" defer></script>
 <script>
 (function () {
   "use strict";
@@ -2492,6 +2514,7 @@
           <div class="wl-avatar">${avatarInner(viewerName, viewerPhoto)}</div>
           <input class="wl-comment-input" type="text" placeholder="Add a comment…" data-add-comment="${escapeHtml(post.id)}" ${viewerEmail ? "" : "disabled"} maxlength="2000">
           ${commentAttachButtons(post.id, "")}
+          <button type="button" class="wl-comment-post" data-post-comment="${escapeHtml(post.id)}" ${viewerEmail ? "" : "disabled"} disabled>Post</button>
         </div>
         ${renderComments(post, "partial")}
       </article>`;
@@ -2538,6 +2561,7 @@
           <div class="wl-avatar">${avatarInner(viewerName, viewerPhoto)}</div>
           <input class="wl-comment-input" type="text" placeholder="Add a comment…" data-add-comment="${escapeHtml(post.id)}" ${viewerEmail ? "" : "disabled"} maxlength="2000">
           ${commentAttachButtons(post.id, "")}
+          <button type="button" class="wl-comment-post" data-post-comment="${escapeHtml(post.id)}" ${viewerEmail ? "" : "disabled"} disabled>Post</button>
         </div>
         ${renderComments(post, "full")}
       </article>`;
@@ -3053,6 +3077,7 @@
               <div class="wl-avatar">${avatarInner(viewerName, viewerPhoto)}</div>
               <input class="wl-comment-input" type="text" placeholder="Reply to ${escapeHtml(name)}…" data-add-reply="${escapeHtml(replyKey)}" maxlength="2000" autofocus>
               ${commentAttachButtons(post.id, comment.id)}
+              <button type="button" class="wl-comment-post" data-post-reply="${escapeHtml(replyKey)}" disabled>Post</button>
             </div>` : ""}
           ${repliesHtml}
         </div>
@@ -3223,36 +3248,51 @@
         renderFeed();
       });
     });
-    document.querySelectorAll("[data-add-comment]").forEach(el => {
-      el.addEventListener("keydown", async e => {
-        if (e.key !== "Enter") return;
-        const body = el.value.trim();
-        if (!body) return;
-        const postId = el.dataset.addComment;
-        el.disabled = true;
-        try {
-          const res = await wallAction("comment", { post_id: postId, body });
-          if (res && res.comment) {
-            const post = posts.find(p => p.id === postId);
-            if (post) { post.comments = post.comments || []; post.comments.push(res.comment); }
-            el.value = "";
-            // The reply may have bubbled the post to the top — keep the
-            // viewer staring at it (not staring at the empty slot it
-            // left behind on page N) by jumping to its new page.
-            sortPosts();
-            const idx = posts.findIndex(p => p.id === postId);
-            if (idx >= 0) currentPage = Math.floor(idx / POSTS_PER_PAGE);
-            renderFeed();
-            // After renderFeed re-creates the DOM, re-focus the fresh
-            // composer input for the same post so a user can keep typing.
-            const fresh = document.querySelector(`[data-add-comment="${cssAttr(postId)}"]`);
-            if (fresh) fresh.focus();
-          }
-        } catch (err) {
-          showBanner(err.message || String(err), true);
-          el.disabled = false; el.focus();
+    // Submit a top-level comment for postId. Shared by the Enter shortcut
+    // and the explicit Post button so behaviour stays identical regardless
+    // of how the user triggered it.
+    async function submitTopLevelComment(postId, sourceEl) {
+      const inp = document.querySelector(`[data-add-comment="${cssAttr(postId)}"]`);
+      const btn = document.querySelector(`[data-post-comment="${cssAttr(postId)}"]`);
+      const el = inp;
+      const body = el ? el.value.trim() : "";
+      if (!body) return;
+      if (el)  el.disabled = true;
+      if (btn) btn.disabled = true;
+      try {
+        const res = await wallAction("comment", { post_id: postId, body });
+        if (res && res.comment) {
+          const post = posts.find(p => p.id === postId);
+          if (post) { post.comments = post.comments || []; post.comments.push(res.comment); }
+          if (el) el.value = "";
+          sortPosts();
+          const idx = posts.findIndex(p => p.id === postId);
+          if (idx >= 0) currentPage = Math.floor(idx / POSTS_PER_PAGE);
+          renderFeed();
+          const fresh = document.querySelector(`[data-add-comment="${cssAttr(postId)}"]`);
+          if (fresh) fresh.focus();
         }
+      } catch (err) {
+        showBanner(err.message || String(err), true);
+        if (el)  { el.disabled = false; el.focus(); }
+        if (btn) btn.disabled = false;
+      }
+    }
+    document.querySelectorAll("[data-add-comment]").forEach(el => {
+      el.addEventListener("keydown", e => {
+        if (e.key !== "Enter") return;
+        e.preventDefault();
+        submitTopLevelComment(el.dataset.addComment, el);
       });
+      // Toggle the matching Post button's disabled state as the user types
+      // so the button always reflects whether a real submit is possible.
+      el.addEventListener("input", () => {
+        const btn = document.querySelector(`[data-post-comment="${cssAttr(el.dataset.addComment)}"]`);
+        if (btn) btn.disabled = !el.value.trim();
+      });
+    });
+    document.querySelectorAll("[data-post-comment]").forEach(btn => {
+      btn.addEventListener("click", () => submitTopLevelComment(btn.dataset.postComment, btn));
     });
     document.querySelectorAll("[data-reply]").forEach(el => {
       el.addEventListener("click", () => {
@@ -3286,30 +3326,51 @@
         }
       });
     });
-    document.querySelectorAll("[data-add-reply]").forEach(el => {
-      el.addEventListener("keydown", async e => {
-        if (e.key !== "Enter") return;
-        const body = el.value.trim();
-        if (!body) return;
-        const [pid, parent] = el.dataset.addReply.split("::");
-        el.disabled = true;
-        try {
-          const res = await wallAction("comment", { post_id: pid, parent_comment_id: parent, body });
-          if (res && res.comment) {
-            const post = posts.find(p => p.id === pid);
-            if (post) { post.comments = post.comments || []; post.comments.push(res.comment); }
-            openReplyTo.delete(`${pid}::${parent}`);
-            sortPosts();
-            const idx = posts.findIndex(p => p.id === pid);
-            if (idx >= 0) currentPage = Math.floor(idx / POSTS_PER_PAGE);
-            renderFeed();
-          }
-        } catch (err) {
-          showBanner(err.message || String(err), true);
-        } finally {
-          el.disabled = false;
+    async function submitReplyByKey(key) {
+      const inp = document.querySelector(`[data-add-reply="${cssAttr(key)}"]`);
+      const btn = document.querySelector(`[data-post-reply="${cssAttr(key)}"]`);
+      const body = inp ? inp.value.trim() : "";
+      if (!body) return;
+      const [pid, parent] = key.split("::");
+      if (inp) inp.disabled = true;
+      if (btn) btn.disabled = true;
+      try {
+        const res = await wallAction("comment", { post_id: pid, parent_comment_id: parent, body });
+        if (res && res.comment) {
+          const post = posts.find(p => p.id === pid);
+          if (post) { post.comments = post.comments || []; post.comments.push(res.comment); }
+          openReplyTo.delete(key);
+          sortPosts();
+          const idx = posts.findIndex(p => p.id === pid);
+          if (idx >= 0) currentPage = Math.floor(idx / POSTS_PER_PAGE);
+          renderFeed();
         }
+      } catch (err) {
+        showBanner(err.message || String(err), true);
+        if (inp) inp.disabled = false;
+        if (btn) btn.disabled = false;
+      }
+    }
+    document.querySelectorAll("[data-add-reply]").forEach(el => {
+      el.addEventListener("keydown", e => {
+        if (e.key !== "Enter") return;
+        e.preventDefault();
+        submitReplyByKey(el.dataset.addReply);
       });
+      el.addEventListener("input", () => {
+        const btn = document.querySelector(`[data-post-reply="${cssAttr(el.dataset.addReply)}"]`);
+        if (btn) btn.disabled = !el.value.trim();
+      });
+      // Pre-filled "@parent " content (from clicking Reply on a reply)
+      // should already enable the Post button — fire one synthetic input
+      // event so the disabled state reflects the prefilled value.
+      if (el.value.trim()) {
+        const btn = document.querySelector(`[data-post-reply="${cssAttr(el.dataset.addReply)}"]`);
+        if (btn) btn.disabled = false;
+      }
+    });
+    document.querySelectorAll("[data-post-reply]").forEach(btn => {
+      btn.addEventListener("click", () => submitReplyByKey(btn.dataset.postReply));
     });
     document.querySelectorAll("[data-react]").forEach(el => {
       el.addEventListener("click", async () => {
