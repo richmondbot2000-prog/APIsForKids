@@ -78,7 +78,7 @@
   }
   .bk-cell {
     border-right: 1px solid var(--paper-300); border-bottom: 1px solid var(--paper-300);
-    padding: 4px 6px; min-height: 88px; box-sizing: border-box;
+    padding: 2px; min-height: 64px; box-sizing: border-box;
     display: flex; align-items: center; justify-content: center; text-align: center;
   }
   .bk-cell.is-today-col { background: var(--paper-200); }
@@ -150,7 +150,7 @@
   /* Avatar+name overlay. Image fills the cell; name shows on hover */
   /* (mouse) or while the cell is touch-pressed (mobile). The .is-external */
   /* class swaps in the AirBnb logo asset. */
-  .bk-cell.bk-has-avatar { padding: 6px; position: relative; }
+  .bk-cell.bk-has-avatar { padding: 0; position: relative; }
   .bk-cell-avatar {
     width: 64px; height: 64px;
     object-fit: cover; display: block;
@@ -676,10 +676,9 @@
     const assets = visibleAssets();
     const { days } = dateRange();
     const todayY = ymd(todayMidnight());
-    /* Day columns are now square — same width as the cell min-height
-       (88px) so each booking slot reads as a tile. Asset column stays
-       compact at 75px. */
-    const dayW = 88;
+    /* Day columns are square at the avatar circle's size (64px) so a
+       booked cell is exactly the round avatar with no padding. */
+    const dayW = 64;
     grid.style.gridTemplateColumns = "75px repeat(" + days.length + ", " + dayW + "px)";
     // Initial scroll: skip past the 3 history days so today's column
     // is the first thing the user sees. Swipe right reveals history.
