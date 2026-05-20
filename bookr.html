@@ -102,21 +102,22 @@
     position: sticky; left: 0; z-index: 2;
     background: var(--paper-50);
     border-right: 2px solid var(--ink-500);
-    padding: 4px 6px; min-width: 100px; max-width: 100px;
+    padding: 3px 5px; min-width: 75px; max-width: 75px;
     border-bottom: 1px solid var(--paper-300);
     display: flex; flex-direction: column; gap: 0;
     box-sizing: border-box;
+    text-align: center;
   }
   .bk-asset-cell.is-section { background: var(--paper-200); }
   .bk-asset-title {
-    font: 600 12px/1.2 var(--font-body); color: var(--ink-900);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font: 600 11px/1.15 var(--font-body); color: var(--ink-900);
+    word-break: break-word; overflow-wrap: anywhere;
   }
   .bk-asset-title a { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--ink-400); }
   .bk-asset-title a:hover { color: var(--brass-700); border-bottom-color: var(--brass-500); }
   .bk-asset-sub {
-    font: 400 10px/1.2 var(--font-mono); color: var(--ink-600);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font: 400 9px/1.15 var(--font-mono); color: var(--ink-600);
+    word-break: break-word; overflow-wrap: anywhere;
   }
   /* Day-header row stays at the top while you scroll the grid vertically.
      For now the page is a single grid, no vertical sticky needed. */
@@ -135,9 +136,9 @@
   .bk-corner {
     position: sticky; left: 0; z-index: 3;
     background: var(--paper-200); border-right: 2px solid var(--ink-500); border-bottom: 1px solid var(--ink-400);
-    padding: 4px 6px; font: 600 9px/1.15 var(--font-mono); color: var(--ink-700);
-    text-transform: uppercase; letter-spacing: 0.05em;
-    min-width: 100px; max-width: 100px; box-sizing: border-box;
+    padding: 4px 4px; font: 600 8px/1.15 var(--font-mono); color: var(--ink-700);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    min-width: 75px; max-width: 75px; box-sizing: border-box;
     display: flex; align-items: center; justify-content: center; text-align: center;
   }
   .bk-cell-name {
@@ -526,7 +527,7 @@
        cell font size. The matching .bk-corner + .bk-asset-cell CSS
        widths are kept in sync. */
     const dayW = 64;
-    grid.style.gridTemplateColumns = "100px repeat(" + days.length + ", " + dayW + "px)";
+    grid.style.gridTemplateColumns = "75px repeat(" + days.length + ", " + dayW + "px)";
     /* Header row */
     const corner = document.createElement("div");
     corner.className = "bk-corner";
