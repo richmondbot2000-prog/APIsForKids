@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T14:23:39.602Z",
+  "updated_at": "2026-05-20T14:24:34.896Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -961,11 +961,12 @@
       "directory_photo_uploaded_at": "2026-05-14T08:58:36+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-20T14:23:39.602Z",
+      "updated_at": "2026-05-20T14:24:34.896Z",
       "url_slug": "cherry.liu",
       "most_recent_payroll_id": null,
       "holiday_plan": "Unlimited",
-      "team": "Finance"
+      "team": "Finance",
+      "date_of_birth": "1995-05-09"
     },
     {
       "id": 41,
