@@ -88,7 +88,7 @@ Layered over those: **SYSC 22 regulatory references.** From **1 September 2026**
 
 You do not need to memorise the rule numbers. You need to know that the regulator may hear about a finding, that substantiated findings travel with the respondent, and that the firm is not in a position to make the matter disappear.
 
-## Section 6: Where to report — six routes, not one
+## Section 6: Where to report — seven routes, not one
 
 The complainant chooses. There is no "right" first stop.
 
@@ -106,7 +106,7 @@ The complainant chooses. There is no "right" first stop.
 
 - **The police.** Where the conduct may be a criminal offence — sexual assault, threats, stalking, malicious communications — 999 in emergency, 101 otherwise. The firm will support a criminal report; it does not replace it with an internal process.
 
-Six routes. You pick.
+Seven routes. You pick.
 
 ## Section 7: "Have I done the right thing?"
 
@@ -138,6 +138,6 @@ If you are uncertain whether to raise something, the right call is almost always
 
 Two open-text prompts. **Logged but not scored. Your line manager will never see your answers** — only Group HR, and only in aggregate themes.
 
-1. If something happened at work tomorrow that you thought might cross the line, which of the six routes in Section 6 would you actually use first, and why? If the honest answer is "none of them," what would have to change for that to be different?
+1. If something happened at work tomorrow that you thought might cross the line, which of the seven routes in Section 6 would you actually use first, and why? If the honest answer is "none of them," what would have to change for that to be different?
 
 2. Think about the last time you considered raising a concern at work — about harassment or anything else — and decided not to. What was the deciding factor? You don't have to describe the incident, just the factor.

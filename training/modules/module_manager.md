@@ -179,7 +179,7 @@ For managers this means:
 
 ### Worked example — broker calls
 
-An underwriter on your team tells you that a broker — call him James at Acme Brokers — has been making sexual comments on calls. She thinks it's been going on for about two months. She didn't want to raise it because Acme is in the top 10 of the firm's broker book and she didn't want to make a fuss.
+An underwriter on your team tells you that a broker at one of the firm's top-10 broker partners has been making sexual comments on calls. She thinks it's been going on for about two months. She didn't want to raise it because the broker firm is a material book of business and she didn't want to make a fuss.
 
 You have a duty to act. From 1 October 2026, the firm's exposure is direct. From 1 September 2026, your handling of it is in scope of your own COCON 1.1.7FR obligation.
 

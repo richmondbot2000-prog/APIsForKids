@@ -97,7 +97,7 @@ How to capture it:
 
 - A **timestamped note in your phone's notes app, or an email to yourself**, is the cleanest form. Both produce a verifiable creation date.
 - A handwritten note in a dated notebook is acceptable.
-- **Screenshots are evidence of a kind, but chain-of-custody matters.** A WhatsApp screenshot can be edited; the original chat history on the original device cannot. Where the conduct is in a digital channel, preserve the message itself in place — don't delete the chat, don't leave the group. The screenshot is your aide-memoire; the message is the evidence.
+- **Screenshots are evidence of a kind, but chain-of-custody matters.** A WhatsApp screenshot can be edited without any audit trail; the original chat history on the original device carries WhatsApp's own integrity markers, timestamps, and (since 2023) an "edited" tag on any message changed within the 15-minute edit window — context a screenshot strips out. Where the conduct is in a digital channel, preserve the message itself in place — don't delete the chat, don't leave the group. The screenshot is your aide-memoire; the message is the evidence.
 - Do **not** circulate documentation. The note is for you, for HR, for the affected colleague if they ask, and ultimately for an investigator. It is not for your team WhatsApp.
 
 Documentation is the D that requires the least courage and produces the most leverage. If you do nothing else from this module, do this one.
@@ -138,7 +138,7 @@ The five are not mutually exclusive. The senior-leadership-at-the-bar scenario a
 
 Two audiences, both important.
 
-**For the affected colleague.** The literature is clear that perhaps 70% of the value a bystander provides is *acknowledgement* — confirming that the colleague isn't imagining it, that the moment was as off as they felt it was, that they are not alone with the memory. This is not a small thing. The single most-cited reason victims of workplace harassment give for not reporting is the fear that no one will believe them or that they will be judged for raising it. A bystander saying *I saw it, I noticed, are you OK?* removes both of those barriers at once.
+**For the affected colleague.** The bystander research is consistent on one thing: *acknowledgement* is among the most valuable single things a witness can offer — confirming that the colleague isn't imagining it, that the moment was as off as they felt it was, that they are not alone with the memory. This is not a small thing. The most-cited reason victims of workplace harassment give for not reporting is the fear that no one will believe them or that they will be judged for raising it. A bystander saying *I saw it, I noticed, are you OK?* removes both of those barriers at once.
 
 Beyond acknowledgement: ask what they want. Not what you think they should want. Some people want the matter escalated immediately; some want it documented and held; some want nothing done at all and just want the conversation. Their preference governs, with one exception — where the conduct is sufficiently serious that the firm has its own duty to act, the bystander cannot guarantee silence. Be honest about that boundary up front.
 

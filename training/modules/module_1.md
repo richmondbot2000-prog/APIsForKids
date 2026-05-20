@@ -34,6 +34,8 @@ The Equality Act 2010 protects people from discrimination based on nine **protec
 
 The Act recognises four main types of prohibited conduct: direct discrimination, indirect discrimination, harassment, and victimisation. This training focuses on harassment, but the others matter too — for example, treating someone less favourably because they are pregnant is direct discrimination, and punishing someone for raising a harassment complaint is victimisation.
 
+One technical point that frequently catches people out. Of the nine protected characteristics, only **seven** trigger the s.26 harassment provisions — marriage/civil partnership and pregnancy/maternity sit outside s.26 and are instead protected against direct discrimination under s.13 and s.18. So when we say "harassment-relevant characteristics" later, we mean: age, disability, gender reassignment, race, religion or belief, sex, sexual orientation. Module 2 covers each of those in detail.
+
 ## Section 3: What harassment legally means
 
 The Equality Act defines harassment as **unwanted conduct related to a protected characteristic** which has the **purpose or effect** of violating someone's dignity, or creating an intimidating, hostile, degrading, humiliating, or offensive environment for them.

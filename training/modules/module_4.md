@@ -63,7 +63,7 @@ If you are the affected employee: leave the venue early without apology, documen
 
 The structural problem with off-sites is that the agenda ends and the hotel bar doesn't. The structural problem with off-site harassment is that everyone present has the same incentive to call it "we were all having a laugh" the next morning.
 
-That excuse never landed in law. **From 1 October 2026 the firm's exposure on its own off-sites is direct.** The off-site is the firm's event, on the firm's time, with attendance effectively required — every employment-law analysis treats it as squarely within course-of-employment. The "all reasonable steps" duty applies whether the agenda has finished or not.
+That excuse never landed in law. Harassment of one employee by another at an off-site has been the firm's exposure for many years — vicariously under s.109 EA 2010 — because the off-site is the firm's event, on the firm's time, with attendance effectively required: every employment-law analysis treats it as squarely within course-of-employment. **From 1 October 2026 the exposure tightens further:** the s.40A duty rises to "all reasonable steps" (s.20 ERA 2025), and the firm becomes directly liable for harassment of its employees by third parties present at the event (s.21 ERA 2025 inserting new s.40(1A)–(1C)) — clients, guest speakers, contractor staff, partner-firm attendees. The "agenda has ended, we were just having a laugh" frame stops working at every layer.
 
 What the firm should be doing — and what you, as an attendee, can expect:
 
@@ -101,7 +101,7 @@ If you are leading a deal team, you set the tone. Make it explicit on the way to
 
 ### 2.6 Consensual workplace relationships and the disclosure expectation
 
-The firm's policy — see Policy HR-12, Workplace Relationships — is that relationships between colleagues must be disclosed where any of the following applies:
+The firm's policy on this (see the **Workplace Relationships policy** on the HR intranet — HR will publish or link the latest version before this training launches) is that relationships between colleagues must be disclosed where any of the following applies:
 
 - A reporting line, direct or indirect, exists between the two people.
 - One party is in an SMCR Senior Manager or Certified role and the other is in the same regulated business.

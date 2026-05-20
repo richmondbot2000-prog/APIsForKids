@@ -74,7 +74,7 @@ The everyday failure modes are mimicked accents, "where are you really from" fol
 
 ## Section 7: Disability
 
-A disabled person under the Equality Act is someone with a physical or mental impairment with a substantial and long-term adverse effect on their ability to carry out normal day-to-day activities. Conditions covered include — among many others — diabetes, multiple sclerosis, depression, anxiety disorders, autism, ADHD, dyslexia, long Covid, and HIV. Cancer, HIV and MS are protected from the point of diagnosis regardless of effect.
+A disabled person under the Equality Act is someone with a physical or mental impairment with a substantial and long-term adverse effect on their ability to carry out normal day-to-day activities. Conditions covered include — among many others — diabetes, multiple sclerosis, depression, anxiety disorders, autism, ADHD, dyslexia, long Covid (where the substantial-and-long-term test is met — assessed case by case), and HIV. Cancer, HIV and MS are protected from the point of diagnosis regardless of effect.
 
 The everyday failure modes are jokes about a colleague's stammer or tic, mimicking, mock surprise at requested adjustments, framing a reasonable adjustment as "special treatment," persistent commentary on a colleague's mental-health absences, and the cluster of language around neurodivergent colleagues ("she's being so autistic about this").
 

@@ -18,7 +18,7 @@ Almost everything you do at work now leaves a written record. Teams, Slack, What
 
 The Equality Act 2010 makes no distinction between conduct delivered out loud and conduct delivered through a keyboard. A comment that would be harassment in the broker dialler row is harassment when it lands in the broker WhatsApp group. The medium does not soften the test. The s.26 three-limb test — **unwanted conduct, related to a protected characteristic, with the purpose or effect of violating dignity or creating an intimidating, hostile, degrading, humiliating or offensive environment** — applies to a GIF as readily as it applies to a sentence.
 
-If you took Module 1, the framework is the same. This module covers how that framework plays out in the channels you actually use all day.
+Module 1 covers the legal framework in depth. This module is its application to the channels you actually use all day.
 
 ## Section 2: "It's the banter group, it's not work"
 
@@ -26,7 +26,7 @@ The most common defence after a screenshotted group chat surfaces is some versio
 
 Three things are routinely misunderstood about work-adjacent chats.
 
-**The channel doesn't have to be official.** Employment tribunals and the FCA both look at substance, not branding. A WhatsApp group called "the lads" with twelve colleagues in it, set up to coordinate Friday drinks, is treated as a work channel the moment work topics, work people, or work-day timing appear in it. The 2024 Bull Express tribunal and successive FCA decisions have made this point repeatedly: if the participants are colleagues and the content touches on the workplace or its people, it is in scope.
+**The channel doesn't have to be official.** Employment tribunals and the FCA both look at substance, not branding. A WhatsApp group called "the lads" with twelve colleagues in it, set up to coordinate Friday drinks, is treated as a work channel the moment work topics, work people, or work-day timing appear in it. Successive tribunal decisions on work-adjacent social media (e.g. *Forbes v LHR Airport Ltd* [2019], where a Facebook post about a colleague was found to be work-related conduct) have made the same point: if the participants are colleagues and the content touches on the workplace or its people, it is in scope.
 
 **Silent members are not bystanders.** If you are in the group when something is posted, "I wasn't the one who sent it" and "I didn't react" are not safe positions. The s.26 effect test asks whether a reasonable person would consider the conduct had the effect of creating a hostile environment. A junior in a group of fifteen who watches an objectifying image of a female colleague get nine laughing-emoji reactions does not need anyone to address her by name for the environment to be hostile. Leaving the group, flagging it, or speaking up are the routes that protect both her and you.
 

@@ -149,16 +149,16 @@
     },
     {
       "id": "q12",
-      "scenario": false,
-      "stem": "The literature suggests that roughly what proportion of the value a bystander provides is acknowledgement — simply confirming that the affected colleague isn't imagining it?",
+      "scenario": true,
+      "stem": "[scenario] You witnessed a colleague being talked over and dismissed by a senior in a client meeting on a basis you read as gendered. The meeting ends. Of the options below, which is the single most valuable thing a bystander can do for the affected colleague before doing anything else?",
       "options": [
-        "About 10%",
-        "About 30%",
-        "About 70%",
-        "100% — acknowledgement is the only thing that matters"
+        "Tell HR immediately so the matter is documented without delay.",
+        "Acknowledge what you saw to the colleague — confirm that the moment was as off as it felt — and ask what they want to happen next.",
+        "Email the senior privately to flag your concern about the dynamic.",
+        "Wait a week to see whether the colleague raises it themselves."
       ],
-      "correct": 2,
-      "rationale": "The research consistently finds that acknowledgement is roughly 70% of the value of bystander action — it removes the isolation that makes harassment corrosive and signals to the affected colleague that they are not alone with the memory. The remaining ~30% sits across the other behaviours including escalation."
+      "correct": 1,
+      "rationale": "The bystander literature is consistent: acknowledgement is the highest-value first step. It removes the isolation that makes harassment corrosive, signals to the affected colleague that they are not alone with the memory, and — critically — preserves their agency over what happens next. Going straight to HR (A) or to the respondent (C) without checking what the colleague wants can recreate the loss of control the conduct itself caused. Doing nothing (D) is the failure mode the module exists to prevent."
     },
     {
       "id": "q13",
@@ -334,12 +334,12 @@
     {
       "id": "r1",
       "prompt": "Think of a moment in the last twelve months — at work or adjacent to work — where you noticed something that sat oddly with you and did not act. Which of the 5Ds was most available to you at the time, and what stopped you using it? Your manager will not see this — it's for your own reflection.",
-      "guidance": "Your manager will not see this — it's for your own reflection. There is no right answer and you are not being scored. The point of the prompt is the act of writing it down."
+      "guidance": "Logged but not scored. Your line manager will never see this — only Group HR, and only as anonymised aggregate themes."
     },
     {
       "id": "r2",
       "prompt": "Imagine a colleague you respect comes to you a week from now and says: 'Something happened at the away-day. I don't know what to do.' Write the first three sentences you would say to them. Your manager will not see this — it's for your own reflection.",
-      "guidance": "Your manager will not see this — it's for your own reflection. The exercise rehearses the acknowledgement-first response that the literature identifies as roughly 70% of the value bystanders provide."
+      "guidance": "Logged but not scored. Your line manager will never see this — only Group HR, and only as anonymised aggregate themes. The exercise rehearses the acknowledgement-first response that the bystander literature identifies as the highest-value first step."
     }
   ]
 }

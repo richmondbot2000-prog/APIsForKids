@@ -6,309 +6,334 @@
   "questions": [
     {
       "id": "m5_q01",
-      "tags": ["routes"],
+      "scenario": false,
       "stem": "There are two routes for raising a harassment concern at the firm. Which statement is most accurate?",
-      "choices": [
-        {"key": "A", "text": "The formal route is the senior version of the informal route; serious matters must always begin formally."},
-        {"key": "B", "text": "The informal and formal routes are different tools, not a ladder, and most matters resolve informally without ever needing a formal grievance.", "correct": true},
-        {"key": "C", "text": "Only the formal route protects you from retaliation."},
-        {"key": "D", "text": "Once you start the informal route you cannot move to the formal route."}
+      "options": [
+        "The formal route is the senior version of the informal route; serious matters must always begin formally.",
+        "The informal and formal routes are different tools, not a ladder, and most matters resolve informally without ever needing a formal grievance.",
+        "Only the formal route protects you from retaliation.",
+        "Once you start the informal route you cannot move to the formal route."
       ],
+      "correct": 1,
       "rationale": "Section 1: the routes are parallel tools, not a hierarchy. EHRC Step 4 explicitly contemplates multiple channels, including informal ones, and the EHRC Technical Guidance treats informal resolution as a legitimate outcome — not a lesser one."
     },
     {
       "id": "m5_q02",
-      "tags": ["confidentiality"],
+      "scenario": false,
       "stem": "What can the firm honestly promise about confidentiality when you raise a harassment concern?",
-      "choices": [
-        {"key": "A", "text": "Absolute confidentiality — no one outside HR will ever know."},
-        {"key": "B", "text": "That the matter will not be reported to the FCA, the police or any external regulator."},
-        {"key": "C", "text": "That information is shared only on a need-to-know basis, and that you will be told before any disclosure is made outside that circle.", "correct": true},
-        {"key": "D", "text": "That the respondent will never know who raised the concern."}
+      "options": [
+        "Absolute confidentiality — no one outside HR will ever know.",
+        "That the matter will not be reported to the FCA, the police or any external regulator.",
+        "That information is shared only on a need-to-know basis, and that you will be told before any disclosure is made outside that circle.",
+        "That the respondent will never know who raised the concern."
       ],
+      "correct": 2,
       "rationale": "Section 2: absolute confidentiality is not possible because three FCA reporting clocks (SUP 10C.14, REP008, SUP 15.3) and potential criminal-law obligations exist independent of the complainant's wishes. Procedural fairness also typically requires the respondent be told the substance of the allegation. The need-to-know-plus-prior-notice promise is what the firm can actually keep."
     },
     {
       "id": "m5_q03",
-      "tags": ["retaliation", "law"],
+      "scenario": false,
       "stem": "Under which provision of which Act is it unlawful to treat someone badly because they have raised a harassment complaint?",
-      "choices": [
-        {"key": "A", "text": "Section 26 of the Equality Act 2010."},
-        {"key": "B", "text": "Section 27 of the Equality Act 2010 (victimisation).", "correct": true},
-        {"key": "C", "text": "Section 40A of the Equality Act 2010."},
-        {"key": "D", "text": "Section 15 of the Employment Rights Act 1996."}
+      "options": [
+        "Section 26 of the Equality Act 2010.",
+        "Section 27 of the Equality Act 2010 (victimisation).",
+        "Section 40A of the Equality Act 2010.",
+        "Section 15 of the Employment Rights Act 1996."
       ],
+      "correct": 1,
       "rationale": "Section 3: s.27 Equality Act 2010 defines victimisation as subjecting someone to a detriment because they have done a protected act, including raising or supporting a harassment complaint. s.26 defines harassment itself; s.40A is the preventative duty; s.15 ERA 1996 is unrelated."
     },
     {
       "id": "m5_q04",
-      "tags": ["whistleblowing", "law", "april_2026"],
+      "scenario": false,
       "stem": "Since 6 April 2026, a qualifying disclosure relating to sexual harassment is:",
-      "choices": [
-        {"key": "A", "text": "An internal HR matter with no specific whistleblowing status."},
-        {"key": "B", "text": "A protected disclosure under the Public Interest Disclosure Act 1998 (as amended by s.23 Employment Rights Act 2025), with uncapped damages for detriment or dismissal in response.", "correct": true},
-        {"key": "C", "text": "Protected only if the discloser has already raised the matter through the internal grievance procedure."},
-        {"key": "D", "text": "Protected only where the conduct alleged would also amount to a criminal offence."}
+      "options": [
+        "An internal HR matter with no specific whistleblowing status.",
+        "A protected disclosure under the Public Interest Disclosure Act 1998 (as amended by s.23 Employment Rights Act 2025), with uncapped damages for detriment or dismissal in response.",
+        "Protected only if the discloser has already raised the matter through the internal grievance procedure.",
+        "Protected only where the conduct alleged would also amount to a criminal offence."
       ],
+      "correct": 1,
       "rationale": "Section 3: s.23 ERA 2025 inserts new paragraph (da) into s.43B Employment Rights Act 1996, commenced 6 April 2026 by S.I. 2026/323 reg. 3(1)(2). Detriment / dismissal claims under the whistleblowing regime have no statutory compensation cap, sitting on top of any Equality Act claim. There is no precondition that internal procedures be exhausted first, nor that conduct be criminal."
     },
     {
       "id": "m5_q05",
-      "tags": ["whistleblowing", "law"],
+      "scenario": false,
       "stem": "The public-interest test under the whistleblowing regime means that a disclosure about sexual harassment is most clearly a protected disclosure where:",
-      "choices": [
-        {"key": "A", "text": "The discloser personally witnessed the conduct."},
-        {"key": "B", "text": "The matter is documented in writing rather than raised verbally."},
-        {"key": "C", "text": "The disclosure concerns a pattern of conduct, a repeat offender, multiple victims, or a systemic failure.", "correct": true},
-        {"key": "D", "text": "The discloser is a Senior Manager under SMCR."}
+      "options": [
+        "The discloser personally witnessed the conduct.",
+        "The matter is documented in writing rather than raised verbally.",
+        "The disclosure concerns a pattern of conduct, a repeat offender, multiple victims, or a systemic failure.",
+        "The discloser is a Senior Manager under SMCR."
       ],
+      "correct": 2,
       "rationale": "Section 3 + research/01 §6: the s.43B public-interest requirement is read more readily as satisfied where the disclosure is about more than a single individual's personal grievance. The Mondaq summary and HMG factsheet both flag pattern / repeat / multiple-victim disclosures as the clearest qualifiers. A single one-off personal incident is in greyer territory but remains a protected act under s.27 EA 2010."
     },
     {
       "id": "m5_q06",
-      "tags": ["scenario", "investigation"],
+      "scenario": true,
       "stem": "[scenario] You raise a concern on a Monday. By the end of the following week you've heard nothing concrete. What does the firm's process say should have happened by now?",
-      "choices": [
-        {"key": "A", "text": "Nothing — investigations routinely take six months and silence is normal."},
-        {"key": "B", "text": "You should have been told within two working days who owns the matter, and an investigator should be named shortly after; if the timeline is slipping you should be told why in writing.", "correct": true},
-        {"key": "C", "text": "You should have already received a finding."},
-        {"key": "D", "text": "You should have been asked to put the complaint in writing as a formal grievance before anything happens."}
+      "options": [
+        "Nothing — investigations routinely take six months and silence is normal.",
+        "You should have been told within two working days who owns the matter, and an investigator should be named shortly after; if the timeline is slipping you should be told why in writing.",
+        "You should have already received a finding.",
+        "You should have been asked to put the complaint in writing as a formal grievance before anything happens."
       ],
+      "correct": 1,
       "rationale": "Section 4: receipt is acknowledged within two working days, an investigator is named, and you are kept informed in writing at each stage. Typical end-to-end timeline is two to six weeks for straightforward matters. If the process is materially delayed, the complainant must be told why."
     },
     {
       "id": "m5_q07",
-      "tags": ["scenario", "investigation"],
+      "scenario": true,
       "stem": "[scenario] You report a senior trader for repeated sexual comments. You are told the investigator is the head of the trading desk that the trader sits on. Is that the right appointment?",
-      "choices": [
-        {"key": "A", "text": "Yes — the line manager is best placed to assess the conduct in context."},
-        {"key": "B", "text": "Yes — provided the head of desk is themselves senior enough."},
-        {"key": "C", "text": "No — the investigator must not be in the respondent's reporting line; raise it with HR and ask for a different appointment.", "correct": true},
-        {"key": "D", "text": "No — only an external investigator can investigate a trader."}
+      "options": [
+        "Yes — the line manager is best placed to assess the conduct in context.",
+        "Yes — provided the head of desk is themselves senior enough.",
+        "No — the investigator must not be in the respondent's reporting line; raise it with HR and ask for a different appointment.",
+        "No — only an external investigator can investigate a trader."
       ],
+      "correct": 2,
       "rationale": "Section 4 + EHRC Step 6: the investigator must be independent of the respondent's reporting line (and the complainant's). Internal appointment is acceptable provided that independence holds; external appointment is appropriate for senior or complex cases but is not the only acceptable option."
     },
     {
       "id": "m5_q08",
-      "tags": ["fca", "smcr", "law"],
+      "scenario": false,
       "stem": "Where the firm becomes aware that a Senior Manager (SMF) may have breached a Conduct Rule by serious harassment, how quickly must the firm notify the FCA?",
-      "choices": [
-        {"key": "A", "text": "Within 24 hours."},
-        {"key": "B", "text": "Within 7 business days, via Form D under SUP 10C.14.", "correct": true},
-        {"key": "C", "text": "By 31 October each year, via the annual REP008 / Form H return."},
-        {"key": "D", "text": "Only after the investigation has concluded with a substantiated finding."}
+      "options": [
+        "Within 24 hours.",
+        "Within 7 business days, via Form D under SUP 10C.14.",
+        "By 31 October each year, via the annual REP008 / Form H return.",
+        "Only after the investigation has concluded with a substantiated finding."
       ],
+      "correct": 1,
       "rationale": "Section 5 + research/02 §4: SUP 10C.14 imposes a 7-business-day Form D notification clock for SMF Conduct Rule breaches. REP008/Form H is the parallel annual route for certified persons. The clock can start before the investigation has concluded — awareness, not adjudication, is the trigger."
     },
     {
       "id": "m5_q09",
-      "tags": ["fca", "smcr", "law"],
+      "scenario": false,
       "stem": "Conduct Rule breaches by certified persons (non-SMFs) are reported to the FCA:",
-      "choices": [
-        {"key": "A", "text": "Within 7 business days via Form D."},
-        {"key": "B", "text": "Annually, via REP008 / Form H, covering the period 1 September to 31 August, deadline 31 October.", "correct": true},
-        {"key": "C", "text": "Only when the certified person resigns or is dismissed."},
-        {"key": "D", "text": "Only via the SUP 15.3 Principle 11 catch-all."}
+      "options": [
+        "Within 7 business days via Form D.",
+        "Annually, via REP008 / Form H, covering the period 1 September to 31 August, deadline 31 October.",
+        "Only when the certified person resigns or is dismissed.",
+        "Only via the SUP 15.3 Principle 11 catch-all."
       ],
+      "correct": 1,
       "rationale": "Section 5 + research/02 §4: REP008 / Form H is the annual return route for non-SMF certified-person Conduct Rule breaches (formal written warnings, suspension, dismissal, remuneration reduction or recovery). 7-day Form D is the SMF route; SUP 15.3 is a separate catch-all under Principle 11."
     },
     {
       "id": "m5_q10",
-      "tags": ["fca", "sysc22", "law"],
+      "scenario": false,
       "stem": "From 1 September 2026, SYSC 22 regulatory references must disclose substantiated findings of non-financial misconduct including harassment. The practical effect is:",
-      "choices": [
-        {"key": "A", "text": "A respondent with a substantiated finding cannot move to another regulated firm without that finding being disclosed in their regulatory reference.", "correct": true},
-        {"key": "B", "text": "Only findings against Senior Managers (SMFs) need to be disclosed in references."},
-        {"key": "C", "text": "Findings older than 12 months drop off the reference."},
-        {"key": "D", "text": "Disclosure is at the firm's discretion."}
+      "options": [
+        "A respondent with a substantiated finding cannot move to another regulated firm without that finding being disclosed in their regulatory reference.",
+        "Only findings against Senior Managers (SMFs) need to be disclosed in references.",
+        "Findings older than 12 months drop off the reference.",
+        "Disclosure is at the firm's discretion."
       ],
+      "correct": 0,
       "rationale": "Section 5 + research/02 §4: SYSC 22 was extended by PS25/23 to close the 'pass the harasser' loophole. From 1 September 2026, substantiated NFM findings — across SMFs and certified persons — must be disclosed in regulatory references. This is not discretionary."
     },
     {
       "id": "m5_q11",
-      "tags": ["routes"],
+      "scenario": false,
       "stem": "Module 5 lists six reporting routes. Which of the following is NOT one of them?",
-      "choices": [
-        {"key": "A", "text": "Your line manager."},
-        {"key": "B", "text": "The Speak Up channel."},
-        {"key": "C", "text": "A national newspaper.", "correct": true},
-        {"key": "D", "text": "The Equality and Human Rights Commission (EHRC)."}
+      "options": [
+        "Your line manager.",
+        "The Speak Up channel.",
+        "A national newspaper.",
+        "The Equality and Human Rights Commission (EHRC)."
       ],
-      "rationale": "Section 6: the six routes are line manager, skip-level manager, HR, Speak Up, EHRC, ACAS (0300 123 1100), and the police. Disclosure to the press is its own legal regime under the Public Interest Disclosure Act tier of 'wider' disclosures and is not a route the firm signposts as a first step."
+      "correct": 2,
+      "rationale": "Section 6: the seven routes are line manager, skip-level manager, HR, Speak Up, EHRC, ACAS (0300 123 1100), and the police. Disclosure to the press is its own legal regime under the Public Interest Disclosure Act tier of 'wider' disclosures and is not a route the firm signposts as a first step."
     },
     {
       "id": "m5_q12",
-      "tags": ["routes"],
+      "scenario": false,
       "stem": "ACAS — which sits between internal grievance and tribunal — is contactable on:",
-      "choices": [
-        {"key": "A", "text": "0800 123 1100"},
-        {"key": "B", "text": "0300 123 1100", "correct": true},
-        {"key": "C", "text": "999"},
-        {"key": "D", "text": "111"}
+      "options": [
+        "0800 123 1100",
+        "0300 123 1100",
+        "999",
+        "111"
       ],
+      "correct": 1,
       "rationale": "Section 6: ACAS helpline number is 0300 123 1100 — free, confidential employment-rights advice. ACAS is the early-conciliation gatekeeper for tribunal claims, so most complainants will deal with them at some point if a matter escalates."
     },
     {
       "id": "m5_q13",
-      "tags": ["scenario", "routes"],
+      "scenario": true,
       "stem": "[scenario] Your direct line manager is the person you want to raise a concern about. The most appropriate first move is to:",
-      "choices": [
-        {"key": "A", "text": "Wait until their next 1:1 with you and raise it then."},
-        {"key": "B", "text": "Approach your skip-level manager, HR directly, or the Speak Up channel — any of which bypass the line you cannot use.", "correct": true},
-        {"key": "C", "text": "Resign first, then raise it."},
-        {"key": "D", "text": "Wait until you have written evidence before saying anything."}
+      "options": [
+        "Wait until their next 1:1 with you and raise it then.",
+        "Approach your skip-level manager, HR directly, or the Speak Up channel — any of which bypass the line you cannot use.",
+        "Resign first, then raise it.",
+        "Wait until you have written evidence before saying anything."
       ],
+      "correct": 1,
       "rationale": "Section 6 + EHRC Step 4: multiple reporting channels exist specifically so that the complainant is never forced to escalate through the line they are complaining about. Skip-level, HR direct, and the Speak Up channel each bypass that line. Documentary evidence is helpful but is not a precondition to raising a concern."
     },
     {
       "id": "m5_q14",
-      "tags": ["scenario", "good_faith"],
+      "scenario": true,
       "stem": "[scenario] You raise a concern about a colleague's conduct in good faith. The investigation concludes that the evidence does not support the complaint and the matter is not upheld. Are you protected from retaliation?",
-      "choices": [
-        {"key": "A", "text": "No — only upheld complaints attract protection."},
-        {"key": "B", "text": "Yes — s.27(3) Equality Act 2010 only removes protection from allegations made in bad faith; a good-faith complaint that is not upheld remains fully protected.", "correct": true},
-        {"key": "C", "text": "Only if you formally apologise to the respondent."},
-        {"key": "D", "text": "Only where you can prove the complaint was reasonable on the available evidence at the time."}
+      "options": [
+        "No — only upheld complaints attract protection.",
+        "Yes — s.27(3) Equality Act 2010 only removes protection from allegations made in bad faith; a good-faith complaint that is not upheld remains fully protected.",
+        "Only if you formally apologise to the respondent.",
+        "Only where you can prove the complaint was reasonable on the available evidence at the time."
       ],
+      "correct": 1,
       "rationale": "Section 7 + s.27(3) Equality Act 2010: the only exception to victimisation protection is allegations made knowing they are false or for an improper purpose. Mistaken, unproven, or unsupported good-faith complaints are fully protected. Being unable to prove a matter on the balance of probabilities is the ordinary outcome in many investigations and does not approach the bad-faith bar."
     },
     {
       "id": "m5_q15",
-      "tags": ["scenario", "retaliation"],
+      "scenario": true,
       "stem": "[scenario] Three weeks after you raise a concern, you are removed from a high-profile project and replaced with a peer. Your manager says the decision was unrelated to the complaint. Is this potentially actionable?",
-      "choices": [
-        {"key": "A", "text": "No — project allocation is a management prerogative."},
-        {"key": "B", "text": "No — three weeks is too short for any causal link."},
-        {"key": "C", "text": "Yes — potentially victimisation under s.27 Equality Act 2010, and (where the underlying disclosure was a protected disclosure) potential whistleblowing detriment with uncapped damages.", "correct": true},
-        {"key": "D", "text": "Only if you can prove the manager explicitly cited the complaint when making the decision."}
+      "options": [
+        "No — project allocation is a management prerogative.",
+        "No — three weeks is too short for any causal link.",
+        "Yes — potentially victimisation under s.27 Equality Act 2010, and (where the underlying disclosure was a protected disclosure) potential whistleblowing detriment with uncapped damages.",
+        "Only if you can prove the manager explicitly cited the complaint when making the decision."
       ],
+      "correct": 2,
       "rationale": "Section 3 + s.27 EA 2010: victimisation does not require an express link; tribunals draw inferences from timing, treatment relative to peers, and the absence of contemporaneous documentation of an alternative reason. If the underlying disclosure was a protected disclosure (s.43B ERA 1996 as amended), the additional whistleblowing-detriment claim attracts uncapped damages."
     },
     {
       "id": "m5_q16",
-      "tags": ["fca", "scenario"],
+      "scenario": true,
       "stem": "[scenario] HR resolves a harassment matter internally with a formal written warning to a certified person (non-SMF). Is the matter still reported to the FCA?",
-      "choices": [
-        {"key": "A", "text": "No — internal resolution removes any external reporting obligation."},
-        {"key": "B", "text": "Yes — formal written warnings to certified persons for Conduct Rule breaches are reportable annually via REP008 / Form H by 31 October.", "correct": true},
-        {"key": "C", "text": "Yes — within 24 hours via Form C."},
-        {"key": "D", "text": "Only if the certified person subsequently resigns."}
+      "options": [
+        "No — internal resolution removes any external reporting obligation.",
+        "Yes — formal written warnings to certified persons for Conduct Rule breaches are reportable annually via REP008 / Form H by 31 October.",
+        "Yes — within 24 hours via Form C.",
+        "Only if the certified person subsequently resigns."
       ],
+      "correct": 1,
       "rationale": "Section 5 + research/02 §4: REP008 / Form H captures reportable disciplinary actions including formal written warnings, suspension, dismissal, and remuneration reduction or recovery. Internal resolution does not remove the regulatory reporting clock — it triggers it."
     },
     {
       "id": "m5_q17",
-      "tags": ["scenario", "confidentiality"],
+      "scenario": true,
       "stem": "[scenario] You ask HR whether the matter will stay confidential. The honest answer is:",
-      "choices": [
-        {"key": "A", "text": "Yes, absolutely — nothing leaves the HR team."},
-        {"key": "B", "text": "Information will be shared only on a need-to-know basis; you will be told before any disclosure is made outside that circle; but absolute confidentiality cannot be promised because of FCA reporting clocks and, in some cases, criminal-law obligations.", "correct": true},
-        {"key": "C", "text": "Yes, provided you sign a non-disclosure agreement."},
-        {"key": "D", "text": "Only if the complaint is informal rather than formal."}
+      "options": [
+        "Yes, absolutely — nothing leaves the HR team.",
+        "Information will be shared only on a need-to-know basis; you will be told before any disclosure is made outside that circle; but absolute confidentiality cannot be promised because of FCA reporting clocks and, in some cases, criminal-law obligations.",
+        "Yes, provided you sign a non-disclosure agreement.",
+        "Only if the complaint is informal rather than formal."
       ],
+      "correct": 1,
       "rationale": "Section 2 + research/02: anyone who promises absolute confidentiality is making a promise the firm cannot keep. The honest answer is need-to-know plus prior notice of any wider disclosure. Note also that NDAs cannot prevent disclosure to the FCA, other regulators or law enforcement — confirmed by the FCA's October 2024 Culture & NFM survey findings."
     },
     {
       "id": "m5_q18",
-      "tags": ["informal_route"],
+      "scenario": false,
       "stem": "The informal route is best understood as:",
-      "choices": [
-        {"key": "A", "text": "A weaker version of the formal route, used where the complainant lacks evidence."},
-        {"key": "B", "text": "A legitimate resolution route in its own right — a conversation, advice-seeking, or manager-mediated action — that resolves the majority of matters without ever needing a written grievance.", "correct": true},
-        {"key": "C", "text": "Off the record, with no logging by the person receiving the disclosure."},
-        {"key": "D", "text": "Only available where the complainant agrees to remain anonymous."}
+      "options": [
+        "A weaker version of the formal route, used where the complainant lacks evidence.",
+        "A legitimate resolution route in its own right — a conversation, advice-seeking, or manager-mediated action — that resolves the majority of matters without ever needing a written grievance.",
+        "Off the record, with no logging by the person receiving the disclosure.",
+        "Only available where the complainant agrees to remain anonymous."
       ],
+      "correct": 1,
       "rationale": "Section 1: informal does not mean lesser. EHRC Step 4 contemplates multiple channels including informal ones, and the Technical Guidance treats informal resolution as a legitimate outcome. The manager receiving the disclosure has a logging duty (see Module M) — informal does not mean off-record."
     },
     {
       "id": "m5_q19",
-      "tags": ["scenario", "investigation"],
+      "scenario": true,
       "stem": "[scenario] During the investigation you are interviewed by HR and your notes are typed up. You spot a factual error in the typed-up version. The correct course is to:",
-      "choices": [
-        {"key": "A", "text": "Sign anyway — the finding is what matters, not the notes."},
-        {"key": "B", "text": "Refuse to participate further until the notes are perfect."},
-        {"key": "C", "text": "Flag the error in writing; the investigator must amend and re-share, because the interview notes form part of the evidence base.", "correct": true},
-        {"key": "D", "text": "Ask the respondent to confirm your version of events."}
+      "options": [
+        "Sign anyway — the finding is what matters, not the notes.",
+        "Refuse to participate further until the notes are perfect.",
+        "Flag the error in writing; the investigator must amend and re-share, because the interview notes form part of the evidence base.",
+        "Ask the respondent to confirm your version of events."
       ],
+      "correct": 2,
       "rationale": "Section 4: notes are taken and shared with the complainant for accuracy precisely so that errors can be corrected before the notes become evidence. This is procedural fairness; it is also basic investigation hygiene. Approaching the respondent yourself during an investigation would compromise the process."
     },
     {
       "id": "m5_q20",
-      "tags": ["scenario", "criminal"],
+      "scenario": true,
       "stem": "[scenario] The conduct you are reporting may amount to a criminal offence (e.g. sexual assault). Where does the firm's process sit relative to a police report?",
-      "choices": [
-        {"key": "A", "text": "The firm's internal process replaces the need to report to the police."},
-        {"key": "B", "text": "The firm will support a police report and may, in cases of immediate risk to others, report itself; the internal process does not displace the criminal route, and the police route is independently available to the complainant.", "correct": true},
-        {"key": "C", "text": "Reporting to the police voids any internal protection from victimisation."},
-        {"key": "D", "text": "The firm will report on the complainant's behalf only after its own investigation concludes."}
+      "options": [
+        "The firm's internal process replaces the need to report to the police.",
+        "The firm will support a police report and may, in cases of immediate risk to others, report itself; the internal process does not displace the criminal route, and the police route is independently available to the complainant.",
+        "Reporting to the police voids any internal protection from victimisation.",
+        "The firm will report on the complainant's behalf only after its own investigation concludes."
       ],
+      "correct": 1,
       "rationale": "Section 2 + Section 6: criminal matters sit alongside, not instead of, the internal process. The firm will support a report and will act on its own in cases of immediate risk to others, but will not generally report on a complainant's behalf without their agreement. The s.27 victimisation protection covers protected acts including external reporting."
     },
     {
       "id": "m5_q21",
-      "tags": ["fca", "sup15"],
+      "scenario": false,
       "stem": "SUP 15.3, derived from Principle 11, requires the firm to notify the FCA of:",
-      "choices": [
-        {"key": "A", "text": "Every internal complaint, regardless of seriousness."},
-        {"key": "B", "text": "Anything relating to the firm of which the FCA 'would reasonably expect notice' — including, for harassment matters, credible allegations against senior executives, media exposure, or a pattern of complaints.", "correct": true},
-        {"key": "C", "text": "Only matters reported to the police."},
-        {"key": "D", "text": "Only matters that have resulted in dismissal."}
+      "options": [
+        "Every internal complaint, regardless of seriousness.",
+        "Anything relating to the firm of which the FCA 'would reasonably expect notice' — including, for harassment matters, credible allegations against senior executives, media exposure, or a pattern of complaints.",
+        "Only matters reported to the police.",
+        "Only matters that have resulted in dismissal."
       ],
+      "correct": 1,
       "rationale": "Section 5 + research/02 §4: SUP 15.3 operationalises Principle 11's 'open and cooperative' standard, requiring notification of matters the FCA would reasonably expect to know about. It is a catch-all sitting alongside the 7-day SMF clock and the annual REP008 return, and it captures serious matters that don't fit either of those routes."
     },
     {
       "id": "m5_q22",
-      "tags": ["scenario", "anonymous"],
+      "scenario": true,
       "stem": "[scenario] You want to raise a concern but do not want the respondent or anyone else to know it was you. What is your honest position?",
-      "choices": [
-        {"key": "A", "text": "Anonymous reporting is impossible; you must give your name."},
-        {"key": "B", "text": "The Speak Up channel accepts anonymous disclosures; anonymous complaints are harder to investigate and harder to act on, but the choice is yours and you will not be pushed in either direction.", "correct": true},
-        {"key": "C", "text": "Anonymous complaints carry the same evidential weight as named complaints."},
-        {"key": "D", "text": "Anonymous complaints are protected from retaliation only if the complainant later identifies themselves."}
+      "options": [
+        "Anonymous reporting is impossible; you must give your name.",
+        "The Speak Up channel accepts anonymous disclosures; anonymous complaints are harder to investigate and harder to act on, but the choice is yours and you will not be pushed in either direction.",
+        "Anonymous complaints carry the same evidential weight as named complaints.",
+        "Anonymous complaints are protected from retaliation only if the complainant later identifies themselves."
       ],
+      "correct": 1,
       "rationale": "Section 2 + EHRC Step 4: anonymous reporting via Speak Up is available and is a legitimate route. The trade-off is investigative — anonymous complaints are harder to corroborate and harder to act on, and procedural fairness limits what can be done where the respondent cannot answer specific allegations. The complainant is told the trade-off and chooses."
     },
     {
       "id": "m5_q23",
-      "tags": ["scenario", "withdrawal"],
+      "scenario": true,
       "stem": "[scenario] You raise a concern and then change your mind and want to withdraw. What happens?",
-      "choices": [
-        {"key": "A", "text": "Withdrawal stops the investigation automatically in every case."},
-        {"key": "B", "text": "Withdrawal is not permitted once a matter has been logged."},
-        {"key": "C", "text": "Your wishes are weighted heavily, but withdrawal does not always stop the investigation — particularly where there is a pattern, a continuing risk, or an FCA Conduct Rule dimension; see also the manager-side duty to act.", "correct": true},
-        {"key": "D", "text": "Withdrawal removes any whistleblowing protection retrospectively."}
+      "options": [
+        "Withdrawal stops the investigation automatically in every case.",
+        "Withdrawal is not permitted once a matter has been logged.",
+        "Your wishes are weighted heavily, but withdrawal does not always stop the investigation — particularly where there is a pattern, a continuing risk, or an FCA Conduct Rule dimension; see also the manager-side duty to act.",
+        "Withdrawal removes any whistleblowing protection retrospectively."
       ],
+      "correct": 2,
       "rationale": "Section 4 + Module M Section 7 (preview): the complainant's wishes are a very strong factor in how the firm proceeds, but the firm has independent legal duties (s.40A preventative duty, FCA Conduct Rules from Sep 2026, criminal-risk safeguarding) that do not depend on the complainant's consent. Whistleblowing protection is not retrospectively removed by withdrawal."
     },
     {
       "id": "m5_q24",
-      "tags": ["scenario", "ehrc"],
+      "scenario": true,
       "stem": "[scenario] You are considering raising a matter directly with the EHRC rather than internally. Is that route open to you?",
-      "choices": [
-        {"key": "A", "text": "No — internal grievance must be exhausted first."},
-        {"key": "B", "text": "Yes — the EHRC is the external regulator for the Equality Act, can investigate the firm directly, and can act without an individual complainant; the route is open whether or not you have raised the matter internally.", "correct": true},
-        {"key": "C", "text": "Only after a tribunal claim has been filed."},
-        {"key": "D", "text": "Only with the firm's permission."}
+      "options": [
+        "No — internal grievance must be exhausted first.",
+        "Yes — the EHRC is the external regulator for the Equality Act, can investigate the firm directly, and can act without an individual complainant; the route is open whether or not you have raised the matter internally.",
+        "Only after a tribunal claim has been filed.",
+        "Only with the firm's permission."
       ],
+      "correct": 1,
       "rationale": "Section 6 + research/01 §2: the EHRC's enforcement powers under the Equality Act 2006 (extended to s.40A by the Worker Protection Act 2023) are free-standing. The EHRC can act on systemic failure without any individual complainant. There is no exhaust-internal-procedures precondition."
     },
     {
       "id": "m5_q25",
-      "tags": ["takeaway"],
+      "scenario": false,
       "stem": "The single most important practical message of Module 5 is:",
-      "choices": [
-        {"key": "A", "text": "Always escalate to the highest possible level first."},
-        {"key": "B", "text": "Reporting routes are multiple, retaliation is unlawful (and after April 2026 carries uncapped damages for sexual-harassment disclosures), and a good-faith complaint that is not upheld is still a protected complaint.", "correct": true},
-        {"key": "C", "text": "The firm cannot promise absolute confidentiality, so it is generally safer not to report."},
-        {"key": "D", "text": "Wait until you have written evidence before raising a concern."}
+      "options": [
+        "Always escalate to the highest possible level first.",
+        "Reporting routes are multiple, retaliation is unlawful (and after April 2026 carries uncapped damages for sexual-harassment disclosures), and a good-faith complaint that is not upheld is still a protected complaint.",
+        "The firm cannot promise absolute confidentiality, so it is generally safer not to report.",
+        "Wait until you have written evidence before raising a concern."
       ],
+      "correct": 1,
       "rationale": "Cumulative — Sections 1, 3, 6, 7. The module's purpose is to demystify the process so the cost of raising a concern is no longer dominated by fear of the unknown. Multiple routes, robust retaliation protection (s.27 EA 2010 + s.43B ERA 1996 as amended), and protection for good-faith complaints together remove the most common rational reasons not to report."
     }
   ],
   "reflections": [
     {
       "id": "m5_r1",
-      "prompt": "If something happened at work tomorrow that you thought might cross the line, which of the six routes in Section 6 would you actually use first, and why? If the honest answer is 'none of them', what would have to change for that to be different?",
+      "prompt": "If something happened at work tomorrow that you thought might cross the line, which of the seven routes in Section 6 would you actually use first, and why? If the honest answer is 'none of them', what would have to change for that to be different?",
       "visibility": "group_hr_only",
       "scored": false
     },
