@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T15:25:34.287Z",
+  "updated_at": "2026-05-20T15:25:46.972Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -4929,13 +4929,13 @@
       "phone": "07708602264",
       "address": "Flat 8\n17 Alumdale Road\nBournemouth\nDorset\nBH4 8HX",
       "start_date": "2025-05-12",
-      "line_manager_id": null,
+      "line_manager_id": "151",
       "line_manager_email_raw": "",
       "role": "",
       "directory_photo_uploaded_at": "2026-05-14T07:59:45+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:59:31Z",
+      "updated_at": "2026-05-20T15:25:46.972Z",
       "most_recent_payroll_id": 32,
       "on_payroll": true,
       "url_slug": "sophie.polychronopulos",
