@@ -7,9 +7,9 @@
 <title>TogetherBOOK — Wall</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1779289673">
-<link rel="stylesheet" href="quiet.css?v=1779289673">
-<link rel="stylesheet" href="quiet-extras.css?v=1779289673">
+<link rel="stylesheet" href="quiet-tokens.css?v=1779291524">
+<link rel="stylesheet" href="quiet.css?v=1779291524">
+<link rel="stylesheet" href="quiet-extras.css?v=1779291524">
 <style>
   /* 648 px column — sweet spot per editorial line-length research
      (60–75 chars per line at 15 px body). Wider feels marketing-y. */
@@ -1419,7 +1419,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="/wall.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779289673" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779291524" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1501,7 +1501,7 @@
   </section>
 </main>
 
-<script src="nav.js?v=1779289673" defer></script>
+<script src="nav.js?v=1779291524" defer></script>
 <script>
 (function () {
   "use strict";
@@ -3884,7 +3884,7 @@
     }
     const list = document.getElementById("wlNotifList");
     if (!events.length) {
-      list.innerHTML = `<div class="wl-notif-empty">Nothing new on your posts.</div>`;
+      list.innerHTML = `<div class="wl-notif-empty">Nothing new on your posts or comments.</div>`;
     } else {
       list.innerHTML = events.slice(0, 30).map(ev => {
         const name = displayName(ev.actor_email, ev.actor_name);
@@ -3896,8 +3896,12 @@
         } else if (ev.kind === "react") {
           line = `<strong>${escapeHtml(name)}</strong> ${emojiGlyph(ev.emoji)} ${reactionPast(ev.emoji)} your post.`;
         } else {
-          const verb = ev.parent_comment_id ? "replied to a comment on your" : "commented on your";
-          line = `<strong>${escapeHtml(name)}</strong> ${verb} post.`;
+          if (ev.is_reply_to_mine) {
+            line = `<strong>${escapeHtml(name)}</strong> replied to your comment.`;
+          } else {
+            const verb = ev.parent_comment_id ? "replied to a comment on your" : "commented on your";
+            line = `<strong>${escapeHtml(name)}</strong> ${verb} post.`;
+          }
         }
         const commentAttr = ev.comment_id ? ` data-comment-jump="${escapeHtml(ev.comment_id)}"` : "";
         return `<a class="wl-notif-item" href="#post-${escapeHtml(ev.post_id)}" data-jump="${escapeHtml(ev.post_id)}" data-event-id="${escapeHtml(eventIdFor(ev))}"${commentAttr}>
@@ -3976,10 +3980,18 @@
     for (const post of posts) {
       if ((post.author_email || "").toLowerCase() !== viewerEmail) continue;
       const seen = lastSeenByPost[post.id] || "";
+      // Index the viewer's own comments on this post so a reply to one of
+      // them gets the "replied to your comment" label instead of the
+      // generic "replied to a comment on your post".
+      const myCommentIds = new Set();
+      for (const c of (post.comments || [])) {
+        if ((c.author_email || "").toLowerCase() === viewerEmail) myCommentIds.add(c.id);
+      }
       // Comments + replies (from other people, since the last mark-seen)
       for (const c of (post.comments || [])) {
         if ((c.author_email || "").toLowerCase() === viewerEmail) continue;
         if ((c.created_at || "") <= seen) continue;
+        const replyToMine = !!c.parent_comment_id && myCommentIds.has(c.parent_comment_id);
         events.push({
           kind: "comment",
           at: c.created_at,
@@ -3988,6 +4000,7 @@
           actor_email: c.author_email,
           actor_name: c.author_name,
           parent_comment_id: c.parent_comment_id || null,
+          is_reply_to_mine: replyToMine,
         });
       }
       // Reactions (from other people, additions only, since mark-seen)
@@ -4007,6 +4020,39 @@
         });
       }
     }
+    // Pass 1b: replies to comments the viewer authored (irrespective of
+    // who owns the post). Post-author notifications are already covered
+    // by Pass 1 above; this pass handles the comment-author-of-the-thread.
+    for (const post of posts) {
+      // Skip if Pass 1 already iterated this post — Pass 1 surfaces every
+      // comment + reply on the viewer's own posts.
+      if ((post.author_email || "").toLowerCase() === viewerEmail) continue;
+      const seen = lastSeenByPost[post.id] || "";
+      const myCommentIds = new Set();
+      for (const c of (post.comments || [])) {
+        if ((c.author_email || "").toLowerCase() === viewerEmail) {
+          myCommentIds.add(c.id);
+        }
+      }
+      if (myCommentIds.size === 0) continue;
+      for (const c of (post.comments || [])) {
+        if (!c.parent_comment_id) continue;
+        if (!myCommentIds.has(c.parent_comment_id)) continue;
+        if ((c.author_email || "").toLowerCase() === viewerEmail) continue;
+        if ((c.created_at || "") <= seen) continue;
+        events.push({
+          kind: "comment",
+          at: c.created_at,
+          post_id: post.id,
+          comment_id: c.id,
+          actor_email: c.author_email,
+          actor_name: c.author_name,
+          parent_comment_id: c.parent_comment_id,
+          is_reply_to_mine: true,
+        });
+      }
+    }
+
     // Pass 2: mentions of viewer in any post / comment / reply.
     if (viewerRx) {
       for (const post of posts) {
