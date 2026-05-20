@@ -38,9 +38,9 @@ jobs:
             echo "no changes to people.json"
             exit 0
           fi
-          matched=$(git diff -- people.json | grep -c '"bookr_uid":' || true)
+          touched=$(git diff --stat people.json | tail -1)
           git config user.email "richmondbot2000@gmail.com"
           git config user.name  "richmondbot2000-prog"
           git add people.json
-          git commit -m "BookR backfill: link ${matched} Persons (matched + created)"
+          git commit -m "BookR backfill: ${touched} (matched + created)"
           git push

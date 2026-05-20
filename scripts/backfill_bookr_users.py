@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
-"""One-shot backfill: link every Person in people.json to a BookR user.
+"""One-shot backfill: link every Person in people.json to BookR users.
 
-For each Person without `bookr_uid`:
-  - Match by walking candidate emails (main_google_email + alts +
-    external_google_email) against /users/<uid>.email in the rg-bookr
-    Firebase Realtime DB.
-  - If no match, mint a fresh BookR user via POST /users.json (Firebase
-    returns the new push key) seeded with the Person's email + name +
-    phone (mobile defaults to "0" to satisfy BookR's existing reads).
-  - Write the resulting uid back to people.json[bookr_uid] in place.
+For each Person, collect every confident BookR match (score >= min) by
+walking candidate emails (main_google_email + alts + external_google_email)
+against /users/<uid>.email in the rg-bookr Firebase Realtime DB. The full
+set is stored in Person.bookr_uids (array). Legacy singular bookr_uid is
+dropped from each row as it is rewritten.
 
-Idempotent: a Person whose `bookr_uid` already resolves to an existing
-/users/<uid> row is left alone.
+With --create, Persons with zero candidates at any score and no existing
+link mint a fresh BookR user via POST /users.json (Firebase returns the
+new push key) seeded with the Person's email + name + phone (mobile
+defaults to "0" to satisfy BookR's existing reads).
+
+Idempotent: existing uids that still resolve in /users are preserved.
+Uids that no longer exist in /users are dropped as stale.
 
 Note on push-key uids: BookR's mobile app authenticates via Firebase Auth
 and looks up the signed-in user by their Auth uid, so a TogetherBook-
@@ -140,6 +142,16 @@ def score_match(person, bookr):
         return 40
     return 0
 
+def person_bookr_uids(p):
+    arr = p.get("bookr_uids")
+    if isinstance(arr, list):
+        return [x.strip() for x in arr if isinstance(x, str) and x.strip()]
+    legacy = p.get("bookr_uid")
+    if isinstance(legacy, str) and legacy.strip():
+        return [legacy.strip()]
+    return []
+
+
 def main() -> int:
     allow_create = "--create" in sys.argv
     min_score = 80
@@ -154,67 +166,100 @@ def main() -> int:
     print(f"loaded {len(bookr_users)} BookR users (allow_create={allow_create}, min_score={min_score})", flush=True)
     file = json.loads(PEOPLE_JSON_PATH.read_text())
     people = file.get("people") or []
-    counts = {"matched": 0, "created": 0, "already_linked": 0,
-              "needs_review": 0, "no_candidates": 0,
-              "skipped_no_email": 0, "errored": 0}
+    counts = {"added": 0, "created": 0, "already_linked": 0,
+              "needs_review": 0, "no_candidates": 0, "stale_dropped": 0,
+              "skipped_no_email": 0, "errored": 0, "people_touched": 0}
     rows = []
     for p in people:
         pid = p.get("id")
         name = p.get("name") or p.get("url_slug") or f"#{pid}"
-        existing_uid = (p.get("bookr_uid") or "").strip()
-        if existing_uid and existing_uid in bookr_users:
-            counts["already_linked"] += 1
-            rows.append((pid, name, "already_linked", 100, existing_uid))
-            continue
-        best_uid, best_score = "", 0
+        existing = person_bookr_uids(p)
+        # Drop stale existing uids no longer in /users.
+        live = [u for u in existing if u in bookr_users]
+        stale = [u for u in existing if u not in bookr_users]
+        # Rank every candidate.
+        ranked = []  # (score, uid)
         for uid, u in bookr_users.items():
             sc = score_match(p, u or {})
-            if sc > best_score:
-                best_uid, best_score = uid, sc
-        if best_score >= min_score:
-            p["bookr_uid"] = best_uid
-            counts["matched"] += 1
-            rows.append((pid, name, f"matched(score={best_score})", best_score, best_uid))
-            continue
-        if best_score > 0:
-            counts["needs_review"] += 1
-            rows.append((pid, name, f"needs_review(score={best_score})", best_score, best_uid))
-            continue
-        if not allow_create:
-            counts["no_candidates"] += 1
-            rows.append((pid, name, "no_candidates", 0, ""))
-            continue
-        primary = (p.get("main_google_email") or (candidate_emails(p) or [""])[0]).strip()
-        if not primary:
-            counts["skipped_no_email"] += 1
-            rows.append((pid, name, "skipped_no_email", 0, ""))
-            continue
-        try:
-            new = bookr_fetch(token, "/users.json", method="POST", body={
-                "email": primary, "name": p.get("name") or "",
-                "mobile": p.get("phone") or "0", "last_online": 0, "suspended": False,
-            })
-            new_uid = (new or {}).get("name")
-            if not new_uid: raise RuntimeError("Firebase POST returned no push key")
-            p["bookr_uid"] = new_uid
-            bookr_users[new_uid] = {"email": primary, "name": p.get("name") or ""}
-            counts["created"] += 1
-            rows.append((pid, name, "created", 0, new_uid))
-        except Exception as exc:
-            counts["errored"] += 1
-            rows.append((pid, name, f"errored:{exc}", 0, ""))
+            if sc > 0:
+                ranked.append((sc, uid))
+        ranked.sort(key=lambda x: -x[0])
+        confident = [uid for (sc, uid) in ranked if sc >= min_score]
+        union = list(live)
+        added = []
+        for uid in confident:
+            if uid not in union:
+                union.append(uid)
+                added.append(uid)
+        legacy_present = "bookr_uid" in p
+        changed = (set(union) != set(existing)) or legacy_present
+        status_parts = []
+        if added:
+            status_parts.append(f"added={len(added)}")
+            counts["added"] += len(added)
+        if stale:
+            status_parts.append(f"stale_dropped={len(stale)}")
+            counts["stale_dropped"] += len(stale)
+        # Decide if creation is appropriate.
+        if not union and not ranked and allow_create:
+            primary = (p.get("main_google_email") or (candidate_emails(p) or [""])[0]).strip()
+            if not primary:
+                counts["skipped_no_email"] += 1
+                rows.append((pid, name, "skipped_no_email", 0, ""))
+                continue
+            try:
+                new = bookr_fetch(token, "/users.json", method="POST", body={
+                    "email": primary, "name": p.get("name") or "",
+                    "mobile": p.get("phone") or "0", "last_online": 0, "suspended": False,
+                })
+                new_uid = (new or {}).get("name")
+                if not new_uid: raise RuntimeError("Firebase POST returned no push key")
+                bookr_users[new_uid] = {"email": primary, "name": p.get("name") or ""}
+                union.append(new_uid)
+                added.append(new_uid)
+                counts["created"] += 1
+                status_parts.append("created")
+                changed = True
+            except Exception as exc:
+                counts["errored"] += 1
+                rows.append((pid, name, f"errored:{exc}", 0, ""))
+                continue
+        # Categorise the outcome for the summary count.
+        if not added and not stale:
+            if union:
+                counts["already_linked"] += 1
+                if not status_parts:
+                    status_parts.append("already_linked")
+            elif ranked and ranked[0][0] < min_score:
+                counts["needs_review"] += 1
+                status_parts.append(f"needs_review(top={ranked[0][0]})")
+            else:
+                counts["no_candidates"] += 1
+                status_parts.append("no_candidates")
+        # Write back if anything actually changed.
+        if changed:
+            counts["people_touched"] += 1
+            p["bookr_uids"] = union
+            if "bookr_uid" in p:
+                del p["bookr_uid"]
+        rows.append((pid, name, ",".join(status_parts) or "noop",
+                     ranked[0][0] if ranked else 0,
+                     ";".join(union)))
     file["people"] = people
     PEOPLE_JSON_PATH.write_text(json.dumps(file, indent=2) + "\n")
     print()
-    print(f"{'pid':>5}  {'name':<32}  {'status':<32}  {'sc':>3}  bookr_uid")
-    print("-" * 100)
-    for pid, name, status, sc, uid in rows:
-        print(f"{pid!s:>5}  {name[:32]:<32}  {status[:32]:<32}  {sc:>3}  {uid}")
+    print(f"{'pid':>5}  {'name':<28}  {'status':<36}  {'top':>3}  bookr_uids")
+    print("-" * 110)
+    for pid, name, status, sc, uids in rows:
+        print(f"{pid!s:>5}  {name[:28]:<28}  {status[:36]:<36}  {sc:>3}  {uids}")
     print()
-    print(f"summary: matched={counts['matched']} already_linked={counts['already_linked']} "
+    print(f"summary: people_touched={counts['people_touched']} added={counts['added']} "
+          f"already_linked={counts['already_linked']} created={counts['created']} "
+          f"stale_dropped={counts['stale_dropped']} "
           f"needs_review={counts['needs_review']} no_candidates={counts['no_candidates']} "
-          f"created={counts['created']} skipped_no_email={counts['skipped_no_email']} "
-          f"errored={counts['errored']}")
+          f"skipped_no_email={counts['skipped_no_email']} errored={counts['errored']}")
     return 0 if counts["errored"] == 0 else 1
+
+
 if __name__ == "__main__":
     sys.exit(main())

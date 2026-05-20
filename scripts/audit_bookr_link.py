@@ -74,6 +74,16 @@ def candidate_emails(p: dict) -> list:
     return [(e or "").strip().lower() for e in out if e]
 
 
+def person_bookr_uids(p: dict) -> list:
+    arr = p.get("bookr_uids")
+    if isinstance(arr, list):
+        return [x.strip() for x in arr if isinstance(x, str) and x.strip()]
+    legacy = p.get("bookr_uid")
+    if isinstance(legacy, str) and legacy.strip():
+        return [legacy.strip()]
+    return []
+
+
 def norm_name(s: str) -> str:
     s = (s or "").lower()
     s = re.sub(r"[^a-z0-9]+", " ", s).strip()
@@ -165,7 +175,7 @@ def main() -> int:
                 "main_email": p.get("main_google_email") or "",
                 "alt_emails": p.get("alt_google_emails") or [],
                 "external_email": p.get("external_google_email") or "",
-                "bookr_uid": p.get("bookr_uid") or "",
+                "bookr_uids": person_bookr_uids(p),
                 "best_score": sc,
                 "best_uid": uid or "",
             })
@@ -219,7 +229,7 @@ def main() -> int:
                 "person_id": pid,
                 "person_name": pers.get("name") or "",
                 "person_email": pers.get("main_google_email") or "",
-                "currently_linked": (pers.get("bookr_uid") or "") == uid,
+                "currently_linked": uid in person_bookr_uids(pers),
             })
     def _sk(r):
         bucket = 0 if 40 <= r["score"] < 80 else (1 if r["score"] >= 80 else 2)
