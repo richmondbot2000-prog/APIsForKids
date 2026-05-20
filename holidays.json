@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T16:19:30.378Z",
+  "updated_at": "2026-05-20T16:19:50.699Z",
   "year_start": "2026-04-01",
   "year_end": "2027-03-31",
   "by_user": {
@@ -219,7 +219,8 @@
         "2026-04-07": "holiday",
         "2026-04-08": "holiday",
         "2026-04-09": "holiday",
-        "2026-04-10": "holiday"
+        "2026-04-10": "holiday",
+        "2026-05-21": "part-holiday-paid"
       },
       "notes": {}
     }
@@ -2160,6 +2161,14 @@
       "to": "holiday",
       "changed_by": "natasha.wright@letme.co.uk",
       "changed_at": "2026-05-20T16:19:30.378Z"
+    },
+    {
+      "user_email": "natasha.wright@letme.co.uk",
+      "date": "2026-05-21",
+      "from": null,
+      "to": "part-holiday-paid",
+      "changed_by": "natasha.wright@letme.co.uk",
+      "changed_at": "2026-05-20T16:19:50.699Z"
     }
   ]
 }
