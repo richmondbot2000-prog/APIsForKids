@@ -99,27 +99,42 @@
     const payrollEnd = parseDate(payroll && payroll.termination_date);
     const effectiveEnd = personEnd || payrollEnd || now;
 
-    // For this tax year, the service window is bounded by the tax-year
-    // start at the lower end and today (or end date, whichever earlier)
-    // at the upper end. If start_date is later than tax-year start, the
-    // service window starts at start_date instead.
+    // Tax year end = day before next year's start (e.g. 2027-03-31 for
+    // fiscal 2026-04-01). Used for max calc.
+    const taxYearEnd = new Date(taxYearStart.getTime());
+    taxYearEnd.setUTCFullYear(taxYearEnd.getUTCFullYear() + 1);
+    taxYearEnd.setUTCDate(taxYearEnd.getUTCDate() - 1);
+
+    // serviceStart: later of (tax-year start, employment start).
     let serviceStart = taxYearStart;
     if (effectiveStart && effectiveStart.getTime() > taxYearStart.getTime()) {
       serviceStart = effectiveStart;
     }
-    let serviceEnd = effectiveEnd.getTime() < now.getTime() ? effectiveEnd : now;
-    if (serviceEnd.getTime() < serviceStart.getTime()) {
-      serviceEnd = serviceStart;   // pre-employment, zero months
-    }
 
-    const monthsWorked = decimalMonthsBetween(serviceStart, serviceEnd);
+    // Min uses months ELAPSED so far (start -> today), floored to full
+    // months. Joined 15 May -> not until 15 Jun does the first 2.33d
+    // accrue, 15 Jul = 4.66d, etc.
+    let minEnd = effectiveEnd.getTime() < now.getTime() ? effectiveEnd : now;
+    if (minEnd.getTime() < serviceStart.getTime()) minEnd = serviceStart;
+    const monthsElapsed = decimalMonthsBetween(serviceStart, minEnd);
+    const fullMonths = Math.floor(monthsElapsed);
+
+    // Max is the FULL-YEAR allowance, pro-rated by months that the
+    // employee will have been with us between start_date and the
+    // fiscal-year end (or their end_date, whichever earlier).
+    let maxEnd = effectiveEnd.getTime() < taxYearEnd.getTime() ? effectiveEnd : taxYearEnd;
+    if (maxEnd.getTime() < serviceStart.getTime()) maxEnd = serviceStart;
+    const monthsInYear = decimalMonthsBetween(serviceStart, maxEnd);
 
     const planId = (person && person.holiday_plan) || defaultPlanId;
     const plan = findPlan(plansDoc, planId) || findPlan(plansDoc, defaultPlanId);
     const annualMax = plan ? Number(plan.annual_max_days) || 0 : 0;
 
-    const minDays = round2(monthsWorked * statutory);
-    const maxDays = round2((annualMax * monthsWorked) / 12);
+    const minDays = round2(fullMonths * statutory);
+    const maxDays = round2((annualMax * monthsInYear) / 12);
+    // Back-compat field names kept for callers that still read them.
+    const monthsWorked = monthsElapsed;
+    const serviceEnd = minEnd;
 
     // Build a human-readable reason for the UI tooltip.
     let reason;

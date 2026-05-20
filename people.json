@@ -28,7 +28,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "abigail.lee",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 2,
@@ -57,7 +58,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "adam.grigg",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 3,
@@ -85,7 +87,7 @@
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "adedayo.adebowale",
       "most_recent_payroll_id": null,
-      "holiday_plan": ""
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 4,
@@ -93,7 +95,7 @@
       "given": "Adnan",
       "family": "Turken",
       "aliases": [
-        "Adnan Türken"
+        "Adnan T\u00fcrken"
       ],
       "main_google_email": "adnan.turken@togetherloans.com",
       "alt_google_emails": [
@@ -116,7 +118,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "adnan.turken",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 6,
@@ -146,7 +149,8 @@
       "on_payroll": true,
       "url_slug": "aerona.sheikh",
       "date_of_birth": "2003-05-18",
-      "team": "Litigation"
+      "team": "Litigation",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 7,
@@ -173,7 +177,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "aldrine.sejour",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 9,
@@ -201,7 +206,8 @@
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "alishia.kasdorf",
       "most_recent_payroll_id": null,
-      "team": "Collections"
+      "team": "Collections",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 10,
@@ -264,7 +270,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "amber.lewis",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 12,
@@ -291,7 +298,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "amber.shoun",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 13,
@@ -320,7 +328,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "amiela.martin",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 14,
@@ -347,7 +356,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "anna.oviedo",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 15,
@@ -374,7 +384,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "annette.rodriguez",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 17,
@@ -437,7 +448,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "autobots-2",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 20,
@@ -464,7 +476,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "autobots-3",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 22,
@@ -497,7 +510,8 @@
       "bookr_uids": [
         "e1vjm8s3tbVvWKmBYXm77Jg1Avi1"
       ],
-      "team": "Underwriting"
+      "team": "Underwriting",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 23,
@@ -524,7 +538,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "azure",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 24,
@@ -588,7 +603,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "ben.morris",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 27,
@@ -613,7 +629,7 @@
       "line_manager_email_raw": "",
       "role": "",
       "directory_photo_uploaded_at": "2026-05-14T09:01:25+01:00",
-      "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
+      "notes": "Person auto-created from payroll import \u2014 no Google account linked yet. Set main_google_email when known.",
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "berginie.botero",
@@ -651,7 +667,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "bernardo.fonseca",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 30,
@@ -681,7 +698,8 @@
       "on_payroll": true,
       "url_slug": "brogan.hackley",
       "date_of_birth": "1988-06-13",
-      "team": "Property"
+      "team": "Property",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 31,
@@ -710,7 +728,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "bryan.mejia",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 32,
@@ -743,7 +762,8 @@
       "bookr_uids": [
         "HQXzIXThbRYSrlSH6go2nv1Ded13"
       ],
-      "team": "Litigation"
+      "team": "Litigation",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 21,
@@ -772,7 +792,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "autobots.parked.1778797190",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 33,
@@ -799,7 +820,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "bushra.tabassum",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 35,
@@ -826,7 +848,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "candice.dorsey",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 34,
@@ -855,7 +878,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "candi.holland",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 36,
@@ -884,7 +908,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "candidate.email",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 37,
@@ -911,7 +936,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "ceera.gillette",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 38,
@@ -938,7 +964,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "chelsea.concini",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 39,
@@ -964,7 +991,7 @@
       "line_manager_email_raw": "",
       "role": "Accounts",
       "directory_photo_uploaded_at": "2026-05-14T08:58:36+01:00",
-      "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
+      "notes": "Person auto-created from payroll import \u2014 no Google account linked yet. Set main_google_email when known.",
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "cherry.liu",
@@ -1005,7 +1032,8 @@
       "bookr_uids": [
         "h9z5OldzZfVeItk8n5V3rmaJK3S2"
       ],
-      "team": "Underwriting"
+      "team": "Underwriting",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 42,
@@ -1065,7 +1093,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "autobots",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 43,
@@ -1128,7 +1157,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "courtnie.raine",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 45,
@@ -1155,7 +1185,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "customer.letters",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 46,
@@ -1181,7 +1212,7 @@
       "line_manager_email_raw": "",
       "role": "Paralegal",
       "directory_photo_uploaded_at": "",
-      "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
+      "notes": "Person auto-created from payroll import \u2014 no Google account linked yet. Set main_google_email when known.",
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "cyrus.leung",
@@ -1219,7 +1250,8 @@
       "most_recent_payroll_id": null,
       "bookr_uids": [
         "ATM7glbOXWPZGENArEjXX01zhVk1"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 48,
@@ -1253,7 +1285,8 @@
       "date_of_birth": "1980-11-25",
       "bookr_uids": [
         "QRIslEY9M1bwi6iB8G2QjAVjmdy1"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 49,
@@ -1285,7 +1318,8 @@
       "date_of_birth": "1988-11-20",
       "bookr_uids": [
         "z6h0cxHwR7gdr2rM71lZnEACdtm1"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 50,
@@ -1312,7 +1346,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "daniel.bartlett",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 52,
@@ -1343,7 +1378,8 @@
       "most_recent_payroll_id": 16,
       "on_payroll": true,
       "url_slug": "daniel.schiavinato",
-      "date_of_birth": "2003-11-18"
+      "date_of_birth": "2003-11-18",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 53,
@@ -1372,7 +1408,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "danny.flores",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 54,
@@ -1396,7 +1433,7 @@
       "line_manager_id": null,
       "line_manager_email_raw": "",
       "role": "",
-      "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
+      "notes": "Person auto-created from payroll import \u2014 no Google account linked yet. Set main_google_email when known.",
       "directory_photo_uploaded_at": "",
       "cover_photo_uploaded_at": "",
       "on_payroll": true,
@@ -1405,7 +1442,8 @@
       "created_at": "2026-05-17T14:06:41Z",
       "updated_at": "2026-05-20T16:38:23.966Z",
       "url_slug": "david.benamor",
-      "date_of_birth": "2002-08-23"
+      "date_of_birth": "2002-08-23",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 55,
@@ -1438,7 +1476,8 @@
       "bookr_uids": [
         "quW6m73sftbmzhF6HEDSzHEYW7B3"
       ],
-      "team": "Property"
+      "team": "Property",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 56,
@@ -1465,7 +1504,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "david.dewaard",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 57,
@@ -1492,7 +1532,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "david.dimmick",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 58,
@@ -1514,7 +1555,7 @@
       "line_manager_id": null,
       "line_manager_email_raw": "",
       "role": "",
-      "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
+      "notes": "Person auto-created from payroll import \u2014 no Google account linked yet. Set main_google_email when known.",
       "directory_photo_uploaded_at": "",
       "cover_photo_uploaded_at": "",
       "on_payroll": true,
@@ -1523,7 +1564,8 @@
       "created_at": "2026-05-17T14:06:41Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "david.patterson",
-      "date_of_birth": "1940-01-01"
+      "date_of_birth": "1940-01-01",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 59,
@@ -1550,7 +1592,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "dawna.smith",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 60,
@@ -1577,7 +1620,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "dejon.johnson",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 61,
@@ -1604,7 +1648,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "dennis.ulloa",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 62,
@@ -1631,7 +1676,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "dervan.cooper",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 63,
@@ -1660,7 +1706,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "dezire.massey",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 64,
@@ -1687,7 +1734,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "diana.rogel",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 65,
@@ -1717,7 +1765,8 @@
       "most_recent_payroll_id": null,
       "bookr_uids": [
         "FonDd1EK0EcepY5Rkd6vUBkPLzA2"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 66,
@@ -1744,7 +1793,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "doyane.reid",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 67,
@@ -1771,7 +1821,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "ed.heaney",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 68,
@@ -1798,7 +1849,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "eden.oxley",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 69,
@@ -1827,7 +1879,8 @@
       "most_recent_payroll_id": 17,
       "on_payroll": true,
       "url_slug": "edward.heaney",
-      "date_of_birth": "1985-07-30"
+      "date_of_birth": "1985-07-30",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 70,
@@ -1856,7 +1909,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T18:20:05.078Z",
       "url_slug": "ekrem.yurtman",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 71,
@@ -1883,7 +1937,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "emily.snyder",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 72,
@@ -1939,7 +1994,7 @@
       "line_manager_id": null,
       "line_manager_email_raw": "",
       "role": "",
-      "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
+      "notes": "Person auto-created from payroll import \u2014 no Google account linked yet. Set main_google_email when known.",
       "directory_photo_uploaded_at": "",
       "cover_photo_uploaded_at": "",
       "on_payroll": true,
@@ -1948,7 +2003,8 @@
       "created_at": "2026-05-17T14:06:41Z",
       "updated_at": "2026-05-20T16:38:55.594Z",
       "url_slug": "fern.benamor",
-      "date_of_birth": "2006-12-06"
+      "date_of_birth": "2006-12-06",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 74,
@@ -1975,7 +2031,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "finance",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 75,
@@ -2002,7 +2059,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "francisco.mejia",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 76,
@@ -2029,7 +2087,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "frederick.knight",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 78,
@@ -2054,13 +2113,14 @@
       "line_manager_email_raw": "",
       "role": "",
       "directory_photo_uploaded_at": "",
-      "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
+      "notes": "Person auto-created from payroll import \u2014 no Google account linked yet. Set main_google_email when known.",
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "gabriella.debacci",
       "most_recent_payroll_id": 89,
       "on_payroll": true,
-      "team": "Underwriting"
+      "team": "Underwriting",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 79,
@@ -2087,7 +2147,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "george.roche.parked.1778681073",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 80,
@@ -2114,7 +2175,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "glasspole.brown",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 81,
@@ -2141,7 +2203,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "grace.campbell",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 82,
@@ -2171,7 +2234,8 @@
       "on_payroll": true,
       "url_slug": "grainne.cranna",
       "date_of_birth": "1998-11-14",
-      "team": "Underwriting"
+      "team": "Underwriting",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 83,
@@ -2200,7 +2264,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "guillermo.aguirre",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 84,
@@ -2233,7 +2298,8 @@
       "bookr_uids": [
         "l8e6iII2UObVqbVKvbIbhHyrJh72"
       ],
-      "team": "Underwriting"
+      "team": "Underwriting",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 85,
@@ -2260,7 +2326,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "historic",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 87,
@@ -2323,7 +2390,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "irlendz.arne",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 89,
@@ -2355,7 +2423,8 @@
       "date_of_birth": "2002-10-15",
       "bookr_uids": [
         "dOe7JPlUluRkNXMhFsSQJbJphPD3"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 90,
@@ -2382,7 +2451,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "jaimi.struble",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 91,
@@ -2421,7 +2491,8 @@
       "bookr_uids": [
         "1S5UQuBsdTPo52nXdInw2NE0no53"
       ],
-      "team": "Management"
+      "team": "Management",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 92,
@@ -2454,7 +2525,8 @@
       "bookr_uids": [
         "LWZCREVTCgaaqSauqQnSnanBadi2"
       ],
-      "team": "Underwriting"
+      "team": "Underwriting",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 93,
@@ -2516,7 +2588,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "jamie.stevens",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 95,
@@ -2545,7 +2618,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "javier.osegueda",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 96,
@@ -2574,7 +2648,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "jazmine.mosely",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 97,
@@ -2603,7 +2678,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "jennifer.taylor",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 98,
@@ -2630,7 +2706,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "jessica.huesman",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 99,
@@ -2658,7 +2735,8 @@
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "joe.cortez",
       "most_recent_payroll_id": null,
-      "team": "Collections"
+      "team": "Collections",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 100,
@@ -2685,7 +2763,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "john.christie",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 101,
@@ -2712,7 +2791,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "john.medina",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 102,
@@ -2739,7 +2819,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "johnathon.ausborn",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 103,
@@ -2766,7 +2847,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "jose.melgar",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 104,
@@ -2799,7 +2881,8 @@
       "bookr_uids": [
         "VeI3u47hHaMNiX1AUuWbiwrCfKq1"
       ],
-      "team": "Finance"
+      "team": "Finance",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 105,
@@ -2826,7 +2909,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "joseph.shabazz",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 107,
@@ -2859,7 +2943,8 @@
       "most_recent_payroll_id": 24,
       "on_payroll": true,
       "url_slug": "joshua.carless",
-      "date_of_birth": "1995-12-22"
+      "date_of_birth": "1995-12-22",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 108,
@@ -2888,7 +2973,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "joshua.cole",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 109,
@@ -2915,7 +3001,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "joshua.gesin",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 110,
@@ -2942,7 +3029,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "josue.tejada",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 111,
@@ -2972,7 +3060,8 @@
       "most_recent_payroll_id": null,
       "bookr_uids": [
         "ZsnettEgyCXzoKqpQCJbLXcKvR03"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 112,
@@ -3002,7 +3091,8 @@
       "updated_at": "2026-05-20T18:28:07.823Z",
       "url_slug": "kamran.kamaei",
       "most_recent_payroll_id": null,
-      "team": "Software development"
+      "team": "Software development",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 113,
@@ -3031,7 +3121,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "kandi.vaughn",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 114,
@@ -3061,7 +3152,8 @@
       "most_recent_payroll_id": null,
       "bookr_uids": [
         "Hkm3HOUMg0aoIBKwui3dwIatCsO2"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 116,
@@ -3088,7 +3180,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "kellee.brown",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 117,
@@ -3117,7 +3210,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "kellie.dickson",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 118,
@@ -3151,7 +3245,8 @@
       "date_of_birth": "1988-01-18",
       "bookr_uids": [
         "qd5BZiWpRoMBgbWEyUOEKMcR0962"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 119,
@@ -3178,7 +3273,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "kenishia.cotner",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 120,
@@ -3207,7 +3303,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "kieran.feltham",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 121,
@@ -3236,7 +3333,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "kody.mroczek",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 122,
@@ -3263,7 +3361,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "krysha.thorp",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 123,
@@ -3290,7 +3389,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "kyle.barrett",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 124,
@@ -3324,7 +3424,8 @@
       "date_of_birth": "1999-12-21",
       "bookr_uids": [
         "ZW4yLSk9zVeHVWQqtho3hNEb7Da2"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 125,
@@ -3351,7 +3452,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "laurine.beaubrun",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 129,
@@ -3378,7 +3480,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "lmautomessagingarchive",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 126,
@@ -3407,7 +3510,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "lesley.perez",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 127,
@@ -3436,7 +3540,8 @@
       "most_recent_payroll_id": 35,
       "on_payroll": true,
       "url_slug": "leticia.alexandre",
-      "date_of_birth": "1983-11-19"
+      "date_of_birth": "1983-11-19",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 158,
@@ -3463,7 +3568,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "office",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 178,
@@ -3490,7 +3596,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "reservation",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 128,
@@ -3517,7 +3624,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "linh.kieu",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 130,
@@ -3579,7 +3687,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "lucas.bishop",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 132,
@@ -3613,7 +3722,8 @@
       "date_of_birth": "1998-08-28",
       "bookr_uids": [
         "XtXjUKDzHWc6K8LcWGrwC841fNA2"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 133,
@@ -3642,7 +3752,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "luis.mancia",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 134,
@@ -3671,7 +3782,8 @@
       "most_recent_payroll_id": 28,
       "on_payroll": true,
       "url_slug": "maisey.lapskas",
-      "date_of_birth": "2002-06-29"
+      "date_of_birth": "2002-06-29",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 135,
@@ -3698,7 +3810,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "marcos.gallegos",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 136,
@@ -3720,7 +3833,7 @@
       "line_manager_id": null,
       "line_manager_email_raw": "",
       "role": "",
-      "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
+      "notes": "Person auto-created from payroll import \u2014 no Google account linked yet. Set main_google_email when known.",
       "directory_photo_uploaded_at": "",
       "cover_photo_uploaded_at": "",
       "on_payroll": true,
@@ -3729,7 +3842,8 @@
       "created_at": "2026-05-17T14:06:41Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "marina.goland",
-      "date_of_birth": "1985-05-24"
+      "date_of_birth": "1985-05-24",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 137,
@@ -3756,7 +3870,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "mario.acuna",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 138,
@@ -3785,7 +3900,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "mark.prior.parked.1778682714",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 139,
@@ -3810,7 +3926,7 @@
       "line_manager_email_raw": "",
       "role": "",
       "directory_photo_uploaded_at": "2026-05-14T08:33:29+01:00",
-      "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
+      "notes": "Person auto-created from payroll import \u2014 no Google account linked yet. Set main_google_email when known.",
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "marta.gallardo",
@@ -3819,7 +3935,8 @@
       "bookr_uids": [
         "fgWLrwndAIXkHwfqRNdsU47GmDo1"
       ],
-      "team": "Front End"
+      "team": "Front End",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 141,
@@ -3853,7 +3970,8 @@
       "date_of_birth": "1995-08-30",
       "bookr_uids": [
         "j2PMKnV0P0MI51DoCNa5QzOVQcs1"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 143,
@@ -3882,7 +4000,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "matthew.wood",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 144,
@@ -3947,7 +4066,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "maynor.torres",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 147,
@@ -3974,7 +4094,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "medallion",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 148,
@@ -4001,7 +4122,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "mercedes.ramirez",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 149,
@@ -4030,7 +4152,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "michelle.jarvis",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 150,
@@ -4060,7 +4183,8 @@
       "most_recent_payroll_id": null,
       "bookr_uids": [
         "EZpcCpmGj4belGoIMTgISZCFTKy1"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 151,
@@ -4094,7 +4218,8 @@
       "date_of_birth": "1999-06-26",
       "bookr_uids": [
         "tdTy6aX3xkVOyGfbmLtrWAhBXlv2"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 152,
@@ -4130,7 +4255,8 @@
       "bookr_uids": [
         "ORwshvZ1IPRzsjfJhWwrcpBvRuI3",
         "qwRu3cbVOFhXIzvHaHyGzRHcssf2"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 153,
@@ -4157,7 +4283,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "murray.breingan",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 154,
@@ -4216,7 +4343,7 @@
       "line_manager_email_raw": "",
       "role": "",
       "directory_photo_uploaded_at": "2026-05-14T08:27:19+01:00",
-      "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
+      "notes": "Person auto-created from payroll import \u2014 no Google account linked yet. Set main_google_email when known.",
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "navodi.sammani",
@@ -4250,7 +4377,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "nikolay.savov",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 172,
@@ -4277,7 +4405,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "printer",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 159,
@@ -4304,7 +4433,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "oleg.goland",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 160,
@@ -4334,7 +4464,8 @@
       "on_payroll": true,
       "url_slug": "oliver.holmes",
       "date_of_birth": "1998-02-20",
-      "team": "Underwriting"
+      "team": "Underwriting",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 161,
@@ -4361,7 +4492,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "olivia.melvin",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 162,
@@ -4390,7 +4522,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "omar.olivas",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 163,
@@ -4417,7 +4550,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "outboundletters",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 164,
@@ -4439,7 +4573,7 @@
       "line_manager_id": null,
       "line_manager_email_raw": "",
       "role": "",
-      "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
+      "notes": "Person auto-created from payroll import \u2014 no Google account linked yet. Set main_google_email when known.",
       "directory_photo_uploaded_at": "",
       "cover_photo_uploaded_at": "",
       "on_payroll": true,
@@ -4448,7 +4582,8 @@
       "created_at": "2026-05-17T14:06:41Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "paspuleti.srujana",
-      "date_of_birth": "1987-09-26"
+      "date_of_birth": "1987-09-26",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 165,
@@ -4475,7 +4610,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "patrick.smith",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 166,
@@ -4502,7 +4638,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "patty.cunningham",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 167,
@@ -4524,7 +4661,7 @@
       "line_manager_id": null,
       "line_manager_email_raw": "",
       "role": "",
-      "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
+      "notes": "Person auto-created from payroll import \u2014 no Google account linked yet. Set main_google_email when known.",
       "directory_photo_uploaded_at": "",
       "cover_photo_uploaded_at": "",
       "on_payroll": true,
@@ -4533,7 +4670,8 @@
       "created_at": "2026-05-17T14:06:41Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "paul.benamor",
-      "date_of_birth": "1955-08-04"
+      "date_of_birth": "1955-08-04",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 168,
@@ -4560,7 +4698,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "paulo.cesar",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 169,
@@ -4587,7 +4726,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "phil.oneill",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 170,
@@ -4614,7 +4754,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "philip.martinez",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 171,
@@ -4636,7 +4777,7 @@
       "line_manager_id": null,
       "line_manager_email_raw": "",
       "role": "",
-      "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
+      "notes": "Person auto-created from payroll import \u2014 no Google account linked yet. Set main_google_email when known.",
       "directory_photo_uploaded_at": "",
       "cover_photo_uploaded_at": "",
       "on_payroll": true,
@@ -4645,7 +4786,8 @@
       "created_at": "2026-05-17T14:06:41Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "philip.oneill",
-      "date_of_birth": "1969-12-03"
+      "date_of_birth": "1969-12-03",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 175,
@@ -4674,7 +4816,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "rafael.arias",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 176,
@@ -4708,7 +4851,8 @@
       "date_of_birth": "2000-10-19",
       "bookr_uids": [
         "jOd6InEG4gcckgzxM35AQP4DRlN2"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 177,
@@ -4735,7 +4879,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "rebekah.dewaard",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 157,
@@ -4762,7 +4907,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "noreply",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 179,
@@ -4789,7 +4935,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "rod.harris",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 180,
@@ -4821,7 +4968,8 @@
       "most_recent_payroll_id": 93,
       "on_payroll": true,
       "date_of_birth": "1999-08-09",
-      "team": "Underwriting"
+      "team": "Underwriting",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 182,
@@ -4848,7 +4996,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "shakeeda.taylor",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 184,
@@ -4875,7 +5024,7 @@
       "line_manager_email_raw": "",
       "role": "",
       "directory_photo_uploaded_at": "2026-05-14T08:17:13+01:00",
-      "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
+      "notes": "Person auto-created from payroll import \u2014 no Google account linked yet. Set main_google_email when known.",
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "sophia.ugwunne",
@@ -4913,7 +5062,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "sophie.james",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 186,
@@ -4945,7 +5095,8 @@
       "date_of_birth": "2000-12-12",
       "bookr_uids": [
         "eAg0Tv3RhGMQd1BFpoL6QzERsWJ2"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 187,
@@ -4973,7 +5124,8 @@
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "srujana.paspuleti",
       "most_recent_payroll_id": null,
-      "team": "Litigation"
+      "team": "Litigation",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 188,
@@ -5007,7 +5159,8 @@
       "date_of_birth": "1972-10-28",
       "bookr_uids": [
         "ZzkVESYUrpYw1Nbf4dLRkDpJeqK2"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 190,
@@ -5038,7 +5191,8 @@
       "bookr_uids": [
         "LKW5wI4i2ZSnIr2uD6KIJlvD54N2",
         "aYmIo4wiG9Pbs9UpaHZ8rumwCg73"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 191,
@@ -5066,7 +5220,8 @@
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "tatiana.rodriguez",
       "most_recent_payroll_id": null,
-      "team": "Collections"
+      "team": "Collections",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 192,
@@ -5093,7 +5248,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "taylor.draper",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 193,
@@ -5154,7 +5310,8 @@
       "bookr_uids": [
         "fIFQbZNuhtMcKwisW89gdbzlkRB3"
       ],
-      "team": "Management"
+      "team": "Management",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 196,
@@ -5181,7 +5338,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "tina.suppa",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 8,
@@ -5208,7 +5366,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "alerts",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 197,
@@ -5233,7 +5392,7 @@
       "line_manager_email_raw": "",
       "role": "Director",
       "directory_photo_uploaded_at": "",
-      "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
+      "notes": "Person auto-created from payroll import \u2014 no Google account linked yet. Set main_google_email when known.",
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:34:57.232Z",
       "url_slug": "tom.slaughter",
@@ -5270,7 +5429,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "tomasz.schwertner",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 199,
@@ -5297,7 +5457,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:35:18.150Z",
       "url_slug": "tyla.woods",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 200,
@@ -5360,7 +5521,8 @@
       "created_at": "2026-05-17T11:13:52Z",
       "updated_at": "2026-05-20T16:02:07Z",
       "url_slug": "yanique.blacks",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 203,
@@ -5392,7 +5554,8 @@
       "most_recent_payroll_id": 95,
       "on_payroll": true,
       "date_of_birth": "2001-10-05",
-      "team": "Underwriting"
+      "team": "Underwriting",
+      "holiday_plan": "OpsPlan1"
     },
     {
       "id": 204,
@@ -5425,7 +5588,8 @@
       "bookr_uids": [
         "3UbUoHhwcgTH2wKPVb5oaLDKZ413",
         "bQMcEaPfVaTseK60sZ9HIwe0lh52"
-      ]
+      ],
+      "holiday_plan": "OpsPlan1"
     }
   ]
 }

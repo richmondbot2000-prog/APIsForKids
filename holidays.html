@@ -567,6 +567,11 @@
   .hd-team-month-name .tb-profile-link {
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
+  .hd-team-budget {
+    display: inline-block; margin-left: 6px;
+    font: 500 11px/1.1 var(--font-mono); color: var(--ink-500);
+    white-space: nowrap;
+  }
   /* Profile link styling — used wherever a user's name appears as a link
      to user.html (team view, activity view, changelog, page header). */
   .tb-profile-link {
@@ -1140,6 +1145,7 @@
 
 <div class="hd-banner" id="hdBanner"></div>
 
+<script src="/holiday-plan.js"></script>
 <script>
   // ──────────────────────────────────────────────────────────────────
   // Holidays page — per-user calendar, Apr→Mar fiscal year, default
@@ -1260,6 +1266,7 @@
   // calendar and can't edit. Same gating applied on their manager's
   // view.
   let payrollData = null;
+  let plansDoc = null;  // /holiday-plans.json — plan catalogue for min/max budgets
   let payrollByEmailLc = new Map();
   let payrollByNameNorm = new Map();
   // people.json — used to collapse the multiple Google emails of a
@@ -1311,7 +1318,9 @@
       .then(r => r.ok ? r.json() : null).catch(() => null),
     fetchFreshJson("holidays-seen.json", HD_SEEN_RAW_URL, { by_user: {} }),
     fetch("people.json",      { cache: "no-store" }).then(r => r.ok ? r.json() : ({ people: [] })).catch(() => ({ people: [] })),
-  ]).then(([who, s, ad, hd, an, pr, seen, pf]) => {
+    fetch("/holiday-plans.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+  ]).then(([who, s, ad, hd, an, pr, seen, pf, plans]) => {
+    plansDoc = plans;
     // Build a canonical email → Person map so the team-calendar view
     // can collapse the multiple Google emails of a merged person into
     // a single row. `peopleById` is the dedupe target; `personByEmail`
@@ -1739,7 +1748,25 @@
     return { days: mergedDays, notes: mergedNotes };
   }
 
-  function countHolidayDays(email) {
+  // Resolve fiscal-year holiday budget (min + max days) for an email.
+  // Uses HolidayPlan.compute (from /holiday-plan.js) with the Person
+  // record + their most recent payroll row. Returns null if plans
+  // file is not loaded; callers fall back to showing the taken count
+  // only.
+  function holidayBudgetFor(email) {
+    if (!plansDoc || typeof HolidayPlan === "undefined") return null;
+    const lc = (email || "").toLowerCase();
+    const person = personByEmail[lc] || null;
+    if (!person) return null;
+    const list = payrollByEmailLc.get(lc) ||
+      (person.main_google_email && payrollByEmailLc.get(person.main_google_email.toLowerCase())) || [];
+    const payroll = list.length ? list[0] : null;
+    try {
+      return HolidayPlan.compute({ person, payroll, plansDoc, asOf: new Date() });
+    } catch (e) { return null; }
+  }
+
+    function countHolidayDays(email) {
     const map = mergedUserMap(email);
     const days = map.days || {};
     let count = 0;
@@ -2100,8 +2127,22 @@
         if (!onPayroll) row.classList.add("is-not-on-payroll");
         const name = document.createElement("div");
         name.className = "hd-team-month-name";
-        name.innerHTML = profileLink(r.email, r.user.name || r.email);
-        if (!onPayroll) name.title = "Not on payroll — calendar disabled";
+        const _baseName = profileLink(r.email, r.user.name || r.email);
+        let _badge = "";
+        if (onPayroll) {
+          const _taken = formatHolidayCount(countHolidayDays(r.email));
+          const _budget = holidayBudgetFor(r.email);
+          if (_budget) {
+            const _min = formatHolidayCount(_budget.min_days);
+            const _max = _budget.is_unlimited ? "INF" : formatHolidayCount(_budget.max_days);
+            const _why = (_budget.reason || "").replace(/"/g, "&quot;");
+            _badge = ' <span class="hd-team-budget" title="' + _why + '">' + _taken + ' / ' + _min + '-' + _max + '</span>';
+          } else {
+            _badge = ' <span class="hd-team-budget">' + _taken + '</span>';
+          }
+        }
+        name.innerHTML = _baseName + _badge;
+        if (!onPayroll) name.title = "Not on payroll - calendar disabled";
         row.appendChild(name);
 
         const dayMap = r.dayMap || ((holidaysDoc.by_user || {})[r.email] || {}).days || {};
