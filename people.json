@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T16:34:36.353Z",
+  "updated_at": "2026-05-20T16:34:57.232Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -5222,7 +5222,7 @@
       "external_google_email": "",
       "auth0_id": "",
       "access_level": "staff",
-      "company": "LetMe",
+      "company": "Richmond Group",
       "title": "",
       "department": "",
       "phone": "07802351793",
@@ -5234,7 +5234,7 @@
       "directory_photo_uploaded_at": "",
       "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-20T16:02:07Z",
+      "updated_at": "2026-05-20T16:34:57.232Z",
       "url_slug": "tom.slaughter",
       "most_recent_payroll_id": 84,
       "on_payroll": true,
