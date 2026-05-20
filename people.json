@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T10:04:00.401Z",
+  "updated_at": "2026-05-20T10:05:53.140Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -3724,11 +3724,12 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:59:31Z",
+      "updated_at": "2026-05-20T10:05:53.140Z",
       "most_recent_payroll_id": 28,
       "on_payroll": true,
       "url_slug": "maisey.lapskas",
-      "date_of_birth": "2002-06-29"
+      "date_of_birth": "2002-06-29",
+      "team": "Underwriting"
     },
     {
       "id": 135,
