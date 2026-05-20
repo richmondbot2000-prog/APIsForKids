@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T10:21:54.049Z",
+  "updated_at": "2026-05-20T10:21:56.178Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -2695,9 +2695,10 @@
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-20T10:21:54.049Z",
+      "updated_at": "2026-05-20T10:21:56.178Z",
       "url_slug": "joe.cortez",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "team": "Collections"
     },
     {
       "id": 100,
