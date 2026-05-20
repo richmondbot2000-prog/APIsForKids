@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T15:25:00.640Z",
+  "updated_at": "2026-05-20T15:25:09.958Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -4078,13 +4078,13 @@
       "phone": "07584188681",
       "address": "16 Whitworth Way\nWimborne Dorset\nWimborne Minster\nDorset\nBH21 3FD",
       "start_date": "2024-01-01",
-      "line_manager_id": null,
+      "line_manager_id": "118",
       "line_manager_email_raw": "",
       "role": "",
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:59:31Z",
+      "updated_at": "2026-05-20T15:25:09.958Z",
       "most_recent_payroll_id": 29,
       "on_payroll": true,
       "url_slug": "morgan.smith",
