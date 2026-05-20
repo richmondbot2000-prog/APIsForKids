@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T12:34:29.176Z",
+  "updated_at": "2026-05-20T12:35:43.359Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -3848,13 +3848,13 @@
       "phone": "",
       "address": "32 The Old Sorting Office 5 Albert Road BH1 1AX\nBournemouth\nDorset\nBH1 1AX",
       "start_date": "2024-10-07",
-      "line_manager_id": null,
+      "line_manager_id": "152",
       "line_manager_email_raw": "",
       "role": "",
       "directory_photo_uploaded_at": "2026-05-14T08:33:29+01:00",
       "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-20T10:59:45.351Z",
+      "updated_at": "2026-05-20T12:35:43.359Z",
       "url_slug": "marta.gallardo",
       "most_recent_payroll_id": 90,
       "on_payroll": true,
