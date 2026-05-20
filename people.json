@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T10:57:48.807Z",
+  "updated_at": "2026-05-20T10:58:04.572Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -731,14 +731,15 @@
       "directory_photo_uploaded_at": "2026-05-14T08:59:54+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-20T10:57:48.807Z",
+      "updated_at": "2026-05-20T10:58:04.572Z",
       "most_recent_payroll_id": 12,
       "on_payroll": true,
       "url_slug": "bryony.leach",
       "date_of_birth": "1999-02-28",
       "bookr_uids": [
         "HQXzIXThbRYSrlSH6go2nv1Ded13"
-      ]
+      ],
+      "team": "Litigation"
     },
     {
       "id": 21,
