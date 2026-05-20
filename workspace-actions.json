@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T14:42:01.222Z",
+  "updated_at": "2026-05-20T15:07:44.415Z",
   "actions": [
     {
       "ts": "2026-05-13T20:27:39.210Z",
@@ -2542,6 +2542,13 @@
       "actor": "amber.cole@letme.com",
       "action": "people-merge",
       "target": "173 → 39",
+      "ok": true
+    },
+    {
+      "ts": "2026-05-20T15:07:44.415Z",
+      "actor": "sophia.ugwunne@letme.com",
+      "action": "people-merge",
+      "target": "77 → 78",
       "ok": true
     }
   ]
