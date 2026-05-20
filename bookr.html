@@ -10,11 +10,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1779059800">
-<link rel="stylesheet" href="quiet-tokens.css?v=1779059800">
-<link rel="stylesheet" href="quiet.css?v=1779059800">
-<link rel="stylesheet" href="quiet-extras.css?v=1779059800">
-<link rel="stylesheet" href="quiet-legacy.css?v=1779059800">
+<link rel="stylesheet" href="style.css?v=1779275180">
+<link rel="stylesheet" href="quiet-tokens.css?v=1779275180">
+<link rel="stylesheet" href="quiet.css?v=1779275180">
+<link rel="stylesheet" href="quiet-extras.css?v=1779275180">
+<link rel="stylesheet" href="quiet-legacy.css?v=1779275180">
 <style>
   .bk-section { max-width: 100%; margin: 0 auto; padding: 18px 16px 48px; }
   .bk-section h1 {
@@ -68,10 +68,14 @@
     padding: 10px 14px; margin: 0 0 14px;
     font: 400 13px/1.45 var(--font-body); color: var(--ink-900);
   }
-  /* The grid lives in a horizontally scrollable wrapper so the sticky
-     asset column always stays put on mobile. */
+  /* The grid lives in a scrollable wrapper so the sticky asset column
+     always stays put on mobile, AND the day-header row can stick to
+     the top of the grid as the user scrolls down. Sticky elements
+     latch to their nearest scrollport, so the wrap has to be the
+     scrolling box for both axes — hence the viewport-height cap. */
   .bk-grid-wrap {
-    overflow-x: auto; max-width: 100%;
+    overflow: auto; max-width: 100%;
+    max-height: calc(100vh - 180px);
     border: 1px solid var(--ink-300); background: var(--paper-50);
   }
   .bk-grid {
@@ -127,9 +131,10 @@
     font: 400 9px/1.15 var(--font-mono); color: var(--ink-600);
     word-break: break-word; overflow-wrap: anywhere;
   }
-  /* Day-header row stays at the top while you scroll the grid vertically.
-     For now the page is a single grid, no vertical sticky needed. */
+  /* Day-header row sticks to the top of the grid scrollport so the
+     date is always visible as the user scrolls through assets. */
   .bk-day-head {
+    position: sticky; top: 0; z-index: 4;
     background: var(--paper-200); padding: 4px 2px;
     text-align: center;
     font: 600 10px/1.1 var(--font-mono); color: var(--ink-700);
@@ -144,7 +149,7 @@
   .bk-day-head .bk-mo  { display: block; font-size: 9px; opacity: 0.65; }
   /* The corner cell (top-left intersection of asset col + day row). */
   .bk-corner {
-    position: sticky; left: 0; z-index: 3;
+    position: sticky; left: 0; top: 0; z-index: 5;
     background: var(--paper-200); border-right: 2px solid #000; border-bottom: 1px solid #ffffff;
     padding: 4px 4px; font: 600 8px/1.15 var(--font-mono); color: var(--ink-700);
     text-transform: uppercase; letter-spacing: 0.04em;
@@ -234,7 +239,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="/wall.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779059800" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779275180" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1071,6 +1076,6 @@
   loadAll();
 })();
 </script>
-<script src="nav.js?v=1779059800"></script>
+<script src="nav.js?v=1779275180"></script>
 </body>
 </html>
