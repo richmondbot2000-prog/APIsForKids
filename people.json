@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T18:21:28.685Z",
+  "updated_at": "2026-05-20T18:21:30.975Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -2993,15 +2993,16 @@
       "phone": "",
       "address": "",
       "start_date": "",
-      "line_manager_id": "87",
+      "line_manager_id": null,
       "line_manager_email_raw": "",
-      "role": "Software Engineer",
+      "role": "",
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-20T18:21:27.668Z",
+      "updated_at": "2026-05-20T18:21:29.375Z",
       "url_slug": "kamran.kamaei",
-      "most_recent_payroll_id": null
+      "most_recent_payroll_id": null,
+      "team": "Software development"
     },
     {
       "id": 113,
