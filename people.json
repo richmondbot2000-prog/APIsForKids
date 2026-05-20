@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T16:33:50.115Z",
+  "updated_at": "2026-05-20T16:34:06.156Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -4987,7 +4987,7 @@
       "external_google_email": "",
       "auth0_id": "",
       "access_level": "staff",
-      "company": "LetMe",
+      "company": "Together",
       "title": "",
       "department": "",
       "phone": "07901144203",
@@ -4999,7 +4999,7 @@
       "directory_photo_uploaded_at": "2026-05-14T07:57:50+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-20T16:02:07Z",
+      "updated_at": "2026-05-20T16:34:06.156Z",
       "url_slug": "stan.majerski",
       "most_recent_payroll_id": 94,
       "on_payroll": true,
