@@ -10,11 +10,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1779302374">
-<link rel="stylesheet" href="quiet-tokens.css?v=1779302374">
-<link rel="stylesheet" href="quiet.css?v=1779302374">
-<link rel="stylesheet" href="quiet-extras.css?v=1779302374">
-<link rel="stylesheet" href="quiet-legacy.css?v=1779302374">
+<link rel="stylesheet" href="style.css?v=1779304150">
+<link rel="stylesheet" href="quiet-tokens.css?v=1779304150">
+<link rel="stylesheet" href="quiet.css?v=1779304150">
+<link rel="stylesheet" href="quiet-extras.css?v=1779304150">
+<link rel="stylesheet" href="quiet-legacy.css?v=1779304150">
 <style>
   .bk-section { max-width: 100%; margin: 0 auto; padding: 18px 16px 48px; }
   .bk-section h1 {
@@ -62,6 +62,71 @@
     padding: 4px 8px; border: 1px solid var(--brass-300); color: var(--brass-700); background: var(--brass-50);
   }
   .bk-link-pill.is-unlinked { color: var(--red-700); border-color: var(--red-300); background: var(--red-50); }
+  /* News tab — magazine layout. Photo on top, broadsheet-style headline,
+     short article, "Book this" link to the Calendar tab pre-filtered to
+     the asset's type. 1 column on mobile, 2 columns from 720 px up. */
+  #bkNewsPanel { margin: 0 0 22px; }
+  .bk-news-status, .bk-news-empty {
+    font: italic 500 13px/1.4 var(--font-display, "Newsreader", serif);
+    color: var(--ink-600); padding: 14px 0 6px;
+  }
+  .bk-news-empty { color: var(--ink-700); padding: 22px 4px; }
+  .bk-news-grid {
+    display: grid; gap: 22px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 720px) {
+    .bk-news-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+  }
+  .bk-news-article {
+    background: var(--paper-50, #FBF6E9);
+    border: 1px solid var(--ink-300);
+    border-left: 4px solid var(--brass-500, #C8973F);
+    padding: 0 0 16px;
+    display: flex; flex-direction: column;
+  }
+  .bk-news-photo {
+    width: 100%; height: 220px;
+    background: var(--paper-200, #F5ECD4);
+    object-fit: cover; display: block;
+    border-bottom: 1px solid var(--paper-300, #ECDFB6);
+  }
+  .bk-news-kicker {
+    font: 600 10px/1.2 var(--font-mono, "JetBrains Mono", monospace);
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--brass-700, #8a6720);
+    margin: 14px 18px 4px;
+  }
+  .bk-news-headline {
+    font: 700 22px/1.15 var(--font-display, "Newsreader", serif);
+    color: var(--ink-900);
+    margin: 0 18px 8px;
+    letter-spacing: 0.005em;
+  }
+  .bk-news-body {
+    font: 400 14px/1.55 var(--font-display, "Newsreader", serif);
+    color: var(--ink-900);
+    margin: 0 18px 14px;
+  }
+  .bk-news-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: 0 18px;
+    border-top: 1px solid var(--paper-300, #ECDFB6);
+    padding-top: 10px;
+  }
+  .bk-news-window {
+    font: italic 500 12px/1.2 var(--font-display);
+    color: var(--ink-600);
+  }
+  .bk-news-cta {
+    font: 600 12px/1 var(--font-body, "Inter", sans-serif);
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--paper-50); background: var(--ink-900);
+    padding: 8px 14px; text-decoration: none;
+    border: 1px solid var(--ink-900);
+  }
+  .bk-news-cta:hover { background: var(--brass-700, #8a6720); border-color: var(--brass-700, #8a6720); }
+
   /* Banner shown when the viewer has no BookR uid mapping. */
   .bk-banner {
     background: var(--red-50); border-left: 4px solid var(--red-500);
@@ -239,7 +304,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="/wall.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779302374" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779304150" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -260,10 +325,16 @@
   <h1>BOOKR</h1>
   <div id="bkBanner" class="bk-banner" style="display:none"></div>
   <div class="bk-tabs">
-    <button class="bk-tab is-active" data-tab="calendar" type="button">Calendar</button>
+    <button class="bk-tab is-active" data-tab="news" type="button">News</button>
+    <button class="bk-tab" data-tab="calendar" type="button">Calendar</button>
     <button class="bk-tab" data-tab="mine" type="button">My Bookings</button>
   </div>
-  <div id="bkCalendarPanel">
+  <div id="bkNewsPanel">
+    <div id="bkNewsStatus" class="bk-news-status">Looking for assets free at short notice…</div>
+    <div id="bkNewsGrid" class="bk-news-grid"></div>
+    <div id="bkNewsEmpty" class="bk-news-empty" hidden></div>
+  </div>
+  <div id="bkCalendarPanel" style="display:none;">
     <div class="bk-toolbar">
       <span><span class="bk-tool-label">Days</span>
         <select id="bkZoom" class="bk-select">
@@ -302,7 +373,9 @@
     bookings: {},      /* keyed by `type:id` -> {date: uid|free} */
     isAdmin: false,
     targetEmail: null, /* removed UI — kept for back-compat with payload helpers */
-    tab: "calendar",
+    tab: "news",
+    newsReady: false,    /* renderNews ran at least once; gate repeats */
+    newsBookings: null,  /* cached /all-bookings response */
     pendingDates: new Set(),
     peopleByBookrUid: {},  /* uid -> Person record (for avatar lookup) */
   };
@@ -582,12 +655,150 @@
     for (let i = 0; i < total; i++) days.push(addDays(start, i));
     return { start: start, end: addDays(start, total - 1), days: days };
   }
+  /* News tab — magazine articles for hand-featured assets that are free at
+     short notice. Photos live in /assets/bookr/. Match a featured slug to
+     a live BookR asset by case-insensitive title-contains; an article is
+     only shown when at least one day in the relevant window (3 for cars,
+     14 for properties) has no booking on the matched asset. */
+  const NEWS_ARTICLES = [
+    {
+      slug: "brawn", type: "cars", photo: "/assets/bookr/Brawn.webp",
+      kicker: "Car · ready when you are",
+      headline: "A Workhorse for the Weekend",
+      body: "Brawn waits in his bay, engine cool, ready for whichever colleague can put him to honest work this week. Built for grit rather than glamour — short on chrome, long on character — Brawn rewards the driver who prefers a back road over a motorway and a thermos over a service-station latte. A handful of free days lie ahead, and they will not last. Take him out for a run; bring him back with a story.",
+    },
+    {
+      slug: "galvatron", type: "cars", photo: "/assets/bookr/Galvatron.png",
+      kicker: "Car · loud, fast, available",
+      headline: "The Decepticon Demands a Driver",
+      body: "Galvatron is loose this week, polished to a thunder, prowling the courtyard for someone bold enough to take the keys. Built for arrival as much as speed, he is the car of choice when the meeting matters more than the mileage. Three free days in the schedule, and not a single one of them belongs to you yet. Reserve him before a colleague does — Galvatron has never once felt sentimental about who climbed in first.",
+    },
+    {
+      slug: "optimus", type: "cars", photo: "/assets/bookr/Optimus.webp",
+      kicker: "Car · steady as the rain",
+      headline: "Optimus, Open for Business",
+      body: "Few cars wear their reputation as lightly as Optimus does. He is reliable in the rain, willing in the morning, and never once in his career has he complained about a long drive home. The diary shows a clear window this week — a quiet pocket before the calendar fills back up. Click through, claim the day, and let Optimus do what Optimus does best: get you there, calmly and without ceremony.",
+    },
+    {
+      slug: "wheeljack", type: "cars", photo: "/assets/bookr/Wheeljack.webp",
+      kicker: "Car · for the scenic route",
+      headline: "An Inventor's Car, Not an Accountant's",
+      body: "Wheeljack is wired for curiosity. He prefers a winding lane to a straight one and treats every junction as a small experiment in possibility — the kind of car a colleague borrows for the day and returns wearing a slightly different smile. Open days in the week ahead. Book him in, point him at a horizon worth looking at, and bring back a story for the Wall when you get home.",
+    },
+    {
+      slug: "chalet", type: "properties", photo: "/assets/bookr/Chalet.jpg",
+      kicker: "Property · two-week window",
+      headline: "A Fortnight's Calm, Keys on the Hook",
+      body: "The Chalet stands quiet this fortnight — woodsmoke off, kettle dry, awaiting the next colleague to take its keys. Two weeks of open dates lie ahead, which means quiet mornings, real silence, and the kind of view that makes a Monday legible. Book the room. Bring the book you keep meaning to read. The world will still be on fire when you get back, only you will be better positioned to face it.",
+    },
+    {
+      slug: "townhouse", type: "properties", photo: "/assets/bookr/Townhouse.jpg",
+      kicker: "Property · two-week window",
+      headline: "The Townhouse Waits, Gas Lamps Lit",
+      body: "Brass knocker polished, floorboards humming, the Townhouse keeps a fortnight free for whichever colleague needs a working week with high ceilings and a half-decent espresso machine. London at the door; quiet rooms behind it. Two weeks of open dates means the diary is yours to claim. Book it, walk in, and let the city do the heavy lifting of impressing anyone you happen to bring along.",
+    },
+  ];
+  const CAR_WINDOW_DAYS  = 3;
+  const PROP_WINDOW_DAYS = 14;
+
+  function newsMatchAsset(article) {
+    const pool = article.type === "cars" ? (STATE.cars || []) : (STATE.properties || []);
+    const slug = article.slug.toLowerCase();
+    return pool.find(a => (a.title || "").toLowerCase().includes(slug)) || null;
+  }
+  function newsHasFreeDay(bookings, asset, windowDays) {
+    if (!asset) return false;
+    const today = todayMidnight();
+    const byDate = (bookings && bookings[asset.id]) || {};
+    for (let i = 0; i < windowDays; i++) {
+      const d = ymd(addDays(today, i));
+      if (!(d in byDate)) return true;  // never booked that day
+      const v = byDate[d];
+      if (!v) return true;              // explicit null/false → free
+    }
+    return false;
+  }
+
+  async function ensureNewsBookings() {
+    if (STATE.newsBookings) return STATE.newsBookings;
+    const today = todayMidnight();
+    const from = ymd(today);
+    const to   = ymd(addDays(today, PROP_WINDOW_DAYS));  // covers both windows
+    try {
+      const r = await getJSON(`/api/bookr/all-bookings?from=${from}&to=${to}`);
+      STATE.newsBookings = (r && r.bookings) || { cars: {}, properties: {} };
+    } catch (e) {
+      STATE.newsBookings = { cars: {}, properties: {} };
+    }
+    return STATE.newsBookings;
+  }
+  async function renderNews() {
+    const statusEl = document.querySelector("#bkNewsStatus");
+    const gridEl   = document.querySelector("#bkNewsGrid");
+    const emptyEl  = document.querySelector("#bkNewsEmpty");
+    if (STATE.newsReady) {
+      statusEl.style.display = "none";  // skip re-fetch on tab toggle
+    } else {
+      statusEl.style.display = "";
+      statusEl.textContent = "Looking for assets free at short notice…";
+      gridEl.innerHTML = "";
+    }
+    const bookings = await ensureNewsBookings();
+    statusEl.style.display = "none";
+    STATE.newsReady = true;
+    const featured = [];
+    for (const art of NEWS_ARTICLES) {
+      const asset = newsMatchAsset(art);
+      const win = art.type === "cars" ? CAR_WINDOW_DAYS : PROP_WINDOW_DAYS;
+      if (!asset || !asset.available) continue;
+      const branch = (bookings && bookings[art.type]) || {};
+      if (!newsHasFreeDay(branch, asset, win)) continue;
+      featured.push({ art, asset, win });
+    }
+    if (!featured.length) {
+      gridEl.innerHTML = "";
+      emptyEl.hidden = false;
+      emptyEl.textContent = "Every featured car and property is booked through the next two weeks. Check back tomorrow.";
+      return;
+    }
+    emptyEl.hidden = true;
+    gridEl.innerHTML = featured.map(({ art, asset, win }) => {
+      const windowLabel = win === CAR_WINDOW_DAYS
+        ? "Free in the next 3 days"
+        : "Free in the next 2 weeks";
+      const ctaHref = `?tab=calendar&type=${encodeURIComponent(art.type)}&asset=${encodeURIComponent(asset.id)}`;
+      return `
+        <article class="bk-news-article">
+          <img class="bk-news-photo" src="${escapeHtml(art.photo)}" alt="${escapeHtml(art.headline)}" loading="lazy">
+          <div class="bk-news-kicker">${escapeHtml(art.kicker)}</div>
+          <h2 class="bk-news-headline">${escapeHtml(art.headline)}</h2>
+          <p class="bk-news-body">${escapeHtml(art.body)}</p>
+          <div class="bk-news-footer">
+            <span class="bk-news-window">${escapeHtml(windowLabel)}</span>
+            <a class="bk-news-cta" href="${ctaHref}" data-news-cta data-asset-type="${escapeHtml(art.type)}">Book ${escapeHtml(asset.title || art.slug)}</a>
+          </div>
+        </article>`;
+    }).join("");
+    gridEl.querySelectorAll("[data-news-cta]").forEach(a => {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        const type = a.dataset.assetType || "all";
+        STATE.tab = "calendar";
+        STATE.filter = (type === "cars" || type === "properties") ? type : "all";
+        document.querySelectorAll(".bk-tab").forEach(x => x.classList.toggle("is-active", x.dataset.tab === "calendar"));
+        document.querySelectorAll("#bkFilter button").forEach(x => x.classList.toggle("is-active", x.dataset.f === STATE.filter));
+        render();
+      });
+    });
+  }
   function render() {
-    /* Switch the calendar/mine panels. */
+    /* Switch the news/calendar/mine panels. */
+    document.querySelector("#bkNewsPanel").style.display     = (STATE.tab === "news")     ? "" : "none";
     document.querySelector("#bkCalendarPanel").style.display = (STATE.tab === "calendar") ? "" : "none";
-    document.querySelector("#bkMinePanel").style.display = (STATE.tab === "mine") ? "" : "none";
+    document.querySelector("#bkMinePanel").style.display     = (STATE.tab === "mine")     ? "" : "none";
     if (STATE.tab === "calendar") renderGrid();
-    else renderMine();
+    else if (STATE.tab === "mine") renderMine();
+    else if (STATE.tab === "news") renderNews();
   }
 
   function buildAssetCell(a) {
@@ -1084,10 +1295,24 @@
       closePop();
     });
   }
+  // Honour ?tab=... so a News-article CTA opened in a new tab lands on
+  // the Calendar (with the matching type filter pre-set). Falls back to
+  // STATE.tab's default ("news") when nothing is in the URL.
+  (function applyDeepLink() {
+    try {
+      const qs = new URLSearchParams(location.search || "");
+      const tab = (qs.get("tab") || "").toLowerCase();
+      if (tab === "calendar" || tab === "mine" || tab === "news") STATE.tab = tab;
+      const f = (qs.get("type") || "").toLowerCase();
+      if (f === "cars" || f === "properties" || f === "all") STATE.filter = f;
+    } catch (e) { /* ignore */ }
+    // Reflect the chosen tab on the buttons before first render.
+    document.querySelectorAll(".bk-tab").forEach(b => b.classList.toggle("is-active", b.dataset.tab === STATE.tab));
+  })();
   wire();
   loadAll();
 })();
 </script>
-<script src="nav.js?v=1779302374"></script>
+<script src="nav.js?v=1779304150"></script>
 </body>
 </html>
