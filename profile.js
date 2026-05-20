@@ -541,6 +541,15 @@
     )).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
     const roleSuggestions = distinctOnPeople("role");
     const teamSuggestions = distinctOnPeople("team");
+    // Company suggestions: always include the three canonical labels so
+    // an admin can pick them without typing, even before any Person has
+    // them set; then union in any other distinct values already in use
+    // (HR may add e.g. a subsidiary by typing freely). Deduped + sorted.
+    const COMPANY_PRESETS = ["Together", "Richmond Group", "LetMe"];
+    const companySuggestions = Array.from(new Set([
+      ...COMPANY_PRESETS,
+      ...distinctOnPeople("company"),
+    ])).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
 
     // Line-manager picker (admin only). The display falls back to the
     // read-only chip / "No line manager" when the viewer isn't admin.
@@ -674,6 +683,7 @@
         <div class="up-card-head">Editable details ${lockedBadge}</div>
         ${editableRow("team",       "Team",         "text",     person.team,  null, teamSuggestions, /*adminOnly*/ true)}
         ${editableRow("role",       "Role",         "text",     person.role,  null, roleSuggestions, /*adminOnly*/ true)}
+        ${editableRow("company",    "Company",      "text",     person.company, "Pick from the suggested companies or type a new one — never overwritten by payroll / Google sync.", companySuggestions, /*adminOnly*/ true)}
         <div class="up-field" data-edit-field="line_manager_id">
           <div class="up-field-label">Line manager</div>
           ${viewerIsAdmin ? lineMgrEditor : `<div class="up-field-value">${lineMgrDisplay}</div>`}
@@ -2928,7 +2938,7 @@
       step = `POST /api/workspace/${action}`;
       const res = await fetch(WORKSPACE_API + "/" + action, {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, user_email: person.main_google_email, photo_b64: b64, tenant: (person.company || "").includes("togetherloans") ? "togetherloans" : "" }),
+        body: JSON.stringify({ action, user_email: person.main_google_email, photo_b64: b64, tenant: ((person.main_google_email || "").toLowerCase().includes("togetherloans") ? "togetherloans" : "") }),
       });
       step = `read response (${res.status})`;
       const out = await res.json();

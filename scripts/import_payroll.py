@@ -430,7 +430,10 @@ def main():
                 "external_google_email": row.get("email") or "",
                 "auth0_id":              "",
                 "access_level":          "staff",
-                "company":               row.get("employer") or "",
+                # company is a manually-curated label (Together / Richmond
+                # Group / LetMe / free text). Imports must not seed it —
+                # leave blank and let an admin set it on the Profile page.
+                "company":               "",
                 "title":                 "",
                 "department":            "",
                 "phone":                 row.get("mobile") or "",

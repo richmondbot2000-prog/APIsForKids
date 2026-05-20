@@ -7,9 +7,9 @@
 <title>TogetherBOOK — Wall</title>
 <link rel="icon" type="image/png" href="site-icon.png">
 <link rel="apple-touch-icon" href="site-icon.png">
-<link rel="stylesheet" href="quiet-tokens.css?v=1779292490">
-<link rel="stylesheet" href="quiet.css?v=1779292490">
-<link rel="stylesheet" href="quiet-extras.css?v=1779292490">
+<link rel="stylesheet" href="quiet-tokens.css?v=1779292950">
+<link rel="stylesheet" href="quiet.css?v=1779292950">
+<link rel="stylesheet" href="quiet-extras.css?v=1779292950">
 <style>
   /* 648 px column — sweet spot per editorial line-length research
      (60–75 chars per line at 15 px body). Wider feels marketing-y. */
@@ -1441,7 +1441,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="/wall.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779292490" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779292950" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1523,7 +1523,7 @@
   </section>
 </main>
 
-<script src="nav.js?v=1779292490" defer></script>
+<script src="nav.js?v=1779292950" defer></script>
 <script>
 (function () {
   "use strict";
@@ -1750,7 +1750,7 @@
         for (const e of emails) {
           personByEmail[e] = p;
           if (!staffByEmail[e]) {
-            staffByEmail[e] = { email: e, name: p.name || p.id, photo_url: "", tenant: (p.company || "").includes("togetherloans") ? "togetherloans" : "letme.co.uk" };
+            staffByEmail[e] = { email: e, name: p.name || p.id, photo_url: "", tenant: ((p.main_google_email || "").toLowerCase().includes("togetherloans") ? "togetherloans" : "letme.co.uk") };
           }
           // Apply the same override (built from the linked email that actually
           // has the file) to every email on this Person, so wall posts authored

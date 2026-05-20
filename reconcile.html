@@ -10,10 +10,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css?v=1778923602">
-<link rel="stylesheet" href="/quiet-tokens.css?v=1778923602">
-<link rel="stylesheet" href="/quiet.css?v=1778923602">
-<link rel="stylesheet" href="/quiet-extras.css?v=1779059756">
+<link rel="stylesheet" href="/style.css?v=1779292950">
+<link rel="stylesheet" href="/quiet-tokens.css?v=1779292950">
+<link rel="stylesheet" href="/quiet.css?v=1779292950">
+<link rel="stylesheet" href="/quiet-extras.css?v=1779292950">
 <style>
   body { background: var(--paper-100, #FBF6E9); }
   .rc-page { max-width: 1080px; margin: 0 auto; padding: 16px 12px 64px; }
@@ -69,7 +69,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="/wall.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="/togetherbook-logo.png?v=1778923602" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="/togetherbook-logo.png?v=1779292950" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -293,7 +293,9 @@
       const payload = { action: "people-set", name: fields.name, main_google_email: fields.main_google_email };
       if (fields.url_slug)   payload.url_slug   = fields.url_slug;
       if (fields.start_date) payload.start_date = fields.start_date;
-      if (fields.company)    payload.company    = fields.company;
+      // company is a manually-curated human label now — admin sets it
+      // on the Profile page, not as a side effect of unmatched-account
+      // reconciliation.
       const out = await workspaceCall(payload);
       people.push(out.person);
       render();
@@ -320,6 +322,6 @@
     render();
   });
 </script>
-<script src="/nav.js?v=1779136390" defer></script>
+<script src="/nav.js?v=1779292950" defer></script>
 </body>
 </html>
