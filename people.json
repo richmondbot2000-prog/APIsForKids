@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T16:35:38.734Z",
+  "updated_at": "2026-05-20T16:38:23.966Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -1387,7 +1387,7 @@
       "external_google_email": "",
       "auth0_id": "",
       "access_level": "staff",
-      "company": "LetMe",
+      "company": "Richmond Group",
       "title": "",
       "department": "",
       "phone": "07966793804",
@@ -1403,7 +1403,7 @@
       "most_recent_payroll_id": 74,
       "suspended": false,
       "created_at": "2026-05-17T14:06:41Z",
-      "updated_at": "2026-05-20T16:33:02.451Z",
+      "updated_at": "2026-05-20T16:38:23.966Z",
       "url_slug": "david.benamor",
       "date_of_birth": "2002-08-23"
     },
