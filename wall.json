@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T10:52:14.685Z",
+  "updated_at": "2026-05-20T10:52:59.591Z",
   "posts": [
     {
       "id": "post_mpdsge97_z03sf8",
@@ -15,6 +15,9 @@
       "reactions": {
         "👍": [
           "ben.gardner@togetherloans.com"
+        ],
+        "❤️": [
+          "mourad.malki@letme.com"
         ]
       },
       "comments": [],
@@ -25,6 +28,14 @@
           "target_kind": "post",
           "target_id": "post_mpdsge97_z03sf8",
           "at": "2026-05-20T10:52:14.481Z",
+          "kind": "added"
+        },
+        {
+          "actor_email": "mourad.malki@letme.com",
+          "emoji": "❤️",
+          "target_kind": "post",
+          "target_id": "post_mpdsge97_z03sf8",
+          "at": "2026-05-20T10:52:59.333Z",
           "kind": "added"
         }
       ]
