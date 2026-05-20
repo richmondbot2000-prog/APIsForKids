@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T15:29:57.236Z",
+  "updated_at": "2026-05-20T15:29:58.625Z",
   "year_start": "2026-04-01",
   "year_end": "2027-03-31",
   "by_user": {
@@ -131,9 +131,7 @@
       "notes": {}
     },
     "victor.igbaifua@letme.com": {
-      "days": {
-        "2026-05-29": "holiday"
-      },
+      "days": {},
       "notes": {}
     },
     "ben.gardner@togetherloans.com": {
@@ -1996,6 +1994,14 @@
       "to": null,
       "changed_by": "victor.igbaifua@letme.com",
       "changed_at": "2026-05-20T15:29:57.236Z"
+    },
+    {
+      "user_email": "victor.igbaifua@letme.com",
+      "date": "2026-05-29",
+      "from": "holiday",
+      "to": null,
+      "changed_by": "victor.igbaifua@letme.com",
+      "changed_at": "2026-05-20T15:29:58.625Z"
     }
   ]
 }
