@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T15:30:16.489Z",
+  "updated_at": "2026-05-20T15:30:21.703Z",
   "year_start": "2026-04-01",
   "year_end": "2027-03-31",
   "by_user": {
@@ -132,7 +132,8 @@
     },
     "victor.igbaifua@letme.com": {
       "days": {
-        "2026-04-28": "approved-holiday"
+        "2026-04-28": "approved-holiday",
+        "2026-04-29": "approved-holiday"
       },
       "notes": {}
     },
@@ -2012,6 +2013,14 @@
       "to": "approved-holiday",
       "changed_by": "victor.igbaifua@letme.com",
       "changed_at": "2026-05-20T15:30:16.489Z"
+    },
+    {
+      "user_email": "victor.igbaifua@letme.com",
+      "date": "2026-04-29",
+      "from": null,
+      "to": "approved-holiday",
+      "changed_by": "victor.igbaifua@letme.com",
+      "changed_at": "2026-05-20T15:30:21.703Z"
     }
   ]
 }
