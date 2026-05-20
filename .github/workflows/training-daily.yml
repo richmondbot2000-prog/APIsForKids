@@ -1,0 +1,79 @@
+name: Training reminders + auto-enrol
+
+# Runs the daily reminder mailer + the new-starter / new-manager
+# auto-enrolment sweep for the harassment-prevention training module.
+#
+# Default mode is DRY-RUN — flip TRAINING_LIVE in the workflow `env`
+# block (or trigger workflow_dispatch with live=true) once HR is
+# ready for real emails to send. Until that flip, the workflow
+# prints every email it would send to the run log and writes no
+# reminder_sent events.
+
+on:
+  schedule:
+    # 08:30 UTC every weekday (09:30 BST / 08:30 GMT). Avoid weekends
+    # — the email arc reads weirdly if a "due in 2 days" lands on a
+    # Saturday morning.
+    - cron: "30 8 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      live:
+        description: "Send for real (otherwise dry-run)"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: training-daily
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      # Set TRAINING_LIVE to "true" via the workflow_dispatch input OR
+      # commit a change to "true" below once HR is happy. Until then
+      # the workflow runs dry: it prints what it WOULD do.
+      TRAINING_LIVE: ${{ github.event.inputs.live || 'false' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Pick dry-run flag
+        id: pick
+        run: |
+          if [ "${{ env.TRAINING_LIVE }}" = "true" ]; then
+            echo "flag=" >> "$GITHUB_OUTPUT"
+            echo "Mode: LIVE"
+          else
+            echo "flag=--dry-run" >> "$GITHUB_OUTPUT"
+            echo "Mode: DRY-RUN"
+          fi
+
+      - name: Auto-enrol new starters + line managers
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: python3 scripts/training_reminders.py --auto-enrol ${{ steps.pick.outputs.flag }}
+
+      - name: Send daily reminders
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          HR_ESCALATION_CC: ${{ secrets.HR_ESCALATION_CC }}
+        run: python3 scripts/training_reminders.py --reminders ${{ steps.pick.outputs.flag }}

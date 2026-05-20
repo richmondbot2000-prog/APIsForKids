@@ -115,6 +115,13 @@ export default {
     if (url0.pathname.startsWith("/api/bookr/")) {
       return await handleBookr(req, env, url0);
     }
+    // /api/training/* — harassment-prevention training module: assign,
+    // start, answer questions, save reflections, issue certificates,
+    // admin reports. Tribunal-defensible audit trail in
+    // training-events.json + training-audit.json.
+    if (url0.pathname.startsWith("/api/training/")) {
+      return await handleTraining(req, env, url0);
+    }
 
     // GET /api/workspace/payroll — returns the payroll JSON stored in the
     // PAYROLL_KV namespace under the key `current`. Behind Cloudflare Access
@@ -4371,3 +4378,795 @@ async function bookrUserUnlink(env, viewerEmail, body) {
   await bookrWritePersonUids(env, pid, next, viewerEmail);
   return { ok: true, person_id: pid, bookr_uids: next, removed: uid };
 }
+
+/* ──────────────────────────────────────────────────────────────────────
+ * /api/training/*  —  harassment-prevention training module
+ *
+ * Storage in the repo:
+ *   training-assignments.json   who is assigned what (with deadlines)
+ *   training-events.json        append-only audit of every employee
+ *                               event (attempt-completed, certificate-
+ *                               issued, etc.) — tribunal-defensible
+ *   training-audit.json         append-only audit of HR/admin actions
+ *   training-config.json        current cycle config (rotation seed,
+ *                               retention years, signing officer, etc.)
+ *   training/modules/*.md       module reading content (HTML
+ *                               rendered on the client from markdown)
+ *   training/modules/*.questions.json   per-module question bank
+ *
+ * Storage in Cloudflare KV (private — never in the public repo):
+ *   PAYROLL_KV key `training:reflections:<email>:<module>:<reflection_id>`
+ *                              stores employee free-text reflections.
+ *                              Sensitive: HR-admin read only.
+ *
+ * Endpoint surface (POST except where noted):
+ *   GET  /api/training/whoami          → viewer email + name + roles
+ *   GET  /api/training/state           → assignments + completion + due
+ *   POST /api/training/start-attempt   { module_id } → { attempt_id, q[] }
+ *   POST /api/training/submit-attempt  { attempt_id, answers[] } → { score, passed, ... }
+ *   POST /api/training/save-reflection { module_id, reflection_id, text }
+ *   POST /api/training/complete-module { module_id }
+ *   POST /api/training/issue-certificate { cycle_year }
+ *   GET  /api/training/certificate?id=<cert_id> → cert HTML
+ *   GET  /api/training/admin/state          (admin only) — full overview
+ *   POST /api/training/admin/assign         (admin only)
+ *   POST /api/training/admin/exempt         (admin only)
+ *   POST /api/training/admin/extend         (admin only)
+ *   POST /api/training/admin/escalate       (admin only) manual escalate
+ *   GET  /api/training/admin/reflections?email=&module=  (admin) — KV read
+ *   GET  /api/training/admin/export?format=csv|json (admin)
+ *   POST /api/training/admin/auto-enrol      (admin/cron) — sweep
+ *
+ * Tribunal-evidence guarantees:
+ *   - Every employee-side write appends an event with server-side
+ *     timestamp + actor + module + version + score.
+ *   - Every admin action appends to training-audit.json.
+ *   - Reflections never appear in the public repo; KV is gated by
+ *     the admin endpoint.
+ *   - Question bank version + module-content version are pinned at
+ *     attempt-start, so a later re-publish doesn't retroactively
+ *     change what someone was tested on.
+ * ──────────────────────────────────────────────────────────────────── */
+
+const TRAINING_ASSIGNMENTS_PATH = "training-assignments.json";
+const TRAINING_EVENTS_PATH      = "training-events.json";
+const TRAINING_AUDIT_PATH       = "training-audit.json";
+const TRAINING_CONFIG_PATH      = "training-config.json";
+const TRAINING_REFLECTION_KV    = "training:reflections:";  // PAYROLL_KV prefix
+const TRAINING_ATTEMPT_KV       = "training:attempt:";       // PAYROLL_KV prefix (in-flight attempts)
+const TRAINING_MAX_ATTEMPTS     = 3;
+const TRAINING_PASS_PERCENT     = 80;
+
+async function handleTraining(req, env, url) {
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(req) });
+  if (!req.headers.get("Cf-Access-Jwt-Assertion")) {
+    return json({ error: "not authenticated via Cloudflare Access" }, 401, req);
+  }
+  const action = url.pathname.replace(/^\/api\/training\/?/, "").split("?")[0];
+  const viewerEmail = (req.headers.get("Cf-Access-Authenticated-User-Email") || "").toLowerCase();
+  const viewerName  = (req.headers.get("Cf-Access-Authenticated-User-Name") || "").trim();
+  const admins = await fetchAdmins();
+  const isAdmin = admins.includes(viewerEmail);
+
+  try {
+    // GET endpoints
+    if (req.method === "GET") {
+      if (action === "whoami")       return json({ ok: true, email: viewerEmail, name: viewerName, is_admin: isAdmin }, 200, req);
+      if (action === "state")        return json(await trainingState(env, viewerEmail), 200, req);
+      if (action === "certificate")  return json(await trainingCertificate(env, viewerEmail, url.searchParams.get("id")), 200, req);
+      if (action === "admin/state") {
+        if (!isAdmin) return json({ error: "admin required" }, 403, req);
+        return json(await trainingAdminState(env), 200, req);
+      }
+      if (action === "admin/reflections") {
+        if (!isAdmin) return json({ error: "admin required" }, 403, req);
+        return json(await trainingAdminReflections(env, url.searchParams.get("email"), url.searchParams.get("module")), 200, req);
+      }
+      if (action === "admin/export") {
+        if (!isAdmin) return json({ error: "admin required" }, 403, req);
+        return await trainingAdminExport(env, url.searchParams.get("format") || "json", req);
+      }
+      return json({ error: `unknown GET action: ${action}` }, 404, req);
+    }
+    if (req.method !== "POST") return json({ error: "method not allowed" }, 405, req);
+
+    let body = {};
+    try { body = await req.json(); } catch (e) { return json({ error: "bad JSON body" }, 400, req); }
+
+    switch (action) {
+      case "start-attempt":      return json(await trainingStartAttempt(env, viewerEmail, body), 200, req);
+      case "submit-attempt":     return json(await trainingSubmitAttempt(env, viewerEmail, viewerName, body), 200, req);
+      case "save-reflection":    return json(await trainingSaveReflection(env, viewerEmail, body), 200, req);
+      case "complete-module":    return json(await trainingCompleteModule(env, viewerEmail, body), 200, req);
+      case "issue-certificate":  return json(await trainingIssueCertificate(env, viewerEmail, viewerName, body), 200, req);
+      case "admin/assign":       if (!isAdmin) return json({ error: "admin required" }, 403, req);
+                                 return json(await trainingAdminAssign(env, viewerEmail, body), 200, req);
+      case "admin/exempt":       if (!isAdmin) return json({ error: "admin required" }, 403, req);
+                                 return json(await trainingAdminExempt(env, viewerEmail, body), 200, req);
+      case "admin/extend":       if (!isAdmin) return json({ error: "admin required" }, 403, req);
+                                 return json(await trainingAdminExtend(env, viewerEmail, body), 200, req);
+      case "admin/escalate":     if (!isAdmin) return json({ error: "admin required" }, 403, req);
+                                 return json(await trainingAdminEscalate(env, viewerEmail, body), 200, req);
+      case "admin/auto-enrol":   if (!isAdmin) return json({ error: "admin required" }, 403, req);
+                                 return json(await trainingAdminAutoEnrol(env, viewerEmail, body), 200, req);
+      case "admin/reminders":    if (!isAdmin) return json({ error: "admin required" }, 403, req);
+                                 return json(await trainingDailyReminders(env, viewerEmail, body), 200, req);
+      default: return json({ error: `unknown training action: ${action}` }, 404, req);
+    }
+  } catch (e) {
+    return json({ ok: false, error: e.message || String(e) }, 500, req);
+  }
+}
+
+/* ── Read helpers ────────────────────────────────────────────────── */
+
+async function trainingFetchConfig(env) {
+  const raw = await ghReadJson(env, TRAINING_CONFIG_PATH);
+  return raw || {};
+}
+async function trainingFetchAssignments(env) {
+  const raw = await ghReadJson(env, TRAINING_ASSIGNMENTS_PATH);
+  return (raw && Array.isArray(raw.assignments)) ? raw.assignments : [];
+}
+async function trainingFetchEvents(env) {
+  const raw = await ghReadJson(env, TRAINING_EVENTS_PATH);
+  return (raw && Array.isArray(raw.events)) ? raw.events : [];
+}
+
+async function ghReadJson(env, path) {
+  if (!env.GITHUB_TOKEN) throw new Error("GITHUB_TOKEN not configured");
+  const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}?ref=${BRANCH}&_=${Date.now()}`, {
+    headers: { Authorization: `Bearer ${env.GITHUB_TOKEN}`, Accept: "application/vnd.github+json", "User-Agent": "apifk-workspace-worker" },
+  });
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error(`read ${path} failed: HTTP ${r.status}`);
+  const meta = await r.json();
+  const bin = atob((meta.content || "").replace(/\s/g, ""));
+  return JSON.parse(new TextDecoder("utf-8").decode(Uint8Array.from(bin, c => c.charCodeAt(0))));
+}
+
+/* ── /state — assignments, completion, due-dates for the viewer ─── */
+
+async function trainingState(env, viewerEmail) {
+  if (!viewerEmail) throw new Error("not authenticated");
+  const [assignments, events, cfg] = await Promise.all([
+    trainingFetchAssignments(env), trainingFetchEvents(env), trainingFetchConfig(env),
+  ]);
+  const mine = assignments.filter(a => (a.user_email || "").toLowerCase() === viewerEmail && !a.exempt);
+  const myEvents = events.filter(e => (e.user_email || "").toLowerCase() === viewerEmail);
+
+  const modules = mine.map(a => {
+    const moduleEvents = myEvents.filter(e => e.module_id === a.module_id);
+    const attempts = moduleEvents.filter(e => e.type === "attempt_completed");
+    const passed = attempts.find(e => e.passed === true) || null;
+    const completed = moduleEvents.find(e => e.type === "module_completed") || null;
+    return {
+      module_id: a.module_id,
+      assigned_at: a.assigned_at,
+      deadline: a.deadline,
+      reason: a.reason,
+      attempts_used: attempts.length,
+      attempts_remaining: Math.max(0, TRAINING_MAX_ATTEMPTS - attempts.length),
+      best_score: attempts.reduce((m, e) => Math.max(m, e.score || 0), 0),
+      passed: !!passed,
+      passed_at: passed ? passed.ts : null,
+      completed: !!completed,
+      completed_at: completed ? completed.ts : null,
+    };
+  });
+
+  const certs = myEvents.filter(e => e.type === "certificate_issued");
+  return { ok: true, email: viewerEmail, modules, certificates: certs, config: { current_cycle_year: cfg.current_cycle_year, retention_years: cfg.retention_years } };
+}
+
+/* ── Quiz: start, submit ─────────────────────────────────────────── */
+
+async function trainingStartAttempt(env, viewerEmail, body) {
+  if (!viewerEmail) throw new Error("not authenticated");
+  const moduleId = String(body.module_id || "");
+  if (!moduleId) throw new Error("missing module_id");
+  // Verify assignment + retake budget.
+  const [assignments, events] = await Promise.all([
+    trainingFetchAssignments(env), trainingFetchEvents(env),
+  ]);
+  const assignment = assignments.find(a => (a.user_email || "").toLowerCase() === viewerEmail && a.module_id === moduleId && !a.exempt);
+  if (!assignment) throw new Error("module not assigned to you");
+  const myAttempts = events.filter(e => (e.user_email || "").toLowerCase() === viewerEmail && e.module_id === moduleId && e.type === "attempt_completed");
+  const alreadyPassed = myAttempts.some(e => e.passed === true);
+  if (alreadyPassed) throw new Error("module already passed");
+  if (myAttempts.length >= TRAINING_MAX_ATTEMPTS) throw new Error("retake budget exhausted — HR has been notified");
+  // Pull the question bank.
+  const bank = await ghReadJson(env, `training/modules/${moduleId}.questions.json`);
+  if (!bank || !Array.isArray(bank.questions) || !bank.questions.length) throw new Error("question bank missing");
+  // Stratified pick: 2 [scenario] questions weighted in, then random fill.
+  const wanted = bank.served_per_attempt || 8;
+  const scenarioPool = bank.questions.filter(q => q.scenario);
+  const otherPool    = bank.questions.filter(q => !q.scenario);
+  const pickN = (arr, n) => arr.slice().sort(() => Math.random() - 0.5).slice(0, n);
+  const scenarioCount = Math.min(2, scenarioPool.length, Math.floor(wanted / 3));
+  const chosen = pickN(scenarioPool, scenarioCount).concat(pickN(otherPool, wanted - scenarioCount));
+  // Shuffle final order.
+  for (let i = chosen.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [chosen[i], chosen[j]] = [chosen[j], chosen[i]]; }
+  const attemptId = `att_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+  const ts = new Date().toISOString();
+  const attempt = {
+    attempt_id: attemptId, user_email: viewerEmail, module_id: moduleId,
+    bank_version: bank.version, served_per_attempt: chosen.length,
+    pass_percent: bank.pass_mark_percent || TRAINING_PASS_PERCENT,
+    qids: chosen.map(q => q.id), correct: chosen.map(q => q.correct),
+    started_at: ts,
+  };
+  if (env.PAYROLL_KV) await env.PAYROLL_KV.put(TRAINING_ATTEMPT_KV + attemptId, JSON.stringify(attempt), { expirationTtl: 7200 });
+  // Don't ship `correct` back to the client.
+  return { ok: true, attempt_id: attemptId, started_at: ts, pass_percent: attempt.pass_percent, served_per_attempt: chosen.length, attempts_used: myAttempts.length, attempts_remaining: Math.max(0, TRAINING_MAX_ATTEMPTS - myAttempts.length - 1),
+    questions: chosen.map(q => ({ id: q.id, scenario: !!q.scenario, stem: q.stem, options: q.options })) };
+}
+
+async function trainingSubmitAttempt(env, viewerEmail, viewerName, body) {
+  if (!viewerEmail) throw new Error("not authenticated");
+  const attemptId = String(body.attempt_id || "");
+  const answers   = Array.isArray(body.answers) ? body.answers : [];
+  const durationSec = Number.isFinite(body.duration_seconds) ? Math.max(0, Math.min(86400, body.duration_seconds | 0)) : null;
+  if (!attemptId) throw new Error("missing attempt_id");
+  if (!env.PAYROLL_KV) throw new Error("PAYROLL_KV binding missing — cannot resolve in-flight attempt");
+  const raw = await env.PAYROLL_KV.get(TRAINING_ATTEMPT_KV + attemptId);
+  if (!raw) throw new Error("attempt expired or not found — start a new attempt");
+  const attempt = JSON.parse(raw);
+  if (attempt.user_email !== viewerEmail) throw new Error("not your attempt");
+  // Score.
+  const ts = new Date().toISOString();
+  const detailed = attempt.qids.map((qid, i) => {
+    const submitted = answers[i] != null ? Number(answers[i]) : null;
+    const correct   = attempt.correct[i];
+    return { qid, submitted, correct, is_correct: submitted === correct };
+  });
+  const score = detailed.filter(d => d.is_correct).length;
+  const outOf = attempt.served_per_attempt;
+  const scorePct = outOf > 0 ? Math.round((score / outOf) * 100) : 0;
+  const passed = scorePct >= (attempt.pass_percent || TRAINING_PASS_PERCENT);
+  // Look up prior attempts to know attempt_n.
+  const events = await trainingFetchEvents(env);
+  const priorN = events.filter(e => (e.user_email || "").toLowerCase() === viewerEmail && e.module_id === attempt.module_id && e.type === "attempt_completed").length;
+  const attemptN = priorN + 1;
+  const attemptsRemaining = Math.max(0, TRAINING_MAX_ATTEMPTS - attemptN);
+  const escalated = !passed && attemptsRemaining === 0;
+  await trainingAppendEvent(env, {
+    type: "attempt_completed",
+    user_email: viewerEmail, user_name: viewerName,
+    module_id: attempt.module_id, bank_version: attempt.bank_version,
+    attempt_id: attemptId, attempt_n: attemptN,
+    score, out_of: outOf, score_percent: scorePct, passed, pass_percent: attempt.pass_percent,
+    duration_seconds: durationSec,
+    questions: detailed,
+    ts,
+  });
+  if (escalated) {
+    await trainingAppendEvent(env, {
+      type: "escalation_attempt_budget", user_email: viewerEmail, user_name: viewerName,
+      module_id: attempt.module_id, attempt_id: attemptId, ts,
+      note: "retake budget exhausted without pass — HR notified",
+    });
+  }
+  // Don't delete the in-flight attempt KV entry — let it expire — so the
+  // client can re-fetch the rationale array if needed.
+  // Build rationale set: pull the bank, attach rationale + correct option to each.
+  const bank = await ghReadJson(env, `training/modules/${attempt.module_id}.questions.json`);
+  const bankById = Object.fromEntries((bank && bank.questions || []).map(q => [q.id, q]));
+  const detailedWithRationale = detailed.map(d => ({
+    ...d,
+    stem: (bankById[d.qid] || {}).stem || null,
+    options: (bankById[d.qid] || {}).options || null,
+    rationale: (bankById[d.qid] || {}).rationale || null,
+  }));
+  return { ok: true, attempt_id: attemptId, score, out_of: outOf, score_percent: scorePct, passed, attempt_n: attemptN, attempts_remaining: attemptsRemaining, escalated, questions: detailedWithRationale };
+}
+
+/* ── Reflections ─────────────────────────────────────────────────── */
+
+async function trainingSaveReflection(env, viewerEmail, body) {
+  if (!viewerEmail) throw new Error("not authenticated");
+  const moduleId   = String(body.module_id || "");
+  const reflectId  = String(body.reflection_id || "");
+  const text       = String(body.text == null ? "" : body.text).slice(0, 4000);
+  if (!moduleId || !reflectId) throw new Error("missing module_id or reflection_id");
+  if (!env.PAYROLL_KV) throw new Error("PAYROLL_KV binding missing");
+  const key = `${TRAINING_REFLECTION_KV}${viewerEmail}:${moduleId}:${reflectId}`;
+  const ts = new Date().toISOString();
+  await env.PAYROLL_KV.put(key, JSON.stringify({ text, saved_at: ts }));
+  // Log only metadata (not the text) in the public event log.
+  await trainingAppendEvent(env, {
+    type: "reflection_saved", user_email: viewerEmail,
+    module_id: moduleId, reflection_id: reflectId,
+    text_length: text.length, ts,
+  });
+  return { ok: true, saved_at: ts, length: text.length };
+}
+
+/* ── Complete a module (after pass + reflections) ────────────────── */
+
+async function trainingCompleteModule(env, viewerEmail, body) {
+  if (!viewerEmail) throw new Error("not authenticated");
+  const moduleId = String(body.module_id || "");
+  if (!moduleId) throw new Error("missing module_id");
+  const events = await trainingFetchEvents(env);
+  const myAttempts = events.filter(e => (e.user_email || "").toLowerCase() === viewerEmail && e.module_id === moduleId && e.type === "attempt_completed");
+  const passed = myAttempts.find(a => a.passed === true);
+  if (!passed) throw new Error("module not yet passed");
+  const already = events.some(e => (e.user_email || "").toLowerCase() === viewerEmail && e.module_id === moduleId && e.type === "module_completed");
+  if (already) return { ok: true, already_completed: true };
+  const ts = new Date().toISOString();
+  await trainingAppendEvent(env, {
+    type: "module_completed", user_email: viewerEmail,
+    module_id: moduleId, score_percent: passed.score_percent,
+    bank_version: passed.bank_version, ts,
+  });
+  return { ok: true, ts };
+}
+
+/* ── Certificate ─────────────────────────────────────────────────── */
+
+async function trainingIssueCertificate(env, viewerEmail, viewerName, body) {
+  if (!viewerEmail) throw new Error("not authenticated");
+  const cycleYear = Number(body.cycle_year) || (new Date()).getUTCFullYear();
+  const [assignments, events, cfg] = await Promise.all([
+    trainingFetchAssignments(env), trainingFetchEvents(env), trainingFetchConfig(env),
+  ]);
+  const myAssignments = assignments.filter(a => (a.user_email || "").toLowerCase() === viewerEmail && !a.exempt);
+  const completed = new Set(
+    events.filter(e => (e.user_email || "").toLowerCase() === viewerEmail && e.type === "module_completed").map(e => e.module_id)
+  );
+  // All assigned modules must be completed.
+  const missing = myAssignments.filter(a => !completed.has(a.module_id));
+  if (missing.length) throw new Error(`not all modules complete yet — ${missing.length} outstanding`);
+  // Mint a certificate ID.
+  const certId = `TBK-HRT-${cycleYear}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+  const ts = new Date().toISOString();
+  // Next-due date: 1 year from issue.
+  const nextDue = new Date(ts);
+  nextDue.setUTCFullYear(nextDue.getUTCFullYear() + 1);
+  await trainingAppendEvent(env, {
+    type: "certificate_issued", certificate_id: certId,
+    user_email: viewerEmail, user_name: viewerName,
+    cycle_year: cycleYear, modules: myAssignments.map(a => a.module_id),
+    signing_officer: (cfg && cfg.signing_officer) || null,
+    next_due: nextDue.toISOString().slice(0, 10),
+    ts,
+  });
+  return { ok: true, certificate_id: certId, issued_at: ts, next_due: nextDue.toISOString().slice(0, 10) };
+}
+
+async function trainingCertificate(env, viewerEmail, certId) {
+  if (!certId) throw new Error("missing certificate id");
+  const events = await trainingFetchEvents(env);
+  const cert = events.find(e => e.type === "certificate_issued" && e.certificate_id === certId);
+  if (!cert) throw new Error("certificate not found");
+  // Non-admins can only view their own.
+  const admins = await fetchAdmins();
+  const isAdmin = admins.includes(viewerEmail);
+  if (!isAdmin && cert.user_email.toLowerCase() !== viewerEmail) {
+    throw new Error("not your certificate");
+  }
+  return { ok: true, certificate: cert };
+}
+
+/* ── Append helpers ──────────────────────────────────────────────── */
+
+async function trainingAppendEvent(env, ev) {
+  await updateGhJson(env, TRAINING_EVENTS_PATH, doc => {
+    doc.schema_version = doc.schema_version || 1;
+    doc.events = doc.events || [];
+    doc.events.push(ev);
+    doc.updated_at = ev.ts || new Date().toISOString();
+  }, `Training: ${ev.type} ${ev.user_email || ""}${ev.module_id ? " " + ev.module_id : ""}`);
+}
+async function trainingAppendAudit(env, actor, ev) {
+  await updateGhJson(env, TRAINING_AUDIT_PATH, doc => {
+    doc.schema_version = doc.schema_version || 1;
+    doc.events = doc.events || [];
+    doc.events.push({ ...ev, actor, ts: ev.ts || new Date().toISOString() });
+    doc.updated_at = new Date().toISOString();
+  }, `Training audit: ${ev.type} by ${actor}`);
+}
+
+/* ── Admin endpoints ─────────────────────────────────────────────── */
+
+async function trainingAdminState(env) {
+  const [assignments, events, cfg] = await Promise.all([
+    trainingFetchAssignments(env), trainingFetchEvents(env), trainingFetchConfig(env),
+  ]);
+  // Build per-user, per-module status.
+  const today = (new Date()).toISOString().slice(0, 10);
+  const byUser = {};
+  for (const a of assignments) {
+    const e = (a.user_email || "").toLowerCase();
+    if (!byUser[e]) byUser[e] = { user_email: e, modules: [] };
+    const attempts = events.filter(ev => ev.user_email === e && ev.module_id === a.module_id && ev.type === "attempt_completed");
+    const passed = attempts.find(ev => ev.passed === true);
+    const completed = events.find(ev => ev.user_email === e && ev.module_id === a.module_id && ev.type === "module_completed");
+    const overdue = !completed && a.deadline && a.deadline < today;
+    byUser[e].modules.push({
+      module_id: a.module_id, deadline: a.deadline, reason: a.reason,
+      exempt: !!a.exempt, attempts_used: attempts.length, best_score: attempts.reduce((m, ev) => Math.max(m, ev.score_percent || 0), 0),
+      passed: !!passed, completed: !!completed, completed_at: completed ? completed.ts : null,
+      overdue, escalated_at: a.escalated_at || null,
+    });
+  }
+  return { ok: true, config: cfg, users: Object.values(byUser), total_events: events.length };
+}
+
+async function trainingAdminReflections(env, email, moduleId) {
+  if (!env.PAYROLL_KV) throw new Error("PAYROLL_KV binding missing");
+  if (!email) throw new Error("missing email");
+  const e = email.toLowerCase();
+  const prefix = `${TRAINING_REFLECTION_KV}${e}:${moduleId ? moduleId + ":" : ""}`;
+  // Cloudflare KV list — paginated under the hood; first 1000 is plenty.
+  const list = await env.PAYROLL_KV.list({ prefix });
+  const out = [];
+  for (const key of (list.keys || [])) {
+    const raw = await env.PAYROLL_KV.get(key.name);
+    if (raw) {
+      try { out.push({ key: key.name, ...JSON.parse(raw) }); }
+      catch { /* skip malformed */ }
+    }
+  }
+  return { ok: true, email: e, module_id: moduleId, reflections: out };
+}
+
+async function trainingAdminAssign(env, actor, body) {
+  const userEmail = String(body.user_email || "").toLowerCase();
+  const moduleIds = Array.isArray(body.module_ids) ? body.module_ids.map(String) : [];
+  const reason    = String(body.reason || "manual");
+  const deadlineDays = Number.isFinite(body.deadline_days) ? body.deadline_days : 14;
+  if (!userEmail || !moduleIds.length) throw new Error("missing user_email or module_ids");
+  const now = new Date();
+  const due = new Date(now); due.setUTCDate(due.getUTCDate() + deadlineDays);
+  const deadline = due.toISOString().slice(0, 10);
+  await updateGhJson(env, TRAINING_ASSIGNMENTS_PATH, doc => {
+    doc.schema_version = doc.schema_version || 1;
+    doc.assignments = doc.assignments || [];
+    for (const m of moduleIds) {
+      const existing = doc.assignments.find(a => (a.user_email || "").toLowerCase() === userEmail && a.module_id === m);
+      if (existing) {
+        existing.deadline = deadline;
+        existing.assigned_at = now.toISOString();
+        existing.reason = reason;
+        existing.exempt = false;
+      } else {
+        doc.assignments.push({
+          user_email: userEmail, module_id: m,
+          assigned_at: now.toISOString(), deadline,
+          reason, exempt: false,
+        });
+      }
+    }
+    doc.updated_at = now.toISOString();
+  }, `Training: assign ${moduleIds.join(",")} → ${userEmail} (by ${actor})`);
+  await trainingAppendAudit(env, actor, { type: "assign", target: userEmail, module_ids: moduleIds, deadline, reason });
+  return { ok: true, user_email: userEmail, module_ids: moduleIds, deadline };
+}
+
+async function trainingAdminExempt(env, actor, body) {
+  const userEmail = String(body.user_email || "").toLowerCase();
+  const moduleId  = String(body.module_id || "");
+  const exempt    = body.exempt !== false;
+  const reason    = String(body.reason || "");
+  if (!userEmail || !moduleId) throw new Error("missing user_email or module_id");
+  await updateGhJson(env, TRAINING_ASSIGNMENTS_PATH, doc => {
+    doc.assignments = doc.assignments || [];
+    const a = doc.assignments.find(x => (x.user_email || "").toLowerCase() === userEmail && x.module_id === moduleId);
+    if (!a) throw new Error("no such assignment");
+    a.exempt = exempt;
+    a.exempt_reason = reason || a.exempt_reason || "";
+    doc.updated_at = new Date().toISOString();
+  }, `Training: ${exempt ? "exempt" : "un-exempt"} ${userEmail}/${moduleId} (by ${actor})`);
+  await trainingAppendAudit(env, actor, { type: exempt ? "exempt" : "un-exempt", target: userEmail, module_id: moduleId, reason });
+  return { ok: true };
+}
+
+async function trainingAdminExtend(env, actor, body) {
+  const userEmail = String(body.user_email || "").toLowerCase();
+  const moduleId  = String(body.module_id || "");
+  const newDeadline = String(body.deadline || "");
+  const reason    = String(body.reason || "");
+  if (!userEmail || !moduleId || !/^\d{4}-\d{2}-\d{2}$/.test(newDeadline)) throw new Error("missing or bad fields");
+  await updateGhJson(env, TRAINING_ASSIGNMENTS_PATH, doc => {
+    doc.assignments = doc.assignments || [];
+    const a = doc.assignments.find(x => (x.user_email || "").toLowerCase() === userEmail && x.module_id === moduleId);
+    if (!a) throw new Error("no such assignment");
+    a.deadline = newDeadline;
+    a.extension_reason = reason;
+    doc.updated_at = new Date().toISOString();
+  }, `Training: extend ${userEmail}/${moduleId} to ${newDeadline} (by ${actor})`);
+  await trainingAppendAudit(env, actor, { type: "extend", target: userEmail, module_id: moduleId, new_deadline: newDeadline, reason });
+  return { ok: true };
+}
+
+async function trainingAdminEscalate(env, actor, body) {
+  const userEmail = String(body.user_email || "").toLowerCase();
+  const moduleId  = String(body.module_id || "");
+  const note      = String(body.note || "");
+  if (!userEmail || !moduleId) throw new Error("missing fields");
+  await updateGhJson(env, TRAINING_ASSIGNMENTS_PATH, doc => {
+    doc.assignments = doc.assignments || [];
+    const a = doc.assignments.find(x => (x.user_email || "").toLowerCase() === userEmail && x.module_id === moduleId);
+    if (a) {
+      a.escalated_at = new Date().toISOString();
+      a.escalation_note = note;
+    }
+    doc.updated_at = new Date().toISOString();
+  }, `Training: escalate ${userEmail}/${moduleId} (by ${actor})`);
+  await trainingAppendAudit(env, actor, { type: "escalate", target: userEmail, module_id: moduleId, note });
+  return { ok: true };
+}
+
+async function trainingAdminAutoEnrol(env, actor, body) {
+  // Sweep people.json: new starters (hire_date within last N days) + line
+  // managers (anyone who is line_manager_id of at least one Person) get the
+  // matching module set assigned. Idempotent — existing assignments are
+  // not duplicated. Run nightly by the GH Action cron.
+  const cfg = await trainingFetchConfig(env);
+  const { file } = await fetchPeopleFile(env);
+  const today = new Date();
+  const todayIso = today.toISOString().slice(0, 10);
+  // Build manager set.
+  const managerIds = new Set();
+  for (const p of file.people || []) {
+    if (p.line_manager_id != null && p.line_manager_id !== "") managerIds.add(String(p.line_manager_id));
+  }
+  const newStarterDays = body.new_starter_window_days || 14;
+  const newStarterCutoff = new Date(today); newStarterCutoff.setUTCDate(newStarterCutoff.getUTCDate() - newStarterDays);
+  const allStaffModules = (cfg && cfg.modules_all_staff) || ["module_0", "module_1", "module_2", "module_3", "module_4", "module_5"];
+  const managerModules = (cfg && cfg.modules_manager_addon) || ["module_manager"];
+  const newHireDays = (cfg && cfg.deadline_days_new_hire) || 30;
+  const managerDays = (cfg && cfg.deadline_days_manager_addon) || 14;
+  const annualDays  = (cfg && cfg.deadline_days_default) || 14;
+  const results = { new_hires_enrolled: 0, managers_enrolled: 0, skipped: 0 };
+  // Read assignments once.
+  const assignments = await trainingFetchAssignments(env);
+  const need = []; // [{ user_email, module_id, reason, deadline_days }]
+  for (const p of file.people || []) {
+    const e = (p.main_google_email || "").toLowerCase();
+    if (!e) continue;
+    if (p.suspended) continue;
+    const start = p.start_date || "";
+    const isNewHire = !!(start && start >= newStarterCutoff.toISOString().slice(0, 10));
+    const isManager = managerIds.has(String(p.id));
+    const enrolForModule = (mid, reason, days) => {
+      const exists = assignments.find(a => (a.user_email || "").toLowerCase() === e && a.module_id === mid);
+      if (exists) { results.skipped += 1; return; }
+      need.push({ user_email: e, module_id: mid, reason, deadline_days: days });
+    };
+    if (isNewHire) {
+      for (const m of allStaffModules) enrolForModule(m, "new_hire", newHireDays);
+      results.new_hires_enrolled += 1;
+    }
+    if (isManager) {
+      for (const m of managerModules) enrolForModule(m, "manager_appointment", managerDays);
+      if (!isNewHire) results.managers_enrolled += 1;
+    }
+  }
+  if (need.length) {
+    await updateGhJson(env, TRAINING_ASSIGNMENTS_PATH, doc => {
+      doc.assignments = doc.assignments || [];
+      const now = new Date();
+      for (const x of need) {
+        if (doc.assignments.find(a => (a.user_email || "").toLowerCase() === x.user_email && a.module_id === x.module_id)) continue;
+        const due = new Date(now); due.setUTCDate(due.getUTCDate() + x.deadline_days);
+        doc.assignments.push({
+          user_email: x.user_email, module_id: x.module_id,
+          assigned_at: now.toISOString(), deadline: due.toISOString().slice(0, 10),
+          reason: x.reason, exempt: false,
+        });
+      }
+      doc.updated_at = now.toISOString();
+    }, `Training: auto-enrol sweep — ${need.length} new assignments (by ${actor})`);
+  }
+  await trainingAppendAudit(env, actor, { type: "auto_enrol_sweep", ...results, new_assignments: need.length });
+  return { ok: true, ...results, new_assignments: need.length };
+}
+
+async function trainingAdminExport(env, format, req) {
+  const [assignments, events] = await Promise.all([
+    trainingFetchAssignments(env), trainingFetchEvents(env),
+  ]);
+  if (format === "csv") {
+    const lines = ["user_email,module_id,assigned_at,deadline,reason,exempt,attempts_used,best_score_percent,passed,completed,completed_at,overdue"];
+    const today = (new Date()).toISOString().slice(0, 10);
+    for (const a of assignments) {
+      const e = (a.user_email || "").toLowerCase();
+      const attempts = events.filter(ev => ev.user_email === e && ev.module_id === a.module_id && ev.type === "attempt_completed");
+      const passed = attempts.find(ev => ev.passed === true);
+      const completed = events.find(ev => ev.user_email === e && ev.module_id === a.module_id && ev.type === "module_completed");
+      const overdue = !completed && a.deadline && a.deadline < today;
+      const best = attempts.reduce((m, ev) => Math.max(m, ev.score_percent || 0), 0);
+      lines.push([e, a.module_id, a.assigned_at, a.deadline, a.reason, a.exempt ? "true" : "false", attempts.length, best, passed ? "true" : "false", completed ? "true" : "false", completed ? completed.ts : "", overdue ? "true" : "false"].map(v => String(v).replace(/"/g, '""')).map(v => /[,"\n]/.test(v) ? `"${v}"` : v).join(","));
+    }
+    return new Response(lines.join("\n"), { status: 200, headers: { ...cors(req), "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="training-export-${today}.csv"` } });
+  }
+  return json({ ok: true, assignments, events }, 200, req);
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+ * Training reminder mailer
+ *
+ * Computes today's reminder set (10 / 5 / 2 / 0 days remaining + day-15
+ * overdue → line-manager + HR escalation) and sends each email via Gmail
+ * API impersonating env.IMPERSONATE_USER (the existing service-account
+ * pattern used everywhere else in this worker).
+ *
+ * Safety:
+ *   - Defaults to DRY-RUN. Set env var TRAINING_EMAIL_LIVE to the literal
+ *     string "true" to send for real. With dry-run, the response contains
+ *     every email that WOULD have been sent — useful for previewing
+ *     before turning the switch on.
+ *   - Idempotent: appends a "reminder_sent" event to training-events.json
+ *     for each (user, module, kind) tuple sent. The next run skips a
+ *     reminder if the same (user, module, kind, ymd) is already logged.
+ *   - GH Action calls this once per day. Re-running same day is a no-op.
+ * ──────────────────────────────────────────────────────────────────── */
+
+const REMINDER_TEMPLATES = {
+  10: { subject: "[TogetherBook training] {{cycle}} cycle — 10 days to go", body:
+    "Hi {{first}},\n\nThe harassment-prevention training cycle is due on {{deadline}}. You have 10 days, which is plenty — most modules take 10–12 minutes.\n\nOpen the dashboard: https://book.togetherbook.net/training.html\n\nThanks,\nTogetherBOOK" },
+  5:  { subject: "[TogetherBook training] {{cycle}} cycle — 5 days to go", body:
+    "Hi {{first}},\n\nFive days to go on the harassment-prevention cycle. If you can find 30 minutes this week the whole thing is done.\n\nOpen the dashboard: https://book.togetherbook.net/training.html\n\nThanks,\nTogetherBOOK" },
+  2:  { subject: "[TogetherBook training] {{cycle}} cycle — 2 days to go", body:
+    "Hi {{first}},\n\nThe harassment-prevention training is due on {{deadline}} — two days away. Please pick up where you left off when you have 30 minutes.\n\nOpen the dashboard: https://book.togetherbook.net/training.html\n\nThanks,\nTogetherBOOK" },
+  0:  { subject: "[TogetherBook training] {{cycle}} cycle — overdue", body:
+    "Hi {{first}},\n\nThe deadline for the harassment-prevention training was {{deadline}}. Please complete the remaining modules by {{deadline7}}. After that date your line manager and HR are notified automatically.\n\nOpen the dashboard: https://book.togetherbook.net/training.html\n\nThanks,\nTogetherBOOK" },
+};
+const ESCALATION_TEMPLATE = {
+  subject: "[TogetherBook training] {{name}} — overdue",
+  body:
+    "Hi {{managerFirst}},\n\n{{name}}'s harassment-prevention training was due on {{deadline}} and is now overdue. HR has also been copied.\n\nA short note from you asking how you can help find the time often unblocks this.\n\nThe dashboard: https://book.togetherbook.net/training.html\n\nThanks,\nTogetherBOOK\n",
+};
+
+async function trainingSendReminderEmail(env, to, subject, body) {
+  if ((env.TRAINING_EMAIL_LIVE || "").toLowerCase() !== "true") {
+    return { ok: true, dry_run: true, would_send_to: to, subject, body };
+  }
+  const sender = env.IMPERSONATE_USER || "noreply@togetherbook.net";
+  let token;
+  try { token = await getGoogleAccessToken(env, sender, GMAIL_SCOPES); }
+  catch (e) { return { ok: false, error: "token: " + e.message }; }
+  const mime = [
+    `From: TogetherBOOK Training <${sender}>`,
+    `To: ${to}`,
+    `Subject: ${subject}`,
+    `MIME-Version: 1.0`,
+    `Content-Type: text/plain; charset=UTF-8`,
+    ``,
+    body,
+  ].join("\r\n");
+  // Gmail send wants base64url-encoded raw MIME.
+  const bytes = new TextEncoder().encode(mime);
+  let bin = ""; for (const b of bytes) bin += String.fromCharCode(b);
+  const raw = btoa(bin).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/g, "");
+  const res = await gmailApi(token, sender, "POST", "messages/send", { raw });
+  return res.ok ? { ok: true, dry_run: false, sent_to: to } : { ok: false, error: res.error };
+}
+
+// Pull the firm Person + their line manager to interpolate the email.
+async function trainingResolvePerson(file, userEmail) {
+  const ve = (userEmail || "").toLowerCase();
+  const p = (file.people || []).find(x =>
+    [x.main_google_email, ...(x.alt_google_emails || []), x.external_google_email]
+      .filter(Boolean).map(e => e.toLowerCase()).includes(ve)
+  );
+  if (!p) return { person: null, first: ve.split("@")[0], manager: null };
+  const first = (p.given || (p.name || "").split(/\s+/)[0] || ve.split("@")[0]);
+  let manager = null;
+  if (p.line_manager_id != null && p.line_manager_id !== "") {
+    manager = (file.people || []).find(x => String(x.id) === String(p.line_manager_id)) || null;
+  }
+  return { person: p, first, manager };
+}
+
+async function trainingDailyReminders(env, actor, body) {
+  const dryRunOverride = body && body.dry_run !== undefined ? !!body.dry_run : null;
+  // dryRunOverride === true forces dry-run, === false forces live (if env permits).
+  const today = new Date(); today.setUTCHours(0, 0, 0, 0);
+  const todayIso = today.toISOString().slice(0, 10);
+  const [assignments, events, cfg] = await Promise.all([
+    trainingFetchAssignments(env), trainingFetchEvents(env), trainingFetchConfig(env),
+  ]);
+  const { file } = await fetchPeopleFile(env);
+  const sentToday = new Set(); // "{kind}|{email}|{module}"
+  for (const ev of events) {
+    if (ev.type !== "reminder_sent") continue;
+    if ((ev.ts || "").slice(0, 10) !== todayIso) continue;
+    sentToday.add(`${ev.kind}|${ev.user_email}|${ev.module_id || ""}`);
+  }
+  const offsets = (cfg && cfg.reminder_offsets_days) || [10, 5, 2, 0];
+  const escalateAtDays = (cfg && cfg.escalation_overdue_days) || 15;
+  const cycleYear = (cfg && cfg.current_cycle_year) || today.getUTCFullYear();
+  const results = { sent: 0, skipped_already_sent: 0, sent_escalations: 0, dry_run_count: 0, items: [] };
+
+  // For each assignment, decide if a reminder fires today.
+  // Group by user_email: one reminder per user per kind covering all their
+  // due modules (cleaner inbox than one per module).
+  const byUser = {};
+  for (const a of assignments) {
+    if (a.exempt) continue;
+    const eve = events.find(ev => ev.user_email === (a.user_email || "").toLowerCase()
+      && ev.module_id === a.module_id && ev.type === "module_completed");
+    if (eve) continue;
+    if (!a.deadline) continue;
+    const dueIso = a.deadline;
+    const daysLeft = Math.round((Date.parse(dueIso) - today.getTime()) / 86400000);
+    const overdueDays = -daysLeft;
+    let kind = null;
+    if (offsets.includes(daysLeft) && daysLeft > 0) kind = String(daysLeft);
+    else if (daysLeft === 0) kind = "0";
+    if (!kind) {
+      // Escalation day (line-manager mail) — fires once, on the exact day.
+      if (overdueDays === escalateAtDays) kind = "esc";
+      else continue;
+    }
+    byUser[a.user_email] = byUser[a.user_email] || { items: [] };
+    byUser[a.user_email].items.push({ assignment: a, kind, daysLeft, overdueDays });
+  }
+
+  for (const [email, ent] of Object.entries(byUser)) {
+    // Resolve person + manager once.
+    const resolved = await trainingResolvePerson(file, email);
+    // Group items by kind — send one mail per kind per user.
+    const byKind = {};
+    for (const it of ent.items) (byKind[it.kind] = byKind[it.kind] || []).push(it);
+    for (const [kind, items] of Object.entries(byKind)) {
+      const dedupeKey = `${kind}|${email}|${items.map(i => i.assignment.module_id).sort().join(",")}`;
+      if (sentToday.has(dedupeKey)) { results.skipped_already_sent += 1; continue; }
+      // Build the email.
+      const earliest = items.map(i => i.assignment.deadline).sort()[0];
+      const deadlineDate = new Date(earliest + "T00:00:00Z");
+      const deadlinePlus7 = new Date(deadlineDate); deadlinePlus7.setUTCDate(deadlinePlus7.getUTCDate() + 7);
+      let subject, plain;
+      if (kind === "esc") {
+        if (!resolved.manager) { /* no manager → skip but still log */ results.items.push({ user_email: email, kind, note: "no line manager set; skipped escalation" }); continue; }
+        const mEmail = (resolved.manager.main_google_email || "").toLowerCase();
+        const mFirst = resolved.manager.given || (resolved.manager.name || "").split(/\s+/)[0] || "there";
+        const tpl = ESCALATION_TEMPLATE;
+        subject = tpl.subject.replace("{{name}}", resolved.person ? resolved.person.name : email);
+        plain   = tpl.body
+          .replace(/{{managerFirst}}/g, mFirst)
+          .replace(/{{name}}/g, resolved.person ? resolved.person.name : email)
+          .replace(/{{deadline}}/g, earliest);
+        const sendResult = await trainingSendReminderEmail(env, mEmail, subject, plain);
+        if (dryRunOverride === true) sendResult.dry_run = true;
+        results.items.push({ user_email: email, manager_email: mEmail, kind, ...sendResult });
+        if (sendResult.ok) {
+          results.sent_escalations += 1;
+          if (sendResult.dry_run) results.dry_run_count += 1; else results.sent += 1;
+          await trainingAppendEvent(env, {
+            type: "reminder_sent", user_email: email, manager_email: mEmail,
+            module_id: items.map(i => i.assignment.module_id).sort().join(","),
+            kind: "esc", dry_run: !!sendResult.dry_run, ts: new Date().toISOString(),
+          });
+        }
+        continue;
+      }
+      const tpl = REMINDER_TEMPLATES[kind === "0" ? 0 : parseInt(kind, 10)];
+      if (!tpl) continue;
+      subject = tpl.subject.replace("{{cycle}}", String(cycleYear));
+      plain = tpl.body
+        .replace(/{{first}}/g, resolved.first)
+        .replace(/{{deadline}}/g, earliest)
+        .replace(/{{deadline7}}/g, deadlinePlus7.toISOString().slice(0,10));
+      const sendResult = await trainingSendReminderEmail(env, email, subject, plain);
+      if (dryRunOverride === true) sendResult.dry_run = true;
+      results.items.push({ user_email: email, kind, modules: items.map(i => i.assignment.module_id), ...sendResult });
+      if (sendResult.ok) {
+        if (sendResult.dry_run) results.dry_run_count += 1; else results.sent += 1;
+        await trainingAppendEvent(env, {
+          type: "reminder_sent", user_email: email,
+          module_id: items.map(i => i.assignment.module_id).sort().join(","),
+          kind, dry_run: !!sendResult.dry_run, ts: new Date().toISOString(),
+        });
+      }
+    }
+  }
+  await trainingAppendAudit(env, actor, { type: "daily_reminder_run", ...results, today: todayIso });
+  return { ok: true, today: todayIso, ...results };
+}
+
+// trainingDailyReminders is wired into handleTraining's switch above.

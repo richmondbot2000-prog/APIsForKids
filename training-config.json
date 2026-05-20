@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-05-20T00:00:00Z",
+  "current_cycle_year": 2026,
+  "rotation_seed": 1,
+  "deadline_days_default": 14,
+  "deadline_days_new_hire": 30,
+  "deadline_days_manager_addon": 14,
+  "retention_years": 7,
+  "reminder_offsets_days": [10, 5, 2, 0],
+  "escalation_overdue_days": 15,
+  "modules_all_staff": ["module_0", "module_1", "module_2", "module_3", "module_4", "module_5"],
+  "modules_manager_addon": ["module_manager"],
+  "signing_officer": {
+    "name": "James Benamor",
+    "title": "Group CEO, Richmond Group",
+    "commitment_line": "On behalf of Richmond Group I confirm this training is part of our reasonable steps to prevent harassment, in line with the Equality Act 2010 (as amended) and the EHRC Technical Guidance."
+  },
+  "external_resources": {
+    "ehrc_eight_step_guide": "https://www.equalityhumanrights.com/employer-8-step-guide-preventing-sexual-harassment-work",
+    "ehrc_technical_guidance": "https://www.equalityhumanrights.com/guidance/sexual-harassment-and-harassment-work-technical-guidance",
+    "acas_sexual_harassment": "https://www.acas.org.uk/sexual-harassment",
+    "acas_helpline": "0300 123 1100"
+  }
+}

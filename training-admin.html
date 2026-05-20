@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<script src="/live-reload.js"></script>
+<title>TogetherBOOK — Training (admin)</title>
+<link rel="icon" type="image/png" href="site-icon.png">
+<link rel="apple-touch-icon" href="site-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=1779316800">
+<link rel="stylesheet" href="quiet-tokens.css?v=1779316800">
+<link rel="stylesheet" href="quiet.css?v=1779316800">
+<link rel="stylesheet" href="quiet-extras.css?v=1779316800">
+<link rel="stylesheet" href="quiet-legacy.css?v=1779316800">
+<style>
+  .ta-section { max-width: 1180px; margin: 0 auto; padding: 28px 20px 80px; }
+  .ta-section h1 {
+    font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-weight: 800; margin: 0 0 6px; color: var(--ink-900);
+  }
+  .ta-eyebrow { font: italic 500 13px/1.3 var(--font-display); color: var(--ink-600); margin: 0 0 18px; }
+  .ta-toolbar {
+    display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center;
+    margin: 0 0 18px; padding-bottom: 14px;
+    border-bottom: 1px solid var(--paper-300);
+  }
+  .ta-toolbar select, .ta-toolbar input {
+    font: 500 13px/1.2 var(--font-body); color: var(--ink-900);
+    background: var(--paper-50); border: 1px solid var(--ink-300);
+    border-radius: 0; padding: 7px 10px;
+  }
+  .ta-toolbar label {
+    font: 500 11px/1 var(--font-mono); letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--ink-600);
+  }
+  .ta-btn {
+    font: 600 12px/1.2 var(--font-body); letter-spacing: 0.02em;
+    padding: 7px 12px; border: 1px solid var(--ink-700);
+    background: var(--paper-50); color: var(--ink-900); cursor: pointer;
+    border-radius: 0; min-height: 32px;
+  }
+  .ta-btn:hover { background: var(--paper-200); }
+  .ta-btn:focus-visible { outline: 2px solid var(--brass-500); outline-offset: 2px; }
+  .ta-btn--primary { background: var(--brass-500); color: var(--paper-50); border-color: var(--brass-600); }
+  .ta-btn--primary:hover { background: var(--brass-600); }
+  .ta-btn--danger { color: var(--red-700); border-color: var(--red-500); }
+  .ta-btn--danger:hover { background: var(--red-50); }
+  .ta-summary {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px; margin: 0 0 24px;
+  }
+  .ta-summary-card {
+    background: var(--paper-50); border: 1px solid var(--paper-300);
+    border-radius: var(--radius-md); padding: 14px 16px;
+  }
+  .ta-summary-num {
+    font: 700 30px/1 var(--font-mono); color: var(--ink-900);
+    margin: 0 0 4px;
+  }
+  .ta-summary-label {
+    font: 500 11px/1 var(--font-mono); letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--ink-600);
+  }
+  .ta-summary-card.is-overdue .ta-summary-num { color: var(--red-600); }
+  .ta-summary-card.is-passed  .ta-summary-num { color: var(--sage-700); }
+  .ta-table {
+    width: 100%; border-collapse: collapse; margin: 12px 0 8px;
+    background: var(--paper-50);
+    font: 400 13px/1.4 var(--font-body); color: var(--ink-900);
+  }
+  .ta-table th, .ta-table td {
+    text-align: left; padding: 8px 12px;
+    border-bottom: 1px solid var(--paper-300); vertical-align: top;
+  }
+  .ta-table th {
+    font: 600 11px/1 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink-600); background: var(--paper-100);
+  }
+  .ta-table td.is-num { font: 500 13px/1 var(--font-mono); white-space: nowrap; }
+  .ta-pill {
+    display: inline-block; font: 600 10px/1 var(--font-mono); letter-spacing: 0.06em;
+    text-transform: uppercase; padding: 3px 7px; border: 1px solid currentColor;
+    border-radius: var(--radius-xs);
+  }
+  .ta-pill.is-due     { color: var(--brass-700); }
+  .ta-pill.is-passed  { color: var(--sage-700); }
+  .ta-pill.is-overdue { color: var(--red-700); }
+  .ta-pill.is-exempt  { color: var(--ink-500); }
+  .ta-pill.is-notstarted { color: var(--ink-500); }
+  .ta-pill.is-inprogress { color: var(--ink-700); }
+  .ta-pill.is-escalated { color: var(--red-700); background: var(--red-50); }
+  .ta-modal {
+    position: fixed; inset: 0; background: rgba(17,25,46,0.55);
+    display: none; align-items: center; justify-content: center;
+    z-index: 1000;
+  }
+  .ta-modal.is-open { display: flex; }
+  .ta-modal-card {
+    background: var(--paper-50); border: 1px solid var(--ink-500);
+    border-radius: var(--radius-md);
+    padding: 22px 26px; max-width: 520px; width: calc(100% - 32px);
+    box-shadow: 0 6px 24px rgba(17,25,46,0.25);
+  }
+  .ta-modal-card h2 { font: 700 18px/1.2 var(--font-display); margin: 0 0 8px; color: var(--ink-900); }
+  .ta-modal-card p { font: 400 14px/1.5 var(--font-body); color: var(--ink-700); margin: 0 0 12px; }
+  .ta-modal-card label { display: block; font: 500 11px/1 var(--font-mono); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-600); margin: 10px 0 4px; }
+  .ta-modal-card input, .ta-modal-card select, .ta-modal-card textarea {
+    width: 100%; box-sizing: border-box;
+    padding: 9px 11px; border: 1px solid var(--ink-300);
+    background: var(--paper-50); font: 400 14px/1.4 var(--font-body); color: var(--ink-900);
+    border-radius: var(--radius-sm);
+  }
+  .ta-modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+  .ta-tabs { display: flex; gap: 24px; border-bottom: 1px solid var(--ink-500); margin: 24px 0 16px; }
+  .ta-tab {
+    background: none; border: 0; padding: 8px 0;
+    font: 600 13px/1.2 var(--font-body); letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-500); cursor: pointer;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .ta-tab.is-active { color: var(--ink-900); border-bottom-color: var(--brass-500); }
+  .ta-tab:hover:not(.is-active) { color: var(--ink-700); }
+  .ta-empty { padding: 28px 0; font: italic 400 14px/1.55 var(--font-display); color: var(--ink-600); }
+  .ta-loading { padding: 28px 0; font: italic 400 14px/1.55 var(--font-display); color: var(--ink-500); }
+  .ta-reflection {
+    background: var(--paper-50); border: 1px solid var(--paper-300);
+    border-radius: var(--radius-sm); padding: 12px 14px; margin: 8px 0;
+    font: 400 14px/1.55 var(--font-display); color: var(--ink-800);
+  }
+  .ta-reflection-meta { font: 500 11px/1 var(--font-mono); color: var(--ink-500); margin-bottom: 4px; }
+  .ta-audit-row { padding: 6px 0; border-bottom: 1px solid var(--paper-300); font: 400 13px/1.4 var(--font-body); color: var(--ink-800); }
+  .ta-audit-row strong { color: var(--ink-900); }
+  .ta-audit-row time { font: 500 11px/1 var(--font-mono); color: var(--ink-500); display: block; margin-bottom: 2px; }
+  .ta-toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--ink-900); color: var(--paper-50);
+    padding: 12px 18px; border-radius: var(--radius-sm);
+    font: 500 13px/1.4 var(--font-body);
+    opacity: 0; pointer-events: none; transition: opacity 180ms ease;
+    z-index: 10001; max-width: 360px;
+  }
+  .ta-toast.is-visible { opacity: 1; pointer-events: auto; }
+  .ta-no-access { padding: 60px 0; text-align: center; font: 500 16px/1.5 var(--font-display); color: var(--red-700); }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="qb-topbar">
+  <a class="qb-brand" href="/wall.html" aria-label="TogetherBOOK — home">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779316800" alt="TogetherBOOK">
+  </a>
+  <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
+          onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="qb-nav">
+    <a class="qb-nav-link" href="/wall.html">Wall</a>
+    <a class="qb-nav-link" href="/bookr.html">BOOKR</a>
+    <a class="qb-nav-link" href="/holidays.html">Holidays</a>
+    <a class="qb-nav-link" href="/directory.html">People</a>
+    <a class="qb-nav-link is-active" href="/training.html">Training</a>
+    <a class="qb-nav-link" href="/reports.html">Business</a>
+    <a class="qb-nav-link" href="/index.html">System</a>
+  </nav>
+</header>
+<div class="qb-nav-backdrop" onclick="document.body.classList.remove('nav-open')"></div>
+
+<main class="qb-page">
+  <section class="ta-section">
+    <h1>Training — admin</h1>
+    <p class="ta-eyebrow">Harassment-prevention training oversight · HR only</p>
+
+    <div id="taAccessGate" style="display:none;">
+      <div class="ta-no-access">You don't have admin access. <a href="/training.html">Back to your training</a>.</div>
+    </div>
+
+    <div id="taContent">
+      <div class="ta-loading">Loading…</div>
+    </div>
+  </section>
+</main>
+
+<div class="ta-modal" id="taModal" role="dialog" aria-modal="true" aria-labelledby="taModalTitle">
+  <div class="ta-modal-card" id="taModalCard"></div>
+</div>
+<div class="ta-toast" id="taToast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  const API = "/api/training";
+  const MODULE_META = {
+    module_0: "Digital channels",
+    module_1: "The law",
+    module_2: "Recognising harassment",
+    module_3: "Bystander (5Ds)",
+    module_4: "Power dynamics",
+    module_5: "Reporting",
+    module_manager: "Manager add-on",
+  };
+  function $(s, r) { return (r || document).querySelector(s); }
+  function escapeHtml(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+  }
+  function toast(msg, ms) {
+    const t = $("#taToast"); if (!t) return;
+    t.textContent = msg; t.classList.add("is-visible");
+    clearTimeout(t._timer); t._timer = setTimeout(() => t.classList.remove("is-visible"), ms || 4000);
+  }
+  async function apiGet(p) {
+    const r = await fetch(API + p, { cache: "no-store" });
+    const t = await r.text();
+    let d; try { d = JSON.parse(t); } catch (e) { throw new Error("non-JSON " + r.status); }
+    if (!r.ok || d.ok === false) throw new Error(d.error || `HTTP ${r.status}`);
+    return d;
+  }
+  async function apiPost(p, body) {
+    const r = await fetch(API + p, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body || {}), cache: "no-store",
+    });
+    const t = await r.text();
+    let d; try { d = JSON.parse(t); } catch (e) { throw new Error("non-JSON " + r.status); }
+    if (!r.ok || d.ok === false) throw new Error(d.error || `HTTP ${r.status}`);
+    return d;
+  }
+
+  const STATE = { whoami: null, adminState: null, currentTab: "overview", filterModule: "all", filterStatus: "all", search: "" };
+
+  async function boot() {
+    try {
+      const who = await apiGet("/whoami");
+      STATE.whoami = who;
+      if (!who.is_admin) {
+        $("#taContent").style.display = "none";
+        $("#taAccessGate").style.display = "block";
+        return;
+      }
+      STATE.adminState = await apiGet("/admin/state");
+      render();
+    } catch (e) {
+      $("#taContent").innerHTML = `<div class="ta-empty">Could not load admin state: ${escapeHtml(e.message)}. <a href="javascript:location.reload()">Try again</a>.</div>`;
+    }
+  }
+
+  function render() {
+    const s = STATE.adminState;
+    if (!s) return;
+    // Compute headline numbers.
+    const today = new Date().toISOString().slice(0,10);
+    let assignedTotal = 0, completedTotal = 0, overdueTotal = 0, escalatedTotal = 0, exemptTotal = 0;
+    const usersList = (s.users || []).slice().sort((a, b) => (a.user_email || "").localeCompare(b.user_email || ""));
+    for (const u of usersList) {
+      for (const m of (u.modules || [])) {
+        if (m.exempt) { exemptTotal += 1; continue; }
+        assignedTotal += 1;
+        if (m.completed) completedTotal += 1;
+        if (m.overdue) overdueTotal += 1;
+        if (m.escalated_at) escalatedTotal += 1;
+      }
+    }
+    const completionPct = assignedTotal ? Math.round((completedTotal / assignedTotal) * 100) : 0;
+
+    const summary = `
+      <div class="ta-summary">
+        <div class="ta-summary-card"><p class="ta-summary-num">${usersList.length}</p><p class="ta-summary-label">People enrolled</p></div>
+        <div class="ta-summary-card"><p class="ta-summary-num">${assignedTotal}</p><p class="ta-summary-label">Module-assignments</p></div>
+        <div class="ta-summary-card is-passed"><p class="ta-summary-num">${completedTotal} <span style="font:500 13px/1 var(--font-mono);color:var(--ink-500);">(${completionPct}%)</span></p><p class="ta-summary-label">Completed</p></div>
+        <div class="ta-summary-card is-overdue"><p class="ta-summary-num">${overdueTotal}</p><p class="ta-summary-label">Overdue</p></div>
+        <div class="ta-summary-card"><p class="ta-summary-num">${escalatedTotal}</p><p class="ta-summary-label">Escalated</p></div>
+        <div class="ta-summary-card"><p class="ta-summary-num">${exemptTotal}</p><p class="ta-summary-label">Exempt</p></div>
+      </div>
+    `;
+    const tabs = `
+      <div class="ta-tabs" role="tablist">
+        <button class="ta-tab ${STATE.currentTab === "overview" ? "is-active" : ""}" data-tab="overview" type="button">Overview</button>
+        <button class="ta-tab ${STATE.currentTab === "overdue"  ? "is-active" : ""}" data-tab="overdue"  type="button">Overdue (${overdueTotal})</button>
+        <button class="ta-tab ${STATE.currentTab === "actions"  ? "is-active" : ""}" data-tab="actions"  type="button">Assign / extend</button>
+        <button class="ta-tab ${STATE.currentTab === "audit"    ? "is-active" : ""}" data-tab="audit"    type="button">Audit log</button>
+        <button class="ta-tab ${STATE.currentTab === "export"   ? "is-active" : ""}" data-tab="export"   type="button">Export</button>
+      </div>
+    `;
+    let body = "";
+    if (STATE.currentTab === "overview") body = renderOverview(usersList);
+    else if (STATE.currentTab === "overdue") body = renderOverdue(usersList);
+    else if (STATE.currentTab === "actions") body = renderActions();
+    else if (STATE.currentTab === "audit")  body = renderAuditPanel();
+    else if (STATE.currentTab === "export") body = renderExportPanel();
+    $("#taContent").innerHTML = summary + tabs + `<div id="taPanel">${body}</div>`;
+    document.querySelectorAll(".ta-tab").forEach(b => b.addEventListener("click", () => { STATE.currentTab = b.dataset.tab; render(); }));
+    wirePanel();
+  }
+
+  function renderOverview(users) {
+    // Filterable table: per-user, per-module rows.
+    const filterRow = `
+      <div class="ta-toolbar">
+        <label>Module
+          <select id="taFilterModule">
+            <option value="all"${STATE.filterModule === "all" ? " selected" : ""}>All modules</option>
+            ${Object.entries(MODULE_META).map(([id, t]) => `<option value="${id}" ${STATE.filterModule === id ? "selected" : ""}>${escapeHtml(t)}</option>`).join("")}
+          </select>
+        </label>
+        <label>Status
+          <select id="taFilterStatus">
+            ${["all","not_started","in_progress","passed","overdue","escalated","exempt"].map(s => `<option value="${s}" ${STATE.filterStatus === s ? "selected" : ""}>${escapeHtml(s.replace("_"," "))}</option>`).join("")}
+          </select>
+        </label>
+        <label>Email contains
+          <input id="taFilterSearch" type="search" placeholder="@letme.com" value="${escapeHtml(STATE.search)}" autocomplete="off">
+        </label>
+        <button class="ta-btn" id="taRunSweep" type="button">Run auto-enrolment sweep</button>
+      </div>
+    `;
+    const rows = [];
+    for (const u of users) {
+      for (const m of (u.modules || [])) {
+        if (STATE.filterModule !== "all" && m.module_id !== STATE.filterModule) continue;
+        const status = m.exempt ? "exempt" : (m.completed ? "passed" : (m.escalated_at ? "escalated" : (m.overdue ? "overdue" : (m.attempts_used ? "in_progress" : "not_started"))));
+        if (STATE.filterStatus !== "all" && STATE.filterStatus !== status) continue;
+        if (STATE.search && (u.user_email || "").toLowerCase().indexOf(STATE.search.toLowerCase()) < 0) continue;
+        let pillCls = "is-" + status.replace("_","");
+        if (status === "in_progress") pillCls = "is-inprogress";
+        if (status === "not_started") pillCls = "is-notstarted";
+        rows.push(`
+          <tr>
+            <td>${escapeHtml(u.user_email)}</td>
+            <td>${escapeHtml(MODULE_META[m.module_id] || m.module_id)}</td>
+            <td><span class="ta-pill ${pillCls}">${escapeHtml(status.replace("_"," "))}</span></td>
+            <td class="is-num">${m.deadline || "—"}</td>
+            <td class="is-num">${m.attempts_used || 0}/3</td>
+            <td class="is-num">${m.best_score ? m.best_score + "%" : "—"}</td>
+            <td class="is-num">${m.completed_at ? m.completed_at.slice(0,10) : "—"}</td>
+            <td>
+              <button class="ta-btn" data-action="extend" data-email="${escapeHtml(u.user_email)}" data-module="${escapeHtml(m.module_id)}" type="button">Extend</button>
+              ${m.exempt
+                ? `<button class="ta-btn" data-action="un-exempt" data-email="${escapeHtml(u.user_email)}" data-module="${escapeHtml(m.module_id)}" type="button">Re-require</button>`
+                : `<button class="ta-btn" data-action="exempt" data-email="${escapeHtml(u.user_email)}" data-module="${escapeHtml(m.module_id)}" type="button">Exempt</button>`}
+              <button class="ta-btn" data-action="reflections" data-email="${escapeHtml(u.user_email)}" data-module="${escapeHtml(m.module_id)}" type="button">Reflections</button>
+            </td>
+          </tr>`);
+      }
+    }
+    const table = rows.length
+      ? `<table class="ta-table"><thead><tr>
+          <th>Person</th><th>Module</th><th>Status</th><th>Deadline</th><th>Attempts</th><th>Best score</th><th>Completed</th><th>Actions</th>
+        </tr></thead><tbody>${rows.join("")}</tbody></table>`
+      : `<div class="ta-empty">No assignments match those filters.</div>`;
+    return filterRow + table;
+  }
+
+  function renderOverdue(users) {
+    const overdue = [];
+    for (const u of users) {
+      for (const m of (u.modules || [])) {
+        if (m.overdue && !m.completed && !m.exempt) {
+          const today = new Date().toISOString().slice(0,10);
+          const daysOver = Math.max(0, Math.round((Date.parse(today) - Date.parse(m.deadline || today)) / 86400000));
+          overdue.push({ ...m, user_email: u.user_email, daysOver });
+        }
+      }
+    }
+    overdue.sort((a, b) => b.daysOver - a.daysOver);
+    if (!overdue.length) return `<div class="ta-empty">No overdue assignments. Nothing to escalate.</div>`;
+    const rows = overdue.map(o => `
+      <tr>
+        <td>${escapeHtml(o.user_email)}</td>
+        <td>${escapeHtml(MODULE_META[o.module_id] || o.module_id)}</td>
+        <td class="is-num">${o.deadline}</td>
+        <td class="is-num">${o.daysOver}</td>
+        <td>${o.escalated_at ? `<span class="ta-pill is-escalated">Escalated</span>` : ""}</td>
+        <td>
+          <button class="ta-btn" data-action="extend"   data-email="${escapeHtml(o.user_email)}" data-module="${escapeHtml(o.module_id)}" type="button">Extend</button>
+          ${o.escalated_at ? "" : `<button class="ta-btn ta-btn--danger" data-action="escalate" data-email="${escapeHtml(o.user_email)}" data-module="${escapeHtml(o.module_id)}" type="button">Escalate</button>`}
+        </td>
+      </tr>`).join("");
+    return `<table class="ta-table"><thead><tr><th>Person</th><th>Module</th><th>Deadline</th><th>Days over</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+
+  function renderActions() {
+    return `
+      <div class="ta-toolbar">
+        <button class="ta-btn ta-btn--primary" id="taAssignNew" type="button">Assign a module to someone</button>
+        <button class="ta-btn" id="taRunSweep2" type="button">Run auto-enrolment sweep</button>
+      </div>
+      <p class="ta-empty">Use Overview or Overdue for per-row actions (extend, exempt, escalate). The two buttons above cover the bulk paths.</p>`;
+  }
+
+  function renderAuditPanel() {
+    return `<div class="ta-empty" id="taAuditList">Loading audit log…</div>`;
+  }
+
+  function renderExportPanel() {
+    return `
+      <p style="font:400 14px/1.55 var(--font-display);color:var(--ink-800);margin:0 0 16px;">Export the current cohort's training records — every assignment, attempt, completion, and certificate — as a compliance bundle. The CSV is what HR typically wants for a tribunal request; the JSON includes the full event log (every question/answer pair, server-side timestamps, reflection-text lengths).</p>
+      <div class="ta-toolbar" style="border:0;">
+        <a class="ta-btn ta-btn--primary" href="/api/training/admin/export?format=csv" download>Download CSV</a>
+        <a class="ta-btn" href="/api/training/admin/export?format=json" download>Download JSON (full audit)</a>
+      </div>`;
+  }
+
+  function wirePanel() {
+    // Filter inputs on Overview.
+    const fm = $("#taFilterModule"); if (fm) fm.addEventListener("change", () => { STATE.filterModule = fm.value; render(); });
+    const fs = $("#taFilterStatus"); if (fs) fs.addEventListener("change", () => { STATE.filterStatus = fs.value; render(); });
+    const fq = $("#taFilterSearch"); if (fq) {
+      let t = null;
+      fq.addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => { STATE.search = fq.value; render(); }, 250); });
+    }
+    const sweep = $("#taRunSweep") || $("#taRunSweep2");
+    if (sweep) sweep.addEventListener("click", async () => {
+      sweep.disabled = true;
+      try {
+        const out = await apiPost("/admin/auto-enrol", {});
+        toast(`Sweep done — ${out.new_assignments || 0} new assignments.`);
+        STATE.adminState = await apiGet("/admin/state");
+        render();
+      } catch (e) { toast("Sweep failed: " + e.message); }
+      finally { sweep.disabled = false; }
+    });
+    document.querySelectorAll("[data-action]").forEach(b => b.addEventListener("click", () => actionClicked(b)));
+    const a = $("#taAssignNew"); if (a) a.addEventListener("click", openAssignModal);
+    // Audit lazy-load.
+    if (STATE.currentTab === "audit") loadAudit();
+  }
+
+  function actionClicked(btn) {
+    const a = btn.dataset.action; const email = btn.dataset.email; const moduleId = btn.dataset.module;
+    if (a === "extend") openExtendModal(email, moduleId);
+    else if (a === "exempt") openExemptModal(email, moduleId, true);
+    else if (a === "un-exempt") openExemptModal(email, moduleId, false);
+    else if (a === "escalate") openEscalateModal(email, moduleId);
+    else if (a === "reflections") openReflectionsModal(email, moduleId);
+  }
+
+  function openModal(html) {
+    $("#taModalCard").innerHTML = html;
+    $("#taModal").classList.add("is-open");
+    document.body.style.overflow = "hidden";
+    const close = () => { $("#taModal").classList.remove("is-open"); document.body.style.overflow = ""; };
+    $("#taModal").onclick = (e) => { if (e.target === $("#taModal")) close(); };
+    document.addEventListener("keydown", function escClose(e) { if (e.key === "Escape") { close(); document.removeEventListener("keydown", escClose); } });
+    return close;
+  }
+  function escapeAttr(s) { return escapeHtml(s); }
+
+  function openExtendModal(email, moduleId) {
+    const today = new Date(); today.setUTCDate(today.getUTCDate() + 7);
+    const close = openModal(`
+      <h2 id="taModalTitle">Extend deadline</h2>
+      <p>${escapeHtml(email)} · ${escapeHtml(MODULE_META[moduleId] || moduleId)}</p>
+      <label for="taExtDeadline">New deadline</label>
+      <input id="taExtDeadline" type="date" value="${today.toISOString().slice(0,10)}">
+      <label for="taExtReason">Reason (logged in the audit trail)</label>
+      <textarea id="taExtReason" rows="3" placeholder="e.g. on leave until next Friday"></textarea>
+      <div class="ta-modal-actions">
+        <button class="ta-btn" type="button" id="taExtCancel">Cancel</button>
+        <button class="ta-btn ta-btn--primary" type="button" id="taExtSave">Save extension</button>
+      </div>`);
+    $("#taExtCancel").addEventListener("click", close);
+    $("#taExtSave").addEventListener("click", async () => {
+      try {
+        await apiPost("/admin/extend", { user_email: email, module_id: moduleId, deadline: $("#taExtDeadline").value, reason: $("#taExtReason").value });
+        toast("Extension saved.");
+        close();
+        STATE.adminState = await apiGet("/admin/state"); render();
+      } catch (e) { toast("Couldn't save: " + e.message); }
+    });
+  }
+
+  function openExemptModal(email, moduleId, makeExempt) {
+    const close = openModal(`
+      <h2 id="taModalTitle">${makeExempt ? "Exempt from module" : "Re-require module"}</h2>
+      <p>${escapeHtml(email)} · ${escapeHtml(MODULE_META[moduleId] || moduleId)}</p>
+      <label for="taExReason">Reason (logged in the audit trail)</label>
+      <textarea id="taExReason" rows="3" placeholder="${makeExempt ? "e.g. on long-term leave; will reattest on return" : "e.g. lifting exemption — back from leave"}"></textarea>
+      <div class="ta-modal-actions">
+        <button class="ta-btn" type="button" id="taExCancel">Cancel</button>
+        <button class="ta-btn ta-btn--primary" type="button" id="taExSave">${makeExempt ? "Exempt" : "Re-require"}</button>
+      </div>`);
+    $("#taExCancel").addEventListener("click", close);
+    $("#taExSave").addEventListener("click", async () => {
+      try {
+        await apiPost("/admin/exempt", { user_email: email, module_id: moduleId, exempt: makeExempt, reason: $("#taExReason").value });
+        toast(makeExempt ? "Exempted." : "Re-required.");
+        close();
+        STATE.adminState = await apiGet("/admin/state"); render();
+      } catch (e) { toast("Couldn't save: " + e.message); }
+    });
+  }
+
+  function openEscalateModal(email, moduleId) {
+    const close = openModal(`
+      <h2 id="taModalTitle">Escalate</h2>
+      <p>${escapeHtml(email)} · ${escapeHtml(MODULE_META[moduleId] || moduleId)}</p>
+      <p>Records the manual escalation in the audit trail. The line-manager notification mailer reads the escalation flag next time it runs.</p>
+      <label for="taEsNote">Note</label>
+      <textarea id="taEsNote" rows="3" placeholder="e.g. spoke to line manager — agreed firm deadline next Monday"></textarea>
+      <div class="ta-modal-actions">
+        <button class="ta-btn" type="button" id="taEsCancel">Cancel</button>
+        <button class="ta-btn ta-btn--danger" type="button" id="taEsSave">Mark escalated</button>
+      </div>`);
+    $("#taEsCancel").addEventListener("click", close);
+    $("#taEsSave").addEventListener("click", async () => {
+      try {
+        await apiPost("/admin/escalate", { user_email: email, module_id: moduleId, note: $("#taEsNote").value });
+        toast("Escalation recorded.");
+        close();
+        STATE.adminState = await apiGet("/admin/state"); render();
+      } catch (e) { toast("Couldn't save: " + e.message); }
+    });
+  }
+
+  function openReflectionsModal(email, moduleId) {
+    const close = openModal(`
+      <h2 id="taModalTitle">Reflections</h2>
+      <p>${escapeHtml(email)} · ${escapeHtml(MODULE_META[moduleId] || moduleId)}</p>
+      <div id="taReflBody"><div class="ta-loading">Loading…</div></div>
+      <div class="ta-modal-actions"><button class="ta-btn" type="button" id="taReflClose">Close</button></div>`);
+    $("#taReflClose").addEventListener("click", close);
+    apiGet(`/admin/reflections?email=${encodeURIComponent(email)}&module=${encodeURIComponent(moduleId)}`).then(out => {
+      const body = $("#taReflBody");
+      if (!out.reflections || !out.reflections.length) {
+        body.innerHTML = `<p>No reflection text saved for this person on this module.</p>`;
+        return;
+      }
+      body.innerHTML = out.reflections.map(r => `
+        <div class="ta-reflection">
+          <div class="ta-reflection-meta">${escapeHtml(r.key.split(":").slice(-1)[0] || "")} · saved ${r.saved_at ? r.saved_at.slice(0,16).replace("T"," ") : "—"}</div>
+          <div>${escapeHtml(r.text || "")}</div>
+        </div>`).join("");
+    }).catch(e => { $("#taReflBody").innerHTML = `<p>Couldn't load: ${escapeHtml(e.message)}</p>`; });
+  }
+
+  function openAssignModal() {
+    const allModules = Object.entries(MODULE_META);
+    const close = openModal(`
+      <h2 id="taModalTitle">Assign a module</h2>
+      <label for="taAsEmail">Person (email)</label>
+      <input id="taAsEmail" type="email" placeholder="someone@letme.com" autocomplete="off">
+      <label>Modules</label>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
+        ${allModules.map(([id, t]) => `<label style="font:400 14px/1.4 var(--font-body);display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0;color:var(--ink-900);"><input type="checkbox" value="${escapeHtml(id)}" data-as-mod> ${escapeHtml(t)}</label>`).join("")}
+      </div>
+      <label for="taAsDays">Deadline (days from now)</label>
+      <input id="taAsDays" type="number" value="14" min="1" max="365">
+      <label for="taAsReason">Reason / note</label>
+      <input id="taAsReason" type="text" placeholder="e.g. promoted to line manager today">
+      <div class="ta-modal-actions">
+        <button class="ta-btn" type="button" id="taAsCancel">Cancel</button>
+        <button class="ta-btn ta-btn--primary" type="button" id="taAsSave">Assign</button>
+      </div>`);
+    $("#taAsCancel").addEventListener("click", close);
+    $("#taAsSave").addEventListener("click", async () => {
+      const email = $("#taAsEmail").value.trim().toLowerCase();
+      const mods = Array.from(document.querySelectorAll("[data-as-mod]:checked")).map(c => c.value);
+      const days = parseInt($("#taAsDays").value, 10) || 14;
+      const reason = $("#taAsReason").value || "manual";
+      if (!email || !mods.length) { toast("Add an email + at least one module."); return; }
+      try {
+        await apiPost("/admin/assign", { user_email: email, module_ids: mods, deadline_days: days, reason });
+        toast("Assigned.");
+        close();
+        STATE.adminState = await apiGet("/admin/state"); render();
+      } catch (e) { toast("Couldn't assign: " + e.message); }
+    });
+  }
+
+  async function loadAudit() {
+    try {
+      const audit = await fetch("/training-audit.json?_=" + Date.now(), { cache: "no-store" }).then(r => r.ok ? r.json() : { events: [] });
+      const events = (audit.events || []).slice().reverse();
+      const el = $("#taAuditList");
+      if (!el) return;
+      if (!events.length) { el.innerHTML = `<p>No admin actions recorded yet.</p>`; return; }
+      el.innerHTML = events.slice(0, 200).map(ev => `
+        <div class="ta-audit-row">
+          <time>${escapeHtml((ev.ts || "").slice(0,16).replace("T"," "))}</time>
+          <strong>${escapeHtml(ev.actor || "—")}</strong> · ${escapeHtml(ev.type || "—")}${ev.target ? " — " + escapeHtml(ev.target) : ""}${ev.module_id ? " (" + escapeHtml(MODULE_META[ev.module_id] || ev.module_id) + ")" : ""}${ev.reason ? " · " + escapeHtml(ev.reason) : ""}${ev.new_deadline ? " · new deadline " + escapeHtml(ev.new_deadline) : ""}
+        </div>`).join("");
+    } catch (e) {
+      $("#taAuditList").innerHTML = `<p>Couldn't load audit log: ${escapeHtml(e.message)}</p>`;
+    }
+  }
+
+  boot();
+})();
+</script>
+<script src="nav.js?v=1779316800"></script>
+</body>
+</html>

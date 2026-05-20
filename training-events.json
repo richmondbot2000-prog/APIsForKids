@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "updated_at": null,
+  "notes": "Append-only audit trail of every training event. Tribunal-defensible record of what was taken, when, and how. Retention default 7 years (configurable via /api/training/admin/retention). Never edit a past event; superseding events (e.g. a re-issued certificate) get a new entry referencing the original.",
+  "events": []
+}

@@ -1,0 +1,328 @@
+{
+  "module_id": "module_manager",
+  "version": "2026-05-20",
+  "pass_mark_percent": 80,
+  "served_per_attempt": 10,
+  "questions": [
+    {
+      "id": "mm_q01",
+      "tags": ["scenario", "receiving_disclosure"],
+      "stem": "[scenario] A team member comes to you and starts describing an incident with a senior colleague. You sense it is going to be a harassment disclosure. What is the right opening move?",
+      "choices": [
+        {"key": "A", "text": "Interrupt early to clarify whether they are making a formal complaint, so you know which process to follow."},
+        {"key": "B", "text": "Tell them you will keep everything they say absolutely confidential, so they feel safe."},
+        {"key": "C", "text": "Let them finish without interruption, thank them plainly for raising it, take contemporaneous notes in their own words, and then tell them what happens next.", "correct": true},
+        {"key": "D", "text": "Reassure them by telling them you will make sure the colleague is disciplined."}
+      ],
+      "rationale": "Section 2: the receiving-a-disclosure skill is listen-first, take contemporaneous notes in the complainant's own words, thank them, and tell them what happens next. Promising absolute confidentiality is a promise the firm cannot keep (Module 5 §2). Promising specific outcomes is not the manager's to make. Interrupting to force a formal/informal choice in the first minute is the wrong pacing."
+    },
+    {
+      "id": "mm_q02",
+      "tags": ["scenario", "receiving_disclosure"],
+      "stem": "[scenario] During the disclosure, the complainant asks: 'Will this stay between us?' The honest manager response is:",
+      "choices": [
+        {"key": "A", "text": "Yes, you have my word — I will tell no one."},
+        {"key": "B", "text": "Yes, provided you don't want it to go any further."},
+        {"key": "C", "text": "Information will be shared only on a need-to-know basis, and you will be told before any disclosure outside that circle is made; but I cannot promise absolute confidentiality, because the firm has independent reporting duties.", "correct": true},
+        {"key": "D", "text": "It depends on whether your complaint is upheld."}
+      ],
+      "rationale": "Section 2 + Module 5 §2: absolute confidentiality cannot be promised — three FCA reporting clocks (SUP 10C.14, REP008, SUP 15.3) and potential criminal-law obligations sit outside the manager's gift. The honest answer is need-to-know plus prior notice of any wider disclosure. A manager who promises secrecy creates a second grievance the moment the promise is broken."
+    },
+    {
+      "id": "mm_q03",
+      "tags": ["receiving_disclosure"],
+      "stem": "Which of the following is the manager NOT permitted to do after receiving a disclosure?",
+      "choices": [
+        {"key": "A", "text": "Take contemporaneous notes."},
+        {"key": "B", "text": "Escalate to HR."},
+        {"key": "C", "text": "Investigate the allegation themselves, including interviewing the alleged perpetrator before HR has had the chance to plan the conversation.", "correct": true},
+        {"key": "D", "text": "Offer the complainant the alternative routes in Module 5 §6 (skip-level, HR, Speak Up, EHRC, ACAS, police)."}
+      ],
+      "rationale": "Section 2: investigating the allegation yourself, and in particular pre-warning the alleged perpetrator, is the single most damaging receive-stage mistake. It destroys evidence, taints witnesses, and converts a normal investigation into a much harder one. Investigation is for a named investigator independent of both parties' reporting lines."
+    },
+    {
+      "id": "mm_q04",
+      "tags": ["scenario", "duty_without_complaint"],
+      "stem": "[scenario] A team member tells you informally that they have been receiving uncomfortable late-night WhatsApp messages from a peer. They then say: 'Please don't escalate this, I just wanted you to know.' What do you do?",
+      "choices": [
+        {"key": "A", "text": "Respect their wishes fully and take no further action."},
+        {"key": "B", "text": "Override their wishes and file a formal complaint on their behalf — your duty trumps theirs."},
+        {"key": "C", "text": "Consult HR confidentially about the dilemma: the complainant's wishes shape how you act, but you have an independent legal duty (s.40A EA 2010 and, from 1 Sep 2026, COCON 1.1.7FR) and silence is not the discharge of it.", "correct": true},
+        {"key": "D", "text": "Tell them to come back to you only when they are ready to make a formal complaint."}
+      ],
+      "rationale": "Section 2 'don't want a formal complaint' trap + Section 3: the manager has an independent duty that flows from awareness, not paperwork. The complainant's wishes are a strong factor in *how* the manager acts, not whether. Going behind their back is a separate manager mistake. The right move is HR consultation that finds the shape of action which respects the complainant's wishes as far as legally possible."
+    },
+    {
+      "id": "mm_q05",
+      "tags": ["scenario", "duty_without_complaint"],
+      "stem": "[scenario] At an industry off-site you overhear a senior colleague making a sexual comment dressed up as a compliment to a junior member of another team. She visibly recoils. She isn't in your reporting line, and nobody has complained. Are you required to do anything?",
+      "choices": [
+        {"key": "A", "text": "No — she is not your team and nobody has complained."},
+        {"key": "B", "text": "No — it was outside the office."},
+        {"key": "C", "text": "Yes — the s.40A EA 2010 preventative duty and (from 1 Sep 2026) your own COCON 1.1.7FR obligation attach to awareness, not paperwork. At minimum: a 5Ds-framework response in the moment and a confidential factual note to HR for the pattern record.", "correct": true},
+        {"key": "D", "text": "Only if she subsequently asks you for help."}
+      ],
+      "rationale": "Section 3 worked example + EHRC Step 3 + Module 3 (5Ds): the manager's duty is triggered by awareness. Off-site, off-team and off-hours do not displace it. Direct or Delay (5Ds) intervention plus a contemporaneous note to HR is the minimum. Walking away is the breach. Bird & Bird's one-year review of the post-October-2024 tribunals flags 'knew, did nothing, argued the duty was paperwork-dependent' as one of the most common employer failures."
+    },
+    {
+      "id": "mm_q06",
+      "tags": ["scenario", "performance_retaliation"],
+      "stem": "[scenario] A team member raised a harassment concern against a peer two months ago. The investigation is ongoing. The annual bonus calibration is now happening and you were minded to give the complainant a below-average bonus on the basis of two missed deadlines last quarter. The right course is:",
+      "choices": [
+        {"key": "A", "text": "Award the below-average bonus — performance is performance and the complaint is separate."},
+        {"key": "B", "text": "Award an average bonus to avoid the question entirely."},
+        {"key": "C", "text": "Pause and review with HR before taking the action: is there a paper trail predating the complaint, is the treatment consistent with peers, is there a less disadvantageous alternative? If you cannot answer all three positively with documentation, do not take the action.", "correct": true},
+        {"key": "D", "text": "Award the below-average bonus but explain in writing that it is unrelated to the complaint."}
+      ],
+      "rationale": "Section 6 operational rule: any performance-management action against a complainant during or after an investigation must be reviewed by HR before it is taken. The three-question test (would it have happened anyway / consistent with peers / less disadvantageous alternative) protects against the s.27 EA 2010 victimisation claim and (where the disclosure is a protected disclosure) the s.43B/47B ERA 1996 whistleblowing-detriment claim with uncapped damages. Writing 'this is unrelated' on the assessment does not solve the inferred-causation problem under s.136 EA 2010."
+    },
+    {
+      "id": "mm_q07",
+      "tags": ["scenario", "performance_retaliation"],
+      "stem": "[scenario] A complainant in a recently-concluded investigation is moved to a less prestigious team. Your reason is genuine — a restructure that was being planned before the complaint. Under s.136 Equality Act 2010, what happens when the complainant brings a victimisation claim?",
+      "choices": [
+        {"key": "A", "text": "The complainant must prove the move was motivated by the complaint; if they can't, the claim fails."},
+        {"key": "B", "text": "Once the complainant shows facts from which a tribunal could conclude that victimisation occurred, the burden shifts to the employer to prove the treatment was for a non-discriminatory reason — meaning contemporaneous documentation of the restructure plan is what protects the firm.", "correct": true},
+        {"key": "C", "text": "The claim cannot succeed because the restructure was pre-planned."},
+        {"key": "D", "text": "The claim is automatically capped at 25% of salary."}
+      ],
+      "rationale": "Section 6 + s.136 EA 2010: the burden of proof shifts once the complainant has shown facts from which a tribunal could infer victimisation. The employer must then prove a non-discriminatory reason. Without contemporaneous documentation predating the complaint, the manager is in the position of trying to prove a negative. There is no automatic salary cap on victimisation awards under the EA 2010; the 25% uplift in s.124A applies to sexual-harassment compensation where the s.40A duty is breached and is unrelated."
+    },
+    {
+      "id": "mm_q08",
+      "tags": ["scenario", "third_party"],
+      "stem": "[scenario] An underwriter on your team tells you that a broker at a top-10 broker firm has been making sexual comments on calls for about two months. She didn't want to make a fuss because the relationship is commercially important. What is the right firm-side escalation?",
+      "choices": [
+        {"key": "A", "text": "Quietly move her onto a different broker portfolio for balance and don't raise it with HR — the relationship is too important."},
+        {"key": "B", "text": "Tell her to manage the broker more firmly and report back if it continues."},
+        {"key": "C", "text": "Acknowledge and thank her, take contemporaneous notes, escalate same-day to HR and your line, preserve the call recordings via Forensic IT (not yourself), take her off direct contact with that broker only with her agreement framed as precaution not demotion, and let HR / Compliance / the relationship lead decide on firm-side action to the broker.", "correct": true},
+        {"key": "D", "text": "Speak directly to the broker yourself and ask him to stop."}
+      ],
+      "rationale": "Section 7 worked example + s.21 ERA 2025 (in force 1 Oct 2026): third-party harassment is direct firm liability. The escalation route is firm-side (formal warning to the broker firm, named-broker exclusion, suspension of the relationship, termination). 'Have a quiet word with the junior to manage the client' is itself potentially victimisation under s.27 EA 2010 because it asks the complainant to absorb the conduct to preserve a commercial relationship. Accessing call recordings yourself is a chain-of-custody breach; Forensic IT does that."
+    },
+    {
+      "id": "mm_q09",
+      "tags": ["evidence"],
+      "stem": "After receiving a disclosure, the most defensible format for your contemporaneous notes is:",
+      "choices": [
+        {"key": "A", "text": "A typed Word document on your laptop, refined and tidied over the following week."},
+        {"key": "B", "text": "A timestamped notes-app entry to yourself, dated, not subsequently edited.", "correct": true},
+        {"key": "C", "text": "A summary you draft a few days later when you have had time to reflect."},
+        {"key": "D", "text": "A WhatsApp message to a trusted peer describing what you heard."}
+      ],
+      "rationale": "Section 4: contemporaneous, timestamped, unedited. Word documents have edit metadata that betrays subsequent changes; a notes-app entry that has not been modified is more evidentially robust than a polished document. A summary days later loses the contemporaneity that makes the note useful. A WhatsApp to a peer is a confidentiality breach in itself."
+    },
+    {
+      "id": "mm_q10",
+      "tags": ["scenario", "evidence"],
+      "stem": "[scenario] The complainant shows you screenshots of a WhatsApp exchange with the alleged perpetrator on her phone. You think they will be important to the investigation. The right move is:",
+      "choices": [
+        {"key": "A", "text": "Take photos of her screen on your own phone so you have copies."},
+        {"key": "B", "text": "Ask her to AirDrop or email the screenshots to you on the spot."},
+        {"key": "C", "text": "Ask whether she would like to share them with HR, let her send the originals herself untouched, and document in your note that she offered them.", "correct": true},
+        {"key": "D", "text": "Tell her the screenshots are inadmissible because they are not from a work device."}
+      ],
+      "rationale": "Section 4: chain-of-custody matters. The complainant owns the contents of her phone; the manager does not. Copying without consent is itself problematic, and copies you make are evidentially weaker than originals she sends herself. Letting her send the originals to HR preserves both her consent and the integrity of the evidence. Screenshots from a personal device are routinely admissible — the medium does not change the s.26 test (see Module 0)."
+    },
+    {
+      "id": "mm_q11",
+      "tags": ["evidence"],
+      "stem": "You believe the alleged perpetrator has been deleting Teams messages relevant to the matter. The correct response is:",
+      "choices": [
+        {"key": "A", "text": "Log into their account yourself to preserve the messages before more are deleted."},
+        {"key": "B", "text": "Ask a friendly IT colleague to pull the messages informally."},
+        {"key": "C", "text": "Inform HR immediately so that Forensic IT can preserve the data through the proper authorised route; do not access the account yourself.", "correct": true},
+        {"key": "D", "text": "Confront the alleged perpetrator and tell them to stop deleting."}
+      ],
+      "rationale": "Section 4: accessing a colleague's account without proper authorisation is potentially a Computer Misuse Act 1990 offence and taints any evidence retrieved. Forensic IT acts through the firm's authorised process. Tipping off the alleged perpetrator destroys further evidence and pre-warns them — both Section 2 mistakes. Server-side retention typically preserves deleted Teams content; the Forensic IT route reaches it without the chain-of-custody problem."
+    },
+    {
+      "id": "mm_q12",
+      "tags": ["smcr", "fca"],
+      "stem": "From 1 September 2026, COCON 1.1.7FR makes the manager's own handling of non-financial misconduct:",
+      "choices": [
+        {"key": "A", "text": "An HR matter only."},
+        {"key": "B", "text": "A regulated matter under the SMCR Conduct Rules — mishandling a disclosure can itself be the Conduct Rule breach, independent of any breach by the alleged perpetrator.", "correct": true},
+        {"key": "C", "text": "Relevant only for managers of certified persons."},
+        {"key": "D", "text": "Relevant only in banks."}
+      ],
+      "rationale": "Section 1 + Section 8 + research/02 §1-2: PS25/23 extends the Conduct Rules to bullying, harassment and violence across all SMCR-regulated firms (approximately 37,000 additional firms beyond banks) from 1 September 2026. The seriousness threshold is the Equality Act test verbatim. A manager's own handling is in scope — silence in the face of awareness, retaliation against a complainant, or pre-warning the alleged perpetrator can each be the breach."
+    },
+    {
+      "id": "mm_q13",
+      "tags": ["smcr", "fca"],
+      "stem": "Where the firm becomes aware that an approved Senior Manager (SMF) has breached a Conduct Rule by serious harassment, the firm must notify the FCA via Form D within:",
+      "choices": [
+        {"key": "A", "text": "24 hours."},
+        {"key": "B", "text": "7 business days, under SUP 10C.14.", "correct": true},
+        {"key": "C", "text": "Once a year, in the annual REP008 return."},
+        {"key": "D", "text": "Only at the conclusion of the investigation."}
+      ],
+      "rationale": "Section 8 + research/02 §4: SUP 10C.14 imposes a 7-business-day Form D notification clock for SMF Conduct Rule breaches. The clock is triggered by awareness, not by adjudication. A manager who is aware that the clock is running cannot legitimately delay the conversation with HR to slow the clock."
+    },
+    {
+      "id": "mm_q14",
+      "tags": ["smcr", "fca"],
+      "stem": "From 1 September 2026, SYSC 22 regulatory references must disclose substantiated NFM findings. For a manager who has had a finding made against them, this means:",
+      "choices": [
+        {"key": "A", "text": "The finding stays inside the firm and does not affect a future move."},
+        {"key": "B", "text": "The finding is disclosed in the manager's regulatory reference when they move to another regulated firm — the 'pass the harasser' loophole closes.", "correct": true},
+        {"key": "C", "text": "Disclosure is at the firm's discretion."},
+        {"key": "D", "text": "Disclosure is required only if the manager is an SMF."}
+      ],
+      "rationale": "Section 8 + research/02 §4: SYSC 22 was extended by PS25/23 to close the pass-the-harasser loophole from 1 September 2026. Substantiated NFM findings — against SMFs and certified persons alike — must be disclosed in regulatory references when the individual moves regulated firm. This is not discretionary. The Odey precedent is the public proof that the FCA will use these tools at senior levels."
+    },
+    {
+      "id": "mm_q15",
+      "tags": ["scenario", "managing_team"],
+      "stem": "[scenario] During an active investigation involving two members of your team, a third team member asks you informally over coffee 'what is actually going on?'. The right response is:",
+      "choices": [
+        {"key": "A", "text": "Tell them the broad outline so the rumour mill is controlled."},
+        {"key": "B", "text": "Say 'I'm not going to discuss this, and I expect you to respect that too' — and apply the same rule to everyone who asks.", "correct": true},
+        {"key": "C", "text": "Tell them whose side you're on, so they aren't confused about how to behave."},
+        {"key": "D", "text": "Refer them to HR for the details."}
+      ],
+      "rationale": "Section 5: communication discipline. No team-wide commentary on the matter. No 'between us' with one party or peer. The complainant must be protected from victimisation; the respondent must be presumed innocent. The only sustainable position is uniform refusal to discuss, modelled visibly so the team knows the standard applies to everyone."
+    },
+    {
+      "id": "mm_q16",
+      "tags": ["scenario", "managing_team"],
+      "stem": "[scenario] You are minded to take the complainant off a high-profile project during the investigation 'for their own comfort'. Is this OK?",
+      "choices": [
+        {"key": "A", "text": "Yes — it shows care for the complainant."},
+        {"key": "B", "text": "Yes, provided you give them a similar-sized project to replace it."},
+        {"key": "C", "text": "No — unilateral removal reads as outcome-determining and as victimisation. If a genuine separation is needed for safeguarding, HR decides on it and frames it as a precautionary measure, not a finding.", "correct": true},
+        {"key": "D", "text": "Yes — but only if you also move the respondent off the project."}
+      ],
+      "rationale": "Section 5: workload and seating decisions taken by the manager during an investigation read as outcome-determining whichever way they go. Removing the complainant 'for their comfort' is a classic Exhibit 1 example of well-intentioned victimisation. Genuine precautionary measures are decided by HR, framed explicitly as precaution, and documented as such."
+    },
+    {
+      "id": "mm_q17",
+      "tags": ["scenario", "manager_is_party"],
+      "stem": "[scenario] A team member has raised a harassment concern against you. What must you do?",
+      "choices": [
+        {"key": "A", "text": "Talk to the team to gather your side of the story."},
+        {"key": "B", "text": "Quietly review the complainant's emails to understand the context."},
+        {"key": "C", "text": "Stand down from any investigatory role, do not access the team's data, do not approach witnesses, and defer to HR — the firm will appoint an investigator not in your reporting line.", "correct": true},
+        {"key": "D", "text": "Resign immediately."}
+      ],
+      "rationale": "Section 9: when the manager is a party, the rules are non-negotiable — stand down, no data access, no witness contact. Approaching witnesses or accessing data is itself a Conduct Rule risk and taints the investigation. You retain procedural-fairness protections as respondent (substance of the allegation, chance to respond, representation, timeline). Resignation is not required and may itself be read as an admission."
+    },
+    {
+      "id": "mm_q18",
+      "tags": ["scenario", "third_party"],
+      "stem": "[scenario] From 1 October 2026, a client makes a transphobic comment about a member of your team during a routine call. Three weeks later the client does it again. The firm's exposure is:",
+      "choices": [
+        {"key": "A", "text": "Nil — the client is not an employee."},
+        {"key": "B", "text": "Direct liability under s.21 ERA 2025 (new s.40(1A)–(1C) EA 2010), because the firm is permitting third-party harassment of its employee by failing to take all reasonable steps to prevent it.", "correct": true},
+        {"key": "C", "text": "Only if the team member resigns in response."},
+        {"key": "D", "text": "Only if the team member is themselves transgender."}
+      ],
+      "rationale": "Section 7 + research/01 §3: s.21 ERA 2025 inserts new s.40(1A)–(1C) into the Equality Act 2010 with effect 1 October 2026. Third-party harassment liability applies across all protected characteristics (not just sex). The 'related to a protected characteristic' test in s.26 does not require the recipient to have the characteristic; conduct that creates a hostile environment for any employee qualifies. The firm's defence is having taken all reasonable steps."
+    },
+    {
+      "id": "mm_q19",
+      "tags": ["scenario", "duty_without_complaint"],
+      "stem": "[scenario] You notice that a senior colleague repeatedly singles out one female junior for criticism in team meetings in a way that does not match how he treats male juniors. She has not complained. Are you required to act?",
+      "choices": [
+        {"key": "A", "text": "No — without a complaint there is nothing to act on."},
+        {"key": "B", "text": "No — criticism in meetings is performance management, not harassment."},
+        {"key": "C", "text": "Yes — EHRC Step 3 (risk assessment) and the s.40A preventative duty require you to act on identified risk; at minimum, raise it confidentially with HR and document the pattern.", "correct": true},
+        {"key": "D", "text": "Only if you can prove his motivation."}
+      ],
+      "rationale": "Section 3 + EHRC Step 3: a pattern that creates a hostile environment differentiated by sex is potentially harassment under s.26 EA 2010. The manager's duty is triggered by awareness of the risk, not by a complaint. Whether the conduct ultimately meets the s.26 test is for an investigator; identifying and flagging the risk is the manager's job. Motivation is not the test (s.26(4) — purpose or effect, judged by what is reasonable)."
+    },
+    {
+      "id": "mm_q20",
+      "tags": ["evidence"],
+      "stem": "Which of the following is acceptable behaviour for a manager once they are aware of a disclosure?",
+      "choices": [
+        {"key": "A", "text": "Coaching potential witnesses on what they should say in interview, to make sure their evidence is consistent."},
+        {"key": "B", "text": "Asking peers what they remember about the alleged perpetrator's conduct, so you can give HR a fuller picture."},
+        {"key": "C", "text": "Telling HR everything you know, including the inconvenient parts, and letting the investigator interview witnesses through the proper process.", "correct": true},
+        {"key": "D", "text": "Tidying up the alleged perpetrator's Teams channel to remove obviously inappropriate material before it is found."}
+      ],
+      "rationale": "Section 4: witness coaching, informal evidence-gathering and tidying-up are all manager mistakes that taint the investigation and create Conduct Rule risk in the manager's own name. Selective disclosure to HR (omitting inconvenient material) is the single most damaging error — it converts a single incident into a much larger problem when the omitted material later surfaces."
+    },
+    {
+      "id": "mm_q21",
+      "tags": ["scenario", "performance_retaliation"],
+      "stem": "[scenario] A complainant raised a harassment concern eight months ago. The investigation concluded with a partially substantiated finding against the respondent four months ago. You now want to give the complainant a lower bonus than peers for genuine performance reasons. What is the safe position?",
+      "choices": [
+        {"key": "A", "text": "The protection has expired — eight months is enough."},
+        {"key": "B", "text": "Lower bonuses are always safe provided you can describe a reason."},
+        {"key": "C", "text": "The post-investigation protection runs for a reasonable period — twelve months is a sensible internal benchmark. The Section 6 three-question test still applies: paper trail predating the action, consistency with peers, less disadvantageous alternative — reviewed by HR before the action is taken.", "correct": true},
+        {"key": "D", "text": "Give an average bonus to avoid the question entirely."}
+      ],
+      "rationale": "Section 6: victimisation protection under s.27 EA 2010 does not lapse when the investigation does. A 12-month internal benchmark is sensible for post-investigation HR review of performance actions against a former complainant. The three-question test remains the operational rule. Awarding an average bonus to avoid scrutiny is itself a distortion that may disadvantage the complainant relative to their genuine trajectory."
+    },
+    {
+      "id": "mm_q22",
+      "tags": ["scenario", "receiving_disclosure"],
+      "stem": "[scenario] A team member describes an incident and ends by saying 'maybe I'm overreacting, please don't think I'm being difficult'. The right response is:",
+      "choices": [
+        {"key": "A", "text": "Reassure them that they probably are overreacting so they don't worry."},
+        {"key": "B", "text": "Tell them that under the Equality Act, harassment is judged by effect not by their reaction — and that raising the concern is the right thing to do regardless of how it ultimately plays out. Continue with the receiving-a-disclosure process.", "correct": true},
+        {"key": "C", "text": "Ask them to consider whether they want to proceed and come back tomorrow with a decision."},
+        {"key": "D", "text": "Tell them you will only act if they put it in writing."}
+      ],
+      "rationale": "Section 2 + Module 5 §7 + s.26(4) EA 2010: harassment is judged by purpose or effect through a reasonableness lens, not by whether the complainant labels themselves a victim. Good-faith complaints that turn out to be unfounded are protected under s.27(3) EA 2010. Discouraging the complainant or imposing artificial preconditions ('put it in writing first') are both manager-side errors that can themselves be victimisation."
+    },
+    {
+      "id": "mm_q23",
+      "tags": ["smcr", "fca"],
+      "stem": "Which of the following best describes the relationship between internal HR resolution and FCA reporting for a certified-person Conduct Rule breach involving harassment?",
+      "choices": [
+        {"key": "A", "text": "Internal resolution removes the need to report to the FCA."},
+        {"key": "B", "text": "Internal resolution triggers, rather than removes, the FCA reporting obligation — reportable disciplinary actions (formal warning, suspension, dismissal, remuneration reduction or recovery) are aggregated and reported annually via REP008 / Form H by 31 October.", "correct": true},
+        {"key": "C", "text": "The FCA only needs to be told if the certified person is dismissed."},
+        {"key": "D", "text": "The FCA only needs to be told if the complainant complains externally."}
+      ],
+      "rationale": "Section 8 + research/02 §4: REP008 / Form H aggregates reportable disciplinary actions against certified persons and is submitted annually. Internal resolution is the trigger, not the escape route. The reporting period is 1 September to 31 August; deadline 31 October. Dismissal is one reportable action among several; formal warnings and remuneration adjustments are also reportable."
+    },
+    {
+      "id": "mm_q24",
+      "tags": ["scenario", "third_party"],
+      "stem": "[scenario] A contractor visiting the office has been making comments about a colleague's religious dress over the past week. Three staff have mentioned it informally. The contractor's engagement is due to end in two weeks. What is the appropriate manager action?",
+      "choices": [
+        {"key": "A", "text": "Wait the two weeks until the engagement ends — the problem will solve itself."},
+        {"key": "B", "text": "Tell the staff to ignore it because the contractor will soon be gone."},
+        {"key": "C", "text": "Escalate to HR + the contractor relationship lead today; consider immediate termination of the engagement or a formal warning; document the pattern in writing; check on the affected colleague directly.", "correct": true},
+        {"key": "D", "text": "Speak to the contractor yourself informally."}
+      ],
+      "rationale": "Section 7 + s.21 ERA 2025 (from 1 Oct 2026) + s.26 EA 2010 (already in force): third-party harassment liability covers contractors and visitors. The protected characteristic here is religion or belief. 'Waiting it out' is the textbook failure of the s.40A preventative duty (and from October 2026, the all-reasonable-steps standard). The manager's instinct to 'have a word' themselves is wrong here — escalation to HR and the relationship lead is the right route, because the firm-side action (warning, termination) is not the manager's alone to decide."
+    },
+    {
+      "id": "mm_q25",
+      "tags": ["takeaway"],
+      "stem": "The single most important practical message of this module for managers is:",
+      "choices": [
+        {"key": "A", "text": "Resolve harassment matters informally wherever possible to protect the team."},
+        {"key": "B", "text": "Receiving a disclosure is a named skill; the duty to act attaches to awareness not paperwork; performance management against a complainant must be reviewed by HR first; and the manager's own handling is now in COCON 1.1.7FR scope from 1 September 2026.", "correct": true},
+        {"key": "C", "text": "Always escalate every concern to the highest possible level."},
+        {"key": "D", "text": "Promise confidentiality to encourage people to come forward."}
+      ],
+      "rationale": "Cumulative — Sections 1, 2, 3, 6, 8. The module's purpose is to give managers the role-specific competencies that all-staff content cannot supply, anchored in the EEOC Task Force evidence that the manager track is the single highest-leverage component of a prevention programme and in the FCA's PS25/23 framework that puts the manager's own handling into regulatory scope."
+    }
+  ],
+  "reflections": [
+    {
+      "id": "mm_r1",
+      "prompt": "Think about the last time a team member came to you with something that was uncomfortable — not necessarily harassment, but something that needed handling. Looking back through the framework in Section 2, what would you have done differently?",
+      "visibility": "group_hr_only",
+      "scored": false
+    },
+    {
+      "id": "mm_r2",
+      "prompt": "The 'they don't want a formal complaint' trap in Section 2 has no clean answer. If you found yourself in that situation tomorrow, who specifically — by name or by role — would be your first call for advice, and is that person actually available to you?",
+      "visibility": "group_hr_only",
+      "scored": false
+    },
+    {
+      "id": "mm_r3",
+      "prompt": "Look honestly at the last performance decision you made about someone on your team — appraisal score, bonus recommendation, project allocation. If that person were to raise a harassment concern next week and the decision had to be defended in a tribunal context (Section 6), is the paper trail there? If not, what would you change about how you document these decisions going forward?",
+      "visibility": "group_hr_only",
+      "scored": false
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "updated_at": null,
+  "notes": "Immutable audit log of admin actions on training records (assignments granted, exemptions, extensions, retention edits, manual escalations). Separate from training-events.json so the employee event-log stays focused on what THEY did.",
+  "events": []
+}

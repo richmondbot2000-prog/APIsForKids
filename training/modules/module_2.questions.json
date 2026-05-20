@@ -1,0 +1,345 @@
+{
+  "module_id": "module_2",
+  "version": "2026-05-20",
+  "pass_mark_percent": 80,
+  "served_per_attempt": 8,
+  "questions": [
+    {
+      "id": "q1",
+      "scenario": false,
+      "stem": "How many of the nine protected characteristics in the Equality Act 2010 trigger the s.26 harassment provisions?",
+      "options": [
+        "All nine",
+        "Seven (all except marriage/civil partnership and pregnancy/maternity)",
+        "Five",
+        "Only sex and race"
+      ],
+      "correct": 1,
+      "rationale": "Section 26(5) limits harassment to seven characteristics: age, disability, gender reassignment, race, religion or belief, sex, sexual orientation. Marriage/civil partnership and pregnancy/maternity remain protected against direct discrimination (s.13, s.18) but sit outside s.26."
+    },
+    {
+      "id": "q2",
+      "scenario": true,
+      "stem": "[scenario] A manager keeps offering food to a colleague observing Ramadan during team lunches — \"go on, one bite, we won't tell Allah.\" The colleague laughs along, then stops attending lunches. The manager believes he is being playfully welcoming. Is this potentially harassment?",
+      "options": [
+        "No, because the manager's intent was friendly",
+        "No, because the colleague laughed in the moment",
+        "Yes, if a reasonable person would consider the conduct had the effect of being humiliating or degrading on the basis of religion",
+        "Only if the colleague has formally complained"
+      ],
+      "correct": 2,
+      "rationale": "Section 26 is judged by purpose OR effect. The s.26(4) reasonable-person lens applies regardless of intent. The colleague's in-the-moment laughter is one circumstance, not the test."
+    },
+    {
+      "id": "q3",
+      "scenario": false,
+      "stem": "Age harassment under the Equality Act:",
+      "options": [
+        "Applies only to workers over 50",
+        "Applies only to workers under 25",
+        "Applies at every age — younger and older",
+        "Is not covered by the Equality Act"
+      ],
+      "correct": 2,
+      "rationale": "Age is a protected characteristic under s.4 EA 2010 with no upper or lower bound for harassment purposes. Conduct related to age, in either direction, can meet the s.26 test."
+    },
+    {
+      "id": "q4",
+      "scenario": true,
+      "stem": "[scenario] A colleague who has transitioned asks the team to use a new name and new pronouns. A senior colleague continues to use the old name and pronouns in meetings, including in front of clients, saying he \"just can't get his head around it.\" Is this potentially harassment?",
+      "options": [
+        "No, because he isn't trying to cause offence",
+        "No, because the law does not require people to change their language",
+        "Yes — the conduct is unwanted, persistent after correction, related to gender reassignment, and a reasonable person would consider it to violate dignity",
+        "Only if the colleague has a Gender Recognition Certificate"
+      ],
+      "correct": 2,
+      "rationale": "The gender-reassignment protection does not require a GRC. Persistent misgendering after correction meets the s.26 unwanted/related/effect test. Subjective inability or unwillingness to adapt is not a defence."
+    },
+    {
+      "id": "q5",
+      "scenario": false,
+      "stem": "A colleague is gay but not out at work. A senior broker makes a homophobic joke in a team meeting. The colleague hears it. The s.26 analysis:",
+      "options": [
+        "Doesn't apply because nobody knows he is gay",
+        "Applies in the same way it would if he were out — sexual orientation is protected whether or not the colleague is openly out",
+        "Applies only if he tells the speaker afterwards",
+        "Applies only if he comes out as a result"
+      ],
+      "correct": 1,
+      "rationale": "The protection attaches to the characteristic, not to whether the colleague has disclosed it. Section 26 conduct related to sexual orientation can be harassment of a closeted colleague — and in many cases the unseen cost is greater."
+    },
+    {
+      "id": "q6",
+      "scenario": true,
+      "stem": "[scenario] At a client lunch in Soho, the most senior person on our side makes a comment about a particular nationality's \"approach to time-keeping.\" Two of our staff are at the table; neither is of that nationality. Can this be harassment of our staff?",
+      "options": [
+        "No, because the comment is not about them",
+        "No, because the client tolerated it",
+        "Yes — under s.26, conduct related to a protected characteristic can create a hostile environment for staff who hear it, even if they are not from the group in question",
+        "Only if one of our staff complains within 48 hours"
+      ],
+      "correct": 2,
+      "rationale": "Section 26's \"related to\" wording does not require the recipient to share the protected characteristic. A racially-loaded remark in a work setting can be harassment of any colleague present whose dignity is violated or for whom a hostile environment is created."
+    },
+    {
+      "id": "q7",
+      "scenario": false,
+      "stem": "Which of the following is correct about disability under the Equality Act?",
+      "options": [
+        "Only physical impairments are covered",
+        "A diagnosis is required in every case",
+        "Mental impairments are covered, and cancer, HIV and MS are protected from the point of diagnosis regardless of effect",
+        "Neurodivergent conditions are excluded"
+      ],
+      "correct": 2,
+      "rationale": "The definition under s.6 EA 2010 covers physical and mental impairments with a substantial and long-term adverse effect on day-to-day activities. Cancer, HIV and MS are deemed disabilities from diagnosis. Neurodivergent conditions (autism, ADHD, dyslexia) routinely meet the test."
+    },
+    {
+      "id": "q8",
+      "scenario": true,
+      "stem": "[scenario] A colleague with ADHD has an agreed adjustment: written agendas before meetings and tasks confirmed in writing afterwards. Her manager posts in the team Teams channel: \"In case anyone forgets, [name] needs everything in writing because reasons.\" Best read?",
+      "options": [
+        "A bit insensitive but not harassment",
+        "Harassment under s.26 (related to disability, written, public, humiliating in effect), and separately likely undermines the firm's reasonable-adjustments obligation",
+        "Not a problem because the adjustment was already agreed",
+        "Only a problem if the colleague replies in the channel"
+      ],
+      "correct": 1,
+      "rationale": "The conduct is unwanted, related to disability, in writing, public, and a reasonable person would consider it humiliating in effect. It also corrodes the reasonable-adjustment process the firm has put in place — two separate failures."
+    },
+    {
+      "id": "q9",
+      "scenario": false,
+      "stem": "Pregnancy and maternity sit outside s.26 harassment, but conduct around them can still be actionable. The most accurate description:",
+      "options": [
+        "There is no remedy at all",
+        "Only criminal-law remedies apply",
+        "Direct discrimination under s.13 or s.18, and gendered conduct around pregnancy can also be analysed as harassment related to sex under s.26",
+        "Only remedies through the FCA apply"
+      ],
+      "correct": 2,
+      "rationale": "Pregnancy and maternity discrimination is actionable directly under s.18, and less favourable treatment because of pregnancy is direct discrimination. Conduct that is gendered in nature is often analysed as harassment related to sex even where the underlying issue is pregnancy."
+    },
+    {
+      "id": "q10",
+      "scenario": true,
+      "stem": "[scenario] A female associate returns from maternity leave to find the deal she was promised has been given to a male peer. Her MD tells her it's \"for her own good given the new circumstances\" and she should \"take a few months to settle back in.\" Most accurate read?",
+      "options": [
+        "Sensible management — she has just returned",
+        "Direct sex discrimination (s.13) and pregnancy/maternity discrimination (s.18), and depending on follow-up conversations potentially harassment related to sex",
+        "Only an issue if she had asked specifically for the deal",
+        "Only an issue if her bonus is affected"
+      ],
+      "correct": 1,
+      "rationale": "\"For her own good\" is the textbook paternalistic framing tribunals identify as evidence of direct discrimination on grounds of sex and maternity. The fact the MD believes he is being helpful does not change the analysis."
+    },
+    {
+      "id": "q11",
+      "scenario": false,
+      "stem": "The ACAS distinction between bullying and harassment is:",
+      "options": [
+        "Bullying is worse than harassment",
+        "There is no difference — the words are interchangeable",
+        "Harassment is bullying that is related to a protected characteristic and actionable under the Equality Act; bullying without that link has no specific statute but can still ground a constructive-dismissal claim",
+        "Bullying applies only to managers"
+      ],
+      "correct": 2,
+      "rationale": "ACAS defines bullying as offensive, intimidating or insulting conduct with no specific statute. The Equality Act adds a statutory route when the conduct is related to a protected characteristic. The route to redress is different, but both can end a career."
+    },
+    {
+      "id": "q12",
+      "scenario": true,
+      "stem": "[scenario] An employee reports that her manager \"bullies\" her — he shouts at the women on the team but never at the men. Most accurate categorisation?",
+      "options": [
+        "A bullying issue with no Equality Act dimension",
+        "A workplace-personality issue best handled informally",
+        "On its face a harassment issue (conduct related to sex) and should be investigated as such, even though the employee used the word \"bullying\"",
+        "Not investigable until a formal complaint is filed"
+      ],
+      "correct": 2,
+      "rationale": "Workers routinely use the word \"bullying\" for what is in fact harassment. A pattern that targets one sex is on its face s.26 conduct related to sex. The label the complainant uses does not determine the legal characterisation."
+    },
+    {
+      "id": "q13",
+      "scenario": false,
+      "stem": "Microaggressions and the cumulative-effect point: which statement most accurately captures how the s.26 test handles low-level repeated conduct?",
+      "options": [
+        "Each comment must meet the test on its own — small comments never count",
+        "Section 26 looks at the environment, which is cumulative; twenty small comments over six months can meet the test even where no single one would",
+        "Microaggressions are only relevant if a manager has been told",
+        "Section 26 ignores low-level conduct"
+      ],
+      "correct": 1,
+      "rationale": "Section 26 protects against conduct that creates a hostile or humiliating environment. \"Environment\" is by nature cumulative. The single-incident threshold and the environmental threshold are alternatives, not requirements both to be met."
+    },
+    {
+      "id": "q14",
+      "scenario": true,
+      "stem": "[scenario] A 56-year-old underwriter returns from sabbatical. Two senior colleagues repeatedly joke about him needing \"IT on speed-dial\" and call him \"the dinosaur\" in front of the team. He laughs at first. Three weeks later he raises it with HR. Is this potentially harassment?",
+      "options": [
+        "No, because he laughed for three weeks",
+        "No, because the comments are about technology rather than age",
+        "Yes — \"dinosaur\" is age-related, the conduct is unwanted and repeated, and a reasonable person could consider the cumulative effect met the test",
+        "Only if the colleagues continue after he raises it"
+      ],
+      "correct": 2,
+      "rationale": "Repeated age-coded language meets the s.26 \"related to\" wording. In-the-moment laughter is a survival strategy, not a defence. Section 26(4) asks how a reasonable person would view the cumulative pattern."
+    },
+    {
+      "id": "q15",
+      "scenario": false,
+      "stem": "From 1 October 2026, the firm's exposure to harassment of its employees by clients, contractors and visitors:",
+      "options": [
+        "Remains zero — the harasser must be an employee",
+        "Becomes direct liability under new s.40(1A) EA 2010 where the firm has failed to take all reasonable steps to prevent the conduct, across all seven harassment-relevant characteristics",
+        "Applies only to sexual harassment",
+        "Applies only if the same third party offends three times or more"
+      ],
+      "correct": 1,
+      "rationale": "Section 21 ERA 2025 inserts new s.40(1A)–(1C) EA 2010 from 1 October 2026, reinstating third-party harassment liability across all seven harassment-relevant characteristics. The liability turns on the firm's failure to take all reasonable steps."
+    },
+    {
+      "id": "q16",
+      "scenario": true,
+      "stem": "[scenario] A client makes a comment about a member of the reception team's appearance and asks her for her personal number. She tells her line manager that afternoon. From October 2026, what is the firm's correct first move?",
+      "options": [
+        "Reassure her and ask her not to escalate, since the client is a major account",
+        "Document the complaint, consider speaking to the client, brief reception on handling any future visits, and record the analysis as part of the all-reasonable-steps defence",
+        "Tell her to take a few days off and hope the client doesn't return",
+        "Refer her to occupational health and close the matter"
+      ],
+      "correct": 1,
+      "rationale": "From October 2026 the firm's response is itself the evidence that it took all reasonable steps. Documenting, considering action against the third party, and briefing the affected team are minimum expectations. \"He's a major client\" is not, on its own, a defence."
+    },
+    {
+      "id": "q17",
+      "scenario": false,
+      "stem": "\"It was just banter\" as a defence to a harassment allegation:",
+      "options": [
+        "Is a complete defence if the team agreed",
+        "Is a partial defence that reduces compensation",
+        "Is not a defence — s.26 is judged by effect through s.26(4)'s reasonable-person lens, not by the speaker's framing",
+        "Is a defence if the conduct happened outside the office"
+      ],
+      "correct": 2,
+      "rationale": "The Equality Act's purpose-or-effect test, judged through s.26(4)'s reasonable-person lens, does not turn on the speaker's framing. Tribunals have repeatedly identified \"banter\" as the precise rhetorical move that signals the speaker has not engaged with the effect of their conduct."
+    },
+    {
+      "id": "q18",
+      "scenario": true,
+      "stem": "[scenario] A contractor placed on a deal team for six weeks repeatedly mimics a junior analyst's accent. She raises it with the deal lead. The deal lead says the contractor \"is just like that\" and tells her to keep her head down for the remaining four weeks. From October 2026, what is the firm's position?",
+      "options": [
+        "Safe — the contractor is not an employee",
+        "Safe — the firm did not invite the conduct",
+        "At risk under new s.40(1A) EA 2010 for failing to take all reasonable steps to prevent third-party harassment; the firm's lever is the contract under which the contractor is engaged",
+        "Safe, provided the deal closes"
+      ],
+      "correct": 2,
+      "rationale": "Third-party liability from October 2026 covers contractors. The firm's failure to act through its contractual lever is exactly the kind of omission the all-reasonable-steps test catches. The fact the harasser is not an employee narrows the disciplinary route but not the firm's exposure."
+    },
+    {
+      "id": "q19",
+      "scenario": false,
+      "stem": "A colleague holds a gender-critical belief and expresses it in a firm-convened policy conversation. Another colleague says they find this distressing and asks the firm to silence the first colleague. The correct read is:",
+      "options": [
+        "The first colleague must be silenced — distress is enough",
+        "The first colleague's belief is not protected and the request must be granted",
+        "Both colleagues hold protected positions; the firm has to navigate the conversation through rules about manner, time and place rather than rules about who is allowed to speak",
+        "It is purely an HR matter with no legal dimension"
+      ],
+      "correct": 2,
+      "rationale": "Forstater and its successors establish that gender-critical beliefs are protected as philosophical beliefs under the EA 2010, as is gender reassignment. The firm's task is to manage the conversation so that neither party is harassed — usually by setting rules about how, when and where, not by silencing one side."
+    },
+    {
+      "id": "q20",
+      "scenario": true,
+      "stem": "[scenario] A Christian colleague keeps a small crucifix on her desk and a Bible verse in her email signature. Another colleague repeatedly mocks both in front of the team and asks her to \"keep her religion out of the office.\" Is this potentially harassment of the Christian colleague?",
+      "options": [
+        "No, because keeping religion out of work is reasonable",
+        "No, because she should expect comment if she displays religious items",
+        "Yes — the conduct is unwanted, related to religion or belief, and could be considered by a reasonable person to violate her dignity or create a hostile environment",
+        "Only if she removes the items"
+      ],
+      "correct": 2,
+      "rationale": "Religion or belief is protected in both directions. Mockery and repeated public pressure related to religious expression meet the s.26 test in the same way they would for any other protected characteristic."
+    },
+    {
+      "id": "q21",
+      "scenario": false,
+      "stem": "Which best describes how the s.26 test handles a single serious incident?",
+      "options": [
+        "A single incident can never meet the test — a pattern is required",
+        "A single incident can meet the test on its own if sufficiently serious",
+        "A single incident counts only if there are witnesses",
+        "A single incident counts only if reported within 48 hours"
+      ],
+      "correct": 1,
+      "rationale": "Section 26 supports both the single-serious-incident route and the cumulative-environment route. One sufficiently serious act — an unwanted physical contact, a single explicit comment — can meet the test on its own."
+    },
+    {
+      "id": "q22",
+      "scenario": true,
+      "stem": "[scenario] On a team Teams call (mic on, camera off) a senior colleague says a difficult female client is \"only being a pain because she's hormonal.\" Two women on the team are present; one returned from maternity last year. Can this be harassment of staff who heard it, even though the comment was about a third party?",
+      "options": [
+        "No — the comment was about a non-employee",
+        "No — unless one of the women is currently pregnant",
+        "Yes — under s.26 the conduct relates to sex, and a reasonable person could consider it to create a hostile environment for the colleagues who heard it",
+        "Only if reported in writing within 24 hours"
+      ],
+      "correct": 2,
+      "rationale": "The \"related to\" wording in s.26 does not require the conduct to be directed at the recipient or for the recipient to share the characteristic of the third party. A sex-related remark in a work channel can create a hostile environment for any colleague present."
+    },
+    {
+      "id": "q23",
+      "scenario": false,
+      "stem": "From 1 September 2026, a substantiated finding of serious harassment is treated by the FCA as:",
+      "options": [
+        "An HR matter with no regulatory consequence",
+        "Relevant only if the conduct happened in the office",
+        "Non-financial misconduct under COCON 1.1.7FR, directly relevant to fitness and propriety under FIT 2.1, and disclosable in regulatory references under SYSC 22",
+        "Relevant only to Senior Managers, not to other certified staff"
+      ],
+      "correct": 2,
+      "rationale": "PS25/23 extends the Conduct Rules to bullying, harassment and violence across all SMCR-regulated firms from 1 September 2026. SYSC 22 closes the \"pass the harasser\" loophole. FIT 2.1 treats substantiated findings as directly relevant to F&P."
+    },
+    {
+      "id": "q24",
+      "scenario": true,
+      "stem": "[scenario] A colleague with generalised anxiety has asked not to be put on client calls. His manager — having recently lost three team members to long-term absence — is sceptical and presses him repeatedly in the open-plan office to \"give it a go.\" Best read?",
+      "options": [
+        "Reasonable management — the manager has commercial pressure",
+        "Probably nothing, since there is no formal occupational-health report yet",
+        "A grey area that should be routed through HR and occupational health and documented; informal repeated pressure in public risks both harassment under s.26 and a failure to make reasonable adjustments",
+        "A purely medical question with no employment-law dimension"
+      ],
+      "correct": 2,
+      "rationale": "The protective move is procedural: HR, OH, document the analysis. Informal repeated pressure related to a disability, in public, is the path that runs through both s.26 and the reasonable-adjustments duty under the Equality Act."
+    },
+    {
+      "id": "q25",
+      "scenario": false,
+      "stem": "The single most useful sentence to take from this module is:",
+      "options": [
+        "Harassment is bad and you should not do it",
+        "Conduct does not have to be aimed at someone from the group in question to be harassment of that person or of someone else in the room",
+        "All harassment requires repeated behaviour",
+        "Only HR can decide whether something is harassment"
+      ],
+      "correct": 1,
+      "rationale": "This is the most-misunderstood point in s.26, and the one that defeats the most common defence (\"nobody from that group was there\"). The conduct creates the environment; the environment harasses anyone in it whose dignity is violated."
+    }
+  ],
+  "reflections": [
+    {
+      "id": "r1",
+      "prompt": "Of the seven harassment-relevant characteristics covered above (religion or belief, age, gender reassignment, sexual orientation, race, disability, sex), which one feels least intuitive to you — the one where, if you're honest, you'd struggle to spot harassment in the moment because the patterns are unfamiliar? You don't have to name colleagues; just the characteristic and what you think the gap is.",
+      "guidance": "Logged but not scored. Your line manager will never see this — only Group HR, and only as anonymised aggregate themes used to shape future training."
+    },
+    {
+      "id": "r2",
+      "prompt": "Think of a piece of conduct you have seen at work in the last twelve months that, on the cumulative-effect reading from Section 11, you would now read differently than you did at the time. What would you do differently next time — and what (if anything) would stop you doing it?",
+      "guidance": "Logged but not scored. Your line manager will never see this — only Group HR, and only as anonymised aggregate themes used to shape future training."
+    }
+  ]
+}

@@ -1,0 +1,345 @@
+{
+  "module_id": "module_3",
+  "version": "2026-05-20",
+  "pass_mark_percent": 80,
+  "served_per_attempt": 8,
+  "questions": [
+    {
+      "id": "q1",
+      "scenario": false,
+      "stem": "Which five names make up the bystander framework taught in this module?",
+      "options": [
+        "Decide, Discuss, Delegate, Defer, Decline",
+        "Direct, Distract, Delegate, Delay, Document",
+        "Direct, Defuse, Defer, Delegate, Disclose",
+        "Detect, Deter, Delegate, Defend, Document"
+      ],
+      "correct": 1,
+      "rationale": "The 5Ds — Direct, Distract, Delegate, Delay, Document — are the de facto framework, originated by Green Dot and extended by Hollaback! / Right To Be. The module uses the established names rather than invented variants because the evidence base attaches to these specific tools."
+    },
+    {
+      "id": "q2",
+      "scenario": false,
+      "stem": "Which of these is the single best general-purpose description of a Direct intervention in a UK finance setting?",
+      "options": [
+        "A long, formal speech calling out the person responsible",
+        "A short, factual sentence that names the behaviour without attacking the person",
+        "A private message to HR in the moment",
+        "A loud reaction designed to embarrass the person doing it"
+      ],
+      "correct": 1,
+      "rationale": "Direct works best when it is brief, factual and unflustered, naming the behaviour rather than the person. Long interventions invite arguments; loud or shaming ones invite escalation; private messages to HR are Delegate, not Direct."
+    },
+    {
+      "id": "q3",
+      "scenario": false,
+      "stem": "Distract is the right choice primarily when:",
+      "options": [
+        "You want to avoid getting involved at all",
+        "Direct intervention is high-risk or the moment is too live to confront",
+        "You disagree with the affected colleague's reaction",
+        "The conduct happened more than 24 hours ago"
+      ],
+      "correct": 1,
+      "rationale": "Distract is for situations where Direct is too risky or would escalate — typically informal settings, steep hierarchies, or moments moving too fast. It is not avoidance; it actively removes the conditions that allow the conduct to continue."
+    },
+    {
+      "id": "q4",
+      "scenario": false,
+      "stem": "Which of the following counts as a form of Delegate?",
+      "options": [
+        "Quietly telling a senior person in the room what is happening so they can act",
+        "Asking the affected colleague what they want to do",
+        "Calling HR the same day rather than waiting",
+        "All of the above"
+      ],
+      "correct": 3,
+      "rationale": "Delegate covers escalating to someone better positioned — a senior in the room, a line manager, HR, security, Speak Up — and crucially also includes delegating back to the affected colleague themselves, since their preference should govern wherever possible."
+    },
+    {
+      "id": "q5",
+      "scenario": false,
+      "stem": "Which statement about Delay is correct?",
+      "options": [
+        "Delay is what you do when you have decided not to act",
+        "Delay is the only D that the research shows is ineffective",
+        "Delay recognises that the moment passing does not end the obligation, and that delayed support is often the most valuable kind",
+        "Delay should only be used by managers"
+      ],
+      "correct": 2,
+      "rationale": "The research is unambiguous that delayed support is still support. Saying 'I saw what happened, are you OK?' hours or days later confirms the colleague isn't imagining it, removes the isolation that makes harassment corrosive, and creates space for them to decide what to do next."
+    },
+    {
+      "id": "q6",
+      "scenario": false,
+      "stem": "Which of these is the cleanest form of contemporaneous documentation?",
+      "options": [
+        "A WhatsApp message to a close colleague describing what happened",
+        "A timestamped note in your phone's notes app, or an email to yourself, written the same day",
+        "A verbal account given to your manager the following week",
+        "A summary written from memory a few weeks later"
+      ],
+      "correct": 1,
+      "rationale": "Notes-app entries and emails-to-self produce a verifiable creation date. WhatsApp messages to others circulate the matter and risk the affected colleague's control of it. Verbal accounts and after-the-fact summaries are not contemporaneous and carry far less evidential weight."
+    },
+    {
+      "id": "q7",
+      "scenario": false,
+      "stem": "Why does the module caution against treating screenshots as the primary form of evidence?",
+      "options": [
+        "Screenshots are not admissible in any UK proceeding",
+        "Screenshots can be edited, so chain-of-custody is weaker than the original message preserved in place",
+        "Screenshots are illegal to take in the workplace",
+        "Screenshots automatically notify the other party"
+      ],
+      "correct": 1,
+      "rationale": "Screenshots are useful as aides-memoire but the original message on the original device is the stronger evidence because chain-of-custody is intact. Where conduct occurs in a digital channel, preserve the message in place — do not delete the chat or leave the group."
+    },
+    {
+      "id": "q8",
+      "scenario": false,
+      "stem": "Section 27 of the Equality Act 2010 makes it unlawful to:",
+      "options": [
+        "Make any false allegation of harassment",
+        "Subject someone to detriment because they have made or supported a complaint about discrimination or harassment",
+        "Discuss an ongoing investigation with colleagues",
+        "Document conduct without the perpetrator's consent"
+      ],
+      "correct": 1,
+      "rationale": "Section 27 protects 'protected acts' — bringing proceedings, giving evidence, supporting a complaint, or alleging that the Act has been contravened. Retaliating against the person who did any of these is itself a separate unlawful act, even if the original complaint is not upheld."
+    },
+    {
+      "id": "q9",
+      "scenario": false,
+      "stem": "Since 6 April 2026, a qualifying disclosure relating to sexual harassment is:",
+      "options": [
+        "A confidential HR matter with no special legal status",
+        "An automatic criminal offence to make in the workplace",
+        "A protected disclosure under the whistleblowing regime, with uncapped damages for detriment or dismissal in response",
+        "Treated identically to a personal grievance"
+      ],
+      "correct": 2,
+      "rationale": "Section 23 of the Employment Rights Act 2025 inserted sexual-harassment disclosures into the whistleblowing regime, in force since 6 April 2026. Detriment or dismissal carries uncapped tribunal damages, on top of any Equality Act claim. The public-interest test still applies, so individual grievances may not always qualify, but anything touching a pattern or systemic failure will."
+    },
+    {
+      "id": "q10",
+      "scenario": false,
+      "stem": "The module's working heuristic for choosing between the Ds is:",
+      "options": [
+        "Always Direct first; if that fails, Delegate; never Delay",
+        "Direct if you can, Distract if you can't, Delegate if it's bigger than you, Delay if you missed it, Document always",
+        "Document first; only act if the documentation supports it",
+        "Whichever D feels most comfortable in the moment"
+      ],
+      "correct": 1,
+      "rationale": "The heuristic captures the three real variables — safety, power asymmetry, and how live the moment is — without pretending a flowchart exists. The 'Document always' clause matters: it is the lowest-cost, highest-leverage D and applies regardless of which other Ds you used."
+    },
+    {
+      "id": "q11",
+      "scenario": false,
+      "stem": "Which statement about the affected colleague is correct?",
+      "options": [
+        "The bystander should escalate the matter regardless of what the affected colleague wants",
+        "The bystander should never raise the matter unless the affected colleague explicitly asks",
+        "The affected colleague's preference governs wherever possible, with the caveat that the firm may have its own duty to act on serious matters",
+        "The bystander should make the decision because the affected colleague is too close to it to judge"
+      ],
+      "correct": 2,
+      "rationale": "Their preference governs in most cases — speaking over them recreates the loss of agency that harassment causes. The exception is conduct serious enough to engage the firm's own duty to act, where the bystander cannot guarantee silence; that boundary should be acknowledged honestly up front."
+    },
+    {
+      "id": "q12",
+      "scenario": false,
+      "stem": "The literature suggests that roughly what proportion of the value a bystander provides is acknowledgement — simply confirming that the affected colleague isn't imagining it?",
+      "options": [
+        "About 10%",
+        "About 30%",
+        "About 70%",
+        "100% — acknowledgement is the only thing that matters"
+      ],
+      "correct": 2,
+      "rationale": "The research consistently finds that acknowledgement is roughly 70% of the value of bystander action — it removes the isolation that makes harassment corrosive and signals to the affected colleague that they are not alone with the memory. The remaining ~30% sits across the other behaviours including escalation."
+    },
+    {
+      "id": "q13",
+      "scenario": true,
+      "stem": "[scenario] On a morning trading-floor call, a senior trader makes a passing crack that a junior analyst is 'too young to remember the last crisis, but cute trying.' You are a peer on the call. Which of the following is the cleanest Direct intervention?",
+      "options": [
+        "'You're being sexist and ageist — apologise to her now.'",
+        "'Let's keep it on the trade.'",
+        "Stay silent and message the analyst afterwards only",
+        "Email HR during the call without saying anything live"
+      ],
+      "correct": 1,
+      "rationale": "Direct should name the behaviour by redirecting it, in one short sentence, in a normal tone. Option A is a confrontation that invites argument and speaks for the analyst. Option C is Delay only and surrenders the live moment. Option D is Delegate but not Direct. 'Let's keep it on the trade' takes three seconds, closes the moment, and leaves the analyst's dignity intact."
+    },
+    {
+      "id": "q14",
+      "scenario": true,
+      "stem": "[scenario] At a client lunch, a contractor at the table makes a derogatory racist comment about a competitor's CEO. Two of your colleagues are at the table; none of them is from the ethnic group referenced. What is the strongest bystander response from a junior member of the team?",
+      "options": [
+        "Say nothing — the comment wasn't about anyone present",
+        "Loudly tell the contractor off in front of the client",
+        "Use Distract to remove a colleague from the table briefly, signal that you noticed, and Document the incident the same day for a Delegate conversation with HR",
+        "Wait until next year's appraisal and raise it then"
+      ],
+      "correct": 2,
+      "rationale": "Harassment can occur where conduct related to a protected characteristic creates a hostile environment, even if not directed at any person present (Module 1 §3). Direct in front of a client is high-risk; saying nothing leaves colleagues exposed. Distract gives an exit, Document creates the record, and Delegate to HR completes the chain. Option A treats 'no-one of that group present' as a defence, which the Equality Act does not recognise."
+    },
+    {
+      "id": "q15",
+      "scenario": true,
+      "stem": "[scenario] At the bar after an off-site agenda, a member of senior leadership repeatedly puts a hand on a junior colleague's lower back. You are a peer of the junior colleague. Which response best matches the module's guidance?",
+      "options": [
+        "Direct confrontation of the senior leader in front of the bar",
+        "Do nothing because the seniority gap makes intervention unsafe",
+        "Delegate in the moment to the most senior person in the room not in that exchange ('I think you should know what's happening at the bar'), and check in with the affected colleague privately the next morning",
+        "Take a photo as evidence and post it in the team WhatsApp"
+      ],
+      "correct": 2,
+      "rationale": "Direct across a steep hierarchy and in alcohol-affected settings carries real risk and rarely lands; doing nothing is the failure mode the module exists to prevent. Delegate gives a senior person in the room the information they need to act, and Delay the next morning gives the affected colleague acknowledgement and choice. Posting a photo to a group chat circulates the matter and removes the affected colleague's control of it."
+    },
+    {
+      "id": "q16",
+      "scenario": true,
+      "stem": "[scenario] A WhatsApp group from a recent off-site contains a long-lens photo of a colleague at the pool, taken without their knowledge. What is the correct sequence?",
+      "options": [
+        "Delete the chat immediately so the image stops spreading",
+        "Leave the group quietly and say nothing",
+        "Document — screenshot the image and surrounding messages with date and time visible, save privately, leave the original chat in place, and Delegate to HR the same day",
+        "Forward the photo to a friend outside work for a second opinion"
+      ],
+      "correct": 2,
+      "rationale": "Deleting destroys the evidence; leaving the group preserves nothing and signals nothing; forwarding circulates the very harm the colleague is already experiencing. The right approach is screenshot for your own record, preserve the original chat in place (chain-of-custody on the original device matters), and escalate to HR the same day."
+    },
+    {
+      "id": "q17",
+      "scenario": true,
+      "stem": "[scenario] A colleague returning from maternity leave is talked over in every team meeting. No single instance crosses a clear line; the pattern is the issue. Which D fits best?",
+      "options": [
+        "Direct intervention in the next meeting only — 'Stop interrupting her'",
+        "Delay — privately, that evening: 'I've noticed you're not getting much air time. Is that something you want me to push back on, or would you rather handle it yourself?'",
+        "Document the pattern and submit it to HR without speaking to her",
+        "Do nothing, because pattern-based behaviour is not capable of being harassment"
+      ],
+      "correct": 1,
+      "rationale": "Patterns can amount to harassment under the Equality Act — option D is wrong on the law. Direct in the meeting risks speaking for her and may not match what she wants. Documenting without speaking to her treats her as a case, not a colleague. Delay gives her acknowledgement, agency and a choice — which is the configuration the affected colleague will almost always benefit most from."
+    },
+    {
+      "id": "q18",
+      "scenario": true,
+      "stem": "[scenario] During onboarding chitchat, a new starter is asked invasive questions about their religious observance — when they pray, why they dress that way, whether they really fast. The new starter laughs awkwardly and changes the subject. You overhear. The right response is:",
+      "options": [
+        "Nothing, because the new starter laughed",
+        "Use Distract in the moment ('Sorry to interrupt — has anyone seen the floor plan?'), then Delay later that day to check on the new starter privately and let them decide what they want done",
+        "Tell the new starter they should toughen up",
+        "Confront the people asking and tell them they have committed a criminal offence"
+      ],
+      "correct": 1,
+      "rationale": "Awkward laughter is not consent (Module 1 Q19). The new starter has limited social capital on day one — Distract removes the moment without exposing them, and Delay gives them the conversation they couldn't have at the time. Option D overstates the law: this is unlawful harassment under the Equality Act, not a criminal offence."
+    },
+    {
+      "id": "q19",
+      "scenario": true,
+      "stem": "[scenario] A colleague's reasonable adjustment for a disability is being 'joked about' by other team members who think it's preferential treatment. The colleague has heard the comments. What does the module suggest?",
+      "options": [
+        "Stay out of it because the adjustment is between the colleague and HR",
+        "Direct — short, factual: 'It's a reasonable adjustment, not a perk. Let's move on.' — plus Delay to check on the affected colleague, plus Document if the comments continue",
+        "Suggest the colleague stop using the adjustment to avoid friction",
+        "Report the colleague to HR for receiving the adjustment in the first place"
+      ],
+      "correct": 1,
+      "rationale": "Conduct related to disability that creates a degrading or hostile environment is harassment under the Equality Act, regardless of intent. Direct works here because the speakers are peers and the comment is factually wrong. Suggesting the colleague drop the adjustment makes them carry the cost of others' behaviour; reporting them for receiving an adjustment is itself potentially discriminatory."
+    },
+    {
+      "id": "q20",
+      "scenario": true,
+      "stem": "[scenario] You acted as a bystander a month ago. Since then, your line manager has withdrawn you from a high-profile project with no clear explanation, started copying their own manager into every email about your work, and given you the lowest possible rating on a piece of work you had previously been told was strong. What does this look like, and what should you do?",
+      "options": [
+        "Coincidence — say nothing and try to win the manager back",
+        "A potential victimisation pattern under s.27 Equality Act; document the timeline, raise it in writing through a route that bypasses the line manager, and consider whether the original disclosure also qualifies as a protected whistleblowing disclosure under the April 2026 reforms",
+        "Resign and bring a constructive dismissal claim immediately",
+        "Confront the line manager publicly in the next team meeting"
+      ],
+      "correct": 1,
+      "rationale": "The pattern is the textbook shape of victimisation — adverse treatment that wasn't there before the protected act. Section 27 EA 2010 makes this independently unlawful. Documenting the timeline and escalating through a route that bypasses the manager is the right play; the April 2026 reforms may add uncapped whistleblowing remedies on top. Option A normalises the retaliation; C is premature; D destroys the evidential picture you'd want to rely on."
+    },
+    {
+      "id": "q21",
+      "scenario": true,
+      "stem": "[scenario] You are a contractor sitting in on a senior trader's morning huddle. The senior trader makes a homophobic crack about a competitor analyst. You are not a permanent employee and the senior trader is several levels above you in the client firm. Which D fits best?",
+      "options": [
+        "None — as a contractor you have no standing to act",
+        "Direct confrontation in the huddle to demonstrate independence",
+        "Document the same day (you are still a witness whose recollection has evidential value), and Delegate via your own engagement manager and the firm's whistleblowing / Speak Up route — both of which exist for exactly this situation",
+        "Forward the comment to your industry peers as a warning"
+      ],
+      "correct": 2,
+      "rationale": "Contractors are within scope of the firm's preventative duty and from October 2026 are explicitly covered by the third-party regime (s.21 ERA 2025). Doing nothing is not neutral. Direct across that hierarchy is high-risk; forwarding to peers is gossip, not action. Document + Delegate through your own engagement manager and the firm's Speak Up route is the standard play and the route the firm has built precisely for cases the line-of-sight chain can't handle."
+    },
+    {
+      "id": "q22",
+      "scenario": true,
+      "stem": "[scenario] In a Teams channel for a project team, a colleague reacts to a returning-from-paternity-leave colleague's update with a string of emoji that read as mocking. Several others on the call laugh. The affected colleague goes quiet. What does the module suggest?",
+      "options": [
+        "Nothing — emoji reactions are not harassment",
+        "Direct in-channel: 'Let's stick to the update' — followed by Delay later that day, privately, to check the affected colleague is OK and ask what they want done, and Document the message thread (preserve in place; screenshot for your own record)",
+        "Leave the channel quietly so you aren't associated with the moment",
+        "Post a longer mocking emoji in response so the original doesn't stand out"
+      ],
+      "correct": 1,
+      "rationale": "Digital channels are within course of employment and emoji can absolutely contribute to a hostile environment for someone returning from leave (the pattern, not any single emoji, is the issue). Short in-channel Direct redirects the moment; Delay privately gives the affected colleague choice; Document preserves the evidence. Options C and D leave the affected colleague worse off; option A misstates the law."
+    },
+    {
+      "id": "q23",
+      "scenario": false,
+      "stem": "Which of these is the most accurate framing of why the firm asks bystanders to document, rather than relying on memory?",
+      "options": [
+        "Because documentation is legally required of every employee",
+        "Because contemporaneous notes are dramatically stronger evidence than after-the-fact recollection, in any investigation or tribunal",
+        "Because the firm wants to track which bystanders are most active",
+        "Because HR cannot accept verbal accounts"
+      ],
+      "correct": 1,
+      "rationale": "Contemporaneous, dated, consistent witness accounts are the single most valuable input to a harassment investigation. They are not legally required of you as an individual, but their absence weakens every other step that might follow. Options C and D mis-describe how investigations actually run."
+    },
+    {
+      "id": "q24",
+      "scenario": false,
+      "stem": "Which of these is NOT good practice when acting as a bystander?",
+      "options": [
+        "Asking the affected colleague what they want before escalating",
+        "Naming the behaviour rather than attacking the person",
+        "Posting a screenshot of the incident to a wider team channel for visibility",
+        "Writing a timestamped note for yourself the same day"
+      ],
+      "correct": 2,
+      "rationale": "Circulating screenshots widely removes the affected colleague's control of the matter, can itself amount to further harassment, and damages the integrity of any later investigation. Options A, B and D are all explicitly recommended by the module."
+    },
+    {
+      "id": "q25",
+      "scenario": false,
+      "stem": "What is the single best summary of what this module asks of you?",
+      "options": [
+        "Confront every harasser personally the moment you see anything",
+        "Report every incident to HR regardless of what the affected colleague wants",
+        "Treat yourself as a responsible witness with five options — Direct, Distract, Delegate, Delay, Document — choose the right one for the situation, and document always",
+        "Stay out of situations that don't directly involve you"
+      ],
+      "correct": 2,
+      "rationale": "The module reframes the learner from 'potential perpetrator I need to deter' to 'responsible witness I can equip.' The right action varies by safety, power and timing; the only universal is documentation. Options A and B override the affected colleague's agency; option D is the disengagement the law and the firm's duty exist to prevent."
+    }
+  ],
+  "reflections": [
+    {
+      "id": "r1",
+      "prompt": "Think of a moment in the last twelve months — at work or adjacent to work — where you noticed something that sat oddly with you and did not act. Which of the 5Ds was most available to you at the time, and what stopped you using it? Your manager will not see this — it's for your own reflection.",
+      "guidance": "Your manager will not see this — it's for your own reflection. There is no right answer and you are not being scored. The point of the prompt is the act of writing it down."
+    },
+    {
+      "id": "r2",
+      "prompt": "Imagine a colleague you respect comes to you a week from now and says: 'Something happened at the away-day. I don't know what to do.' Write the first three sentences you would say to them. Your manager will not see this — it's for your own reflection.",
+      "guidance": "Your manager will not see this — it's for your own reflection. The exercise rehearses the acknowledgement-first response that the literature identifies as roughly 70% of the value bystanders provide."
+    }
+  ]
+}

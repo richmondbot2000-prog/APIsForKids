@@ -1,0 +1,345 @@
+{
+  "module_id": "module_0",
+  "version": "2026-05-20",
+  "pass_mark_percent": 80,
+  "served_per_attempt": 8,
+  "questions": [
+    {
+      "id": "q1",
+      "scenario": false,
+      "stem": "Does the Equality Act 2010 distinguish between harassment committed in spoken conversation and harassment committed in writing (Teams, Slack, WhatsApp, email)?",
+      "options": [
+        "Yes — written conduct only counts if it is sent on a company-owned device",
+        "Yes — written conduct only counts if the channel is an official corporate one",
+        "No — the s.26 test applies to the conduct regardless of the medium",
+        "No — written conduct is treated more leniently because it can be deleted"
+      ],
+      "correct": 2,
+      "rationale": "Section 26 EA 2010 turns on whether conduct is unwanted, related to a protected characteristic, and has the purpose or effect of violating dignity or creating a hostile environment. The medium is immaterial — a GIF, an emoji reaction or a DM is conduct in the same way a spoken comment is."
+    },
+    {
+      "id": "q2",
+      "scenario": true,
+      "stem": "[scenario] A WhatsApp group called \"Dialler Top 5\" exists between six brokers. After Friday drinks, one posts a photo of a junior colleague's screen with a caption mocking her for \"not taking a joke.\" Three react with laughing emojis; two say nothing. From the firm's perspective, who is in scope of any subsequent investigation?",
+      "options": [
+        "Only the broker who posted the photo",
+        "The broker who posted the photo and the three who reacted",
+        "All six members of the chat — silent membership after the post is itself relevant",
+        "Nobody, because WhatsApp is a personal channel"
+      ],
+      "correct": 2,
+      "rationale": "Tribunals and the FCA look at substance, not the channel name. Reactions are participation. Silent continued membership after a post like this is relevant both to the firm's all-reasonable-steps defence and to individual COCON 1.1.7FR responsibility from 1 September 2026."
+    },
+    {
+      "id": "q3",
+      "scenario": false,
+      "stem": "A colleague says \"the WhatsApp group is private, it's nothing to do with work.\" Why is this rarely a safe assumption in a tribunal or FCA context?",
+      "options": [
+        "Because WhatsApp is owned by Meta and Meta cooperates with regulators",
+        "Because tribunals and the FCA look at participants, content and timing — not the platform's branding",
+        "Because every WhatsApp chat is automatically backed up to corporate servers",
+        "Because IT can always access private phones"
+      ],
+      "correct": 1,
+      "rationale": "If the participants are colleagues and the content or timing touches the workplace, the chat is in scope. The platform's label or ownership is not the test."
+    },
+    {
+      "id": "q4",
+      "scenario": true,
+      "stem": "[scenario] A trader announces in a Teams channel of about thirty people that she will be going on maternity leave. A colleague replies with a GIF of a heavily pregnant woman waddling and dropping coffee. He intends it warmly; she laughs in the moment. Is this potentially harassment?",
+      "options": [
+        "No, because his intent was friendly",
+        "No, because she laughed at the time",
+        "Yes, if a reasonable person would consider the conduct had the effect of being degrading or humiliating on the basis of pregnancy",
+        "Only if she lodges a formal complaint within 48 hours"
+      ],
+      "correct": 2,
+      "rationale": "Section 26 uses a purpose-or-effect test judged through s.26(4)'s reasonable-person lens. Intent is irrelevant. An in-the-moment laugh from the recipient doesn't end the analysis — many people react with social cover before processing privately."
+    },
+    {
+      "id": "q5",
+      "scenario": false,
+      "stem": "Since 6 April 2026, a colleague who passes a screenshot of a sexist or discriminatory work-adjacent group chat to HR has, in most circumstances, made:",
+      "options": [
+        "An informal HR query with no special legal status",
+        "A breach of confidentiality, exposing them to disciplinary action",
+        "A protected whistleblowing disclosure under the Employment Rights Act 1996 (as amended by s.23 ERA 2025), with uncapped damages for retaliation",
+        "A criminal complaint that must be referred to the police"
+      ],
+      "correct": 2,
+      "rationale": "Section 23 ERA 2025 commenced 6 April 2026 (S.I. 2026/323). It expands \"qualifying disclosure\" to cover sexual harassment under s.26(2) EA 2010, with uncapped damages for detriment or dismissal in retaliation. The public-interest test still applies, but disclosures about patterns of conduct readily qualify."
+    },
+    {
+      "id": "q6",
+      "scenario": true,
+      "stem": "[scenario] You are a senior associate. A junior on your team ends a six-month relationship with you. Over the following month you continue sending them personal messages via Teams; they ask you to stop, but you keep going. Which statement is most accurate?",
+      "options": [
+        "A private matter between two adults — not a workplace issue",
+        "Potential sexual harassment under s.26(2) EA 2010, and from 1 September 2026 potentially also a Conduct Rule breach under COCON 1.1.7FR",
+        "Not a workplace issue because the messages are on Teams, not in person",
+        "Only a workplace issue if the messages are sexually explicit"
+      ],
+      "correct": 1,
+      "rationale": "Persistent unwanted contact of a personal or sexual nature through a work channel after a clear refusal sits squarely in s.26(2). The senior/junior gradient and the work medium also put it in scope of the new COCON rule when it commences."
+    },
+    {
+      "id": "q7",
+      "scenario": false,
+      "stem": "A laughing-face reaction on a colleague's message that mocks another colleague's accent is best described as:",
+      "options": [
+        "A small social signal that doesn't carry weight in an investigation",
+        "Logged, attributed conduct that is read alongside the underlying message",
+        "Only relevant if the reactor also adds a written comment",
+        "Only relevant if the recipient sees the reaction"
+      ],
+      "correct": 1,
+      "rationale": "Reactions are timestamped, attributed and persistent. In an investigation they are read alongside the message they were attached to. A reaction is participation in the conduct, not punctuation around it."
+    },
+    {
+      "id": "q8",
+      "scenario": true,
+      "stem": "[scenario] A managing director, returning from drinks at 11:30pm after a mortgage completion, DMs a graduate analyst on Teams: \"You up?\" The text is not explicit. Is this likely to be a problem?",
+      "options": [
+        "No — the words themselves are innocuous",
+        "No — anything sent after work hours is outside the firm's remit",
+        "Potentially yes — the message will be read in the context of the power gradient and the time, not in isolation",
+        "Only if the analyst replies in the affirmative"
+      ],
+      "correct": 2,
+      "rationale": "Section 26's reasonable-person test takes the surrounding circumstances into account, including power, time and prior context. A late-night personal DM from a senior to a junior is interpreted through that gradient, not solely through the literal words."
+    },
+    {
+      "id": "q9",
+      "scenario": false,
+      "stem": "From 1 September 2026, the new FCA rule COCON 1.1.7FR will extend the SMCR Conduct Rules to bullying, harassment and violence against colleagues. Where does the seriousness threshold sit?",
+      "options": [
+        "A separate, FCA-specific definition that requires repeated conduct",
+        "The Equality Act 2010 test, taken verbatim",
+        "A criminal-law threshold requiring police involvement",
+        "Whatever the firm's HR policy says"
+      ],
+      "correct": 1,
+      "rationale": "PS25/23 confirms COCON 1.1.7FR uses the Equality Act test verbatim. There is no parallel FCA definition — the same s.26 framework governs both the employment claim and the regulatory finding."
+    },
+    {
+      "id": "q10",
+      "scenario": true,
+      "stem": "[scenario] During a Teams call with a client, you mute, complain to a colleague on a private call about \"the client's hopeless French accent,\" and unmute thinking you have switched windows. The client hears you. Best read?",
+      "options": [
+        "A funny anecdote — clients understand",
+        "A private remark accidentally broadcast — not your responsibility",
+        "Third-party harassment exposure for the firm and a likely Conduct Rule issue for you personally; the medium amplified the conduct rather than excusing it",
+        "An IT issue to be raised with the helpdesk"
+      ],
+      "correct": 2,
+      "rationale": "From October 2026, s.21 ERA 2025 makes the firm directly liable for third-party harassment across all protected characteristics. A race-related comment broadcast to the third party themselves is squarely in scope. The mic slip explains how, not whether."
+    },
+    {
+      "id": "q11",
+      "scenario": false,
+      "stem": "\"It was just a GIF from the library, it wasn't something I made\" is, as a defence to a harassment allegation:",
+      "options": [
+        "A complete defence",
+        "A partial defence — likely to reduce sanction",
+        "Not a defence — you chose to send it, and the content meets the s.26 test on its face or it doesn't",
+        "A defence if other people had previously used the same GIF"
+      ],
+      "correct": 2,
+      "rationale": "The platform's autocomplete or library is not the test. The conduct is your decision to send the content. Section 26 looks at what was sent, not where it came from."
+    },
+    {
+      "id": "q12",
+      "scenario": true,
+      "stem": "[scenario] You are in a fifteen-person broker WhatsApp group. Over a week, three members post jokes about a junior colleague's religious dress. You find it uncomfortable but say nothing. Two months later it surfaces in an investigation. Your position is:",
+      "options": [
+        "Safe — you wrote nothing",
+        "Safe, provided you did not react to the posts",
+        "At risk — silent continued membership is relevant to whether you met your COCON 1.1.7FR responsibilities, and the firm's all-reasonable-steps record is affected by what each member did or did not do",
+        "Only relevant if the junior colleague was in the group"
+      ],
+      "correct": 2,
+      "rationale": "Silent members are within scope. From 1 September 2026 the FCA expects individuals to act on conduct they observe in work channels. The firm's October 2026 all-reasonable-steps defence depends on what people did when they saw it, not only on what they posted."
+    },
+    {
+      "id": "q13",
+      "scenario": false,
+      "stem": "A colleague asks you out on Teams. You decline politely. They ask again the next week — you decline more firmly. They ask a third time. This is:",
+      "options": [
+        "Persistence — a compliment",
+        "Awkward but harmless until they ask a fifth or sixth time",
+        "Potentially sexual harassment under s.26(2); persistent unwanted conduct of a sexual or romantic nature after a clear refusal meets the test",
+        "Only a problem if the messages contain explicit language"
+      ],
+      "correct": 2,
+      "rationale": "Persistence after clear refusal is the textbook s.26(2) pattern. The channel is irrelevant. The explicitness of the language is irrelevant."
+    },
+    {
+      "id": "q14",
+      "scenario": false,
+      "stem": "Which of the following is the strongest reason not to draft a sarcastic message about a colleague even if you have no intention of sending it?",
+      "options": [
+        "Drafts auto-send after 30 minutes",
+        "IT scans drafts for keywords",
+        "Drafts can be screenshotted; the screenshot is conduct even though the draft itself was hypothetical",
+        "Drafts count towards your typing-speed metric"
+      ],
+      "correct": 2,
+      "rationale": "The draft is private until you photograph it. Then it is documentary conduct, attributable to you and dated. The defence \"I never sent it\" doesn't help once the screenshot exists."
+    },
+    {
+      "id": "q15",
+      "scenario": true,
+      "stem": "[scenario] During a screenshare on a client call, a Slack notification preview reads \"[Colleague] is being a nightmare again.\" The client sees it. What is the most accurate read of the firm's exposure?",
+      "options": [
+        "No exposure — Slack previews are an IT issue",
+        "Personal exposure to you only, since you sent the original message",
+        "Both: the firm faces potential reputational and regulatory exposure, and you face personal exposure for the underlying message",
+        "Exposure only if the colleague named in the preview makes a formal complaint"
+      ],
+      "correct": 2,
+      "rationale": "The underlying message and its disclosure to a third party are both relevant. The firm's reputation and any FCA dimension are not erased by the accidental nature of the leak; nor is your authorship of the message."
+    },
+    {
+      "id": "q16",
+      "scenario": false,
+      "stem": "\"I didn't mean it that way\" is, as a defence to a harassment allegation arising from a Slack message:",
+      "options": [
+        "A full defence if witnesses confirm the speaker's character",
+        "A partial defence that reduces compensation",
+        "Not a defence — s.26 is judged by purpose OR effect, and effect is judged by a reasonable person",
+        "A defence if the message included a winking emoji"
+      ],
+      "correct": 2,
+      "rationale": "Section 26(4) is explicit: the test takes the recipient's perception, the surrounding circumstances and the reasonableness of the effect. The sender's stated intent is not the test."
+    },
+    {
+      "id": "q17",
+      "scenario": true,
+      "stem": "[scenario] A client emails your reception team with an off-colour comment about a named female colleague's appearance. From 1 October 2026, what is the firm's potential exposure?",
+      "options": [
+        "None — the harasser is not an employee",
+        "The firm could be liable under s.40(1A) EA 2010 for failing to take all reasonable steps to prevent third-party harassment",
+        "Liability only arises if the client offends multiple times",
+        "Liability only arises if the receptionist quits"
+      ],
+      "correct": 1,
+      "rationale": "Section 21 ERA 2025 reinstates third-party liability from 1 October 2026, across all protected characteristics. The firm becomes directly liable where it has not taken all reasonable steps to prevent harassment of its employees by clients, contractors, suppliers or visitors."
+    },
+    {
+      "id": "q18",
+      "scenario": false,
+      "stem": "Of the following, which is the firmest principle for staying out of trouble in any work channel?",
+      "options": [
+        "Use a private device — work doesn't apply",
+        "Only send messages that you would be comfortable being read aloud at a disciplinary hearing or printed in a regulatory reference",
+        "Always add a smiley face — it shows you meant well",
+        "Send anything risky as a voice note — voice notes are harder to extract"
+      ],
+      "correct": 1,
+      "rationale": "The disciplinary-hearing and regulatory-reference test cuts through every \"is this OK?\" question. If the answer is no, neither the device, the emoji, nor the format will save you."
+    },
+    {
+      "id": "q19",
+      "scenario": true,
+      "stem": "[scenario] After a mortgage-completion-night drinks, a director sends two suggestive Teams DMs to a junior analyst, then deletes them within the hour. The analyst has already screenshotted them. From an FCA perspective, the deletion:",
+      "options": [
+        "Solves the problem — there is no record",
+        "Is neutral — Teams keeps a hidden copy anyway",
+        "Likely makes the position worse, because attempting to destroy a record of misconduct is itself relevant to fitness and propriety under FIT 2.1",
+        "Is sensible operational hygiene"
+      ],
+      "correct": 2,
+      "rationale": "Attempting to suppress evidence of misconduct is independently relevant to F&P. The FCA's published guidance on FIT 2.1 treats willingness to conceal as directly relevant to integrity, separate from the underlying conduct."
+    },
+    {
+      "id": "q20",
+      "scenario": false,
+      "stem": "Which statement most accurately describes the FCA's position on \"private\" conduct in a work-adjacent WhatsApp group?",
+      "options": [
+        "The FCA never looks at private channels",
+        "The FCA looks at anything sent on company devices only",
+        "The FCA will consider private conduct where it shows a willingness to disregard ethical obligations, abuse a position of trust, or exploit vulnerabilities of others",
+        "The FCA only considers private conduct after a criminal conviction"
+      ],
+      "correct": 2,
+      "rationale": "PS25/23 clarifies FIT 2.1: private-life conduct can matter where it bears on those three dimensions. A work-adjacent chat with colleagues, used to mock or target them, is not \"private\" in the sense the regulator means."
+    },
+    {
+      "id": "q21",
+      "scenario": true,
+      "stem": "[scenario] You are added to a Teams side-channel with five colleagues you trust. Within a week, two of them are posting derogatory comments about a named colleague's disability. The right first move is:",
+      "options": [
+        "Stay silent — it isn't aimed at you",
+        "Mute notifications so you don't have to see them",
+        "Push back in the channel or leave it, and document the posts so you can raise them through the firm's reporting route",
+        "Forward the posts to other colleagues to gauge opinion before acting"
+      ],
+      "correct": 2,
+      "rationale": "Continued silent membership puts you in scope under both s.26 and COCON 1.1.7FR. Speaking up or leaving, with a contemporaneous record, is the protective action — and is itself a candidate protected disclosure if raised internally."
+    },
+    {
+      "id": "q22",
+      "scenario": false,
+      "stem": "From 1 September 2026, a substantiated finding under COCON 1.1.7FR for serious harassment in a Slack channel will typically:",
+      "options": [
+        "Be a purely internal HR matter",
+        "Be reported once, then expire after 12 months",
+        "Be disclosable in regulatory references under SYSC 22 when the individual moves firm, and is directly relevant to F&P under FIT 2.1",
+        "Only affect bonus, never employment"
+      ],
+      "correct": 2,
+      "rationale": "SYSC 22 from 1 September 2026 closes the \"pass the harasser\" loophole — substantiated non-financial misconduct findings must be disclosed in regulatory references. FIT 2.1 makes them relevant to the annual fit-and-proper assessment."
+    },
+    {
+      "id": "q23",
+      "scenario": true,
+      "stem": "[scenario] A senior colleague says in a Teams call (mic on, camera off) that a particular client is \"only being a pain because she's hormonal.\" Two members of the team are female; one of them was on maternity leave last year. Is this potentially harassment of staff present, even though the comment was about the client?",
+      "options": [
+        "No — the comment was about a third party",
+        "No — unless one of the staff is currently pregnant",
+        "Yes — under s.26, conduct related to a protected characteristic can be harassment of anyone in the environment where a reasonable person would find the effect met the test",
+        "Only if a formal complaint is made"
+      ],
+      "correct": 2,
+      "rationale": "Section 26 does not require the conduct to be aimed at the recipient. A sex-related remark in a work channel can create a hostile environment for colleagues who hear it, even though the comment was nominally about a third party."
+    },
+    {
+      "id": "q24",
+      "scenario": false,
+      "stem": "The best operational habit before sharing your screen in any meeting that includes external parties is:",
+      "options": [
+        "Trust the platform to mask notifications automatically",
+        "Close Teams, Slack and your inbox; keep open only the document or app you are sharing",
+        "Apologise in advance if a notification appears",
+        "Use a smaller monitor — notifications won't fit"
+      ],
+      "correct": 1,
+      "rationale": "Platform notification masking is inconsistent across versions and operating systems. The reliable preventative step is to close everything that isn't the artefact being shared."
+    },
+    {
+      "id": "q25",
+      "scenario": true,
+      "stem": "[scenario] A WhatsApp group of fifteen colleagues, started for charity-run logistics, has drifted into regular sexist banter. You weren't in the group when it was set up — you were added later. Your responsibility, from a Conduct Rules perspective:",
+      "options": [
+        "None — you didn't start the group",
+        "None — the group is officially about the charity run",
+        "The same as any other member from the date you were added; you cannot rely on \"the founders did it first\"",
+        "Limited to what you yourself have posted"
+      ],
+      "correct": 2,
+      "rationale": "Conduct Rule responsibility runs from the point you are in the channel. Origin of the group is not a defence; nor is its nominal purpose. The s.26 test and COCON 1.1.7FR look at what each member did from the point of their participation."
+    }
+  ],
+  "reflections": [
+    {
+      "id": "r1",
+      "prompt": "Think of the last work-adjacent group chat you joined — WhatsApp, Signal, a Teams side-channel, anything. If a full transcript of the last month landed on the Group CEO's desk tomorrow, is there anything in it you would want to explain in advance? You don't have to write what it is; just whether the answer is yes or no, and what (if anything) you might do about it now.",
+      "guidance": "Logged but not scored. Your line manager will never see this — only Group HR, and only as anonymised aggregate themes."
+    },
+    {
+      "id": "r2",
+      "prompt": "Have you ever stayed silent in a work group chat when something was posted that sat oddly with you? What stopped you from saying something at the time, and what would have made it easier?",
+      "guidance": "Logged but not scored. Your line manager will never see this — only Group HR, and only as anonymised aggregate themes."
+    }
+  ]
+}

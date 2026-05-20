@@ -1,29 +1,246 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Training &middot; TogetherBOOK</title>
-<link rel="icon" type="image/png" href="/site-icon.png">
-<link rel="apple-touch-icon" href="/site-icon.png">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<script src="/live-reload.js"></script>
+<title>TogetherBOOK — Training</title>
+<link rel="icon" type="image/png" href="site-icon.png">
+<link rel="apple-touch-icon" href="site-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/quiet-tokens.css">
-<link rel="stylesheet" href="/quiet.css">
-<link rel="stylesheet" href="/quiet-extras.css">
+<link rel="stylesheet" href="style.css?v=1779316800">
+<link rel="stylesheet" href="quiet-tokens.css?v=1779316800">
+<link rel="stylesheet" href="quiet.css?v=1779316800">
+<link rel="stylesheet" href="quiet-extras.css?v=1779316800">
+<link rel="stylesheet" href="quiet-legacy.css?v=1779316800">
 <style>
-  .tr-page { max-width: 920px; margin: 16px auto 56px; padding: 0 16px; font: 400 14px/1.5 var(--font-body); color: var(--ink-900); }
-  .tr-page h1 { font: 700 36px/1.1 var(--font-display); margin: 18px 0 6px; letter-spacing: -0.01em; }
-  .tr-lede { font: italic 400 16px/1.5 var(--font-display); color: var(--ink-700); margin: 0 0 28px; max-width: 64ch; }
-  .tr-empty { padding: 48px 24px; text-align: center; border: 1px dashed var(--ink-300); background: var(--paper-50); color: var(--ink-500); font: italic 400 14px/1.5 var(--font-display); }
+  .tr-section { max-width: 920px; margin: 0 auto; padding: 32px 20px 80px; }
+  .tr-section h1 {
+    font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-weight: 800; letter-spacing: 0.01em; color: var(--ink-900);
+    margin: 0 0 8px;
+  }
+  .tr-eyebrow {
+    font: italic 500 13px/1.3 var(--font-display); color: var(--ink-600);
+    margin: 0 0 24px;
+  }
+  .tr-dash { display: flex; flex-direction: column; gap: 12px; margin: 16px 0; }
+  .tr-card {
+    background: var(--paper-50);
+    border: 1px solid var(--paper-300);
+    border-left: 4px solid var(--paper-300);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .tr-card.is-active   { border-left-color: var(--brass-500); }
+  .tr-card.is-passed   { border-left-color: var(--sage-500); }
+  .tr-card.is-overdue  { border-left-color: var(--red-500); }
+  .tr-card.is-exempt   { opacity: 0.7; }
+  .tr-card-title {
+    font: 600 17px/1.3 var(--font-display); color: var(--ink-900);
+    margin: 0;
+  }
+  .tr-card-meta { font: 400 13px/1.45 var(--font-body); color: var(--ink-600); }
+  .tr-card-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+  .tr-card-status-chip {
+    display: inline-block;
+    font: 600 10px/1 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 4px 8px; border: 1px solid currentColor;
+    border-radius: var(--radius-xs); color: var(--ink-600);
+  }
+  .tr-card-status-chip.is-due     { color: var(--brass-700); }
+  .tr-card-status-chip.is-passed  { color: var(--sage-700); }
+  .tr-card-status-chip.is-overdue { color: var(--red-700); }
+  .tr-card-status-chip.is-exempt  { color: var(--ink-500); }
+  .tr-btn {
+    font: 600 13px/1.2 var(--font-body); letter-spacing: 0.02em;
+    padding: 10px 18px; border: 1px solid var(--ink-700);
+    background: var(--paper-50); color: var(--ink-900);
+    cursor: pointer; border-radius: 0;
+    transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+    min-height: 44px; box-sizing: border-box;
+  }
+  .tr-btn:hover { background: var(--paper-200); }
+  .tr-btn:focus-visible { outline: 2px solid var(--brass-500); outline-offset: 3px; }
+  .tr-btn--primary { background: var(--brass-500); color: var(--paper-50); border-color: var(--brass-600); }
+  .tr-btn--primary:hover { background: var(--brass-600); border-color: var(--brass-700); }
+  .tr-btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+  .tr-btn--link {
+    background: none; border: none; padding: 6px 4px;
+    color: var(--ink-700); text-decoration: none;
+    border-bottom: 1px solid var(--brass-300);
+    font: 500 13px/1.2 var(--font-body); cursor: pointer;
+  }
+  .tr-btn--link:hover { color: var(--ink-900); border-bottom-color: var(--brass-500); }
+  .tr-btn--link:focus-visible { outline: 2px solid var(--brass-500); outline-offset: 3px; }
+  .tr-reader-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin: 0 0 6px; gap: 16px; flex-wrap: wrap;
+  }
+  .tr-saved-at { font: 500 11px/1 var(--font-mono); color: var(--ink-500); letter-spacing: 0.04em; }
+  .tr-stepper {
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    margin: 0 0 24px; padding-bottom: 14px;
+    border-bottom: 1px solid var(--paper-300);
+  }
+  .tr-stepper-dot {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 1.5px solid var(--ink-300); background: transparent;
+    cursor: pointer; padding: 0;
+    font: 600 10px/1 var(--font-mono); color: var(--ink-500);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tr-stepper-dot:hover { border-color: var(--ink-500); }
+  .tr-stepper-dot:focus-visible { outline: 2px solid var(--brass-500); outline-offset: 2px; }
+  .tr-stepper-dot.is-done    { background: var(--brass-500); border-color: var(--brass-500); color: var(--paper-50); }
+  .tr-stepper-dot.is-current { border-color: var(--brass-500); color: var(--brass-700); border-width: 2px; }
+  .tr-stepper-dot.is-locked  { cursor: not-allowed; opacity: 0.55; }
+  .tr-stepper-label {
+    font: 500 12px/1 var(--font-mono); color: var(--ink-600);
+    letter-spacing: 0.04em; margin-left: 8px;
+  }
+  .tr-reading {
+    font: 400 17px/1.7 var(--font-display);
+    color: var(--ink-800);
+    max-width: 68ch; margin: 0 auto;
+  }
+  .tr-reading h2 { font: 700 22px/1.25 var(--font-display); color: var(--ink-900); margin: 0 0 8px; }
+  .tr-reading h3 { font: 700 18px/1.3 var(--font-display); color: var(--ink-900); margin: 28px 0 10px; }
+  .tr-reading p, .tr-reading ul, .tr-reading ol { margin: 0 0 14px; }
+  .tr-reading ul, .tr-reading ol { padding-left: 22px; }
+  .tr-reading li { margin: 0 0 6px; }
+  .tr-reading strong { font-weight: 700; color: var(--ink-900); }
+  .tr-reading em { font-style: italic; }
+  .tr-reading a {
+    color: var(--ink-800); border-bottom: 1px dotted var(--brass-500); text-decoration: none;
+  }
+  .tr-reading a:hover { color: var(--brass-700); border-bottom-color: var(--brass-700); }
+  .tr-reading code { font: 500 14px/1 var(--font-mono); padding: 1px 4px; background: var(--paper-200); }
+  .tr-reading blockquote {
+    border-left: 3px solid var(--brass-500); padding-left: 16px; margin: 14px 0;
+    font-style: italic; color: var(--ink-700);
+  }
+  .tr-cw {
+    background: var(--red-50);
+    border-left: 4px solid var(--red-500);
+    padding: 14px 16px; margin: 24px 0;
+    font: 400 14px/1.55 var(--font-body); color: var(--ink-900);
+  }
+  .tr-cw a { color: var(--ink-900); border-bottom: 1px solid currentColor; text-decoration: none; }
+  .tr-section-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 36px; padding-top: 18px;
+    border-top: 1px solid var(--paper-300); gap: 14px; flex-wrap: wrap;
+  }
+  .tr-quiz-stem {
+    font: 600 19px/1.45 var(--font-display); color: var(--ink-900);
+    margin: 0 0 18px;
+  }
+  .tr-quiz-scenario {
+    font: 600 10px/1 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--brass-700); display: block; margin-bottom: 4px;
+  }
+  .tr-quiz-options { display: flex; flex-direction: column; gap: 8px; margin: 0 0 18px; }
+  .tr-quiz-option {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 14px 16px;
+    background: var(--paper-50);
+    border: 1px solid var(--ink-300);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font: 400 15px/1.45 var(--font-body); color: var(--ink-900);
+    text-align: left; width: 100%;
+    transition: border-color 100ms ease, background 100ms ease;
+    min-height: 44px; box-sizing: border-box;
+  }
+  .tr-quiz-option:hover { border-color: var(--ink-500); background: var(--paper-100); }
+  .tr-quiz-option:focus-visible { outline: 2px solid var(--brass-500); outline-offset: 2px; }
+  .tr-quiz-option.is-selected { border-color: var(--brass-500); background: var(--brass-50); }
+  .tr-quiz-option.is-correct  { border-color: var(--sage-500); background: var(--sage-50); }
+  .tr-quiz-option.is-wrong    { border-color: var(--red-300); }
+  .tr-quiz-option[disabled]   { cursor: default; }
+  .tr-quiz-option-letter {
+    font: 600 12px/1 var(--font-mono); color: var(--ink-600);
+    letter-spacing: 0.04em; margin-top: 3px; flex-shrink: 0; width: 22px;
+  }
+  .tr-quiz-feedback {
+    margin: 16px 0 20px;
+    padding: 14px 16px;
+    border-left: 4px solid var(--sage-500);
+    background: var(--sage-50);
+  }
+  .tr-quiz-feedback.is-wrong {
+    border-left-color: var(--red-500); background: var(--red-50);
+  }
+  .tr-quiz-feedback-header {
+    font: 700 14px/1.2 var(--font-body); color: var(--ink-900); margin: 0 0 4px;
+  }
+  .tr-quiz-feedback-body { font: 400 14px/1.55 var(--font-body); color: var(--ink-800); margin: 0; }
+  .tr-reflect-prompt { font: 500 16px/1.5 var(--font-display); color: var(--ink-900); margin: 0 0 4px; }
+  .tr-reflect-caveat { font: italic 400 13px/1.4 var(--font-display); color: var(--ink-600); margin: 0 0 10px; }
+  .tr-reflect-textarea {
+    width: 100%; min-height: 110px; box-sizing: border-box;
+    padding: 14px 16px;
+    border: 1px solid var(--ink-300); background: var(--paper-50);
+    font: 400 16px/1.6 var(--font-body); color: var(--ink-900);
+    border-radius: var(--radius-sm); resize: vertical;
+  }
+  .tr-reflect-textarea:focus { outline: 2px solid var(--brass-500); outline-offset: 1px; }
+  .tr-reflect-group { margin-bottom: 28px; }
+  .tr-reflect-saved {
+    text-align: right; font: 500 11px/1 var(--font-mono); color: var(--ink-500);
+    letter-spacing: 0.04em; margin-top: 4px; min-height: 12px;
+  }
+  .tr-result {
+    background: var(--paper-50); border: 1px solid var(--paper-300);
+    border-radius: var(--radius-md);
+    padding: 28px 24px; margin: 20px 0; text-align: center;
+  }
+  .tr-result-title { font: 700 24px/1.2 var(--font-display); color: var(--ink-900); margin: 0 0 8px; }
+  .tr-result-body  { font: 400 16px/1.55 var(--font-display); color: var(--ink-700); margin: 0 0 16px; }
+  .tr-cert-banner {
+    border-left: 4px solid var(--brass-500);
+    padding: 18px 22px; background: var(--brass-50); margin: 24px 0;
+  }
+  .tr-cert-banner h2 { font: 700 20px/1.25 var(--font-display); color: var(--ink-900); margin: 0 0 6px; }
+  .tr-cert-banner p  { font: 400 14px/1.55 var(--font-body); color: var(--ink-800); margin: 0 0 12px; }
+  .tr-flag-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 18px; padding-top: 14px;
+    border-top: 1px solid var(--paper-300); gap: 12px; flex-wrap: wrap;
+  }
+  .tr-loading { padding: 40px 0; text-align: center; font: italic 400 14px/1.4 var(--font-display); color: var(--ink-500); }
+  .tr-empty   { padding: 28px 0; font: italic 400 15px/1.55 var(--font-display); color: var(--ink-600); }
+  .tr-toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--ink-900); color: var(--paper-50);
+    padding: 12px 18px; border-radius: var(--radius-sm);
+    font: 500 13px/1.4 var(--font-body);
+    opacity: 0; pointer-events: none;
+    transition: opacity 180ms ease;
+    z-index: 10000; max-width: 340px;
+  }
+  .tr-toast.is-visible { opacity: 1; pointer-events: auto; }
+  @media (max-width: 600px) {
+    .tr-section { padding: 22px 14px 60px; }
+    .tr-reading { font-size: 16px; }
+    .tr-stepper-dot { width: 22px; height: 22px; }
+    .tr-section-nav, .tr-flag-row { flex-direction: column; gap: 12px; align-items: stretch; }
+    .tr-btn { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
 </style>
 </head>
 <body>
 
 <header class="qb-topbar">
-  <a class="qb-brand" href="/wall.html" aria-label="TogetherBOOK &mdash; home">
-    <img class="qb-brand-logo" src="/togetherbook-logo.png" alt="TogetherBOOK">
+  <a class="qb-brand" href="/wall.html" aria-label="TogetherBOOK — home">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779316800" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -31,27 +248,568 @@
   </button>
   <nav class="qb-nav">
     <a class="qb-nav-link" href="/wall.html">Wall</a>
-    <a class="qb-nav-link" href="/bookr.html">BookR</a>
+    <a class="qb-nav-link" href="/bookr.html">BOOKR</a>
     <a class="qb-nav-link" href="/holidays.html">Holidays</a>
-    <a class="qb-nav-link" href="/directory.html" data-sub='[{"href": "/directory.html", "label": "Directory"}, {"href": "/directory.html", "label": "Your Page", "data-yourpage": "1"}, {"href": "/org-structure.html", "label": "Org Structure"}]'>People</a>
+    <a class="qb-nav-link" href="/directory.html">People</a>
     <a class="qb-nav-link is-active" href="/training.html">Training</a>
-    <a class="qb-nav-link" href="/reports.html" data-sub='[{"href": "/yesterday.html", "label": "Payouts"}, {"href": "/brandwatch.html", "label": "Brandwatch"}, {"href": "/1stcontact.html", "label": "1st Contact"}, {"href": "/topups.html", "label": "Top Ups"}, {"href": "/pipeline.html", "label": "Pipeline"}, {"href": "/brokers.html", "label": "Brokers"}, {"href": "/comms.html", "label": "Comms"}]'>Business</a>
-    <a class="qb-nav-link" href="/index.html" data-sub='[{"href": "/database.html", "label": "Schema"}, {"href": "/stats.html", "label": "Code"}, {"href": "/pending.html", "label": "Pending"}]'>System</a>
+    <a class="qb-nav-link" href="/reports.html">Business</a>
+    <a class="qb-nav-link" href="/index.html">System</a>
   </nav>
 </header>
 <div class="qb-nav-backdrop" onclick="document.body.classList.remove('nav-open')"></div>
 
-<main class="tr-page">
-  <h1>Training</h1>
-  <p class="tr-lede">
-    A hub for delivering training and tests to everyone at Richmond Group.
-    Each person has a list of mandatory modules to work through; the page
-    tracks what has been completed and when. Modules and content will be
-    added here as they are ready.
-  </p>
-  <div class="tr-empty">Nothing here yet.</div>
+<main class="qb-page">
+  <section class="tr-section">
+    <h1 id="trTitle">Training</h1>
+    <p class="tr-eyebrow" id="trEyebrow">Harassment-prevention training cycle</p>
+    <div id="trBody" aria-live="polite">
+      <div class="tr-loading">Loading…</div>
+    </div>
+  </section>
 </main>
 
-<script src="/nav.js"></script>
+<div id="trToast" class="tr-toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  const API = "/api/training";
+  const MODULE_META = {
+    module_0: { title: "Professional conduct in digital channels", minutes: 5,  contentWarning: false },
+    module_1: { title: "The law and why it matters",               minutes: 12, contentWarning: false },
+    module_2: { title: "Recognising harassment",                   minutes: 12, contentWarning: true  },
+    module_3: { title: "Bystander action — the 5Ds",               minutes: 10, contentWarning: false },
+    module_4: { title: "Power dynamics and high-risk situations",  minutes: 12, contentWarning: true  },
+    module_5: { title: "Reporting and what happens next",          minutes: 10, contentWarning: false },
+    module_manager: { title: "Manager add-on", minutes: 20, contentWarning: false },
+  };
+
+  const STATE = {
+    whoami: null, state: null,
+    moduleData: null, activeModuleId: null,
+    phase: "dashboard", sectionIndex: 0,
+    attempt: null, qIndex: 0,
+    answers: [], submitted: [], feedback: [],
+    reflections: {}, reflectionSaved: {},
+    cycleYear: null,
+  };
+
+  function $(s, r) { return (r || document).querySelector(s); }
+  function escapeHtml(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+  }
+  function nowTime() { return new Date().toTimeString().slice(0,5); }
+  function toast(msg, ms) {
+    const t = $("#trToast"); if (!t) return;
+    t.textContent = msg; t.classList.add("is-visible");
+    clearTimeout(t._timer); t._timer = setTimeout(() => t.classList.remove("is-visible"), ms || 4000);
+  }
+  async function apiGet(p) {
+    const r = await fetch(API + p, { cache: "no-store" });
+    const t = await r.text();
+    let d; try { d = JSON.parse(t); } catch (e) { throw new Error("non-JSON " + r.status); }
+    if (!r.ok || d.ok === false) throw new Error(d.error || `HTTP ${r.status}`);
+    return d;
+  }
+  async function apiPost(p, body) {
+    const r = await fetch(API + p, {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body || {}), cache: "no-store",
+    });
+    const t = await r.text();
+    let d; try { d = JSON.parse(t); } catch (e) { throw new Error("non-JSON " + r.status); }
+    if (!r.ok || d.ok === false) throw new Error(d.error || `HTTP ${r.status}`);
+    return d;
+  }
+
+  // ── Minimal markdown for the modules (subset only) ──
+  function renderMarkdown(md) {
+    md = md.replace(/^---\n[\s\S]*?\n---\n/, "");
+    const lines = md.split(/\r?\n/);
+    const out = [];
+    let inUl = false, inOl = false, inQuote = false, paraBuf = [];
+    function flushPara() { if (paraBuf.length) { out.push("<p>" + inline(paraBuf.join(" ")) + "</p>"); paraBuf = []; } }
+    function flushLists() { if (inUl) { out.push("</ul>"); inUl = false; } if (inOl) { out.push("</ol>"); inOl = false; } }
+    function flushQuote() { if (inQuote) { out.push("</blockquote>"); inQuote = false; } }
+    function inline(s) {
+      s = escapeHtml(s);
+      s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+      s = s.replace(/(^|[^*])\*([^*]+)\*/g, "$1<em>$2</em>");
+      s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+      s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+      return s;
+    }
+    for (const raw of lines) {
+      const line = raw.replace(/\s+$/, "");
+      if (!line.trim()) { flushPara(); flushLists(); flushQuote(); continue; }
+      const h = /^(#{1,6})\s+(.*)$/.exec(line);
+      if (h) {
+        flushPara(); flushLists(); flushQuote();
+        const lvl = h[1].length;
+        const tag = lvl <= 2 ? "h2" : "h3";
+        out.push(`<${tag}>${inline(h[2])}</${tag}>`); continue;
+      }
+      if (/^>\s?/.test(line)) {
+        flushPara(); flushLists();
+        if (!inQuote) { out.push("<blockquote>"); inQuote = true; }
+        out.push("<p>" + inline(line.replace(/^>\s?/, "")) + "</p>"); continue;
+      }
+      const u = /^[-*]\s+(.*)$/.exec(line);
+      if (u) { flushPara(); flushQuote(); if (inOl) { out.push("</ol>"); inOl = false; } if (!inUl) { out.push("<ul>"); inUl = true; } out.push("<li>" + inline(u[1]) + "</li>"); continue; }
+      const o = /^\d+\.\s+(.*)$/.exec(line);
+      if (o) { flushPara(); flushQuote(); if (inUl) { out.push("</ul>"); inUl = false; } if (!inOl) { out.push("<ol>"); inOl = true; } out.push("<li>" + inline(o[1]) + "</li>"); continue; }
+      flushLists(); flushQuote(); paraBuf.push(line);
+    }
+    flushPara(); flushLists(); flushQuote();
+    return out.join("\n");
+  }
+  function splitIntoSections(html) {
+    const tmp = document.createElement("div"); tmp.innerHTML = html;
+    const sections = []; let current = null;
+    for (const child of Array.from(tmp.children)) {
+      if (child.tagName === "H2") {
+        if (current) sections.push(current);
+        current = { heading: child.textContent || "", html: "" };
+      } else {
+        if (!current) current = { heading: "", html: "" };
+        current.html += child.outerHTML;
+      }
+    }
+    if (current) sections.push(current);
+    return sections;
+  }
+
+  // ── URL state ──
+  function readUrl() {
+    const qs = new URLSearchParams(location.search);
+    return {
+      module: qs.get("module"),
+      phase: qs.get("phase"),
+      section: parseInt(qs.get("section") || "0", 10) || 0,
+      q: parseInt(qs.get("q") || "0", 10) || 0,
+    };
+  }
+  function writeUrl(patch) {
+    const u = new URL(location.href); const qs = u.searchParams;
+    const apply = (k, v) => { if (v == null || v === "") qs.delete(k); else qs.set(k, String(v)); };
+    if ("module"  in patch) apply("module",  patch.module);
+    if ("phase"   in patch) apply("phase",   patch.phase);
+    if ("section" in patch) apply("section", patch.section);
+    if ("q"       in patch) apply("q",       patch.q);
+    history.replaceState({}, "", u.toString());
+  }
+
+  // ── Boot ──
+  async function boot() {
+    try {
+      const [who, state] = await Promise.all([apiGet("/whoami"), apiGet("/state")]);
+      STATE.whoami = who; STATE.state = state;
+      STATE.cycleYear = (state.config && state.config.current_cycle_year) || new Date().getUTCFullYear();
+    } catch (e) {
+      $("#trBody").innerHTML = `<div class="tr-empty">Could not load training: ${escapeHtml(e.message)}. <button class="tr-btn--link" onclick="location.reload()">Try again</button></div>`;
+      return;
+    }
+    const url = readUrl();
+    if (url.module && MODULE_META[url.module]) {
+      await openModule(url.module, url.phase || "cover", url.section || 0);
+    } else {
+      renderDashboard();
+    }
+  }
+  window.addEventListener("popstate", () => boot());
+
+  function backToDash() { location.href = "/training.html"; }
+
+  // ── Dashboard ──
+  function renderDashboard() {
+    STATE.phase = "dashboard";
+    writeUrl({ module: null, phase: null, section: null, q: null });
+    const body = $("#trBody");
+    if (!STATE.state) { body.innerHTML = '<div class="tr-loading">Loading…</div>'; return; }
+    const mods = STATE.state.modules || [];
+    if (!mods.length) {
+      body.innerHTML = `<div class="tr-empty">Nothing assigned right now. You'll see modules here when HR enrols you in the next cycle.</div>`;
+      return;
+    }
+    const today = new Date().toISOString().slice(0, 10);
+    const sortKey = (m) => m.completed ? 2 : 0;
+    const sorted = mods.slice().sort((a, b) => sortKey(a) - sortKey(b) || (a.deadline || "").localeCompare(b.deadline || ""));
+    const resumeMod = sorted.find(m => !m.completed && m.attempts_used > 0);
+    const cycleComplete = mods.length > 0 && mods.every(m => m.completed);
+    const cert = (STATE.state.certificates || [])[0] || null;
+
+    let html = "";
+    if (resumeMod && !cycleComplete) {
+      const meta = MODULE_META[resumeMod.module_id] || {};
+      html += `
+        <div class="tr-card is-active" role="region" aria-label="Resume your in-progress module">
+          <div class="tr-card-title">Resume: ${escapeHtml(meta.title || resumeMod.module_id)}</div>
+          <div class="tr-card-meta">${resumeMod.attempts_used} attempt${resumeMod.attempts_used === 1 ? "" : "s"} used · pass mark 80%</div>
+          <div class="tr-card-actions">
+            <button class="tr-btn tr-btn--primary" data-resume="${escapeHtml(resumeMod.module_id)}">Resume module</button>
+          </div>
+        </div>`;
+    }
+    html += `<div class="tr-dash" role="list" aria-label="Assigned training modules">`;
+    for (const m of sorted) {
+      const meta = MODULE_META[m.module_id] || { title: m.module_id, minutes: 10 };
+      const overdue = !m.completed && m.deadline && m.deadline < today;
+      let stateCls = "", chipCls = "is-due", chipText = `Due ${m.deadline || "—"}`;
+      if (m.completed)      { stateCls = "is-passed"; chipCls = "is-passed"; chipText = "Completed"; }
+      else if (overdue)     { stateCls = "is-overdue"; chipCls = "is-overdue"; chipText = `Overdue from ${m.deadline}`; }
+      const startVerb = m.attempts_used > 0 ? "Resume" : "Start";
+      const noRetake = m.attempts_remaining === 0 && !m.passed;
+      html += `
+        <div class="tr-card ${stateCls}" role="listitem">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;">
+            <div class="tr-card-title">Module — ${escapeHtml(meta.title)}</div>
+            <span class="tr-card-status-chip ${chipCls}">${escapeHtml(chipText)}</span>
+          </div>
+          <div class="tr-card-meta">
+            About ${meta.minutes} minutes${m.passed ? " · passed" : ""}${m.attempts_used && !m.passed ? " · " + m.attempts_used + " attempt" + (m.attempts_used === 1 ? "" : "s") + " used" : ""}
+          </div>
+          <div class="tr-card-actions">
+            ${m.completed
+              ? `<button class="tr-btn" data-resume="${escapeHtml(m.module_id)}">Review</button>`
+              : noRetake
+                ? `<span class="tr-card-meta">Retakes exhausted — HR has been notified.</span>`
+                : `<button class="tr-btn ${(resumeMod && resumeMod.module_id === m.module_id) || cycleComplete ? "" : "tr-btn--primary"}" data-resume="${escapeHtml(m.module_id)}">${escapeHtml(startVerb)}</button>`
+            }
+          </div>
+        </div>`;
+    }
+    html += `</div>`;
+    if (cycleComplete) {
+      html += `
+        <div class="tr-cert-banner" role="region" aria-label="Your certificate">
+          <h2>You've completed the cycle.</h2>
+          <p>Your certificate is below.</p>
+          ${cert
+            ? `<button class="tr-btn tr-btn--primary" data-view-cert="${escapeHtml(cert.certificate_id)}">View certificate ${escapeHtml(cert.certificate_id)}</button>`
+            : `<button class="tr-btn tr-btn--primary" data-issue-cert>Issue my certificate</button>`}
+        </div>`;
+    }
+    body.innerHTML = html;
+    body.querySelectorAll("[data-resume]").forEach(b => b.addEventListener("click", () => openModule(b.dataset.resume)));
+    const ib = body.querySelector("[data-issue-cert]"); if (ib) ib.addEventListener("click", issueCertificate);
+    body.querySelectorAll("[data-view-cert]").forEach(b => b.addEventListener("click", () => { location.href = "/training-cert.html?id=" + encodeURIComponent(b.dataset.viewCert); }));
+  }
+
+  async function issueCertificate() {
+    try {
+      const out = await apiPost("/issue-certificate", { cycle_year: STATE.cycleYear });
+      location.href = "/training-cert.html?id=" + encodeURIComponent(out.certificate_id);
+    } catch (e) { toast("Couldn't issue certificate: " + e.message); }
+  }
+
+  // ── Module load ──
+  async function openModule(moduleId, phase, sectionIndex) {
+    STATE.activeModuleId = moduleId;
+    STATE.phase = phase || "cover";
+    STATE.sectionIndex = sectionIndex || 0;
+    $("#trBody").innerHTML = '<div class="tr-loading">Loading module…</div>';
+    try {
+      const [contentRes, qsRes] = await Promise.all([
+        fetch(`/training/modules/${moduleId}.md?_=${Date.now()}`, { cache: "no-store" }).then(r => r.ok ? r.text() : Promise.reject("module not found")),
+        fetch(`/training/modules/${moduleId}.questions.json?_=${Date.now()}`, { cache: "no-store" }).then(r => r.ok ? r.json() : null).catch(() => null),
+      ]);
+      const html = renderMarkdown(contentRes);
+      const sections = splitIntoSections(html);
+      STATE.moduleData = { sections, reflections: (qsRes && qsRes.reflections) || [] };
+      STATE.reflections = {}; STATE.reflectionSaved = {};
+      writeUrl({ module: moduleId, phase: STATE.phase, section: STATE.sectionIndex });
+      renderModule();
+    } catch (e) {
+      $("#trBody").innerHTML = `<div class="tr-empty">Could not load module: ${escapeHtml(String(e.message || e))}. <button class="tr-btn--link" onclick="(${backToDash.toString()})()">Back to dashboard</button></div>`;
+    }
+  }
+
+  function moduleProgress() { return (STATE.state.modules || []).find(m => m.module_id === STATE.activeModuleId); }
+  function moduleTitle()   { return (MODULE_META[STATE.activeModuleId] || {}).title || STATE.activeModuleId; }
+  function moduleMinutes() { return (MODULE_META[STATE.activeModuleId] || {}).minutes || 10; }
+
+  function renderModule() {
+    if (STATE.phase === "cover")   return renderCover();
+    if (STATE.phase === "read")    return renderRead();
+    if (STATE.phase === "quiz")    return renderQuiz();
+    if (STATE.phase === "reflect") return renderReflect();
+    if (STATE.phase === "result")  return renderResult();
+    return renderCover();
+  }
+
+  function renderCover() {
+    writeUrl({ phase: "cover", section: null, q: null });
+    const m = moduleProgress() || {};
+    const meta = MODULE_META[STATE.activeModuleId] || {};
+    const hasCW = !!meta.contentWarning;
+    $("#trBody").innerHTML = `
+      <button class="tr-btn--link" onclick="(${backToDash.toString()})()">‹ Back to dashboard</button>
+      <h2 style="font:700 24px/1.25 var(--font-display);color:var(--ink-900);margin:18px 0 6px;">${escapeHtml(moduleTitle())}</h2>
+      <p class="tr-eyebrow" style="margin-bottom:12px;">About ${moduleMinutes()} minutes · pass mark 80% (7 of 8) · ${m.attempts_used || 0} of 3 attempts used</p>
+      ${hasCW ? `<div class="tr-cw">This module contains scenarios of a sexual or otherwise sensitive nature. If you'd rather pause and speak to someone first, our Employee Assistance Programme is one route. You can leave at any time — your place is saved.</div>` : ""}
+      <p class="tr-reading" style="max-width:60ch;margin:18px auto 28px;">This module will take about ${moduleMinutes()} minutes. You can stop and resume at any point — your place is saved automatically.</p>
+      <div style="text-align:center;">
+        <button class="tr-btn tr-btn--primary" id="trStartBtn">${m.attempts_used > 0 ? "Resume reading" : "Start the module"}</button>
+      </div>`;
+    $("#trStartBtn").addEventListener("click", () => { STATE.phase = "read"; STATE.sectionIndex = 0; renderRead(); });
+  }
+
+  function renderStepper(kind, current, total) {
+    const dots = [];
+    for (let i = 0; i < total; i++) {
+      const isDone = i < current;
+      const isCurrent = i === current;
+      const isLocked = kind === "question" && i > current && !STATE.submitted[i - 1];
+      dots.push(`<button class="tr-stepper-dot ${isDone ? "is-done" : ""} ${isCurrent ? "is-current" : ""} ${isLocked ? "is-locked" : ""}" data-step="${i}" ${isLocked ? 'aria-disabled="true"' : ''} aria-label="${kind} ${i + 1} of ${total}${isCurrent ? " (current)" : ""}">${i + 1}</button>`);
+    }
+    const label = `${kind === "section" ? "Section" : "Question"} ${current + 1} of ${total}`;
+    return `<nav class="tr-stepper" role="navigation" aria-label="${escapeHtml(label)}">${dots.join("")}<span class="tr-stepper-label">${escapeHtml(label)}</span></nav>`;
+  }
+
+  function renderRead() {
+    writeUrl({ phase: "read", section: STATE.sectionIndex, q: null });
+    const sections = (STATE.moduleData && STATE.moduleData.sections) || [];
+    if (!sections.length) { $("#trBody").innerHTML = `<div class="tr-empty">No content available for this module.</div>`; return; }
+    if (STATE.sectionIndex >= sections.length) STATE.sectionIndex = sections.length - 1;
+    const sec = sections[STATE.sectionIndex];
+    const total = sections.length;
+    const head = `
+      <div class="tr-reader-head">
+        <button class="tr-btn--link" onclick="(${backToDash.toString()})()">‹ ${escapeHtml(moduleTitle())}</button>
+        <span class="tr-saved-at">Saved ${nowTime()}</span>
+      </div>
+      ${renderStepper("section", STATE.sectionIndex, total)}
+    `;
+    const isLast = STATE.sectionIndex === total - 1;
+    const nav = `
+      <div class="tr-section-nav">
+        ${STATE.sectionIndex > 0 ? `<button class="tr-btn--link" id="trBack">‹ Back</button>` : `<span></span>`}
+        <button class="tr-btn tr-btn--primary" id="trNext">${isLast ? "Start the test" : "Next section ›"}</button>
+      </div>
+    `;
+    $("#trBody").innerHTML = head + `<div class="tr-reading">${sec.html}</div>` + nav;
+    $("#trBody").querySelectorAll(".tr-stepper-dot").forEach(d => d.addEventListener("click", () => {
+      const i = parseInt(d.dataset.step, 10); STATE.sectionIndex = i; renderRead();
+    }));
+    const back = $("#trBack"); if (back) back.addEventListener("click", () => { STATE.sectionIndex--; renderRead(); window.scrollTo({ top: 0 }); });
+    $("#trNext").addEventListener("click", () => {
+      if (isLast) startQuiz();
+      else { STATE.sectionIndex++; renderRead(); window.scrollTo({ top: 0 }); }
+    });
+  }
+
+  // ── Quiz ──
+  async function startQuiz() {
+    $("#trBody").innerHTML = '<div class="tr-loading">Preparing your test…</div>';
+    try {
+      const out = await apiPost("/start-attempt", { module_id: STATE.activeModuleId });
+      STATE.attempt = out; STATE.attempt._startedAt = Date.now();
+      STATE.qIndex = 0;
+      STATE.answers = new Array(out.questions.length).fill(null);
+      STATE.submitted = new Array(out.questions.length).fill(false);
+      STATE.feedback = new Array(out.questions.length).fill(null);
+      STATE.phase = "quiz";
+      renderQuiz();
+    } catch (e) {
+      $("#trBody").innerHTML = `<div class="tr-empty">Could not start the test: ${escapeHtml(e.message)}. <button class="tr-btn--link" onclick="(${backToDash.toString()})()">Back to dashboard</button></div>`;
+    }
+  }
+
+  function renderQuiz() {
+    writeUrl({ phase: "quiz", q: STATE.qIndex, section: null });
+    const att = STATE.attempt; if (!att) { renderCover(); return; }
+    const total = att.questions.length;
+    const q = att.questions[STATE.qIndex];
+    const submitted = STATE.submitted[STATE.qIndex];
+    const ans = STATE.answers[STATE.qIndex];
+    const fb = STATE.feedback[STATE.qIndex];
+    const isLast = STATE.qIndex === total - 1;
+    const letters = ["A","B","C","D","E","F"];
+
+    const optsHtml = q.options.map((opt, i) => {
+      const sel = ans === i;
+      let cls = "tr-quiz-option";
+      if (sel) cls += " is-selected";
+      if (submitted && fb) {
+        if (i === fb.correct) cls += " is-correct";
+        else if (sel && !fb.is_correct) cls += " is-wrong";
+      }
+      const dis = submitted ? "disabled" : "";
+      return `<button class="${cls}" data-opt="${i}" ${dis} aria-pressed="${sel}"><span class="tr-quiz-option-letter">${letters[i]}.</span><span>${escapeHtml(opt)}</span></button>`;
+    }).join("");
+
+    const feedbackHtml = submitted && fb ? `
+      <div class="tr-quiz-feedback ${fb.is_correct ? "" : "is-wrong"}" role="status">
+        <p class="tr-quiz-feedback-header">${fb.is_correct ? "Correct." : "That's not the answer."}</p>
+        <p class="tr-quiz-feedback-body">${escapeHtml(fb.rationale || "")}${fb.is_correct ? "" : ` The correct answer is ${letters[fb.correct]}.`}</p>
+      </div>` : "";
+
+    const actionsHtml = submitted ? `
+      <div class="tr-flag-row">
+        <button class="tr-btn--link" id="trFlag">Flag this question</button>
+        <button class="tr-btn tr-btn--primary" id="trNextQ">${isLast ? "See result" : "Next question ›"}</button>
+      </div>`
+    : `
+      <div class="tr-flag-row">
+        <button class="tr-btn--link" id="trFlag">Flag this question</button>
+        <button class="tr-btn tr-btn--primary" id="trSubmit" ${ans == null ? "disabled" : ""}>Submit answer</button>
+      </div>`;
+
+    $("#trBody").innerHTML = `
+      <div class="tr-reader-head">
+        <button class="tr-btn--link" onclick="(${backToDash.toString()})()">‹ ${escapeHtml(moduleTitle())} — test</button>
+      </div>
+      ${renderStepper("question", STATE.qIndex, total)}
+      <h2 class="tr-quiz-stem">${q.scenario ? `<span class="tr-quiz-scenario">Scenario</span>` : ""}${escapeHtml(q.stem)}</h2>
+      <div class="tr-quiz-options" role="radiogroup" aria-label="Answer options">${optsHtml}</div>
+      ${feedbackHtml}
+      ${actionsHtml}`;
+    $("#trBody").querySelectorAll(".tr-quiz-option:not([disabled])").forEach(b => b.addEventListener("click", () => {
+      STATE.answers[STATE.qIndex] = parseInt(b.dataset.opt, 10); renderQuiz();
+    }));
+    $("#trBody").querySelectorAll(".tr-stepper-dot").forEach(d => d.addEventListener("click", () => {
+      const i = parseInt(d.dataset.step, 10);
+      if (STATE.submitted[i] || i <= STATE.qIndex) { STATE.qIndex = i; renderQuiz(); }
+    }));
+    const sb = $("#trSubmit"); if (sb) sb.addEventListener("click", submitOneQuestion);
+    const nb = $("#trNextQ"); if (nb) nb.addEventListener("click", () => {
+      if (isLast) finalizeQuiz();
+      else { STATE.qIndex++; renderQuiz(); window.scrollTo({ top: 0 }); }
+    });
+    const fl = $("#trFlag"); if (fl) fl.addEventListener("click", () => toast("Thanks — flagged for review."));
+  }
+
+  function submitOneQuestion() {
+    if (!STATE.attempt) return;
+    if (STATE.attempt._result) {
+      // Result already in hand — just reveal this question's feedback.
+      STATE.submitted[STATE.qIndex] = true; renderQuiz(); return;
+    }
+    $("#trSubmit").disabled = true; $("#trSubmit").textContent = "Submitting…";
+    apiPost("/submit-attempt", {
+      attempt_id: STATE.attempt.attempt_id,
+      answers: STATE.answers.slice(),
+      duration_seconds: Math.max(1, Math.round((Date.now() - STATE.attempt._startedAt) / 1000)),
+    }).then(out => {
+      STATE.attempt._result = out;
+      for (let i = 0; i < out.questions.length; i++) STATE.feedback[i] = out.questions[i];
+      STATE.submitted[STATE.qIndex] = true;
+      renderQuiz();
+    }).catch(e => {
+      toast("Couldn't submit: " + e.message);
+      $("#trSubmit").disabled = false; $("#trSubmit").textContent = "Submit answer";
+    });
+  }
+
+  function finalizeQuiz() {
+    if (!STATE.attempt || !STATE.attempt._result) { renderQuiz(); return; }
+    const out = STATE.attempt._result;
+    STATE.phase = "result"; writeUrl({ phase: "result", q: null });
+    let html = `<div class="tr-reader-head"><button class="tr-btn--link" onclick="(${backToDash.toString()})()">‹ ${escapeHtml(moduleTitle())}</button></div>`;
+    const passMark = Math.ceil((out.out_of * 80) / 100);
+    if (out.passed) {
+      html += `<div class="tr-result">
+        <p class="tr-result-title">You answered ${out.score} of ${out.out_of} correctly. That's a pass.</p>
+        <p class="tr-result-body">Two short reflection prompts and you're done with this module.</p>
+        <button class="tr-btn tr-btn--primary" id="trToReflect">Reflection (2 prompts)</button>
+      </div>`;
+    } else if (out.attempts_remaining > 0) {
+      html += `<div class="tr-result">
+        <p class="tr-result-title">You answered ${out.score} of ${out.out_of} correctly. The pass mark is ${passMark}.</p>
+        <p class="tr-result-body">You have ${out.attempts_remaining} retake${out.attempts_remaining === 1 ? "" : "s"} available. The next attempt uses a fresh random sample from the question bank.</p>
+        <button class="tr-btn tr-btn--primary" id="trTryAgain">Try again</button>
+      </div>`;
+    } else {
+      html += `<div class="tr-result">
+        <p class="tr-result-title">You answered ${out.score} of ${out.out_of} correctly, and have used your three attempts.</p>
+        <p class="tr-result-body">HR has been notified and will be in touch to schedule a one-to-one.</p>
+        <button class="tr-btn" onclick="(${backToDash.toString()})()">Back to dashboard</button>
+      </div>`;
+    }
+    $("#trBody").innerHTML = html;
+    const a = $("#trToReflect"); if (a) a.addEventListener("click", () => { STATE.phase = "reflect"; renderReflect(); });
+    const b = $("#trTryAgain"); if (b) b.addEventListener("click", startQuiz);
+  }
+
+  // ── Reflection ──
+  function cssEsc(s) { return String(s).replace(/[^a-zA-Z0-9_-]/g, "_"); }
+  function renderReflect() {
+    writeUrl({ phase: "reflect", q: null });
+    const reflections = (STATE.moduleData && STATE.moduleData.reflections) || [];
+    if (!reflections.length) return completeModule();
+    const head = `
+      <div class="tr-reader-head">
+        <button class="tr-btn--link" onclick="(${backToDash.toString()})()">‹ ${escapeHtml(moduleTitle())}</button>
+      </div>
+      <h2 style="font:700 22px/1.25 var(--font-display);color:var(--ink-900);margin:18px 0 6px;">Reflection</h2>
+      <p class="tr-eyebrow">${reflections.length} short prompts. Logged for your own reflection — never shared with your manager.</p>`;
+    const groups = reflections.map((r, i) => `
+      <div class="tr-reflect-group">
+        <p class="tr-reflect-prompt">${i + 1}. ${escapeHtml(r.prompt)}</p>
+        <p class="tr-reflect-caveat">${escapeHtml(r.guidance || "Your manager will not see this — it's for your own reflection.")}</p>
+        <textarea class="tr-reflect-textarea" id="trRefl_${cssEsc(r.id)}" data-id="${escapeHtml(r.id)}" placeholder="A sentence or two is plenty." aria-label="${escapeHtml(r.prompt)}"></textarea>
+        <p class="tr-reflect-saved" id="trReflSaved_${cssEsc(r.id)}"></p>
+      </div>`).join("");
+    const nav = `<div class="tr-section-nav"><span></span><button class="tr-btn tr-btn--primary" id="trComplete">Complete module</button></div>`;
+    $("#trBody").innerHTML = head + groups + nav;
+    reflections.forEach(r => {
+      const ta = $("#trRefl_" + cssEsc(r.id)); if (!ta) return;
+      if (STATE.reflections[r.id]) ta.value = STATE.reflections[r.id];
+      let timer = null;
+      ta.addEventListener("input", () => {
+        STATE.reflections[r.id] = ta.value;
+        clearTimeout(timer);
+        timer = setTimeout(() => saveReflection(r.id, ta.value), 700);
+      });
+    });
+    $("#trComplete").addEventListener("click", () => {
+      const missing = reflections.filter(r => !((STATE.reflections[r.id] || "").trim()));
+      if (missing.length) { toast("Add a sentence in each box before completing. These won't be shared with your manager."); return; }
+      completeModule();
+    });
+  }
+  async function saveReflection(reflectionId, text) {
+    try {
+      const out = await apiPost("/save-reflection", { module_id: STATE.activeModuleId, reflection_id: reflectionId, text });
+      const el = $("#trReflSaved_" + cssEsc(reflectionId));
+      if (el) el.textContent = "Saved " + (out.saved_at ? new Date(out.saved_at).toTimeString().slice(0,5) : nowTime());
+    } catch (e) {
+      const el = $("#trReflSaved_" + cssEsc(reflectionId));
+      if (el) el.textContent = "Couldn't save — will retry";
+    }
+  }
+
+  async function completeModule() {
+    $("#trBody").innerHTML = '<div class="tr-loading">Marking complete…</div>';
+    try {
+      await apiPost("/complete-module", { module_id: STATE.activeModuleId });
+      STATE.state = await apiGet("/state");
+      const mods = STATE.state.modules || [];
+      const allDone = mods.length > 0 && mods.every(m => m.completed);
+      // Drop module from URL and go back to dashboard.
+      writeUrl({ module: null, phase: null, section: null, q: null });
+      STATE.phase = "dashboard"; STATE.activeModuleId = null;
+      renderDashboard(); window.scrollTo({ top: 0 });
+      if (allDone) toast("Module complete. The cycle is finished — claim your certificate below.");
+      else {
+        const next = mods.find(m => !m.completed);
+        toast("Module complete. " + (next ? (MODULE_META[next.module_id] || {title:next.module_id}).title + " is now available." : ""));
+      }
+    } catch (e) {
+      $("#trBody").innerHTML = `<div class="tr-empty">Could not mark complete: ${escapeHtml(e.message)}</div>`;
+    }
+  }
+
+  // Re-entry stub (URL has &phase=result on reload — no in-memory attempt). Show a friendly fallback.
+  function renderResult() {
+    if (STATE.attempt && STATE.attempt._result) return finalizeQuiz();
+    $("#trBody").innerHTML = `<div class="tr-empty">This page is mid-flight from a previous session. <button class="tr-btn--link" onclick="(${backToDash.toString()})()">Back to dashboard</button></div>`;
+  }
+
+  boot();
+})();
+</script>
+<script src="nav.js?v=1779316800"></script>
 </body>
 </html>

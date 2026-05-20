@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<script src="/live-reload.js"></script>
+<title>TogetherBOOK — Training Certificate</title>
+<link rel="icon" type="image/png" href="site-icon.png">
+<link rel="apple-touch-icon" href="site-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=1779316800">
+<link rel="stylesheet" href="quiet-tokens.css?v=1779316800">
+<link rel="stylesheet" href="quiet.css?v=1779316800">
+<link rel="stylesheet" href="quiet-extras.css?v=1779316800">
+<link rel="stylesheet" href="quiet-legacy.css?v=1779316800">
+<style>
+  body { background: var(--paper-200); }
+  .cert-wrap {
+    max-width: 760px; margin: 28px auto; padding: 0 16px;
+  }
+  .cert-actions {
+    display: flex; gap: 10px; justify-content: flex-end;
+    flex-wrap: wrap; margin: 0 0 16px;
+  }
+  .cert-btn {
+    font: 600 12px/1.2 var(--font-body); letter-spacing: 0.02em;
+    padding: 8px 14px; border: 1px solid var(--ink-700);
+    background: var(--paper-50); color: var(--ink-900); cursor: pointer;
+    border-radius: 0;
+  }
+  .cert-btn:hover { background: var(--paper-50); border-color: var(--ink-900); }
+  .cert-btn--primary { background: var(--brass-500); color: var(--paper-50); border-color: var(--brass-600); }
+  .cert-btn--primary:hover { background: var(--brass-600); }
+  /* The certificate "paper" */
+  .cert-paper {
+    background: var(--paper-50);
+    border: 1px solid var(--paper-300);
+    border-radius: 0;
+    padding: 48px 56px 36px;
+    box-shadow: 0 1px 12px rgba(17,25,46,0.08);
+    color: var(--ink-900);
+    font-family: var(--font-display);
+    position: relative;
+    aspect-ratio: 210 / 297;
+    display: flex; flex-direction: column;
+  }
+  .cert-head {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    border-bottom: 1px solid var(--paper-300); padding-bottom: 18px; margin-bottom: 18px;
+  }
+  .cert-brand {
+    font: 700 14px/1.1 var(--font-body); letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--ink-700);
+  }
+  .cert-issuer {
+    font: italic 500 12px/1.4 var(--font-display); color: var(--ink-600);
+    text-align: right;
+  }
+  .cert-title {
+    text-align: center; margin: 36px 0 6px;
+    font: 800 32px/1.15 var(--font-display); color: var(--brass-700);
+    letter-spacing: 0.02em;
+  }
+  .cert-name {
+    text-align: center; margin: 32px 0 18px;
+    font: 600 26px/1.2 var(--font-display); color: var(--ink-900);
+  }
+  .cert-summary {
+    text-align: center; max-width: 56ch; margin: 0 auto 24px;
+    font: 400 16px/1.55 var(--font-display); color: var(--ink-800);
+  }
+  .cert-modules {
+    margin: 4px auto 28px; padding: 0; list-style: none;
+    max-width: 60ch; font: 400 14px/1.6 var(--font-display); color: var(--ink-800);
+  }
+  .cert-modules li { padding: 2px 0; }
+  .cert-modules li::before { content: "·"; margin-right: 10px; color: var(--brass-500); }
+  .cert-sign {
+    text-align: center; margin: auto 0 24px;
+    font: 400 14px/1.5 var(--font-display); color: var(--ink-800);
+  }
+  .cert-sign-line {
+    border-top: 1px solid var(--ink-500); width: 220px;
+    margin: 32px auto 8px;
+  }
+  .cert-sign-name { font: 600 14px/1.2 var(--font-display); color: var(--ink-900); }
+  .cert-sign-role { font: italic 400 12px/1.2 var(--font-display); color: var(--ink-600); }
+  .cert-commitment {
+    text-align: center; max-width: 60ch; margin: 16px auto 0;
+    font: italic 400 12px/1.45 var(--font-display); color: var(--ink-700);
+  }
+  .cert-foot {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    border-top: 1px solid var(--paper-300); padding-top: 18px; margin-top: 28px;
+  }
+  .cert-foot-left, .cert-foot-right { font: 500 11px/1.4 var(--font-mono); color: var(--ink-600); }
+  .cert-foot-right { text-align: right; }
+  .cert-verif-id { color: var(--ink-900); font-weight: 600; }
+  .cert-qr {
+    display: block; margin-top: 6px;
+    width: 96px; height: 96px;
+    background: var(--paper-100);
+    border: 1px solid var(--paper-300);
+  }
+  .cert-error { padding: 40px; text-align: center; font: italic 400 16px/1.5 var(--font-display); color: var(--red-700); }
+  @media print {
+    body { background: white !important; }
+    .cert-actions, .qb-topbar, .qb-nav-backdrop { display: none !important; }
+    .cert-wrap { margin: 0; padding: 0; }
+    .cert-paper { box-shadow: none; border: 0; padding: 18mm 22mm; }
+  }
+  @media (max-width: 600px) {
+    .cert-paper { padding: 28px 22px; aspect-ratio: auto; }
+    .cert-title { font-size: 26px; margin: 20px 0 8px; }
+    .cert-name { font-size: 22px; }
+    .cert-foot { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .cert-foot-right { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<header class="qb-topbar">
+  <a class="qb-brand" href="/wall.html" aria-label="TogetherBOOK — home">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779316800" alt="TogetherBOOK">
+  </a>
+  <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
+          onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="qb-nav">
+    <a class="qb-nav-link" href="/wall.html">Wall</a>
+    <a class="qb-nav-link" href="/bookr.html">BOOKR</a>
+    <a class="qb-nav-link" href="/holidays.html">Holidays</a>
+    <a class="qb-nav-link" href="/directory.html">People</a>
+    <a class="qb-nav-link is-active" href="/training.html">Training</a>
+    <a class="qb-nav-link" href="/reports.html">Business</a>
+    <a class="qb-nav-link" href="/index.html">System</a>
+  </nav>
+</header>
+<div class="qb-nav-backdrop" onclick="document.body.classList.remove('nav-open')"></div>
+
+<main class="qb-page">
+  <div class="cert-wrap">
+    <div class="cert-actions" id="certActions" style="display:none;">
+      <a class="cert-btn" href="/training.html">‹ Back to training</a>
+      <button class="cert-btn" id="certPrint" type="button">Print / save PDF</button>
+    </div>
+    <div class="cert-paper" id="certPaper">
+      <div class="cert-error">Loading…</div>
+    </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  const MODULE_META = {
+    module_0: "Professional conduct in digital channels",
+    module_1: "The law and why it matters",
+    module_2: "Recognising harassment",
+    module_3: "Bystander action — the 5Ds",
+    module_4: "Power dynamics and high-risk situations",
+    module_5: "Reporting and what happens next",
+    module_manager: "Manager add-on",
+  };
+  function escapeHtml(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+  }
+  function fmtDate(iso) {
+    if (!iso) return "—";
+    const d = new Date(iso);
+    return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  }
+  async function boot() {
+    const id = new URLSearchParams(location.search).get("id") || "";
+    if (!id) {
+      document.getElementById("certPaper").innerHTML = `<div class="cert-error">No certificate id supplied.</div>`;
+      return;
+    }
+    try {
+      const r = await fetch("/api/training/certificate?id=" + encodeURIComponent(id), { cache: "no-store" });
+      const data = await r.json();
+      if (!r.ok || !data.ok) throw new Error(data.error || ("HTTP " + r.status));
+      render(data.certificate);
+    } catch (e) {
+      document.getElementById("certPaper").innerHTML = `<div class="cert-error">Couldn't load certificate: ${escapeHtml(e.message)}</div>`;
+    }
+  }
+
+  function render(cert) {
+    const signer = cert.signing_officer || { name: "James Benamor", title: "Group CEO, Richmond Group", commitment_line: "" };
+    const modules = (cert.modules || []).map(id => `<li>${escapeHtml(MODULE_META[id] || id)}</li>`).join("");
+    const issuedAt = fmtDate(cert.ts);
+    const validUntil = fmtDate(cert.next_due);
+    const verifyUrl = location.origin + "/training-cert.html?id=" + encodeURIComponent(cert.certificate_id);
+    document.getElementById("certPaper").innerHTML = `
+      <div class="cert-head">
+        <div class="cert-brand">TogetherBOOK · Richmond Group</div>
+        <div class="cert-issuer">${escapeHtml(signer.title || "Group CEO, Richmond Group")}</div>
+      </div>
+      <div class="cert-title">Certificate of Completion</div>
+      <div class="cert-name">${escapeHtml(cert.user_name || cert.user_email || "")}</div>
+      <div class="cert-summary">
+        has completed the Richmond Group harassment-prevention training cycle for ${escapeHtml(String(cert.cycle_year || ""))}.
+      </div>
+      <ul class="cert-modules">${modules}</ul>
+      <div class="cert-sign">
+        <div class="cert-sign-line"></div>
+        <div class="cert-sign-name">${escapeHtml(signer.name || "")}</div>
+        <div class="cert-sign-role">${escapeHtml(signer.title || "")}</div>
+        ${signer.commitment_line ? `<div class="cert-commitment">${escapeHtml(signer.commitment_line)}</div>` : ""}
+      </div>
+      <div class="cert-foot">
+        <div class="cert-foot-left">
+          <div class="cert-verif-id">${escapeHtml(cert.certificate_id)}</div>
+          <div>Issued ${escapeHtml(issuedAt)}</div>
+          <div>Verify at <code>${escapeHtml(verifyUrl)}</code></div>
+        </div>
+        <div class="cert-foot-right">
+          <div>Valid until ${escapeHtml(validUntil)}</div>
+        </div>
+      </div>
+    `;
+    document.getElementById("certActions").style.display = "flex";
+    document.getElementById("certPrint").addEventListener("click", () => window.print());
+  }
+
+  boot();
+})();
+</script>
+<script src="nav.js?v=1779316800"></script>
+</body>
+</html>

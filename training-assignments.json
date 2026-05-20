@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "updated_at": null,
+  "notes": "Auto-managed by /api/training/*. Each entry assigns a module to a user with a due-date. Entries are NOT removed on completion — completion lives in training-events.json. Removing an entry effectively voids the assignment; do that only via the admin UI.",
+  "assignments": []
+}

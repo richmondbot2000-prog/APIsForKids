@@ -1,0 +1,345 @@
+{
+  "module_id": "module_4",
+  "version": "2026-05-20",
+  "pass_mark_percent": 80,
+  "served_per_attempt": 8,
+  "questions": [
+    {
+      "id": "q1",
+      "scenario": false,
+      "stem": "Section 26(3) of the Equality Act 2010 specifically catches:",
+      "options": [
+        "Any comment about a colleague's appearance",
+        "Less favourable treatment of a person because they rejected or submitted to unwanted conduct of a sexual nature",
+        "Only conduct that occurs inside the office",
+        "Only conduct between people of different sexes"
+      ],
+      "correct": 1,
+      "rationale": "Section 26(3) catches less favourable treatment for rejecting or submitting to sexual conduct — the project that 'doesn't quite suit', the review that suddenly becomes developmental, the introduction that quietly stops happening. The conduct that triggered the rejection does not itself have to be independently unlawful for s.26(3) to bite."
+    },
+    {
+      "id": "q2",
+      "scenario": false,
+      "stem": "Power asymmetry in the harassment context exists only where:",
+      "options": [
+        "There is a direct reporting line on the org chart",
+        "One party is significantly older than the other",
+        "One party has meaningful influence over the other's work, compensation, attestation, career, mandate or client access — formal or informal",
+        "Both parties are in the same SMCR regime"
+      ],
+      "correct": 2,
+      "rationale": "Power does not have to be formal. Peer relationships with mandate-allocation power, mentor relationships, certifier relationships, and client-side relationships all create the asymmetry the law was written for. Reporting-line-only thinking misses most of the real cases."
+    },
+    {
+      "id": "q3",
+      "scenario": false,
+      "stem": "The technical name for harassment that links a benefit or detriment at work to submission to or rejection of sexual conduct is:",
+      "options": [
+        "Constructive harassment",
+        "Quid pro quo harassment",
+        "Indirect discrimination",
+        "Vicarious harassment"
+      ],
+      "correct": 1,
+      "rationale": "Quid pro quo harassment is the established term. The Equality Act does not use the phrase but s.26(3) catches the pattern. The explicit version is rare in practice; the implicit, plausibly-deniable version — a comment about future earning potential drifting into a dinner invitation — does most of the actual damage."
+    },
+    {
+      "id": "q4",
+      "scenario": false,
+      "stem": "Why does the SMCR remuneration regime add a layer of risk when bonus or appraisal conversations drift into personal territory?",
+      "options": [
+        "It doesn't — remuneration sits outside the SMCR framework",
+        "Because remuneration is a regulated decision in many SMCR firms, so introducing personal-interest considerations puts the firm's regulatory compliance and the individual's fitness and propriety in scope",
+        "Because the FCA reviews every bonus decision individually",
+        "Because bonus discussions must always be witnessed by HR"
+      ],
+      "correct": 1,
+      "rationale": "Remuneration determination is governed by the SYSC remuneration code in many SMCR firms — it is a controlled process. A senior person who lets personal interest influence it puts the firm's compliance and their own F&P at risk, on top of any Equality Act exposure. Option C overstates the FCA's individual-decision involvement."
+    },
+    {
+      "id": "q5",
+      "scenario": false,
+      "stem": "From 1 October 2026, the firm's exposure to harassment of its employees by clients, contractors, suppliers and visitors is:",
+      "options": [
+        "Excluded — third parties are outside the Equality Act framework",
+        "Limited to sexual harassment only",
+        "Direct, across all protected characteristics, with an 'all reasonable steps' defence",
+        "Triggered only after a written complaint to the regulator"
+      ],
+      "correct": 2,
+      "rationale": "Section 21 of the Employment Rights Act 2025 inserts s.40(1A)–(1C) into the Equality Act 2010, making the firm directly liable for harassment of its employees by third parties across all protected characteristics, with an 'all reasonable steps' defence. The pre-2026 'they're not our employee' framing stops being available."
+    },
+    {
+      "id": "q6",
+      "scenario": false,
+      "stem": "Which statement best describes the firm's expectation around consensual workplace relationships?",
+      "options": [
+        "All consensual relationships must be publicly disclosed in team meetings",
+        "Relationships are a private matter and never need to be disclosed",
+        "Relationships must be disclosed where a reporting line, SMCR / certified relationship, or any other material power asymmetry exists — disclosure is to HR, confidential, and exists to remove conflicts and protect both parties if the relationship ends",
+        "Only relationships involving a Senior Manager need be disclosed"
+      ],
+      "correct": 2,
+      "rationale": "Policy HR-12 requires disclosure where there is a reporting line, an SMCR / certified relationship, or any other material power asymmetry (mentor / mentee, allocation, sign-off). Disclosure goes to HR confidentially. The firm's interest is in removing the structural conflict and reducing post-breakup risk, not in surveillance."
+    },
+    {
+      "id": "q7",
+      "scenario": false,
+      "stem": "Which of the following is the textbook signature of 'performance management as retaliation' under s.27 Equality Act 2010?",
+      "options": [
+        "A scheduled annual appraisal taking place on its normal date",
+        "A complainant's appraisal becoming suddenly weaker, work being withdrawn, or a new performance concern appearing shortly after a complaint is filed",
+        "A line manager asking for additional context on a piece of work",
+        "A bonus award being lower than the previous year due to firm-wide adjustments"
+      ],
+      "correct": 1,
+      "rationale": "The textbook pattern is adverse change that postdates the protected act and lacks a contemporaneous evidentiary basis — a sudden weak appraisal, withdrawn work, a new performance concern that wasn't there last month. Options A, C and D are ordinary management activity. The Manager add-on covers handling complainant appraisals in depth; recognising the pattern is the all-staff skill."
+    },
+    {
+      "id": "q8",
+      "scenario": false,
+      "stem": "Why does the module say a manager cannot be the harasser and also the recipient's complaint route?",
+      "options": [
+        "Because the manager might lose their temper",
+        "Because the structure of asking someone to raise a concern with the person it is about does not produce reliable disclosure, regardless of the individual manager's intentions",
+        "Because the FCA has banned it specifically",
+        "Because HR has not authorised it"
+      ],
+      "correct": 1,
+      "rationale": "The point is structural, not personal. Even a manager who would handle a complaint fairly cannot fix the disincentive the structure creates. The firm provides reporting routes that bypass the line manager — Speak Up, HR direct, the named senior owner, the audit committee — because the literature and the FCA both treat single-channel reporting as a system that isn't working."
+    },
+    {
+      "id": "q9",
+      "scenario": false,
+      "stem": "COCON 1.1.7FR, in force from 1 September 2026, does which of the following?",
+      "options": [
+        "Replaces the Equality Act for SMCR firms",
+        "Extends the FCA Conduct Rules to bullying, harassment and violence against colleagues across all SMCR-regulated firms, using the Equality Act seriousness threshold",
+        "Applies only to retail-bank front-office staff",
+        "Removes the requirement to report Conduct Rule breaches to the FCA"
+      ],
+      "correct": 1,
+      "rationale": "COCON 1.1.7FR brings bullying, harassment and violence against colleagues into Conduct Rule scope across all SMCR firms (roughly 37,000 additional firms beyond the existing banking population). The seriousness threshold is the Equality Act test verbatim. It supplements the Equality Act regime, it doesn't replace it."
+    },
+    {
+      "id": "q10",
+      "scenario": false,
+      "stem": "What is the principal regulatory significance of the Odey Final Notice (3 March 2025) for the purposes of this module?",
+      "options": [
+        "It established a new statutory definition of harassment",
+        "It set a fixed £1.8m penalty for any future harassment case",
+        "It is the public marker that the FCA will use the Conduct Rules and Fit and Proper powers at the most senior level over conduct around the handling of harassment allegations",
+        "It transferred jurisdiction over harassment from tribunals to the FCA"
+      ],
+      "correct": 2,
+      "rationale": "The Final Notice — a £1.8m fine and an industry ban under ICR 1 — is currently under Upper Tribunal review, but the Decision Notice is public proof that the regulator will treat conduct around harassment allegations as a regulated integrity matter at the most senior level. It does not change the underlying statutory definitions or jurisdiction."
+    },
+    {
+      "id": "q11",
+      "scenario": false,
+      "stem": "Section 23 of the Employment Rights Act 2025, in force since 6 April 2026, means that:",
+      "options": [
+        "Sexual-harassment complaints must always be made to the police",
+        "A qualifying disclosure relating to sexual harassment is now a protected whistleblowing disclosure, with uncapped damages for detriment or dismissal in response",
+        "Whistleblowers must obtain regulator pre-approval before disclosing",
+        "Internal complaints are no longer permitted"
+      ],
+      "correct": 1,
+      "rationale": "Section 23 ERA 2025 inserts sexual-harassment disclosures into the whistleblowing regime. The public-interest test in s.43B ERA 1996 still applies — purely individual personal grievances may not qualify — but anything touching a pattern, repeat offender or systemic failure will. Detriment or dismissal carries uncapped tribunal damages on top of any Equality Act claim."
+    },
+    {
+      "id": "q12",
+      "scenario": false,
+      "stem": "Which of the following best describes the firm's expected approach to disclosure of a workplace relationship under Policy HR-12?",
+      "options": [
+        "A public announcement to the team",
+        "A short confidential conversation with HR, the substance not the colour; one party re-assigned where necessary so neither has decision-making authority over the other",
+        "A formal letter to the FCA",
+        "Approval of the relationship by the relevant line manager"
+      ],
+      "correct": 1,
+      "rationale": "Disclosure is private, to HR, and confidential. It is not a moral judgment, an invitation to manage the relationship, or a public statement. Re-assignment happens where a reporting or sign-off line exists. The boundary between disclosure and surveillance is the boundary the firm sits on — disclosure side, deliberately."
+    },
+    {
+      "id": "q13",
+      "scenario": true,
+      "stem": "[scenario] A managing director, at the end of a long one-on-one dinner with a junior analyst, says: 'You're really impressive — I could put you forward for the [major mandate]. We should talk about that properly. Maybe a weekend.' The analyst declines. Two weeks later the analyst is told the mandate has been allocated to a different team 'for development reasons.' Which of the following is most accurate?",
+      "options": [
+        "Lawful — project allocation is a management decision",
+        "Potential sexual harassment by less favourable treatment for rejecting sexual conduct under s.26(3) EA 2010, with a potential additional Conduct Rule 1 (integrity) issue for the MD from 1 September 2026 under COCON 1.1.7FR",
+        "Only actionable if the analyst can produce a recording of the dinner",
+        "A purely private matter between the two adults concerned"
+      ],
+      "correct": 1,
+      "rationale": "This is the textbook s.26(3) pattern — the dinner conversation, the rejection, the subsequent withdrawal of the opportunity. The Equality Act treats the project decision and the prior invitation as connected, with the burden effectively shifting to the MD to show they aren't. Layered on top: COCON 1.1.7FR brings this into FCA Conduct Rule scope from 1 September 2026, with consequences for the MD's F&P regardless of how the firm's internal process concludes."
+    },
+    {
+      "id": "q14",
+      "scenario": true,
+      "stem": "[scenario] At a client dinner, a senior client of a longstanding mandate makes increasingly personal comments to a junior banker, then suggests they continue at the hotel bar after dinner. From 1 October 2026, what is the firm's position?",
+      "options": [
+        "The firm has no exposure because the client is not an employee",
+        "The firm is directly liable for failing to take all reasonable steps to prevent third-party harassment of its employees, regardless of how important the client is",
+        "The junior banker must continue the dinner to preserve the client relationship",
+        "The firm's only obligation is to remind the banker of the dress code"
+      ],
+      "correct": 1,
+      "rationale": "Section 21 ERA 2025 (in force 1 October 2026) inserts s.40(1A)–(1C) EA 2010, making the firm directly liable for third-party harassment across all protected characteristics, with an 'all reasonable steps' defence. 'Important client' raises, not lowers, the rigour required. The banker has full permission to leave; the firm's response — including refusing to staff the client with that banker again, or refusing the client at all — is what the law looks at."
+    },
+    {
+      "id": "q15",
+      "scenario": true,
+      "stem": "[scenario] At the hotel bar after the off-site agenda has finished, a member of senior leadership repeatedly tries to persuade a junior colleague to continue drinking in their room. From a power-dynamics perspective, the correct framing is:",
+      "options": [
+        "Not the firm's concern — the agenda has ended",
+        "The off-site is within course of employment and the firm's preventative duty applies; the conduct is potentially sexual harassment under s.26 EA 2010 and a Conduct Rule 1 matter for the senior leader from 1 September 2026",
+        "Acceptable if the junior colleague has been drinking",
+        "Only relevant if the senior leader is on the same team as the junior colleague"
+      ],
+      "correct": 1,
+      "rationale": "The off-site is the firm's event, with effectively required attendance — every employment-law analysis treats the bar afterwards as squarely within course of employment. The 'agenda has ended' framing has never been a defence. Alcohol consumption by the affected colleague is not relevant to consent and is not a defence. Power asymmetry does not require a direct reporting line; senior leadership of the firm is the asymmetry."
+    },
+    {
+      "id": "q16",
+      "scenario": true,
+      "stem": "[scenario] On a work trip, your manager knocks on your hotel-room door at 11pm 'to check you're OK.' You did not invite them and there is no work reason. What does the module say about this?",
+      "options": [
+        "Normal and expected on work travel",
+        "The knock is itself a course-of-employment situation; the conduct is potentially harassment; document the same night with date, time and what was said, and escalate the following morning through a route that does not run through that manager",
+        "Only a problem if the manager enters the room",
+        "Only a problem if you can prove the manager intended something improper"
+      ],
+      "correct": 1,
+      "rationale": "Work travel is within course of employment. The Equality Act test is purpose-or-effect, not intent — option D misstates the law. Documentation that night, and escalation the following morning through a route bypassing the manager, is the correct play. The firm should have a no-questions-asked 'switch hotels at the firm's expense' route available for exactly this situation."
+    },
+    {
+      "id": "q17",
+      "scenario": true,
+      "stem": "[scenario] A senior trader and a junior analyst on the same desk start a relationship. Neither discloses. Six months later the relationship ends acrimoniously. The senior trader, who allocates the desk's bonus pool, marks the analyst's contribution down sharply and recommends a transfer 'for development reasons.' Which of the following is correct?",
+      "options": [
+        "A private matter between two adults; the firm should not be involved",
+        "A textbook Policy HR-12 disclosure failure, a potential s.26(3) and s.27 EA 2010 claim, and (for the senior trader) a potential COCON 1.1.7FR Conduct Rule 1 matter from 1 September 2026 — all of which earlier disclosure would have prevented",
+        "Only the analyst is at fault for not disclosing",
+        "Lawful, because bonus allocation is a management decision"
+      ],
+      "correct": 1,
+      "rationale": "The disclosure obligation under HR-12 attached when the relationship started, because the senior trader had bonus-allocation authority over the analyst — the precise asymmetry the policy is built around. The post-breakup pattern fits s.26(3) (less favourable treatment) and s.27 (victimisation) if the analyst raised the matter, with COCON 1.1.7FR Conduct Rule exposure on top from 1 September 2026. Disclosure earlier would have triggered re-assignment and avoided all of it."
+    },
+    {
+      "id": "q18",
+      "scenario": true,
+      "stem": "[scenario] After a junior colleague files a harassment complaint, you notice that their next mid-year review — previously strong — comes back materially weaker, that they have been quietly removed from a high-profile project, and that their line manager has started copying their own boss into every email about their work. What does the pattern suggest?",
+      "options": [
+        "Coincidence — performance fluctuates",
+        "Potential victimisation under s.27 EA 2010; the pattern fits the textbook 'performance management as retaliation' shape and should be flagged through a route that bypasses the line manager. The April 2026 whistleblowing reforms may also be in scope if the original disclosure was protected",
+        "Evidence that the original complaint was unfounded",
+        "A purely management matter outside the scope of harassment law"
+      ],
+      "correct": 1,
+      "rationale": "Adverse change postdating a protected act, without a contemporaneous evidentiary basis, is the canonical victimisation pattern. Section 27 EA 2010 treats it as independently unlawful regardless of whether the original complaint is upheld. The April 2026 whistleblowing reforms add uncapped damages where the disclosure qualified as protected. Option C is the precise reasoning the law rules out."
+    },
+    {
+      "id": "q19",
+      "scenario": true,
+      "stem": "[scenario] Completion drinks for a major deal. It's 1am, the team is in the bar, and a senior member of the deal team starts behaving towards a junior in a way that would never be acceptable in the office. The argument 'we'd all just closed' is offered the next morning. Which of the following is correct?",
+      "options": [
+        "Big-deal energy is recognised in law as a mitigating factor",
+        "The Equality Act applies identically at 1am on completion night as on a Tuesday afternoon; the firm's preventative duty applies; and the same conduct that would be a Conduct Rule breach in the office is a Conduct Rule breach in the bar",
+        "Only office conduct is in scope of the Equality Act",
+        "Mitigated if no formal complaint is filed"
+      ],
+      "correct": 1,
+      "rationale": "The law does not have a deal-just-closed exception. Course of employment, preventative duty and Conduct Rules all apply. The pattern is well-recognised precisely because endorphin baseline lowers inhibition; that lowered inhibition is the firm's risk to manage, not a defence to its consequences."
+    },
+    {
+      "id": "q20",
+      "scenario": true,
+      "stem": "[scenario] In a bonus conversation, a senior leader says to a high-performing junior: 'I've been thinking about your career — we should grab dinner properly, just the two of us, somewhere off-piste.' The junior says they're busy. Two weeks later the bonus award lands materially below expectations and below the desk's median, with no clear competency rationale. The correct read is:",
+      "options": [
+        "Lawful — bonus is the leader's call",
+        "Potential implicit quid pro quo conduct followed by less favourable treatment under s.26(3) EA 2010; potential SMCR remuneration-code exposure for the firm; document the same day, escalate through a route that bypasses the senior leader",
+        "Only actionable if there is a recording of the conversation",
+        "A matter for the next year's appraisal cycle"
+      ],
+      "correct": 1,
+      "rationale": "This is the implicit version of the quid pro quo pattern that does most of the actual damage in practice — plausibly deniable, hard to prove individually, but textbook s.26(3) when the bonus drift follows. Remuneration is a regulated decision; SMCR remuneration-code exposure is on top. Documentation the same day and escalation that bypasses the senior leader are the correct moves; option D normalises the retaliation."
+    },
+    {
+      "id": "q21",
+      "scenario": true,
+      "stem": "[scenario] A senior mentor in a structured mentorship programme is mentoring a junior in a different team — no reporting line. Over coffee, the mentor says: 'I'd love to put you up for the high-potential list, but I think we should get to know each other better outside the programme first.' Which is the most accurate read?",
+      "options": [
+        "Lawful — there is no reporting line, so s.26(3) doesn't apply",
+        "Potential s.26(3) EA 2010 quid-pro-quo conduct: power asymmetry does not require a reporting line, and mentor / mentee programmes with allocation power (high-potential list nomination) are explicitly within the asymmetry the section is built around",
+        "Acceptable as long as the mentor doesn't repeat the offer",
+        "Only actionable if the junior accepts and the relationship goes wrong"
+      ],
+      "correct": 1,
+      "rationale": "Section 26(3) doesn't require a formal reporting line — mentor / mentee relationships with allocation or nomination power create the asymmetry directly. The comment is also a Policy HR-12 trigger (material power asymmetry), so any relationship that did follow would itself need disclosure. Options A and C miss the law; option D suggests the only harm is the relationship going wrong, when the conduct itself is the issue."
+    },
+    {
+      "id": "q22",
+      "scenario": false,
+      "stem": "Which of the following counts as a 'reasonable step' the firm should take in relation to off-sites and away-days from 1 October 2026?",
+      "options": [
+        "Removing alcohol entirely from every event",
+        "A written code of conduct circulated in advance, a named sober point of contact each evening, no-retaliation protection for staff who leave early, and clear escalation routes — all documented",
+        "Trusting that 'we're all professionals' makes formal measures unnecessary",
+        "Holding every off-site in head-office hours only"
+      ],
+      "correct": 1,
+      "rationale": "The 'all reasonable steps' test, post-October 2026, requires a documented combination of measures the firm can point to. Pre-circulated code of conduct, named sober point of contact, no-retaliation protection and clear escalation are the minimum architecture; option C is what the duty was designed to displace, and options A and D are not realistic or proportionate."
+    },
+    {
+      "id": "q23",
+      "scenario": false,
+      "stem": "From 1 September 2026, SYSC 22 requires firms to disclose substantiated non-financial misconduct findings in regulatory references when an individual moves firm. The principal purpose is to:",
+      "options": [
+        "Embarrass the individual publicly",
+        "Close the 'pass the harasser' loophole — historically a regulated person could move to a new firm without the new firm being told",
+        "Replace the FCA's own enforcement powers",
+        "Generate revenue for the FCA"
+      ],
+      "correct": 1,
+      "rationale": "The 'pass the harasser' route — quietly leaving one firm with a non-disclosure settlement and joining another with a clean reference — has been a recurring FCA concern. SYSC 22 from 1 September 2026 closes it. References are not public; they go between firms, with the regulator's framework setting the floor for what must be disclosed."
+    },
+    {
+      "id": "q24",
+      "scenario": true,
+      "stem": "[scenario] Two colleagues on the same desk started a relationship eight months ago. Neither disclosed. One holds Certified status; the other does not. They have broken up amicably and are continuing to work alongside each other professionally. Is disclosure still required, and to whom?",
+      "options": [
+        "No — the relationship has ended, so HR-12 no longer applies",
+        "Yes — under HR-12, the relationship should have been disclosed when it started (Certified-to-same-business asymmetry is a trigger). Disclosing now, confidentially to HR, is still the right move: it closes the past gap, lets the firm consider whether any historical decisions need review, and protects both parties going forward if the situation deteriorates",
+        "Only if one party complains",
+        "Only the Certified person needs to disclose, and only at their next attestation"
+      ],
+      "correct": 1,
+      "rationale": "HR-12 disclosure triggers attach to the structural asymmetry, not the duration. The disclosure obligation arose when the relationship began (Certified person in the same regulated business — explicit trigger in §2.6). Late disclosure is still better than none — it closes the historical exposure, lets the firm assess whether any decisions need review, and reduces the post-breakup risk pattern even when things currently look amicable."
+    },
+    {
+      "id": "q25",
+      "scenario": false,
+      "stem": "What is the single best summary of what this module asks of you?",
+      "options": [
+        "Avoid all forms of socialising with colleagues",
+        "Recognise that power asymmetry is what most of harassment law is built around; treat bonus, appraisal, client entertainment, off-sites, travel and deal-closing as the high-risk contexts they are; disclose relationships that create structural conflict; and recognise victimisation patterns when you see them",
+        "Report every social interaction to HR",
+        "Trust that the firm's policies will handle every situation without your input"
+      ],
+      "correct": 1,
+      "rationale": "The module is specifically about the contexts in which power asymmetry most often does damage and the patterns that most often follow when something goes wrong. Options A and C are caricatures of the response; option D is exactly the disengagement the all-reasonable-steps duty exists to displace."
+    }
+  ],
+  "reflections": [
+    {
+      "id": "r1",
+      "prompt": "Think of the most senior person you have ever worked with one-on-one in a high-risk context — a client dinner, a work trip, an off-site bar, a deal-closing night. Looking back, was the structural protection in place that should have been? If not, what would you change about how the firm sets those situations up? Your manager will not see this — it's for your own reflection.",
+      "guidance": "Your manager will not see this — it's for your own reflection. The prompt is designed to make the structural risk concrete by anchoring it to a specific remembered moment, rather than reading it as something that happens elsewhere."
+    },
+    {
+      "id": "r2",
+      "prompt": "If you became aware tomorrow that a colleague's recent weak appraisal landed shortly after they had raised a harassment concern, what would your first three actions be? Your manager will not see this — it's for your own reflection.",
+      "guidance": "Your manager will not see this — it's for your own reflection. The prompt rehearses the recognition step the module identifies as the single most reliable external signal that something has gone wrong in the response to a complaint."
+    }
+  ]
+}

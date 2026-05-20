@@ -1,0 +1,220 @@
+{
+  "module_id": "module_1",
+  "version": "2026-05-20",
+  "pass_mark_percent": 80,
+  "served_per_attempt": 8,
+  "questions": [
+    {
+      "id": "q1",
+      "scenario": false,
+      "stem": "Which of the following is not a protected characteristic under the Equality Act 2010?",
+      "options": ["Age", "Sexual orientation", "Political opinion", "Religion or belief"],
+      "correct": 2,
+      "rationale": "Section 4 of the Equality Act 2010 enumerates the nine protected characteristics. Political opinion is not one of them."
+    },
+    {
+      "id": "q2",
+      "scenario": true,
+      "stem": "A colleague tells a joke about a national stereotype in the kitchen. Nobody of that nationality is present. Can this be harassment?",
+      "options": ["No, because nobody of that nationality heard it", "Yes, if a colleague who heard it found it offensive and a reasonable person would agree", "Only if the joke was directed at a specific person", "Only if it is repeated multiple times"],
+      "correct": 1,
+      "rationale": "Section 26 EA 2010 makes clear that conduct related to a protected characteristic can be harassment of any colleague who hears it, judged by purpose or effect."
+    },
+    {
+      "id": "q3",
+      "scenario": false,
+      "stem": "Under the Equality Act, harassment is judged primarily by:",
+      "options": ["The intention of the person who made the comment or took the action", "Whether the conduct was repeated more than once", "The purpose or effect of the conduct, judged by what a reasonable person would conclude", "Whether a formal complaint was made"],
+      "correct": 2,
+      "rationale": "Section 26(4) EA 2010 tells tribunals to weigh the recipient's perception, the circumstances, and whether it is reasonable for the conduct to have that effect. Intent is irrelevant."
+    },
+    {
+      "id": "q4",
+      "scenario": false,
+      "stem": "From October 2026, the legal duty on employers to prevent sexual harassment will be to take:",
+      "options": ["Reasonable steps", "All reasonable steps", "Every conceivable step", "Steps the employer considers proportionate"],
+      "correct": 1,
+      "rationale": "Section 20 of the Employment Rights Act 2025 amends s.40A EA 2010 to insert the word 'all' from October 2026."
+    },
+    {
+      "id": "q5",
+      "scenario": false,
+      "stem": "The maximum uplift an employment tribunal can apply to a successful sexual harassment compensation award where the employer has not met its preventative duty is:",
+      "options": ["10%", "15%", "25%", "50%"],
+      "correct": 2,
+      "rationale": "Section 124A EA 2010 (inserted by the Worker Protection Act 2023) allows an uplift of up to 25%."
+    },
+    {
+      "id": "q6",
+      "scenario": true,
+      "stem": "A senior manager repeatedly compliments a junior colleague on her appearance during team meetings. She has not complained, but visibly looks uncomfortable. Is this potentially harassment?",
+      "options": ["No, because she hasn't complained", "No, because compliments are not harassment", "Yes, if a reasonable person would consider the conduct has the effect of violating her dignity or creating an uncomfortable environment", "Only if he does it again after she objects"],
+      "correct": 2,
+      "rationale": "The purpose-or-effect test in s.26(1) EA 2010 doesn't require a complaint — it asks what a reasonable person would conclude about the effect."
+    },
+    {
+      "id": "q7",
+      "scenario": false,
+      "stem": "Which statement about sexual harassment is correct?",
+      "options": ["It can only occur between people of different sexes", "It requires physical contact", "It can occur between any combination of people regardless of gender", "It only applies to conduct outside the office"],
+      "correct": 2,
+      "rationale": "Section 26(2) EA 2010 is gender-neutral and not limited to physical conduct."
+    },
+    {
+      "id": "q8",
+      "scenario": false,
+      "stem": "A single serious incident:",
+      "options": ["Cannot constitute harassment because harassment requires a pattern", "Can constitute harassment on its own if sufficiently serious", "Only counts if witnessed by others", "Only counts if the recipient reports it within 48 hours"],
+      "correct": 1,
+      "rationale": "The Equality Act does not require a pattern of behaviour — a single sufficiently serious incident can meet the s.26 test."
+    },
+    {
+      "id": "q9",
+      "scenario": false,
+      "stem": "Victimisation under the Equality Act means:",
+      "options": ["Being the victim of harassment", "Being treated badly because you have made or supported a complaint about discrimination or harassment", "Being unfairly criticised at work", "Being passed over for promotion"],
+      "correct": 1,
+      "rationale": "Section 27 EA 2010 defines victimisation as detriment because the person has done a 'protected act' (made or supported a complaint)."
+    },
+    {
+      "id": "q10",
+      "scenario": true,
+      "stem": "A client makes a sexual comment to a member of our reception team during a visit. From October 2026, what is the firm's potential exposure?",
+      "options": ["None, because the harasser is not an employee", "The firm could be liable for failing to take all reasonable steps to prevent third-party harassment", "The firm is only liable if the same client offends multiple times", "The firm is liable only if the receptionist is physically harmed"],
+      "correct": 1,
+      "rationale": "Section 21 of the Employment Rights Act 2025 reinstates third-party harassment liability from October 2026, across all protected characteristics."
+    },
+    {
+      "id": "q11",
+      "scenario": false,
+      "stem": "Which of the following can constitute sexual harassment?",
+      "options": ["Persistent requests for dates after refusal", "Sharing sexually explicit images", "Inappropriate questions about someone's sex life", "All of the above"],
+      "correct": 3,
+      "rationale": "Section 26(2) covers unwanted conduct of a sexual nature in any form."
+    },
+    {
+      "id": "q12",
+      "scenario": false,
+      "stem": "In the financial services context, harassment by an SMCR-certified individual:",
+      "options": ["Is purely an HR matter", "Can affect that individual's fitness and propriety and the firm's regulatory standing", "Is only relevant if it occurs in the office", "Only matters if the recipient is also SMCR-certified"],
+      "correct": 1,
+      "rationale": "From 1 September 2026 COCON 1.1.7FR brings harassment into the Conduct Rules for every SMCR firm; FIT 2.1 / PS25/23 confirm a substantiated finding is relevant to fitness and propriety."
+    },
+    {
+      "id": "q13",
+      "scenario": true,
+      "stem": "Two colleagues are dating. The relationship ends. One of them continues to send unsolicited messages of a personal nature to the other through Teams. The recipient asks them to stop, but the messages continue. This is most accurately described as:",
+      "options": ["A private matter between two adults", "Potential sexual harassment in the workplace", "Not a workplace issue because it is via Teams", "Only a workplace issue if the messages are explicit"],
+      "correct": 1,
+      "rationale": "Workplace channels are the workplace. Unwanted persistent contact of a personal nature after refusal can be sexual harassment under s.26(2)."
+    },
+    {
+      "id": "q14",
+      "scenario": false,
+      "stem": "'It was just banter' is:",
+      "options": ["A complete defence to a harassment claim", "A defence if everyone in the team agreed", "Not a defence; harassment is judged by effect, not the speaker's framing", "A defence if the conduct happened outside working hours"],
+      "correct": 2,
+      "rationale": "s.26(1) judges harassment by purpose or effect. The speaker's framing of intent is not what the law tests."
+    },
+    {
+      "id": "q15",
+      "scenario": false,
+      "stem": "The Equality Act protects against harassment related to:",
+      "options": ["Sex only", "Sex and race only", "Any of the nine protected characteristics", "Any characteristic the recipient finds important"],
+      "correct": 2,
+      "rationale": "Section 26 covers conduct related to any of the seven harassment-relevant protected characteristics (the nine minus marriage/civil partnership and pregnancy/maternity, which are covered by direct discrimination)."
+    },
+    {
+      "id": "q16",
+      "scenario": true,
+      "stem": "A manager passes a team member over for a high-profile project shortly after that team member declined an invitation to dinner. The team member believes the two are linked. Under the Equality Act, this is potentially:",
+      "options": ["Lawful, because project allocation is a management decision", "Sexual harassment through less favourable treatment for rejecting sexual conduct", "Only actionable if there is written evidence linking the two", "A matter for the manager's discretion"],
+      "correct": 1,
+      "rationale": "Section 26(3) EA 2010 captures less favourable treatment for rejecting or submitting to sexual conduct, even where the underlying conduct itself might not meet the s.26(1) bar."
+    },
+    {
+      "id": "q17",
+      "scenario": false,
+      "stem": "Disclosures relating to sexual harassment, as of April 2026, are automatically classified as:",
+      "options": ["Internal grievances only", "Protected disclosures under whistleblowing law", "Confidential HR matters with no legal status", "Matters for the police"],
+      "correct": 1,
+      "rationale": "Section 23 ERA 2025 (commenced 6 April 2026) inserts a new paragraph into s.43B ERA 1996 making sexual-harassment disclosures protected disclosures."
+    },
+    {
+      "id": "q18",
+      "scenario": false,
+      "stem": "Indirect discrimination occurs when:",
+      "options": ["Someone is treated badly directly because of a protected characteristic", "A policy that applies to everyone disadvantages people with a particular protected characteristic without justification", "Someone overhears a discriminatory remark", "An employer fails to provide training"],
+      "correct": 1,
+      "rationale": "Section 19 EA 2010 defines indirect discrimination as a 'provision, criterion or practice' that puts people with a protected characteristic at a disadvantage without objective justification."
+    },
+    {
+      "id": "q19",
+      "scenario": true,
+      "stem": "At a Friday team drinks, a member of the team makes a comment about a colleague's religious dress. The colleague laughs along but later tells you privately that she was hurt. Is this potentially harassment?",
+      "options": ["No, because she laughed at the time", "No, because it was outside the office", "Yes; the conduct relates to religion and may have had the effect of violating her dignity regardless of her outward reaction", "Only if she lodges a formal complaint"],
+      "correct": 2,
+      "rationale": "Course-of-employment extends to work-adjacent social events; outward reaction does not determine the s.26 purpose-or-effect test."
+    },
+    {
+      "id": "q20",
+      "scenario": false,
+      "stem": "Which of these is not one of the four main types of prohibited conduct under the Equality Act?",
+      "options": ["Direct discrimination", "Indirect discrimination", "Constructive misconduct", "Victimisation"],
+      "correct": 2,
+      "rationale": "The four are direct, indirect, harassment, and victimisation. 'Constructive misconduct' is not a recognised category."
+    },
+    {
+      "id": "q21",
+      "scenario": false,
+      "stem": "The body responsible for enforcing the Equality Act at a regulatory level is:",
+      "options": ["ACAS", "The Equality and Human Rights Commission (EHRC)", "The Financial Conduct Authority", "HMRC"],
+      "correct": 1,
+      "rationale": "The EHRC has investigatory and enforcement powers under the Equality Act 2006."
+    },
+    {
+      "id": "q22",
+      "scenario": true,
+      "stem": "During a client lunch, a client makes a derogatory comment about a particular ethnic group. Two of our staff are at the table. Neither is from that ethnic group. Can this still be harassment of our staff?",
+      "options": ["No, because the comment wasn't about them", "No, because the client is not an employee", "Yes; harassment can occur where conduct related to a protected characteristic creates a hostile environment, even if not directed at the recipient", "Only if a staff member is from that group"],
+      "correct": 2,
+      "rationale": "Section 26 captures conduct 'related to' a protected characteristic; from October 2026, s.21 ERA 2025 makes the firm directly liable for third-party harassment of its employees."
+    },
+    {
+      "id": "q23",
+      "scenario": false,
+      "stem": "The 'all reasonable steps' defence requires an employer to demonstrate:",
+      "options": ["That a written policy exists", "That training has been delivered at some point", "That a comprehensive set of preventative measures — including risk assessment, policies, reporting routes, and training — has been implemented and monitored", "That no complaint has previously been received"],
+      "correct": 2,
+      "rationale": "The EHRC Technical Guidance and 8-step employer guide treat the test as the combination of measures, not any single one."
+    },
+    {
+      "id": "q24",
+      "scenario": true,
+      "stem": "A colleague asks you out. You decline politely. They ask again the following week. You decline again, more firmly. They ask a third time. Is this potentially harassment?",
+      "options": ["No, persistence is flattering", "No, asking someone out is never harassment", "Yes; persistent unwanted conduct of a sexual or romantic nature after clear refusal can constitute sexual harassment", "Only if they touch you"],
+      "correct": 2,
+      "rationale": "Persistent unwanted requests after clear refusal can meet the s.26(2) sexual-harassment test."
+    },
+    {
+      "id": "q25",
+      "scenario": false,
+      "stem": "The key reason this training matters to you personally, beyond the firm's legal duty, is:",
+      "options": ["It helps avoid awkward conversations", "It is mandatory", "Harassment causes serious harm to colleagues, can have regulatory consequences for individuals in financial services, and creates personal liability in some cases", "It improves team productivity"],
+      "correct": 2,
+      "rationale": "The training combines the duty-of-care to colleagues with the personal regulatory exposure under SMCR (COCON 1.1.7FR, FIT 2.1, SYSC 22 references)."
+    }
+  ],
+  "reflections": [
+    {
+      "id": "r1",
+      "prompt": "Looking at the seven harassment-relevant protected characteristics, which one do you think colleagues at the firm are least likely to recognise as a basis for harassment?",
+      "guidance": "Your manager will not see this — it's for your own reflection."
+    },
+    {
+      "id": "r2",
+      "prompt": "If you witnessed something this week that fell into the 'purpose or effect' grey area, would you raise it? With whom — and if not, what would stop you?",
+      "guidance": "Your manager will not see this — it's for your own reflection."
+    }
+  ]
+}
