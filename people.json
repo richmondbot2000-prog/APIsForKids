@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T10:03:58.259Z",
+  "updated_at": "2026-05-20T10:04:00.401Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -4268,13 +4268,13 @@
       "phone": "",
       "address": "Flat 5\n17 Wordsworth Road\nSouthampton\nHampshire\nSO15 5LY",
       "start_date": "2025-05-13",
-      "line_manager_id": null,
+      "line_manager_id": "43",
       "line_manager_email_raw": "",
       "role": "",
       "directory_photo_uploaded_at": "2026-05-14T08:27:19+01:00",
       "notes": "Person auto-created from payroll import — no Google account linked yet. Set main_google_email when known.",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-20T10:03:58.259Z",
+      "updated_at": "2026-05-20T10:04:00.401Z",
       "url_slug": "navodi.sammani",
       "most_recent_payroll_id": 78,
       "on_payroll": true,
