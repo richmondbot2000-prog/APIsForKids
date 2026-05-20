@@ -510,18 +510,24 @@
     }
     if (value && value !== "free") {
       const u = STATE.users[value];
-      const fullName = (u && u.name) || value;
-      const bookerEmail = (u && u.email) || "";
+      // SmartBnB is the external-channel integration owner (AirBnb / Guesty
+      // sync writes its uid into the date cell). Render those as "AirBnb"
+      // and skip the Person link — there's no Directory record behind it.
+      const isExternalChannel = (value === "smartbnb");
+      const fullName = isExternalChannel ? "AirBnb" : ((u && u.name) || value);
       el.classList.add("is-booked");
+      if (isExternalChannel) el.classList.add("is-external");
       if (myUids.length && myUids.indexOf(value) >= 0) el.classList.add("is-mine");
       // Name is a link to the booker's TogetherBook profile. We pass
       // ?bookr_uid= rather than ?email= because the BookR `email` is
       // often on a different domain (e.g. @lendingmate.ca, @rgroup.co.uk)
       // than the Person's main_google_email, so profile.js resolves by
       // the Person.bookr_uid field instead of by email match.
-      const name = document.createElement("a");
+      const name = isExternalChannel
+        ? document.createElement("span")
+        : document.createElement("a");
       name.className = "bk-cell-name";
-      name.href = "/user.html?bookr_uid=" + encodeURIComponent(value);
+      if (!isExternalChannel) name.href = "/user.html?bookr_uid=" + encodeURIComponent(value);
       name.textContent = fullName;
       el.appendChild(name);
       el.title = fullName + " · " + a.title;
