@@ -4004,11 +4004,23 @@ async function bookrCancel(env, viewerEmail, body) {
     const own = await bookrWhoami(env, viewerEmail);
     if (!own.uid) throw new Error("your TogetherBook email isn't linked to a BookR user");
     const current = await bookrFetch(env, path);
-    if (current !== own.uid) throw new Error("you can only cancel your own bookings");
+    // Allow cancel under ANY linked uid the viewer owns (work + personal +
+    // cross-domain) — not just the primary one. Otherwise a person whose
+    // booking landed under uid B can't cancel because whoami's primary uid
+    // happens to be A.
+    const myUids = new Set(own.uids || []);
+    if (current && !myUids.has(current)) throw new Error("you can only cancel your own bookings");
   }
-  // Match BookR's existing convention: cancellations set the date to "free".
-  await bookrFetch(env, path, { method: "PUT", body: JSON.stringify("free"), headers: { "Content-Type": "application/json" } });
-  return { ok: true, type, asset, date };
+  // DELETE the date key entirely — more reliable than PUT "free", which
+  // silently no-ops in some setups (and reads the same shape from the
+  // client either way: a missing key renders as a free cell). Also do a
+  // post-write verify GET so the worker reply confirms Firebase actually
+  // cleared the value — that lets the client log a real diagnostic if
+  // something is preventing the write rather than appearing to succeed.
+  await bookrFetch(env, path, { method: "DELETE" });
+  let verify = null;
+  try { verify = await bookrFetch(env, path); } catch (e) { /* fall through */ }
+  return { ok: true, type, asset, date, after: verify };
 }
 
 async function bookrComments(env, type, id) {
