@@ -2,7 +2,27 @@
 
 _The source-of-truth document for `togetherbook.net` / `richmondbot2000-prog/togetherbook`. Lives in this repo so future maintainers find it next to the code. **A successor Claude or engineer should be able to pick this up cold and operate the site competently.**_
 
-**Last reviewed:** 2026-05-19 (nightly auto-refresh) — Accounts box: drop the leading triangle + worker self-edit tightening; Profile Info: reorder rows + admin-only gate on the HR fields; Profile Info: remove Un-Admin from Admin actions; Profile Info: Access level moves to the bottom of Editable details; Profile Info: autocomplete on Role + Team from other people's values; +33 more
+**Last reviewed:** 2026-05-20 (session end) — BookR shipped; Person.bookr_uids array migration; fuzzy matcher; Holidays Team/Mgmt read Person.line_manager_id; isOnPayroll falls back to Person; worker 409 retries; Holiday plan + Date of birth on Info; Holidays top-level nav; brand logo to /wall.html. Carried over: Company field rework.
+
+### 0.5 Today (2026-05-20) — session-end summary
+### 0.6 BookR-Person linkage (today)
+
+Person.bookr_uid (string) migrated to Person.bookr_uids (string array). Legacy field stripped on every Person write. Matcher scores: 100 exact email, 80 local-part, 60 name, 40 given+family. Auto-link at 80+. Never auto-creates duplicates. Auto-sync hook on Person create. Backfill script + audit workflow.
+
+### 0.7 Holidays page (today)
+
+Team and Management Team tabs now read Person.line_manager_id from people.json in addition to annotations.json. Manager appears in own Team Calendar. Viewer appears in own Management Team. isOnPayroll falls back to Person.on_payroll / most_recent_payroll_id / aliases (Sophia/Chidinma case). Team count uses buildTeamReports().length consistently.
+
+### 0.8 Worker 409 retry (today)
+
+commitPeopleFile retries up to 5 times with 200/400/600/800ms backoff. doPeopleMerge wrapped in its own 5-attempt retry (extracted to doPeopleMergeOnce). Eliminates HTML error responses during high-write windows.
+
+### 0.9 Carried over (next session)
+
+Company field rework: one-off bulk update where Kelly subtree -> Together, six named persons (James/Amber/Natasha/Victor/Cherry/Cyrus) -> Richmond Group, rest -> LetMe. Stop payroll-import and Google-link scanners from writing company. Add editable Company field on Info under Role with datalist (Together, Richmond Group, LetMe) plus free-text. Not started this session.
+
+
+**BookR shipped end-to-end.** Calendar at /bookr.html (assets-left sticky, day-cols right; -webkit-overflow-scrolling:touch removed from .bk-grid-wrap to restore iOS Safari sticky). Per-asset page /bookr-asset.html with comments at /<type>/<id>/comments/ in Firebase. Admin page /bookr-admin.html with per-asset Available? checkbox stored in repo-side bookr-asset-availability.json (Firebase untouched). Worker apifk-workspace-worker2 routes: /api/bookr/{whoami,users,assets,bookings,all-bookings,book,cancel,comments,comment,asset-availability,user-match-or-create,user-link,user-add,user-unlink}. BOOKR_SERVICE_ACCOUNT_JSON secret on Cloudflare. Progressive week-by-week loading with per-cell skeleton spinners. Today column solid black on header + cells. Two-line names (first/surname) with per-line shrink-to-fit (8px floor); fitNamesInGrid gated above 2000 cells (360-day zoom). Cells link to /user.html?bookr_uid= for cross-domain BookR emails.
 
 ## Contents
 
