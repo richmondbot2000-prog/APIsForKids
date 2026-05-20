@@ -617,21 +617,26 @@
             <p class="up-hint" data-holiday-plan-hint>${describe(current)}</p>
           </div>`;
       }
-      const opts = [
-        `<option value="" ${current === "" ? "selected" : ""}>Default (${escapeHtml((planFor(defaultId) || {}).label || defaultId || "company default")})</option>`,
-        ...plans.map(pl => `<option value="${escapeHtml(pl.id)}" ${current === pl.id ? "selected" : ""}>${escapeHtml(pl.label || pl.id)}</option>`),
-      ].join("");
+      // Show only the real plans from holiday-plans.json — no separate
+      // "Default (Ops Plan 1)" option, which read as a duplicate of
+      // the explicit Ops Plan 1 row. If the Person record has no plan
+      // set (current === ""), the dropdown still selects the default
+      // plan id so the visible state matches what'll actually apply.
+      const effective = current || defaultId;
+      const opts = plans.map(pl =>
+        `<option value="${escapeHtml(pl.id)}" ${effective === pl.id ? "selected" : ""}>${escapeHtml(pl.label || pl.id)}</option>`
+      ).join("");
       return `
         <div class="up-field" data-edit-field="holiday_plan">
           <div class="up-field-label">Holiday plan ${savedBadge}</div>
           <div class="up-field-editor-row">
-            <select name="holiday_plan" data-orig="${escapeHtml(current)}" data-holiday-plan-select>
+            <select name="holiday_plan" data-orig="${escapeHtml(effective)}" data-holiday-plan-select>
               ${opts}
             </select>
             <button type="button" class="up-btn-sm up-btn-sm--primary" data-edit-save="holiday_plan" disabled>Save</button>
             <span class="up-edit-status" data-edit-status="holiday_plan"></span>
           </div>
-          <p class="up-hint" data-holiday-plan-hint>${describe(current)}</p>
+          <p class="up-hint" data-holiday-plan-hint>${describe(effective)}</p>
         </div>`;
     }
 
