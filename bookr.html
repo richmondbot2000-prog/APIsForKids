@@ -10,11 +10,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1779304482">
-<link rel="stylesheet" href="quiet-tokens.css?v=1779304482">
-<link rel="stylesheet" href="quiet.css?v=1779304482">
-<link rel="stylesheet" href="quiet-extras.css?v=1779304482">
-<link rel="stylesheet" href="quiet-legacy.css?v=1779304482">
+<link rel="stylesheet" href="style.css?v=1779304559">
+<link rel="stylesheet" href="quiet-tokens.css?v=1779304559">
+<link rel="stylesheet" href="quiet.css?v=1779304559">
+<link rel="stylesheet" href="quiet-extras.css?v=1779304559">
+<link rel="stylesheet" href="quiet-legacy.css?v=1779304559">
 <style>
   .bk-section { max-width: 100%; margin: 0 auto; padding: 18px 16px 48px; }
   .bk-section h1 {
@@ -254,7 +254,7 @@
   .bk-cell.bk-has-avatar.bk-pressed .bk-cell-avatar { opacity: 0; }
   .bk-cell.bk-has-avatar:hover .bk-cell-name,
   .bk-cell.bk-has-avatar.bk-pressed .bk-cell-name { opacity: 1; pointer-events: auto; }
-  .bk-cell.is-external .bk-cell-avatar { background: #000000; }
+  .bk-cell.is-external .bk-cell-avatar { background: transparent; }
   .bk-admin-link { padding: 18px 0 8px; text-align: center; font: italic 400 12px/1.4 var(--font-display); color: var(--ink-500); }
   .bk-admin-link a { color: inherit; text-decoration: underline; text-decoration-style: dotted; }
   /* Popover that opens when you click a cell. */
@@ -304,7 +304,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="/wall.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779304482" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779304559" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -838,7 +838,7 @@
 
   function avatarUrlForBookrUid(uid) {
     if (!uid) return null;
-    if (uid === "smartbnb") return "/assets/airbnb-logo.svg";
+    if (uid === "smartbnb") return "/assets/airbnb-logo.png";
     const p = STATE.peopleByBookrUid[uid];
     return (p && p._photo_url) || null;
   }
@@ -1313,6 +1313,6 @@
   loadAll();
 })();
 </script>
-<script src="nav.js?v=1779304482"></script>
+<script src="nav.js?v=1779304559"></script>
 </body>
 </html>
