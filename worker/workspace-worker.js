@@ -3960,6 +3960,60 @@ function personCandidateEmails(p) {
     .filter(Boolean).map(e => e.toString().toLowerCase());
 }
 
+function normName(s) {
+  return (s || "").toString().toLowerCase()
+    .normalize("NFD").replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, " ").trim();
+}
+function emailLocalPart(e) {
+  const at = (e || "").indexOf("@");
+  return at > 0 ? e.slice(0, at).toLowerCase() : "";
+}
+// Rank a BookR user record against a Person. Higher = more confident.
+//   100  exact email match
+//    80  email local-part match (eg same handle, different work domain)
+//    60  full name exact match after normalisation
+//    40  first+last both appear in normalised name (order-independent)
+//     0  no match
+function scoreBookrUserForPerson(person, bookrUser) {
+  const bEmail = (bookrUser.email || "").toLowerCase();
+  const bName  = normName(bookrUser.name);
+  if (!bEmail && !bName) return 0;
+  const pEmails = personCandidateEmails(person);
+  if (bEmail && pEmails.includes(bEmail)) return 100;
+  if (bEmail) {
+    const bLocal = emailLocalPart(bEmail);
+    if (bLocal && pEmails.some(e => emailLocalPart(e) === bLocal)) return 80;
+  }
+  const pName  = normName(person.name);
+  const pGiven = normName(person.given || "");
+  const pFam   = normName(person.family || "");
+  if (pName && bName && pName === bName) return 60;
+  if (pGiven && pFam && bName.includes(pGiven) && bName.includes(pFam)) return 40;
+  return 0;
+}
+// Return ranked candidates (best first), filtered to score > 0. Limit
+// keeps the response small for the UI; admins can still pick from the
+// full users list in the dropdown if none of these are right.
+async function bookrRankCandidatesForPerson(env, person, limit) {
+  const all = await bookrFetch(env, "/users.json") || {};
+  const out = [];
+  for (const [uid, u] of Object.entries(all)) {
+    const score = scoreBookrUserForPerson(person, u || {});
+    if (score > 0) {
+      out.push({
+        uid,
+        score,
+        email: (u && u.email) || "",
+        name: (u && u.name) || "",
+        suspended: !!(u && u.suspended),
+      });
+    }
+  }
+  out.sort((a, b) => b.score - a.score || (a.email || a.name).localeCompare(b.email || b.name));
+  return limit ? out.slice(0, limit) : out;
+}
+
 async function bookrUserExists(env, uid) {
   if (!uid) return null;
   const u = await bookrFetch(env, `/users/${encodeURIComponent(uid)}.json`);
@@ -3971,15 +4025,30 @@ async function bookrUserExists(env, uid) {
 // /api/bookr/user-match-or-create endpoint and the auto-sync hook in
 // peopleSet. Returns { matched, created, already_linked, bookr_uid,
 // bookr_email, bookr_name } on success.
-async function bookrMatchOrCreateForPerson(env, person) {
+async function bookrMatchOrCreateForPerson(env, person, opts) {
+  opts = opts || {};
+  const allowCreate = !!opts.create_if_no_match;
+  const minScoreAutoLink = (typeof opts.min_score_auto_link === "number") ? opts.min_score_auto_link : 80;
   if (person.bookr_uid) {
     const existing = await bookrUserExists(env, person.bookr_uid);
     if (existing) return { already_linked: true, bookr_uid: existing.uid, bookr_email: existing.email, bookr_name: existing.name };
   }
-  const candidates = personCandidateEmails(person);
-  const hit = await bookrFindUidByEmail(env, candidates);
-  if (hit) return { matched: true, bookr_uid: hit.uid, bookr_email: hit.email, bookr_name: hit.name };
-  const primary = (person.main_google_email || candidates[0] || "").toString();
+  const ranked = await bookrRankCandidatesForPerson(env, person, 10);
+  // Confident link: exact email (100) or local-part (80) → auto-link the best.
+  const top = ranked[0];
+  if (top && top.score >= minScoreAutoLink) {
+    return { matched: true, score: top.score, bookr_uid: top.uid, bookr_email: top.email, bookr_name: top.name, candidates: ranked };
+  }
+  // Lower-confidence candidates exist (name-only matches): surface them
+  // rather than auto-creating a duplicate; let an admin confirm.
+  if (top && top.score > 0) {
+    return { needs_review: true, score: top.score, candidates: ranked };
+  }
+  // Nothing plausible.
+  if (!allowCreate) {
+    return { no_candidates: true, candidates: [] };
+  }
+  const primary = (person.main_google_email || personCandidateEmails(person)[0] || "").toString();
   if (!primary) throw new Error("cannot create BookR user: Person has no email");
   const body = {
     email: primary,
@@ -4022,10 +4091,18 @@ async function bookrUserMatchOrCreate(env, viewerEmail, body) {
   const { file } = await fetchPeopleFile(env);
   const person = (file.people || []).find(p => String(p.id) === String(pid));
   if (!person) throw new Error(`no Person with id ${pid}`);
-  const result = await bookrMatchOrCreateForPerson(env, person);
+  const result = await bookrMatchOrCreateForPerson(env, person, {
+    create_if_no_match: !!(body && body.create_if_no_match),
+  });
   if (result.already_linked) return { ok: true, already_linked: true, bookr_uid: result.bookr_uid, bookr_email: result.bookr_email, bookr_name: result.bookr_name };
+  if (result.needs_review) {
+    return { ok: true, needs_review: true, score: result.score, candidates: result.candidates };
+  }
+  if (result.no_candidates) {
+    return { ok: true, no_candidates: true, candidates: [] };
+  }
   await bookrWritePersonUid(env, person.id, result.bookr_uid, viewerEmail);
-  return { ok: true, matched: !!result.matched, created: !!result.created, bookr_uid: result.bookr_uid, bookr_email: result.bookr_email, bookr_name: result.bookr_name };
+  return { ok: true, matched: !!result.matched, created: !!result.created, score: result.score || null, bookr_uid: result.bookr_uid, bookr_email: result.bookr_email, bookr_name: result.bookr_name };
 }
 
 async function bookrUserLink(env, viewerEmail, body) {
