@@ -95,8 +95,8 @@
   .bk-cell.is-past { color: var(--ink-400); background: #ffffff; cursor: default; }
   .bk-cell.is-free { cursor: pointer; }
   .bk-cell.is-free:hover { background: var(--brass-50); }
-  /* Booked cells: 75% grey (≈ #404040) so the round avatar pops on top. */
-  .bk-cell.is-booked { background: rgba(0, 0, 0, 0.75); cursor: pointer; color: var(--paper-50); }
+  /* Booked cells: 60% grey so the round avatar pops on top. */
+  .bk-cell.is-booked { background: rgba(0, 0, 0, 0.6); cursor: pointer; color: #ffffff; }
   .bk-cell.is-mine { background: rgba(200, 151, 63, 0.18); }
   .bk-cell.is-pending { opacity: 0.55; cursor: progress; }
   .bk-cell.is-loading { position: relative; cursor: progress; background: var(--paper-100); }
@@ -156,10 +156,11 @@
   }
   .bk-cell-name {
     display: block;
-    font: 500 11px/1.15 var(--font-body); color: var(--ink-900);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font: 500 16px/1.15 var(--font-body); color: #ffffff;
+    white-space: normal; word-break: break-word; overflow-wrap: anywhere;
     max-width: 100%;
   }
+  .bk-cell:not(.is-booked) .bk-cell-name { color: var(--ink-900); }
   /* Avatar+name overlay. Image fills the cell; name shows on hover */
   /* (mouse) or while the cell is touch-pressed (mobile). The .is-external */
   /* class swaps in the AirBnb logo asset. */
