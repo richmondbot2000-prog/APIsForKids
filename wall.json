@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T15:27:23.243Z",
+  "updated_at": "2026-05-20T15:27:25.001Z",
   "posts": [
     {
       "id": "post_mpdsge97_z03sf8",
@@ -436,7 +436,6 @@
           "Chicken Pizza"
         ],
         "votes": {
-          "james.benamor@letme.com": 0,
           "mourad.malki@letme.com": 0,
           "amber.cole@letme.com": 0,
           "sophia.ugwunne@letme.com": 0,
