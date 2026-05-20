@@ -1753,6 +1753,53 @@
   // record + their most recent payroll row. Returns null if plans
   // file is not loaded; callers fall back to showing the taken count
   // only.
+  function workedBhsForEmail(email) {
+    const map = mergedUserMap(email);
+    const days = map.days || {};
+    const today = new Date(); today.setHours(0,0,0,0);
+    const todayIso = isoDate(today);
+    const ysIso = isoDate(yearStart);
+    let n = 0;
+    for (const iso of UK_BANK_HOLIDAYS) {
+      if (iso < ysIso || iso > todayIso) continue;
+      const d = parseISO(iso);
+      const dow = d.getDay();
+      if (dow === 0 || dow === 6) continue;
+      const stored = days[iso];
+      if (stored === "office" || stored === "wfh") n++;
+    }
+    return n;
+  }
+
+  function countHolidayDaysPlanned(email) {
+    const map = mergedUserMap(email);
+    const days = map.days || {};
+    const ysIso = isoDate(yearStart);
+    const yeIso = isoDate(yearEnd);
+    let n = 0;
+    for (const iso of Object.keys(days)) {
+      if (iso < ysIso || iso > yeIso) continue;
+      const status = days[iso];
+      if (status === "holiday" || status === "approved-holiday") n++;
+    }
+    return n;
+  }
+
+  function countHolidayDaysTaken(email) {
+    const map = mergedUserMap(email);
+    const days = map.days || {};
+    const today = new Date(); today.setHours(0,0,0,0);
+    const todayIso = isoDate(today);
+    const ysIso = isoDate(yearStart);
+    let n = 0;
+    for (const iso of Object.keys(days)) {
+      if (iso < ysIso || iso > todayIso) continue;
+      const status = days[iso];
+      if (status === "holiday" || status === "approved-holiday") n++;
+    }
+    return n;
+  }
+
   function holidayBudgetFor(email) {
     if (!plansDoc || typeof HolidayPlan === "undefined") return null;
     const lc = (email || "").toLowerCase();
@@ -1762,7 +1809,10 @@
       (person.main_google_email && payrollByEmailLc.get(person.main_google_email.toLowerCase())) || [];
     const payroll = list.length ? list[0] : null;
     try {
-      return HolidayPlan.compute({ person, payroll, plansDoc, asOf: new Date() });
+      return HolidayPlan.compute({
+        person, payroll, plansDoc, asOf: new Date(),
+        worked_bhs_count: workedBhsForEmail(lc),
+      });
     } catch (e) { return null; }
   }
 
@@ -2130,15 +2180,16 @@
         const _baseName = profileLink(r.email, r.user.name || r.email);
         let _badge = "";
         if (onPayroll) {
-          const _taken = formatHolidayCount(countHolidayDays(r.email));
+          const _taken = formatHolidayCount(countHolidayDaysTaken(r.email));
+          const _plan  = formatHolidayCount(countHolidayDaysPlanned(r.email));
           const _budget = holidayBudgetFor(r.email);
           if (_budget) {
             const _min = formatHolidayCount(_budget.min_days);
             const _max = _budget.is_unlimited ? "INF" : formatHolidayCount(_budget.max_days);
-            const _why = (_budget.reason || "").replace(/"/g, "&quot;");
-            _badge = ' <span class="hd-team-budget" title="' + _why + '">' + _taken + ' / ' + _min + '-' + _max + '</span>';
+            const _why = ("Taken: " + _taken + "  Planned: " + _plan + "  Range: " + _min + "-" + _max + "  " + (_budget.reason || "")).replace(/"/g, "&quot;");
+            _badge = ' <span class="hd-team-budget" title="' + _why + '">' + _taken + ' (' + _plan + ') / ' + _min + '-' + _max + '</span>';
           } else {
-            _badge = ' <span class="hd-team-budget">' + _taken + '</span>';
+            _badge = ' <span class="hd-team-budget">' + _taken + ' (' + _plan + ')</span>';
           }
         }
         name.innerHTML = _baseName + _badge;

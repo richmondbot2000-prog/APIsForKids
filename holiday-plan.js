@@ -55,6 +55,14 @@
   // of that month's length, so 2026-04-15 → 2026-05-15 = exactly 1.0
   // and 2026-04-15 → 2026-05-30 ≈ 1.48 (the trailing 15 days are 15/31
   // of May, not 15/30).
+  function fullYearsBetween(a, b) {
+    if (!a || !b || b.getTime() <= a.getTime()) return 0;
+    let y = b.getUTCFullYear() - a.getUTCFullYear();
+    const mDiff = b.getUTCMonth() - a.getUTCMonth();
+    if (mDiff < 0 || (mDiff === 0 && b.getUTCDate() < a.getUTCDate())) y--;
+    return Math.max(0, y);
+  }
+
   function decimalMonthsBetween(a, b) {
     if (!a || !b || b.getTime() <= a.getTime()) return 0;
     const yA = a.getUTCFullYear(), mA = a.getUTCMonth(), dA = a.getUTCDate();
@@ -77,7 +85,8 @@
     return plans.find(p => p.id === target) || null;
   }
 
-  function compute({ person, payroll, plansDoc, asOf } = {}) {
+  function compute({ person, payroll, plansDoc, asOf, worked_bhs_count } = {}) {
+    const opts = { worked_bhs_count };
     const now = asOf instanceof Date ? asOf : new Date();
     const taxMonth = (plansDoc && plansDoc.tax_year_start_month) || 4;
     const taxDay = (plansDoc && plansDoc.tax_year_start_day) || 1;
@@ -131,7 +140,23 @@
     const annualMax = plan ? Number(plan.annual_max_days) || 0 : 0;
 
     const minDays = round2(fullMonths * statutory);
-    const maxDays = round2((annualMax * monthsInYear) / 12);
+
+    // Max depends on the plan:
+    //   - OpsPlan1: 2.33 per full month + 0.833333 per full month per
+    //     full year of service, plus 0.5 per UK BH they worked since
+    //     the tax-year start. Accrues over the year; not a flat
+    //     allowance.
+    //   - everything else (e.g. Unlimited): annualMax pro-rated to
+    //     fiscal-year end.
+    let maxDays;
+    if (plan && plan.id === "OpsPlan1") {
+      const yearsFull = effectiveStart ? fullYearsBetween(effectiveStart, now) : 0;
+      const perFullMonth = 2.33 + 0.833333 * yearsFull;
+      const bhBonus = 0.5 * (Number(opts && opts.worked_bhs_count) || 0);
+      maxDays = round2(fullMonths * perFullMonth + bhBonus);
+    } else {
+      maxDays = round2((annualMax * monthsInYear) / 12);
+    }
     // Back-compat field names kept for callers that still read them.
     const monthsWorked = monthsElapsed;
     const serviceEnd = minEnd;
