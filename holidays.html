@@ -2177,23 +2177,23 @@
         if (!onPayroll) row.classList.add("is-not-on-payroll");
         const name = document.createElement("div");
         name.className = "hd-team-month-name";
-        const _baseName = profileLink(r.email, r.user.name || r.email);
-        let _badge = "";
-        if (onPayroll) {
+        name.innerHTML = profileLink(r.email, r.user.name || r.email);
+        // Holiday budget shows on hover as a native title tooltip — so
+        // the row keeps the full name visible and the four numbers
+        // (Taken / Year / Min / Max) only appear when you point at it.
+        if (!onPayroll) {
+          name.title = "Not on payroll - calendar disabled";
+        } else {
           const _taken = formatHolidayCount(countHolidayDaysTaken(r.email));
           const _plan  = formatHolidayCount(countHolidayDaysPlanned(r.email));
           const _budget = holidayBudgetFor(r.email);
+          const _lines = ["Taken " + _taken, "Year " + _plan];
           if (_budget) {
-            const _min = formatHolidayCount(_budget.min_days);
-            const _max = _budget.is_unlimited ? "INF" : formatHolidayCount(_budget.max_days);
-            const _why = ("Taken: " + _taken + "  Planned: " + _plan + "  Range: " + _min + "-" + _max + "  " + (_budget.reason || "")).replace(/"/g, "&quot;");
-            _badge = ' <span class="hd-team-budget" title="' + _why + '">' + _taken + ' (' + _plan + ') / ' + _min + '-' + _max + '</span>';
-          } else {
-            _badge = ' <span class="hd-team-budget">' + _taken + ' (' + _plan + ')</span>';
+            _lines.push("Min " + formatHolidayCount(_budget.min_days));
+            _lines.push("Max " + (_budget.is_unlimited ? "365" : formatHolidayCount(_budget.max_days)));
           }
+          name.title = _lines.join("\n");
         }
-        name.innerHTML = _baseName + _badge;
-        if (!onPayroll) name.title = "Not on payroll - calendar disabled";
         row.appendChild(name);
 
         const dayMap = r.dayMap || ((holidaysDoc.by_user || {})[r.email] || {}).days || {};
