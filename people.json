@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T10:07:28.465Z",
+  "updated_at": "2026-05-20T10:10:12.133Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -1403,11 +1403,11 @@
       "start_date": "2025-10-06",
       "line_manager_id": null,
       "line_manager_email_raw": "",
-      "role": "",
+      "role": "PM",
       "directory_photo_uploaded_at": "2026-05-14T08:54:40+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:59:31Z",
+      "updated_at": "2026-05-20T10:10:12.133Z",
       "most_recent_payroll_id": 2,
       "on_payroll": true,
       "url_slug": "david.byatt",
