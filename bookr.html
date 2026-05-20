@@ -10,11 +10,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1779304559">
-<link rel="stylesheet" href="quiet-tokens.css?v=1779304559">
-<link rel="stylesheet" href="quiet.css?v=1779304559">
-<link rel="stylesheet" href="quiet-extras.css?v=1779304559">
-<link rel="stylesheet" href="quiet-legacy.css?v=1779304559">
+<link rel="stylesheet" href="style.css?v=1779304675">
+<link rel="stylesheet" href="quiet-tokens.css?v=1779304675">
+<link rel="stylesheet" href="quiet.css?v=1779304675">
+<link rel="stylesheet" href="quiet-extras.css?v=1779304675">
+<link rel="stylesheet" href="quiet-legacy.css?v=1779304675">
 <style>
   .bk-section { max-width: 100%; margin: 0 auto; padding: 18px 16px 48px; }
   .bk-section h1 {
@@ -304,7 +304,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="/wall.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779304559" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779304675" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -505,7 +505,15 @@
         if (p.bookr_uid) map[p.bookr_uid] = p;
       }
       STATE.peopleByBookrUid = map;
+      // Stash the viewer's Person record so age-gated filters (under-25
+      // can't see Galvatron/Optimus/Wheeljack) have a DOB to read.
+      const myUids = (STATE.whoami && STATE.whoami.uids) || [];
+      STATE.viewerPerson = null;
+      for (const uid of myUids) {
+        if (map[uid]) { STATE.viewerPerson = map[uid]; break; }
+      }
       if (STATE.tab === "calendar") renderGrid();
+      if (STATE.tab === "news") renderNews();
     });
     loadBookingsProgressively();
   }
@@ -635,11 +643,44 @@
   // the viewer's own uid when no target_user_uid is supplied.
   function renderUserPicker() { /* removed */ }
 
+  // Performance cars (Galvatron / Optimus / Wheeljack) are restricted to
+  // colleagues 25+. Match by case-insensitive title-contains so the
+  // mapping survives 'Optimus Prime' / 'Galvatron 2024' style renames.
+  const AGE_RESTRICTED_CAR_SLUGS = ["galvatron", "optimus", "wheeljack"];
+  // DOB is YYYY-MM-DD. Returns viewer's age in whole years, or null when
+  // unknown — we err PERMISSIVE on null (no DOB → show everything).
+  function viewerAgeYears() {
+    const dob = (STATE.viewerPerson && STATE.viewerPerson.date_of_birth) || "";
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dob)) return null;
+    const [y, m, d] = dob.split("-").map(Number);
+    const today = new Date();
+    let age = today.getFullYear() - y;
+    const beforeBirthday = (today.getMonth() + 1 < m) ||
+                           (today.getMonth() + 1 === m && today.getDate() < d);
+    if (beforeBirthday) age -= 1;
+    return age;
+  }
+  function isAgeRestricted(asset) {
+    if (!asset || asset.type !== "cars") return false;
+    const t = (asset.title || "").toLowerCase();
+    return AGE_RESTRICTED_CAR_SLUGS.some(slug => t.includes(slug));
+  }
+  function viewerCanSee(asset) {
+    if (!isAgeRestricted(asset)) return true;
+    const age = viewerAgeYears();
+    if (age == null) return true;       // unknown DOB → permissive
+    return age >= 25;
+  }
+
   function visibleAssets() {
     const keep = a => (a && a.available !== false);
-    if (STATE.filter === "cars") return STATE.cars.filter(keep).map(a => Object.assign({}, a, { type: "cars" }));
-    if (STATE.filter === "properties") return STATE.properties.filter(keep).map(a => Object.assign({}, a, { type: "properties" }));
-    const cs = STATE.cars.filter(keep).map(a => Object.assign({}, a, { type: "cars" }));
+    if (STATE.filter === "cars") {
+      return STATE.cars.filter(keep).map(a => Object.assign({}, a, { type: "cars" })).filter(viewerCanSee);
+    }
+    if (STATE.filter === "properties") {
+      return STATE.properties.filter(keep).map(a => Object.assign({}, a, { type: "properties" })).filter(viewerCanSee);
+    }
+    const cs = STATE.cars.filter(keep).map(a => Object.assign({}, a, { type: "cars" })).filter(viewerCanSee);
     const ps = STATE.properties.filter(keep).map(a => Object.assign({}, a, { type: "properties" }));
     return cs.concat(ps);
   }
@@ -751,6 +792,10 @@
       const asset = newsMatchAsset(art);
       const win = art.type === "cars" ? CAR_WINDOW_DAYS : PROP_WINDOW_DAYS;
       if (!asset || !asset.available) continue;
+      // Same age gate as the Calendar grid: hide Galvatron / Optimus /
+      // Wheeljack for under-25 viewers so they don't even know the
+      // articles exist.
+      if (!viewerCanSee(Object.assign({}, asset, { type: art.type }))) continue;
       const branch = (bookings && bookings[art.type]) || {};
       if (!newsHasFreeDay(branch, asset, win)) continue;
       featured.push({ art, asset, win });
@@ -1313,6 +1358,6 @@
   loadAll();
 })();
 </script>
-<script src="nav.js?v=1779304559"></script>
+<script src="nav.js?v=1779304675"></script>
 </body>
 </html>
