@@ -84,12 +84,11 @@
     padding: 2px; min-height: 64px; box-sizing: border-box;
     display: flex; align-items: center; justify-content: center; text-align: center;
   }
-  /* Today gets thick black side-borders so it pops without changing
-     the column width (no border-left + border-right would push the
-     grid out of alignment; box-shadow inset draws inside the cell). */
-  .bk-cell.is-today-col {
-    box-shadow: inset 4px 0 0 0 #000, inset -4px 0 0 0 #000;
-  }
+  /* Today: solid black so it pops without changing column width.
+     Override booked grey + free paper. Avatar img stays on top because
+     it's an actual element, not a background. */
+  .bk-cell.is-today-col { background: #000; color: #fff; }
+  .bk-cell.is-today-col.is-booked { background: #000; }
   .bk-cell.is-weekend { background: #ffffff; }
   .bk-cell.is-past { color: var(--ink-400); background: #ffffff; cursor: default; }
   .bk-cell.is-free { cursor: pointer; }
@@ -137,10 +136,9 @@
     border-right: 1px solid #ffffff; border-bottom: 1px solid #ffffff;
   }
   .bk-day-head.is-weekend { background: var(--paper-200); }
-  .bk-day-head.is-today-col {
-    background: var(--paper-300); color: var(--ink-900);
-    box-shadow: inset 4px 0 0 0 #000, inset -4px 0 0 0 #000;
-  }
+  .bk-day-head.is-today-col { background: #000; color: #fff; }
+  .bk-day-head.is-today-col .bk-dow,
+  .bk-day-head.is-today-col .bk-mo { opacity: 1; }
   .bk-day-head .bk-dow { display: block; opacity: 0.7; letter-spacing: 0.04em; }
   .bk-day-head .bk-dn  { display: block; font: 700 22px/1.1 var(--font-body); margin-top: 2px; }
   .bk-day-head .bk-mo  { display: block; font-size: 9px; opacity: 0.65; }
@@ -154,11 +152,12 @@
     display: flex; align-items: center; justify-content: center; text-align: center;
   }
   .bk-cell-name {
-    display: block;
-    font: 600 19px/1.1 var(--font-body); color: #ffffff;
-    white-space: normal; word-break: break-word; overflow-wrap: anywhere;
-    max-width: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font: 600 19px/1.05 var(--font-body); color: #ffffff;
+    max-width: 100%; line-height: 1.05; gap: 1px;
   }
+  .bk-name-line { display: block; white-space: nowrap; }
   .bk-cell:not(.is-booked) .bk-cell-name { color: var(--ink-900); }
   /* Avatar+name overlay. Image fills the cell; name shows on hover */
   /* (mouse) or while the cell is touch-pressed (mobile). The .is-external */
@@ -653,7 +652,23 @@
         : document.createElement("a");
       name.className = "bk-cell-name";
       if (!isExternalChannel) name.href = "/user.html?bookr_uid=" + encodeURIComponent(value);
-      name.textContent = fullName;
+      // Split into two stacked lines: everything before the last space
+      // goes on top, surname on the bottom. fitNamesInGrid then shrinks
+      // the font until the widest line fits the cell. One-word names
+      // (e.g. "AirBnb") render as a single line.
+      const _parts = (fullName || "").trim().split(/\s+/).filter(Boolean);
+      const _last = _parts.length > 1 ? _parts.pop() : "";
+      const _first = _parts.join(" ");
+      const _l1 = document.createElement("span");
+      _l1.className = "bk-name-line";
+      _l1.textContent = _first || fullName || "";
+      name.appendChild(_l1);
+      if (_last) {
+        const _l2 = document.createElement("span");
+        _l2.className = "bk-name-line";
+        _l2.textContent = _last;
+        name.appendChild(_l2);
+      }
       // If we have an avatar (or the AirBnb logo for smartbnb), put it
       // over the name; CSS swaps it for the name on :hover / .bk-pressed.
       const avatarUrl = avatarUrlForBookrUid(value);
@@ -730,10 +745,18 @@
       el.style.fontSize = "";
       const parent = el.parentElement;
       if (!parent) continue;
-      const max = parent.clientWidth - 6;
+      const max = parent.clientWidth - 4;
       if (max <= 0) continue;
-      let size = 11;
-      while (el.scrollWidth > max && size > 7) {
+      const lines = el.querySelectorAll(".bk-name-line");
+      // Start at the CSS-default size and shrink until the WIDER of the
+      // two name lines fits the cell. Floor 8px to stay readable.
+      let size = 19;
+      function widest() {
+        let w = 0;
+        for (const ln of lines) { if (ln.scrollWidth > w) w = ln.scrollWidth; }
+        return w;
+      }
+      while (widest() > max && size > 8) {
         size -= 0.5;
         el.style.fontSize = size + "px";
       }
