@@ -205,7 +205,7 @@
     try {
       if (currentTab === "info")          panel.innerHTML = renderInfoPanel();
       else if (currentTab === "wall")     panel.innerHTML = renderFeedPanel();
-      else if (currentTab === "calendar") panel.innerHTML = renderCalendarPanel();
+      else if (currentTab === "calendar") { panel.innerHTML = renderCalendarPanel(); wireCalendarPanel(); }
       else if (currentTab === "accounts") panel.innerHTML = renderAccountsPanel();
     } catch (err) {
       panel.innerHTML = `<div class="up-error" style="padding:24px;">
@@ -217,13 +217,249 @@
     wirePanel();
   }
 
+  /* ─── Calendar tab ─────────────────────────────────────────────────
+   * Unified personal view from today to year-end: viewer's holidays,
+   * UK + US bank holidays, birthday + RDay anniversary, future BookR
+   * bookings. Read-only — the booking flows live on /holidays.html
+   * and /bookr.html. Built progressively after the panel renders so
+   * the grid skeleton paints first; data layers fill in week by
+   * week (BookR) and from local JSON (holidays). */
   function renderCalendarPanel() {
-    const src = `/holidays.html?user=${encodeURIComponent(person.main_google_email)}&view=own&embed=1`;
     return `
       <h2 class="up-panel-title">Calendar</h2>
-      <div class="up-cal-wrap">
-        <iframe class="up-cal-frame" id="upCalFrame" src="${src}" title="Calendar" referrerpolicy="same-origin"></iframe>
-      </div>`;
+      <div class="up-cal-links">
+        <a class="up-cal-link" href="/holidays.html">Book a holiday →</a>
+        <a class="up-cal-link" href="/bookr.html">Book a car or property →</a>
+      </div>
+      <div id="upCalLegend" class="up-cal-legend"></div>
+      <div id="upCalMonths" class="up-cal-months"></div>
+      <p class="up-cal-status" id="upCalStatus">Loading your data…</p>
+    `;
+  }
+
+  // 2026 bank holidays. Keep the list updated each Jan; we render the
+  // matching MM-DD into every visible year so 2027 December lookups
+  // still show 2026 NYE if we span new year. Sources: gov.uk/bank-holidays
+  // for UK; federal-holidays list for US (observed dates, not strict).
+  const UK_BANK_HOLIDAYS_2026 = {
+    "2026-01-01": "New Year's Day",
+    "2026-04-03": "Good Friday",
+    "2026-04-06": "Easter Monday",
+    "2026-05-04": "Early May",
+    "2026-05-25": "Spring",
+    "2026-08-31": "Summer",
+    "2026-12-25": "Christmas Day",
+    "2026-12-28": "Boxing Day",
+  };
+  const US_BANK_HOLIDAYS_2026 = {
+    "2026-01-01": "New Year's Day",
+    "2026-01-19": "MLK Day",
+    "2026-02-16": "Presidents' Day",
+    "2026-05-25": "Memorial Day",
+    "2026-06-19": "Juneteenth",
+    "2026-07-03": "Independence Day",
+    "2026-09-07": "Labor Day",
+    "2026-10-12": "Columbus Day",
+    "2026-11-11": "Veterans Day",
+    "2026-11-26": "Thanksgiving",
+    "2026-12-25": "Christmas Day",
+  };
+  const HOLIDAY_KIND_LABEL = {
+    annual: "Annual leave", sick: "Sick", maternity: "Maternity",
+    paternity: "Paternity", wfh: "Working from home", training: "Training",
+    "in-lieu": "Time in lieu", unpaid: "Unpaid", other: "Off",
+  };
+
+  function pad2(n) { return String(n).padStart(2, "0"); }
+  function dateKey(y, m, d) { return y + "-" + pad2(m + 1) + "-" + pad2(d); }
+  function mondayDow(d) { return (d.getDay() + 6) % 7; }
+
+  async function wireCalendarPanel() {
+    const monthsEl  = document.getElementById("upCalMonths");
+    const legendEl  = document.getElementById("upCalLegend");
+    const statusEl  = document.getElementById("upCalStatus");
+    if (!monthsEl) return;
+
+    // ── 1. Grid skeleton: today's month → December of same year.
+    const today = new Date();
+    const startY = today.getFullYear(), startM = today.getMonth();
+    const months = [];
+    for (let m = startM; m <= 11; m++) months.push([startY, m]);
+    monthsEl.innerHTML = "";
+    for (const [y, m] of months) monthsEl.appendChild(buildMonthSkeleton(y, m, today));
+    legendEl.innerHTML = `
+      <span class="up-cal-leg"><span class="up-cal-dot up-cal-dot--uk"></span> UK bank holiday</span>
+      <span class="up-cal-leg"><span class="up-cal-dot up-cal-dot--us"></span> US bank holiday</span>
+      <span class="up-cal-leg">🎈 Birthday</span>
+      <span class="up-cal-leg"><span class="up-cal-rday-icon">🎈</span> RDay (joined Richmond Group)</span>
+      <span class="up-cal-leg"><span class="up-cal-dot up-cal-dot--holiday"></span> Your booked time off</span>
+      <span class="up-cal-leg"><span class="up-cal-dot up-cal-dot--bookr"></span> Your BookR booking</span>`;
+
+    // ── 2. Sync layers — bank holidays, birthday, RDay anniversaries.
+    applyBankHolidaysToCal(monthsEl);
+    applyBirthdayAndRDay(monthsEl);
+
+    // ── 3. Async: personal holidays from holidays.json (fast, repo file).
+    statusEl.textContent = "Loading your booked time off…";
+    try {
+      const r = await fetch("/holidays.json", { cache: "no-store", headers: { "Cache-Control": "no-cache, no-store, must-revalidate", "Pragma": "no-cache" } });
+      const doc = r.ok ? await r.json() : null;
+      const emails = [person.main_google_email, ...(person.alt_google_emails || []), person.external_google_email]
+        .filter(Boolean).map(e => e.toLowerCase());
+      const byUser = (doc && doc.by_user) || {};
+      let mine = null;
+      for (const e of emails) { if (byUser[e]) { mine = byUser[e]; break; } }
+      if (mine && mine.days) applyMyHolidaysToCal(monthsEl, mine.days);
+    } catch (e) { /* non-fatal */ }
+
+    // ── 4. Async progressive: BookR bookings, week by week.
+    statusEl.textContent = "Loading your BookR bookings…";
+    let myBookrUid = null;
+    try {
+      const who = await fetch("/api/bookr/whoami", { cache: "no-store" }).then(r => r.ok ? r.json() : null);
+      myBookrUid = (who && who.uid) || null;
+    } catch (e) { /* non-fatal */ }
+    if (myBookrUid) {
+      await loadBookrBookingsProgressively(monthsEl, myBookrUid, statusEl);
+    }
+    statusEl.textContent = "";
+    statusEl.style.display = "none";
+  }
+
+  function buildMonthSkeleton(year, month, todayD) {
+    const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+    const wrap = document.createElement("div");
+    wrap.className = "up-cal-month";
+    const head = document.createElement("h3");
+    head.className = "up-cal-month-head";
+    head.textContent = MONTH_NAMES[month] + " " + year;
+    wrap.appendChild(head);
+    const dowRow = document.createElement("div");
+    dowRow.className = "up-cal-dows";
+    ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].forEach(s => {
+      const c = document.createElement("div"); c.textContent = s; dowRow.appendChild(c);
+    });
+    wrap.appendChild(dowRow);
+    const grid = document.createElement("div");
+    grid.className = "up-cal-grid";
+    const first = new Date(year, month, 1);
+    const last  = new Date(year, month + 1, 0);
+    const lead  = mondayDow(first);
+    for (let i = 0; i < lead; i++) {
+      const c = document.createElement("div"); c.className = "up-cal-day is-pad"; grid.appendChild(c);
+    }
+    const todayY = todayD.getFullYear(), todayM = todayD.getMonth(), todayDate = todayD.getDate();
+    for (let d = 1; d <= last.getDate(); d++) {
+      const c = document.createElement("div");
+      c.className = "up-cal-day";
+      const dt = new Date(year, month, d);
+      const dow = mondayDow(dt);
+      if (dow >= 5) c.classList.add("is-weekend");
+      if (year === todayY && month === todayM && d === todayDate) c.classList.add("is-today");
+      if (year < todayY || (year === todayY && month < todayM) || (year === todayY && month === todayM && d < todayDate)) c.classList.add("is-past");
+      c.dataset.date = dateKey(year, month, d);
+      c.innerHTML = `<span class="up-cal-day-n">${d}</span><div class="up-cal-day-marks"></div>`;
+      grid.appendChild(c);
+    }
+    wrap.appendChild(grid);
+    return wrap;
+  }
+
+  function addCalMark(cell, kind, label, char) {
+    cell.classList.add("has-" + kind);
+    const marks = cell.querySelector(".up-cal-day-marks");
+    if (!marks) return;
+    const m = document.createElement("span");
+    m.className = "up-cal-mark up-cal-mark--" + kind;
+    if (char) m.textContent = char;
+    if (label) m.title = label;
+    marks.appendChild(m);
+  }
+
+  function applyBankHolidaysToCal(monthsEl) {
+    // Re-key from the 2026 baseline into every visible year so that
+    // when the page spans new year we still hit the right dates.
+    const visibleYears = new Set(
+      Array.from(monthsEl.querySelectorAll("[data-date]"))
+        .map(c => c.dataset.date.slice(0, 4))
+    );
+    for (const yStr of visibleYears) {
+      for (const [date, name] of Object.entries(UK_BANK_HOLIDAYS_2026)) {
+        const key = yStr + date.slice(4);
+        const cell = monthsEl.querySelector(`[data-date="${key}"]`);
+        if (cell) addCalMark(cell, "uk", "UK bank holiday — " + name);
+      }
+      for (const [date, name] of Object.entries(US_BANK_HOLIDAYS_2026)) {
+        const key = yStr + date.slice(4);
+        const cell = monthsEl.querySelector(`[data-date="${key}"]`);
+        if (cell) addCalMark(cell, "us", "US bank holiday — " + name);
+      }
+    }
+  }
+
+  function applyBirthdayAndRDay(monthsEl) {
+    const dob = (person.date_of_birth || "").slice(5, 10); // MM-DD
+    const start = person.start_date || "";
+    monthsEl.querySelectorAll("[data-date]").forEach(cell => {
+      const md = cell.dataset.date.slice(5);
+      if (dob && md === dob) {
+        addCalMark(cell, "bday", "Your birthday", "🎈");
+      }
+      if (start && md === start.slice(5, 10)) {
+        const cellYear = Number(cell.dataset.date.slice(0, 4));
+        const startYear = Number(start.slice(0, 4));
+        if (cellYear > startYear) {
+          const yrs = cellYear - startYear;
+          addCalMark(cell, "rday", `RDay — ${yrs} year${yrs === 1 ? "" : "s"} at Richmond Group`, "🎈");
+        }
+      }
+    });
+  }
+
+  function applyMyHolidaysToCal(monthsEl, days) {
+    for (const [date, kind] of Object.entries(days || {})) {
+      const cell = monthsEl.querySelector(`[data-date="${date}"]`);
+      if (!cell) continue;
+      const label = HOLIDAY_KIND_LABEL[kind] || kind || "Off";
+      addCalMark(cell, "holiday", label);
+    }
+  }
+
+  async function loadBookrBookingsProgressively(monthsEl, myUid, statusEl) {
+    // Walk visible date range in 7-day chunks; for each chunk hit
+    // /api/bookr/all-bookings and mark cells whose value === my uid.
+    const cells = Array.from(monthsEl.querySelectorAll("[data-date]"));
+    if (!cells.length) return;
+    const first = cells[0].dataset.date;
+    const last  = cells[cells.length - 1].dataset.date;
+    const startD = new Date(first);
+    const endD   = new Date(last);
+    const cursor = new Date(startD);
+    while (cursor <= endD) {
+      const weekStart = new Date(cursor);
+      const weekEnd   = new Date(cursor); weekEnd.setDate(weekEnd.getDate() + 6);
+      if (weekEnd > endD) weekEnd.setTime(endD.getTime());
+      const from = dateKey(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
+      const to   = dateKey(weekEnd.getFullYear(),   weekEnd.getMonth(),   weekEnd.getDate());
+      try {
+        const r = await fetch("/api/bookr/all-bookings?type=all&from=" + from + "&to=" + to, { cache: "no-store" });
+        const j = r.ok ? await r.json() : null;
+        const tree = (j && j.bookings) || { cars: {}, properties: {} };
+        for (const kind of ["cars", "properties"]) {
+          const dict = tree[kind] || {};
+          for (const [assetId, datesObj] of Object.entries(dict)) {
+            for (const [date, uid] of Object.entries(datesObj || {})) {
+              if (uid !== myUid) continue;
+              const cell = monthsEl.querySelector(`[data-date="${date}"]`);
+              if (!cell) continue;
+              addCalMark(cell, "bookr", (kind === "cars" ? "Car " : "Property ") + assetId);
+            }
+          }
+        }
+      } catch (e) { /* per-week silent fail */ }
+      if (statusEl) statusEl.textContent = "Loading BookR bookings — through " + to + "…";
+      cursor.setDate(cursor.getDate() + 7);
+    }
   }
 
   /* ─── Information panel — fields come from the Person record ──────── */
