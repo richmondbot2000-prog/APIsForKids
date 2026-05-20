@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T16:34:57.232Z",
+  "updated_at": "2026-05-20T16:35:18.150Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -5282,7 +5282,7 @@
       "external_google_email": "",
       "auth0_id": "",
       "access_level": "staff",
-      "company": "LetMe",
+      "company": "Together",
       "title": "",
       "department": "",
       "phone": "",
@@ -5294,7 +5294,7 @@
       "directory_photo_uploaded_at": "2026-05-14T07:53:09+01:00",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-20T16:02:07Z",
+      "updated_at": "2026-05-20T16:35:18.150Z",
       "url_slug": "tyla.woods",
       "most_recent_payroll_id": null
     },
