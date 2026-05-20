@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T14:25:45.408Z",
+  "updated_at": "2026-05-20T14:25:55.536Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -1166,14 +1166,14 @@
       "department": "",
       "phone": "",
       "address": "",
-      "start_date": "",
+      "start_date": "2025-11-18",
       "line_manager_id": "10",
       "line_manager_email_raw": "",
       "role": "",
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-20T14:25:38.480Z",
+      "updated_at": "2026-05-20T14:25:55.536Z",
       "url_slug": "cyrus.leung",
       "most_recent_payroll_id": null
     },
