@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T16:38:23.966Z",
+  "updated_at": "2026-05-20T16:38:55.594Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -1930,7 +1930,7 @@
       "external_google_email": "",
       "auth0_id": "",
       "access_level": "staff",
-      "company": "LetMe",
+      "company": "Richmond Group",
       "title": "",
       "department": "",
       "phone": "",
@@ -1946,7 +1946,7 @@
       "most_recent_payroll_id": 76,
       "suspended": false,
       "created_at": "2026-05-17T14:06:41Z",
-      "updated_at": "2026-05-20T16:02:07Z",
+      "updated_at": "2026-05-20T16:38:55.594Z",
       "url_slug": "fern.benamor",
       "date_of_birth": "2006-12-06"
     },
