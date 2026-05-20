@@ -10,11 +10,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1779306678">
-<link rel="stylesheet" href="quiet-tokens.css?v=1779306678">
-<link rel="stylesheet" href="quiet.css?v=1779306678">
-<link rel="stylesheet" href="quiet-extras.css?v=1779306678">
-<link rel="stylesheet" href="quiet-legacy.css?v=1779306678">
+<link rel="stylesheet" href="style.css?v=1779307172">
+<link rel="stylesheet" href="quiet-tokens.css?v=1779307172">
+<link rel="stylesheet" href="quiet.css?v=1779307172">
+<link rel="stylesheet" href="quiet-extras.css?v=1779307172">
+<link rel="stylesheet" href="quiet-legacy.css?v=1779307172">
 <style>
   .bk-section { max-width: 100%; margin: 0 auto; padding: 18px 16px 48px; }
   .bk-section h1 {
@@ -306,7 +306,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="/wall.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779306678" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779307172" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -1311,7 +1311,7 @@
     const end = new Date(to + "T00:00:00");
     const dates = [];
     for (let d = new Date(start); d <= end; d = addDays(d, 1)) dates.push(ymd(d));
-    if (!confirm("Cancel " + dates.length + " day" + (dates.length === 1 ? "" : "s") + "?")) return;
+    if (!confirm("Remove " + dates.length + " booked day" + (dates.length === 1 ? "" : "s") + "?\n\nTap OK to free up the days. Tap Cancel to keep them.")) return;
     for (const d of dates) {
       try {
         const r = await fetch("/api/bookr/cancel", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: type, asset: asset, date: d }), cache: "no-store" });
@@ -1375,7 +1375,13 @@
         const asset   = cell.dataset.asset;
         const date    = cell.dataset.date;
         const assetTitle = (visibleAssets().find(a => String(a.id) === String(asset) && a.type === type) || {}).title || asset;
-        if (confirm(`Cancel your booking?\n\n${assetTitle} booked for ${date}`)) {
+        // Native confirm() always labels its buttons "OK" + "Cancel" in
+        // Safari, so the prompt has to phrase the action so OK = do it
+        // and Cancel = back out. "Cancel your booking?" read as a
+        // question where the "Cancel" button looked like the
+        // affirmative answer — rephrased to "Remove…?" so OK is the
+        // unambiguous "yes" path.
+        if (confirm(`Remove your ${assetTitle} booking on ${date}?\n\nTap OK to free up the day. Tap Cancel to keep it.`)) {
           cancelOne(type, asset, date, cell);
         }
         return;
@@ -1408,6 +1414,6 @@
   loadAll();
 })();
 </script>
-<script src="nav.js?v=1779306678"></script>
+<script src="nav.js?v=1779307172"></script>
 </body>
 </html>
