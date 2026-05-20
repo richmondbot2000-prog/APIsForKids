@@ -2905,6 +2905,19 @@
       const n = normaliseName(u.name);
       if (payrollByNameNorm.has(n)) return true;
     }
+    // Final fallback: trust the Person record's on_payroll flag or its
+    // most_recent_payroll_id link. Catches the case where someone's
+    // legal payroll name (e.g. "Chidinma Ugwunne") differs from their
+    // Workspace display name ("Sophia Ugwunne"), which the email and
+    // staffByEmail name lookups above can't bridge.
+    const person = personByEmail[lc];
+    if (person) {
+      if (person.on_payroll) return true;
+      if (person.most_recent_payroll_id) return true;
+      for (const alias of (person.aliases || [])) {
+        if (payrollByNameNorm.has(normaliseName(alias))) return true;
+      }
+    }
     return false;
   }
   function normaliseName(s) {
