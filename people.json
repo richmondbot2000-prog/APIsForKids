@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T10:23:35.156Z",
+  "updated_at": "2026-05-20T10:26:52.141Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -2382,13 +2382,13 @@
       "phone": "07760666491",
       "address": "98 The Grove\nBournemouth\nDorset\nBH9 2TZ",
       "start_date": "2024-08-05",
-      "line_manager_id": null,
+      "line_manager_id": "24",
       "line_manager_email_raw": "",
       "role": "",
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T19:59:31Z",
+      "updated_at": "2026-05-20T10:26:52.141Z",
       "most_recent_payroll_id": 21,
       "on_payroll": true,
       "url_slug": "jack.bassilious",
