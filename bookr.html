@@ -10,11 +10,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=1779304150">
-<link rel="stylesheet" href="quiet-tokens.css?v=1779304150">
-<link rel="stylesheet" href="quiet.css?v=1779304150">
-<link rel="stylesheet" href="quiet-extras.css?v=1779304150">
-<link rel="stylesheet" href="quiet-legacy.css?v=1779304150">
+<link rel="stylesheet" href="style.css?v=1779304482">
+<link rel="stylesheet" href="quiet-tokens.css?v=1779304482">
+<link rel="stylesheet" href="quiet.css?v=1779304482">
+<link rel="stylesheet" href="quiet-extras.css?v=1779304482">
+<link rel="stylesheet" href="quiet-legacy.css?v=1779304482">
 <style>
   .bk-section { max-width: 100%; margin: 0 auto; padding: 18px 16px 48px; }
   .bk-section h1 {
@@ -162,8 +162,8 @@
   .bk-cell.is-past { color: var(--ink-400); background: #ffffff; cursor: default; }
   .bk-cell.is-free { cursor: pointer; }
   .bk-cell.is-free:hover { background: var(--brass-50); }
-  /* Booked cells: 60% grey so the round avatar pops on top. */
-  .bk-cell.is-booked { background: rgba(0, 0, 0, 0.5); cursor: pointer; color: #ffffff; }
+  /* Booked cells: 30% grey backdrop, black name text on top. */
+  .bk-cell.is-booked { background: rgba(0, 0, 0, 0.3); cursor: pointer; color: #000000; }
   .bk-cell.is-mine { background: rgba(200, 151, 63, 0.18); }
   .bk-cell.is-pending { opacity: 0.55; cursor: progress; }
   .bk-cell.is-loading { position: relative; cursor: progress; background: var(--paper-100); }
@@ -224,7 +224,7 @@
   .bk-cell-name {
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    font: 600 10pt/1.05 var(--font-body); color: #ffffff;
+    font: 600 10pt/1.05 var(--font-body); color: #000000;
     max-width: 100%; gap: 1px;
     word-break: break-word; overflow-wrap: anywhere;
   }
@@ -304,7 +304,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="/wall.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779304150" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="togetherbook-logo.png?v=1779304482" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -325,16 +325,16 @@
   <h1>BOOKR</h1>
   <div id="bkBanner" class="bk-banner" style="display:none"></div>
   <div class="bk-tabs">
-    <button class="bk-tab is-active" data-tab="news" type="button">News</button>
-    <button class="bk-tab" data-tab="calendar" type="button">Calendar</button>
+    <button class="bk-tab is-active" data-tab="calendar" type="button">Calendar</button>
+    <button class="bk-tab" data-tab="news" type="button">News</button>
     <button class="bk-tab" data-tab="mine" type="button">My Bookings</button>
   </div>
-  <div id="bkNewsPanel">
+  <div id="bkNewsPanel" style="display:none;">
     <div id="bkNewsStatus" class="bk-news-status">Looking for assets free at short notice…</div>
     <div id="bkNewsGrid" class="bk-news-grid"></div>
     <div id="bkNewsEmpty" class="bk-news-empty" hidden></div>
   </div>
-  <div id="bkCalendarPanel" style="display:none;">
+  <div id="bkCalendarPanel">
     <div class="bk-toolbar">
       <span><span class="bk-tool-label">Days</span>
         <select id="bkZoom" class="bk-select">
@@ -373,7 +373,7 @@
     bookings: {},      /* keyed by `type:id` -> {date: uid|free} */
     isAdmin: false,
     targetEmail: null, /* removed UI — kept for back-compat with payload helpers */
-    tab: "news",
+    tab: "calendar",
     newsReady: false,    /* renderNews ran at least once; gate repeats */
     newsBookings: null,  /* cached /all-bookings response */
     pendingDates: new Set(),
@@ -1313,6 +1313,6 @@
   loadAll();
 })();
 </script>
-<script src="nav.js?v=1779304150"></script>
+<script src="nav.js?v=1779304482"></script>
 </body>
 </html>
