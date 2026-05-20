@@ -10,10 +10,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/style.css?v=1778923602">
-<link rel="stylesheet" href="/quiet-tokens.css?v=1778923602">
-<link rel="stylesheet" href="/quiet.css?v=1778923602">
-<link rel="stylesheet" href="/quiet-extras.css?v=1779059756">
+<link rel="stylesheet" href="/style.css?v=1779293852">
+<link rel="stylesheet" href="/quiet-tokens.css?v=1779293852">
+<link rel="stylesheet" href="/quiet.css?v=1779293852">
+<link rel="stylesheet" href="/quiet-extras.css?v=1779293852">
 <style>
   body { background: var(--paper-100, #FBF6E9); }
   .pp-page { max-width: 1280px; margin: 0 auto; padding: 16px 12px 64px; }
@@ -336,7 +336,7 @@
 
 <header class="qb-topbar">
   <a class="qb-brand" href="/wall.html" aria-label="TogetherBOOK — home">
-    <img class="qb-brand-logo" src="/togetherbook-logo.png?v=1778923602" alt="TogetherBOOK">
+    <img class="qb-brand-logo" src="/togetherbook-logo.png?v=1779293852" alt="TogetherBOOK">
   </a>
   <button class="qb-hamburger" aria-label="Toggle navigation menu" aria-expanded="false"
           onclick="document.body.classList.toggle('nav-open');this.setAttribute('aria-expanded',document.body.classList.contains('nav-open'))">
@@ -536,11 +536,18 @@
     return "";
   }
 
-  // Predicate per filter chip.
+  // Predicate per filter chip. Company chips match against the human
+  // Company label on each Person (Together / Richmond Group / LetMe or
+  // any free-text value an admin has typed), NOT the email-domain
+  // tenant — those drifted apart once Company became a hand-curated
+  // field instead of a mirror of the Google domain.
+  const companyMatches = (p, label) =>
+    (p.company || "").trim().toLowerCase() === label.toLowerCase();
   const FILTERS = {
     live:      p => statusOf(p) === "live",
-    letme:     p => (googleByPersonId[p.id] || []).some(a => a.tenant === "letme"    && !a.suspended && !a.deletion_time),
-    together:  p => (googleByPersonId[p.id] || []).some(a => a.tenant === "together" && !a.suspended && !a.deletion_time),
+    letme:     p => companyMatches(p, "LetMe"),
+    together:  p => companyMatches(p, "Together"),
+    richmond:  p => companyMatches(p, "Richmond Group"),
     payroll:   p => !!p.on_payroll,
     warehouse: p => !!warehouseByPersonId[p.id],
   };
@@ -552,14 +559,16 @@
       const extra = key === "all" ? " pp-stat--all" : "";
       return `<button class="pp-stat${extra}${active ? " is-active" : ""}" data-stat="${key}">${escapeHtml(label)}</button>`;
     };
-    // Order: All first (exclusive), then the five named filters
-    // (Payroll · Together · LetMe · Live · on CRM). A divider sits
-    // between the two groups to read as "this OR any of these".
+    // Order: All first (exclusive), then the named filters:
+    // Payroll · Together · Richmond Group · LetMe · Live · on CRM.
+    // A divider sits between the two groups to read as "this OR
+    // any of these".
     document.getElementById("ppStats").innerHTML = `
       ${chip("all",       "All")}
       <span class="pp-stats-divider" aria-hidden="true"></span>
       ${chip("payroll",   "Payroll")}
       ${chip("together",  "Together")}
+      ${chip("richmond",  "Richmond Group")}
       ${chip("letme",     "LetMe")}
       ${chip("live",      "Live")}
       ${chip("warehouse", "on CRM")}
@@ -1065,6 +1074,6 @@
     render();
   });
 </script>
-<script src="/nav.js?v=1779136390" defer></script>
+<script src="/nav.js?v=1779293852" defer></script>
 </body>
 </html>
