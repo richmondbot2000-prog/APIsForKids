@@ -1,21 +1,7 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T08:16:39.267Z",
+  "updated_at": "2026-05-20T08:16:42.329Z",
   "posts": [
-    {
-      "id": "post_mpdseea8_o8elfv",
-      "author_email": "james.benamor@letme.com",
-      "author_name": "james.benamor",
-      "created_at": "2026-05-20T08:15:29.744Z",
-      "body": "",
-      "photos": [
-        "https://media2.giphy.com/media/v1.Y2lkPWYzOWU3YTk3N2lrYnh4YTI2NW1iYWQzdGNvNjNwMmtwY25rcTV4djlsZjB2ZGF0ZCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/kxei1ibnxITFUvvtJU/giphy.gif"
-      ],
-      "channel": null,
-      "reactions": {},
-      "comments": [],
-      "edited_at": "2026-05-20T08:16:39.068Z"
-    },
     {
       "id": "post_mpaytpuv_p51jep",
       "author_email": "amber.cole@letme.com",
