@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T22:33:13.187Z",
+  "updated_at": "2026-05-20T22:33:33.710Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -530,13 +530,13 @@
       "phone": "",
       "address": "",
       "start_date": "",
-      "line_manager_id": 91,
+      "line_manager_id": null,
       "line_manager_email_raw": "james.benamor@letme.com",
       "role": "",
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-20T16:02:07Z",
+      "updated_at": "2026-05-20T22:33:33.710Z",
       "url_slug": "azure",
       "most_recent_payroll_id": null,
       "holiday_plan": "OpsPlan1"
