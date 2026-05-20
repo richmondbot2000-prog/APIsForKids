@@ -2473,13 +2473,23 @@
       payloadValue = value === "" ? null : value;
     }
     status.textContent = "Saving…"; status.className = "up-edit-status up-edit-status--working";
+    let res = null;
+    let rawBody = "";
     try {
-      const res = await fetch(WORKSPACE_API + "/people-set", {
+      res = await fetch(WORKSPACE_API + "/people-set", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: person.id, [field]: payloadValue  }),
       });
-      const out = await res.json();
-      if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
+      // Read the body as text first so a non-JSON / empty / truncated
+      // response surfaces a useful error instead of a generic JSON parse
+      // exception that swallows the worker's actual reply.
+      rawBody = await res.text();
+      let out;
+      try { out = JSON.parse(rawBody); }
+      catch (parseErr) {
+        throw new Error(`HTTP ${res.status} (non-JSON reply): ${(rawBody || "(empty)").slice(0, 200)}`);
+      }
+      if (!res.ok || !out.ok) throw new Error(`HTTP ${res.status} — ${out.error || rawBody.slice(0, 200) || "no detail"}`);
       Object.assign(person, out.person);
       // Write-through to localStorage so the user's own session sees
       // the new value regardless of any cache layer in front of the
