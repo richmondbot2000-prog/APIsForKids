@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "updated_at": "2026-05-20T15:08:00.017Z",
+  "updated_at": "2026-05-20T15:24:35.352Z",
   "source": "build_people.py bootstrap from staff.json + annotations.json",
   "people": [
     {
@@ -2702,13 +2702,13 @@
       "phone": "",
       "address": "",
       "start_date": "",
-      "line_manager_id": null,
+      "line_manager_id": "118",
       "line_manager_email_raw": "",
       "role": "",
       "directory_photo_uploaded_at": "",
       "notes": "",
       "created_at": "2026-05-17T11:13:52Z",
-      "updated_at": "2026-05-17T11:13:52Z",
+      "updated_at": "2026-05-20T15:24:35.352Z",
       "url_slug": "john.medina",
       "most_recent_payroll_id": null
     },
