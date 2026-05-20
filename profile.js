@@ -937,10 +937,14 @@
 
 
   function renderBookrBox() {
-    const uid = (person.bookr_uid || "").trim();
+    const uids = Array.isArray(person.bookr_uids)
+      ? person.bookr_uids.filter(Boolean)
+      : (person.bookr_uid ? [person.bookr_uid] : []);
     const usersDict = (bookrUsersById && bookrUsersById.users) || null;
-    const linkedUser = uid && usersDict ? usersDict[uid] : null;
     const candEmails = [person.main_google_email, ...(person.alt_google_emails || []), person.external_google_email].filter(Boolean).map(e => e.toLowerCase());
+
+    // Picker options — show every BookR user; star ones whose email
+    // matches a Person email; grey ones already linked.
     let options = "";
     if (usersDict) {
       const entries = Object.entries(usersDict).map(([u, x]) => ({ uid: u, email: (x.email || "").toLowerCase(), name: x.name || "" }));
@@ -951,64 +955,93 @@
         return (a.email || a.name).localeCompare(b.email || b.name);
       });
       options = entries.map(e => {
+        const linked = uids.includes(e.uid);
         const star = candEmails.includes(e.email) ? "* " : "";
-        return `<option value="${escapeHtml(e.uid)}">${escapeHtml(star + (e.email || "(no email)"))} &middot; ${escapeHtml(e.name || "(no name)")} &middot; ${escapeHtml(e.uid)}</option>`;
+        const tag = linked ? " (already linked)" : "";
+        return `<option value="${escapeHtml(e.uid)}" ${linked ? "disabled" : ""}>${escapeHtml(star + (e.email || "(no email)"))} &middot; ${escapeHtml(e.name || "(no name)")} &middot; ${escapeHtml(e.uid)}${escapeHtml(tag)}</option>`;
       }).join("");
     }
-    let summary;
-    if (!uid) {
-      summary = `<span class="up-empty-val">not linked</span>`;
-    } else if (linkedUser) {
-      summary = `<span><code>${escapeHtml(linkedUser.email || "(no email)")}</code> &middot; ${escapeHtml(linkedUser.name || "(no name)")}</span>`;
-    } else if (usersDict) {
-      summary = `<span><code>${escapeHtml(uid)}</code> &middot; <em>unknown</em> &middot; re-link required</span>`;
-    } else {
-      summary = `<span><code>${escapeHtml(uid)}</code> &middot; <span class="up-card-hint">loading&hellip;</span></span>`;
+
+    // Summary line: count + primary email/name. Pick a stable primary:
+    // first uid whose linked-user email also matches a Person email,
+    // else just the first uid.
+    let primaryEmail = "", primaryName = "";
+    if (uids.length && usersDict) {
+      let primaryUid = uids.find(u => {
+        const x = usersDict[u];
+        return x && candEmails.includes((x.email || "").toLowerCase());
+      }) || uids[0];
+      const x = usersDict[primaryUid];
+      if (x) { primaryEmail = x.email || ""; primaryName = x.name || ""; }
     }
+    let summary;
+    if (uids.length === 0) {
+      summary = `<span class="up-empty-val">not linked</span>`;
+    } else if (usersDict) {
+      const head = primaryEmail
+        ? `<code>${escapeHtml(primaryEmail)}</code> &middot; ${escapeHtml(primaryName || "(no name)")}`
+        : `<code>${escapeHtml(uids[0])}</code> &middot; <em>unknown</em>`;
+      summary = `<span>${uids.length} linked &middot; primary: ${head}</span>`;
+    } else {
+      summary = `<span>${uids.length} linked &middot; <span class="up-card-hint">loading&hellip;</span></span>`;
+    }
+
     const provenance = `
       <p class="up-hint">
-        BookR is the staff van/property booking app (<code>book.togetherbook.net/bookr.html</code>). Linking a Person to a BookR user lets admins make bookings on their behalf and shows their bookings on the BookR calendar. A TogetherBook-minted BookR user can be <em>booked for</em> but cannot <em>sign in</em> to the BookR mobile app until a Firebase Auth account is provisioned for that email separately.
+        BookR is the staff van/property booking app (<code>book.togetherbook.net/bookr.html</code>). A Person can link to multiple BookR users — useful when someone has a work + personal email, or alt accounts across domains. Each linked account lets admins book on their behalf and shows up as theirs on the BookR calendar.
       </p>`;
-    let body;
-    if (uid) {
-      const known = linkedUser
-        ? `<div class="up-fields-grid"><div class="up-field"><div class="up-field-label">BookR email</div><div class="up-field-value">${escapeHtml(linkedUser.email || "")}</div></div><div class="up-field"><div class="up-field-label">BookR name</div><div class="up-field-value">${escapeHtml(linkedUser.name || "")}</div></div><div class="up-field"><div class="up-field-label">BookR uid</div><div class="up-field-value"><code>${escapeHtml(uid)}</code></div></div></div>`
-        : `<p class="up-hint">Linked to BookR uid <code>${escapeHtml(uid)}</code>${usersDict ? ` &mdash; but no /users row with that uid exists in BookR anymore. Unlink and re-link to fix.` : ""}.</p>`;
-      const unlink = viewerIsAdmin ? `
-        <div class="up-editor-row">
-          <button type="button" class="up-btn-sm up-btn-sm--danger" data-bookr-unlink>Unlink</button>
-          <span class="up-card-hint">Keeps BookR's user record and booking history; only clears the link.</span>
-          <span class="up-edit-status" data-edit-status="bookr"></span>
-        </div>` : "";
-      body = provenance + known + unlink;
-    } else {
-      const adminBlock = viewerIsAdmin ? `
-        <div class="up-bookr-link-grid">
-          <div class="up-bookr-link-col">
-            <h4 class="up-card-head">Match an existing BookR user</h4>
-            <p class="up-hint">${usersDict ? `${Object.keys(usersDict).length} BookR users loaded. Asterisks mark users whose email matches one this Person already has.` : "Loading BookR user list&hellip;"}</p>
-            <select class="up-pay-input" data-bookr-match-select ${usersDict ? "" : "disabled"}>
-              <option value="">&mdash; pick a BookR user &mdash;</option>
-              ${options}
-            </select>
-            <div class="up-editor-row">
-              <button type="button" class="up-btn-sm up-btn-sm--primary" data-bookr-link-save>Link</button>
-              <span class="up-edit-status" data-edit-status="bookr-link"></span>
-            </div>
-          </div>
-          <div class="up-bookr-link-col">
-            <h4 class="up-card-head">Create a new BookR user from this Person</h4>
-            <p class="up-hint">Source of truth for the new BookR row: <code>${escapeHtml(person.main_google_email || "(no main_google_email)")}</code>. If an existing BookR user already matches one of this Person's emails the worker will link to that instead.</p>
-            <div class="up-editor-row">
-              <button type="button" class="up-btn-sm up-btn-sm--primary" data-bookr-match-or-create ${person.main_google_email ? "" : "disabled"}>Create or auto-match</button>
-              <span class="up-edit-status" data-edit-status="bookr-create"></span>
-            </div>
-          </div>
-        </div>` : `<p class="up-hint">Not linked. Admin-only to link.</p>`;
-      body = provenance + adminBlock;
+
+    // Per-uid rows: email + name + uid + Remove button.
+    let linkedRows = "";
+    if (uids.length) {
+      linkedRows = `<div class="up-fields-grid">` + uids.map((uid) => {
+        const u = usersDict && usersDict[uid];
+        const email = u ? (u.email || "") : "";
+        const name  = u ? (u.name  || "") : "";
+        const stale = usersDict && !u;
+        const headRow = u
+          ? `<div class="up-field-value"><code>${escapeHtml(email || "(no email)")}</code> &middot; ${escapeHtml(name || "(no name)")}</div>`
+          : (stale
+              ? `<div class="up-field-value"><span class="up-card-hint">no /users row in BookR — stale</span></div>`
+              : `<div class="up-field-value"><span class="up-card-hint">loading&hellip;</span></div>`);
+        const removeBtn = viewerIsAdmin
+          ? `<button type="button" class="up-btn-sm up-btn-sm--danger" data-bookr-remove="${escapeHtml(uid)}">Remove</button>`
+          : "";
+        return `<div class="up-field">
+          ${headRow}
+          <div class="up-field-label"><code>${escapeHtml(uid)}</code></div>
+          <div class="up-editor-row">${removeBtn}<span class="up-edit-status" data-edit-status="bookr-remove-${escapeHtml(uid)}"></span></div>
+        </div>`;
+      }).join("") + `</div>`;
     }
+
+    const adminAddBlock = viewerIsAdmin ? `
+      <div class="up-bookr-link-grid">
+        <div class="up-bookr-link-col">
+          <h4 class="up-card-head">Add an existing BookR user</h4>
+          <p class="up-hint">${usersDict ? `${Object.keys(usersDict).length} BookR users loaded. Asterisks mark users whose email matches one this Person already has; already-linked ones are disabled.` : "Loading BookR user list&hellip;"}</p>
+          <select class="up-pay-input" data-bookr-match-select ${usersDict ? "" : "disabled"}>
+            <option value="">&mdash; pick a BookR user to add &mdash;</option>
+            ${options}
+          </select>
+          <div class="up-editor-row">
+            <button type="button" class="up-btn-sm up-btn-sm--primary" data-bookr-link-save>Add</button>
+            <span class="up-edit-status" data-edit-status="bookr-link"></span>
+          </div>
+        </div>
+        <div class="up-bookr-link-col">
+          <h4 class="up-card-head">Auto-match or create</h4>
+          <p class="up-hint">Looks across every Person email and adds every confident match (score &ge; 80). If zero candidates exist anywhere, mints a fresh BookR user seeded from <code>${escapeHtml(person.main_google_email || "(no main_google_email)")}</code>.</p>
+          <div class="up-editor-row">
+            <button type="button" class="up-btn-sm up-btn-sm--primary" data-bookr-match-or-create ${person.main_google_email ? "" : "disabled"}>Auto-match or create</button>
+            <span class="up-edit-status" data-edit-status="bookr-create"></span>
+          </div>
+        </div>
+      </div>` : (uids.length ? "" : `<p class="up-hint">Not linked. Admin-only to link.</p>`);
+
+    const body = provenance + linkedRows + adminAddBlock;
     return `
-      <details class="up-src-box up-src-box--bookr${uid ? "" : " up-src-box--empty"}">
+      <details class="up-src-box up-src-box--bookr${uids.length ? "" : " up-src-box--empty"}">
         <summary class="up-src-box-summary">
           <span class="up-src-box-label">BookR</span>
           <span class="up-src-box-value">${summary}</span>
@@ -1632,11 +1665,12 @@
         .then(r => r.ok ? r.json() : null).catch(() => null)
         .then(data => { bookrUsersById = data || { users: {} }; bookrUsersLoading = null; if (currentTab === "accounts") renderPanel(); });
     }
-    document.querySelectorAll("[data-bookr-unlink]").forEach(btn => {
-      btn.addEventListener("click", (e) => { e.preventDefault(); unlinkBookr(); });
+    document.querySelectorAll("[data-bookr-remove]").forEach(btn => {
+      const uid = btn.getAttribute("data-bookr-remove");
+      btn.addEventListener("click", (e) => { e.preventDefault(); removeBookrUid(uid); });
     });
     document.querySelectorAll("[data-bookr-link-save]").forEach(btn => {
-      btn.addEventListener("click", () => linkBookr());
+      btn.addEventListener("click", () => addBookrUid());
     });
     document.querySelectorAll("[data-bookr-match-or-create]").forEach(btn => {
       btn.addEventListener("click", () => matchOrCreateBookr());
@@ -2477,36 +2511,38 @@
 
 
   // ─── BookR link handlers ────────────────────────────────────────────
-  async function unlinkBookr() {
-    const status = document.querySelector('[data-edit-status="bookr"]');
-    if (status) { status.textContent = "Unlinking…"; status.className = "up-edit-status up-edit-status--working"; }
+  async function removeBookrUid(uid) {
+    const status = document.querySelector('[data-edit-status="bookr-remove-' + uid + '"]');
+    if (status) { status.textContent = "Removing…"; status.className = "up-edit-status up-edit-status--working"; }
     try {
       const res = await fetch("/api/bookr/user-unlink", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ person_id: person.id }),
-      });
-      const out = await res.json();
-      if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
-      person.bookr_uid = "";
-      renderPanel();
-    } catch (err) {
-      if (status) { status.textContent = "Failed — " + (err && err.message || err); status.className = "up-edit-status up-edit-status--err"; }
-    }
-  }
-  async function linkBookr() {
-    const sel = document.querySelector("[data-bookr-match-select]");
-    const status = document.querySelector('[data-edit-status="bookr-link"]');
-    const uid = sel && sel.value;
-    if (!uid) { if (status) { status.textContent = "Pick a BookR user first"; status.className = "up-edit-status up-edit-status--err"; } return; }
-    if (status) { status.textContent = "Linking…"; status.className = "up-edit-status up-edit-status--working"; }
-    try {
-      const res = await fetch("/api/bookr/user-link", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ person_id: person.id, bookr_uid: uid }),
       });
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
-      person.bookr_uid = out.bookr_uid;
+      person.bookr_uids = Array.isArray(out.bookr_uids) ? out.bookr_uids : [];
+      delete person.bookr_uid; // legacy cleared on the worker side too
+      renderPanel();
+    } catch (err) {
+      if (status) { status.textContent = "Failed — " + (err && err.message || err); status.className = "up-edit-status up-edit-status--err"; }
+    }
+  }
+  async function addBookrUid() {
+    const sel = document.querySelector("[data-bookr-match-select]");
+    const status = document.querySelector('[data-edit-status="bookr-link"]');
+    const uid = sel && sel.value;
+    if (!uid) { if (status) { status.textContent = "Pick a BookR user first"; status.className = "up-edit-status up-edit-status--err"; } return; }
+    if (status) { status.textContent = "Adding…"; status.className = "up-edit-status up-edit-status--working"; }
+    try {
+      const res = await fetch("/api/bookr/user-add", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ person_id: person.id, bookr_uid: uid }),
+      });
+      const out = await res.json();
+      if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
+      person.bookr_uids = Array.isArray(out.bookr_uids) ? out.bookr_uids : [];
+      delete person.bookr_uid;
       renderPanel();
     } catch (err) {
       if (status) { status.textContent = "Failed — " + (err && err.message || err); status.className = "up-edit-status up-edit-status--err"; }
@@ -2516,13 +2552,16 @@
     const status = document.querySelector('[data-edit-status="bookr-create"]');
     if (status) { status.textContent = "Working…"; status.className = "up-edit-status up-edit-status--working"; }
     try {
+      // Default behaviour: only add confident matches; create only when
+      // zero candidates exist anywhere.
       const res = await fetch("/api/bookr/user-match-or-create", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ person_id: person.id }),
+        body: JSON.stringify({ person_id: person.id, create_if_no_match: true }),
       });
       const out = await res.json();
       if (!res.ok || !out.ok) throw new Error(out.error || `HTTP ${res.status}`);
-      person.bookr_uid = out.bookr_uid;
+      person.bookr_uids = Array.isArray(out.bookr_uids) ? out.bookr_uids : [];
+      delete person.bookr_uid;
       // Pull fresh users list so the newly-minted row appears in the
       // dropdown if the user later opens it.
       bookrUsersById = null;
@@ -2531,7 +2570,6 @@
       if (status) { status.textContent = "Failed — " + (err && err.message || err); status.className = "up-edit-status up-edit-status--err"; }
     }
   }
-
   /* ─── Feed panel (Wall preview, read-only) ─────────────────────────── */
   function plainBody(text) {
     return String(text || "").replace(/<\/?strong>/gi, "").replace(/<\/?em>/gi, "").trim();
@@ -2734,7 +2772,11 @@
     // their BookR email, not a TogetherBook one).
     if (targetSlug && peopleBySlug[targetSlug]) person = peopleBySlug[targetSlug];
     else if (targetEmail && peopleByEmail[targetEmail]) person = peopleByEmail[targetEmail];
-    else if (targetBookrUid) person = people.find(p => (p.bookr_uid || "") === targetBookrUid) || null;
+    else if (targetBookrUid) person = people.find(p => {
+      if (Array.isArray(p.bookr_uids) && p.bookr_uids.includes(targetBookrUid)) return true;
+      if ((p.bookr_uid || "") === targetBookrUid) return true; // legacy single-uid records
+      return false;
+    }) || null;
 
     // Overlay any localStorage recent edit so the user's own session
     // is guaranteed-correct even if some cache layer served stale.

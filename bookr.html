@@ -498,7 +498,7 @@
     if (dy < todayY) el.classList.add("is-past");
     const bookings = STATE.bookings[a.type + ":" + a.id] || {};
     const value = bookings[dy];
-    const myUid = STATE.whoami && STATE.whoami.uid;
+    const myUids = (STATE.whoami && STATE.whoami.uids) || [];
     if (STATE.pendingDates && STATE.pendingDates.has(dy)) {
       el.classList.add("is-loading");
       el.setAttribute("aria-busy", "true");
@@ -513,7 +513,7 @@
       const fullName = (u && u.name) || value;
       const bookerEmail = (u && u.email) || "";
       el.classList.add("is-booked");
-      if (myUid && value === myUid) el.classList.add("is-mine");
+      if (myUids.length && myUids.indexOf(value) >= 0) el.classList.add("is-mine");
       // Name is a link to the booker's TogetherBook profile. We pass
       // ?bookr_uid= rather than ?email= because the BookR `email` is
       // often on a different domain (e.g. @lendingmate.ca, @rgroup.co.uk)
@@ -600,7 +600,8 @@
     const date = cell.dataset.date;
     const kind = cell.dataset.kind;
     const asset = (t === "cars" ? STATE.cars : STATE.properties).find(a => a.id === id) || {};
-    const myUid = STATE.whoami && STATE.whoami.uid;
+    const myUids = (STATE.whoami && STATE.whoami.uids) || [];
+    const myUid = myUids[0] || null;
     /* Position the popover near the clicked cell. */
     const r = cell.getBoundingClientRect();
     pop.style.display = "";
@@ -642,7 +643,7 @@
       const cancelBtn = document.createElement("button");
       cancelBtn.className = "bk-btn is-danger";
       cancelBtn.textContent = "Cancel " + date;
-      const canCancel = STATE.isAdmin || (myUid && uid === myUid);
+      const canCancel = STATE.isAdmin || (myUids.length && myUids.indexOf(uid) >= 0);
       if (!canCancel) cancelBtn.disabled = true;
       cancelBtn.onclick = () => cancelOne(t, id, date, cell);
       actions.appendChild(cancelBtn);
@@ -702,8 +703,8 @@
   async function renderMine() {
     const panel = document.querySelector("#bkMinePanel");
     panel.innerHTML = "";
-    const myUid = STATE.whoami && STATE.whoami.uid;
-    if (!myUid) {
+    const myUids = (STATE.whoami && STATE.whoami.uids) || [];
+    if (!myUids.length) {
       panel.innerHTML = '<div class="bk-mine-empty">You are not linked to a BookR user yet, so there are no bookings to list.</div>';
       return;
     }
@@ -720,7 +721,7 @@
     /* Build runs of consecutive same-uid dates per asset. */
     const groups = [];
     fetches.forEach(({ a, b }) => {
-      const dates = Object.keys(b).filter(d => b[d] === myUid).sort();
+      const dates = Object.keys(b).filter(d => myUids.indexOf(b[d]) >= 0).sort();
       if (!dates.length) return;
       const runs = [];
       let s = dates[0], prev = dates[0];
