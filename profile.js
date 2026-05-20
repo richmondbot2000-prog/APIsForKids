@@ -473,6 +473,24 @@
     const editable = canEditPerson();
     const lockedBadge = editable ? "" : `<span class="up-card-hint">read-only · sign in as ${escapeHtml(person.name || person.url_slug)} or an admin to edit</span>`;
 
+    // Sensitive PII: only admins, or the person themselves, see the full
+    // address and the year of birth. Other viewers get the address row
+    // omitted entirely and a day+month-only birthday line.
+    const ownedEmails = [person.main_google_email, ...(person.alt_google_emails || []), person.external_google_email]
+      .filter(Boolean).map(e => (e || "").toLowerCase());
+    const isOwnRecord = ownedEmails.includes((viewerEmail || "").toLowerCase());
+    const canSeeSensitive = viewerIsAdmin || isOwnRecord;
+    // "13 Sep" — month + day only. Returns "" when DOB is blank.
+    function dobDayMonth(iso) {
+      if (!iso || iso.length < 10) return "";
+      const [_y, m, d] = iso.slice(0, 10).split("-");
+      const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+      const mi = parseInt(m, 10) - 1;
+      const di = parseInt(d, 10);
+      if (mi < 0 || mi > 11 || !di) return "";
+      return `${di} ${months[mi]}`;
+    }
+
     const lineMgr = (person.line_manager_id != null && people.find(p => String(p.id) === String(person.line_manager_id))) || null;
     const lineMgrDisplay = lineMgr
       ? `<a class="up-mgr-link" href="${profileHrefForPerson(lineMgr)}">${escapeHtml(lineMgr.name || lineMgr.url_slug)}</a>`
@@ -689,12 +707,19 @@
           ${viewerIsAdmin ? lineMgrEditor : `<div class="up-field-value">${lineMgrDisplay}</div>`}
         </div>
         ${editableRow("start_date", "Start date",   "date",     person.start_date, null, null, /*adminOnly*/ true)}
-        ${editableRow("date_of_birth", "Date of birth", "date", person.date_of_birth, "Drives the team-calendar balloon emoji + the daily birthday Wall post.", null, /*adminOnly*/ true)}
+        ${canSeeSensitive
+          ? editableRow("date_of_birth", "Date of birth", "date", person.date_of_birth, "Drives the team-calendar balloon emoji + the daily birthday Wall post.", null, /*adminOnly*/ true)
+          : (dobDayMonth(person.date_of_birth)
+              ? `<div class="up-field" data-edit-field="date_of_birth">
+                  <div class="up-field-label">Birthday</div>
+                  <div class="up-field-value">${escapeHtml(dobDayMonth(person.date_of_birth))}</div>
+                </div>`
+              : "")}
         ${holidayPlanRow()}
         ${editableRow("name",       "Display name", "text",     person.name)}
         ${editableRow("aliases",    "Aliases",      "text",     (person.aliases || []).join(", "), "Comma-separated — used in name search + mentions")}
         ${editableRow("phone",      "Phone",        "tel",      person.phone)}
-        ${editableRow("address",    "Address",      "textarea", person.address)}
+        ${canSeeSensitive ? editableRow("address", "Address", "textarea", person.address) : ""}
         <div class="up-field" data-edit-field="access_level">
           <div class="up-field-label">Access level</div>
           ${viewerIsAdmin
